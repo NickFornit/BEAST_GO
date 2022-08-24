@@ -1,0 +1,245 @@
+/*  Моторные дейсвтвия автоматизма
+
+Для каждого действия brain\reflexes\terminete_action.go задается "сила" действия в градации от 1 до 10, которая передается наПульт словами:
+Максимально (сила=10), wwww (сила=8)", "Очень сильно (сила=9), ... Едва (сила=1).
+При этом пропорционально расходуется энергия и могут происходить другие изменения гоместаза.
+Такой результат сопоставляется с допустимым сразу при действии и корректируется установкой рефлекса мозжечка.
+
+Две области моторного терминала уровня психики:
+Область Брока VerbalFromIdArr=make(map[int]*Verbal)
+отвечает за смысл распознанных слов и словосочетаний,
+за конструирование собственных словосочетаний,
+за моторное использование сло и словосочетаний.
+За все ответственная структура - образ осмысленных слов и сочетаний.
+
+Область моторных действий ActivityFromIdArr=make(map[int]*Activity)
+отвечает за смысл распознанных действий с Пульта,
+за конструирование собственных последовательностей действий,
+за моторное использование действий.
+За все ответственная структура - образ осмысленных действий и их сочетаний.
+
+*/
+
+package psychic
+
+import (
+	"BOT/brain/gomeostas"
+	_ "BOT/brain/gomeostas"
+	termineteAction "BOT/brain/terminete_action"
+	word_sensor "BOT/brain/words_sensor"
+	"BOT/lib"
+	"strconv"
+	"strings"
+)
+
+// при срабатывании автоматизма - блокируются все рефлексторные действия
+var MotorTerminalBlocking=false
+
+////////////////////////////////////////////////
+
+
+// момент запуска автоматизма в числе пульсов
+var LastRunAutomatizmPulsCount =0 //сбрасывать ожидание результата автоматизма если прошло 20 пульсов
+// ожидается результат запущенного MotAutomatizm
+var LastAutomatizmWeiting *Automatizm
+
+
+
+/////////////////////////////////////////
+/* запуск автоматизма на выполнение
+возвращает true при успехе
+ */
+func RumAutomatizmID(id int)(bool){
+	a:=AutomatizmFromIdArr[id]
+	if a==nil{
+		return false
+	}
+	return RumAutomatizm(AutomatizmFromIdArr[id])
+}
+////////////////////
+// todo = true - выполнить полюбому,
+func RumAutomatizm(am *Automatizm)(bool){
+
+	if am==nil{
+		return false
+	}
+// NotAllowAnyActions ставится тогда, когда сохранение памяти должно выполняться в тишине, в бездействии
+	if  NotAllowAnyActions{
+		return false
+	}
+	if len(am.Sequence)==0{
+		return false
+	}
+
+// блокировка выполнения плохого автоматизма, если только не применен СИЛА ВОЛИ
+if am.Usefulness<0{
+
+	return false
+}
+
+
+	actArr:=ParceAutomatizmSequence(am.Sequence)
+	for i := 0; i < len(actArr); i++ {
+		// строка действий (любого типа) через запятую
+		aArr:=strings.Split(actArr[i].Acts, ",")
+		var idArr []int
+
+		switch actArr[i].Type{
+		case 1: // Snn- перечень ID сенсора слов через запятую,
+			for n := 0; n < len(aArr); n++ {
+				aID, _ := strconv.Atoi(aArr[n])
+				idArr=append(idArr, aID)
+			}
+			addE:=0
+			if am.Belief!=3 {// не рефлекс мозжечка
+				addE = getCerebellumReflexAddEnergy(am.ID)
+			}
+			TerminatePraseAutomatizmActions(idArr,am.Energy+addE)
+		case 2: //Dnn - ID прогрмаммы действий, через запятую
+
+			for n := 0; n < len(aArr); n++ {
+				aID, _ := strconv.Atoi(aArr[n])
+				idArr=append(idArr, aID)
+			}
+			addE:=0
+			if am.Belief!=3 {// не рефлекс мозжечка
+				addE = getCerebellumReflexAddEnergy(am.ID)
+			}
+			TerminateMotorAutomatizmActions(idArr,am.Energy+addE)
+
+		case 3: //Ann - последовательный запуск автоматизмов с id1,id2..
+			// НО нужно как-то дожидаться выплнения предыдущего до запуска следующего !!!!!!
+			// последний просто перекроет все. Лучше выполнять следующий просто по следующему двойному тику пульса??
+			for n := 0; n < len(aArr); n++ {
+				aID,_:=strconv.Atoi(aArr[n])
+				RumAutomatizmID(aID)
+			}
+
+		///////////////////////////////////////
+		}
+	}
+
+	//выполнить мозжечковый рефлекс сразу после выполняющегося автоматизма
+	runCerebellumReflex(am.ID)
+
+	MotorTerminalBlocking=true // через 2 пульса погаснет
+	LastRunAutomatizmPulsCount =PulsCount // активность мот.автоматизма в чисде пульсов
+	LastAutomatizmWeiting=am
+
+
+	return true
+}
+//////////////////////////////////////////
+
+
+
+
+/* совершить МОТОРНОЕ (http://go/pages/terminal_actions.php) действие  - Dnn-часть автоматизма (не фраза)
+cила действия сначала задается =5, а потот корректируется мозжечковыми рефлексами
+Использование: 	TerminateMotorAutomatizmActions(actIDarr,energy)
+ */
+func TerminateMotorAutomatizmActions(actIDarr []int,energy int){
+	if MotorTerminalBlocking { //блокировка моторных терминалов во сне или произвольно
+		return
+	}
+	// energy=1
+	//название силы:
+	enegrName:= termineteAction.EnergyDescrib[energy]
+	var out="3|<b>Действие Beast:</b><br>"
+	var isAct=false
+	for i := 0; i < len(actIDarr); i++ {
+
+		// при моторном действии  меняются гомео-параметры:
+		expensesGomeostatParametersAfterAction(actIDarr[i],energy)
+
+		// выдать на ПУльт:
+		actName:= termineteAction.TerminalActonsNameFromID[actIDarr[i]]
+		// ЭНЕРГИЧНОСТЬ
+
+		switch energy{
+		case 1:
+			out +="<span style=\"font-size:10px;\">"+actName+"</span>"
+		case 2:
+			out +="<span style=\"font-size:11px;\">"+actName+"</span>"
+		case 3:
+			out +="<span style=\"font-size:12px;\">"+actName+"</span>"
+		case 4:
+			out +="<span style=\"font-size:13px;\">"+actName+"</span>"
+		case 5:
+			out +="<span style=\"font-size:14px;\">"+actName+"</span>"
+		case 6:
+			out +="<span style=\"font-size:14px;\"><b>"+actName+"<b></span>"
+		case 7:
+			out +="<span style=\"font-size:17px;color:#927ACC\"><b>"+actName+"<b></span>"
+		case 8:
+			out +="<span style=\"font-size:19px;color:#E8A7A7\"><b>"+actName+"<b></span>"
+		case 9:
+			out +="<span style=\"font-size:21px;color:#E86966\"><b>"+actName+"<b></span>"
+		case 10:
+			out +="<span style=\"font-size:25px;color:#FF0000\"><b>"+actName+"<b></span>"
+		}
+		isAct=true
+	}
+if isAct {
+
+	out += "<br><span style=\"font-size:14px;\">Энергичность: " + enegrName+"</span>"
+	lib.SentActionsForPult(out)
+}
+}
+//////////////////////////////////////////////////
+
+/* совершить МОТОРНОЕ (ВЫДАТЬ ФРАЗУ) действие  - Snn-часть автоматизма
+cила действия сначала задается =5, а потот корректируется мозжечковыми рефлексами
+*/
+func TerminatePraseAutomatizmActions(IDarr []int,energy int){
+	if MotorTerminalBlocking { //блокировка моторных терминалов во сне или произвольно
+		return
+	}
+
+
+	// при моторном действии  меняются гомео-параметры:
+	//expensesGomeostatParametersAfterAction(aI) болтать можно без устали?
+
+	// выдать на ПУльт
+	var out="2|<b>Фраза Beast:</b><br>"
+	for i := 0; i < len(IDarr); i++ {
+		prase := word_sensor.GetPhraseStringsFromPhraseID(IDarr[i])
+		out += prase
+	}
+	//название силы:
+	out += termineteAction.EnergyDescrib[energy]
+	lib.SentActionsForPult(out)
+}
+//////////////////////////////////////////////////
+
+
+
+
+/////////////////////////////////////////////
+/* изменение гомео-параметров при действии
+сила действия корректирует воздействие на параметр гомеостаза
+*/
+func expensesGomeostatParametersAfterAction(actID int,energy int){
+	se :=termineteAction.TerminalActionsExpensesFromID[actID]
+	if se != nil {
+		for j := 0; j < len(se); j++ {
+// (2*aI.Energy/10) при силе==5 коэффициент будет 1, при силе==10 воздействие увеличиться в 2 раза
+
+if !gomeostas.NotAllowSetGomeostazParams{
+			k:=float64(2*energy/10)
+			gomeostas.GomeostazParams[se[j].GomeoID]+=se[j].Diff * k
+			if gomeostas.GomeostazParams[se[j].GomeoID]>100{
+				gomeostas.GomeostazParams[se[j].GomeoID]=100
+			}
+			if gomeostas.GomeostazParams[se[j].GomeoID]<0{
+				gomeostas.GomeostazParams[se[j].GomeoID]=0
+			}
+
+		}
+}
+	}
+}
+/////////////////////////////////////////////
+
+
+

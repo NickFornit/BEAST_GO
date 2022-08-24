@@ -1,0 +1,243 @@
+/* Словестные образы (область Брока)  для 4, 5 и 6-го уровня дерева автоматизмов.
+Смысл (осознанную значимость) образ приобретеает только в контексте Дерева Понимания (дерева мент.автоматизмов)
+
+Детекторы зоны Вернике распознают слова и словосочетания, 
+а область Брока отвечает за смысл распознанных слов и словосочетений,
+за конструирование собственных словосочетаний,
+за моторное использование слов и словосочетаний.
+За все ответственная структура - образ осмысленных слов и сочетаний.
+
+! Нужно иметь в виду, что в Vernike_detector.go есть массив памяти фраз, накапливается в течении дня
+var MemoryDetectedArr []MemoryDetected - структур фразы с контекстным окружением
+и Verbal.PhraseID[] - можно найти в этом массиве для ориентировки что бы ло раньше и позже.
+MemoryDetectedArr - как бы оперативная память фраз для сопоставлений.
+*/
+
+package psychic
+
+import (
+	wordSensor "BOT/brain/words_sensor"
+	"BOT/lib"
+	"strconv"
+	"strings"
+)
+
+/////////////////////////////////////////////
+
+func verbalInit(){
+	loadVerbalFromIdArr()
+
+/*
+var tm=922// "Обычный, Хорошее"
+	str:=getToneMoodStrFromID(tm)
+	if len(str)>0{	}
+ */
+
+}
+////////////////////////////////////////////
+
+/* для оптимизации поиска по дереву перед узлом Verbal идет узел первого символа : var symbolsArr из word_tree.go
+Смысл (осознанную значимость) образ приобретеает только в контексте Дерева Понимания (дерева мент.автоматизмов)
+ */
+type Verbal struct {
+	ID int
+	// для текущего сообщения с Пусльта:
+	SimbolID int // id первого символа первой фразы PhraseID: var symbolsArr из word_tree.go
+	PhraseID[] int // массив фразID (DetectedUnicumPhraseID) слова каждой фразы вытаскиваются wordSensor.GetWordArrFromPhraseID(PhraseID[0])
+//0 - обычный, 1 - восклицательный, 2- вопросительный, 3- вялый, 4 - Повышенный	
+	ToneID int // тон сообщения с Пульта
+//20-Хорошее    21-Плохое    22-Игровое    23-Учитель    24-Агрессивное   25-Защитное    26-Протест
+	MoodID int // настроение оператора
+}
+var VerbalFromIdArr=make(map[int]*Verbal)
+//////////////////////////////////////////
+
+// создать образ сочетаний пусковых стимулов
+//В случае отсуствия пусковых стимулов создается ID такого отсутсвия, пример такой записи: 2|||0|0| - ID=2
+var lastVerbalID=0
+func createNewlastVerbalID(id int,SimbolID int,PhraseID []int,ToneID int,MoodID int)(int,*Verbal){
+	oldID,oldVal:=checkUnicumVerbal(PhraseID,ToneID,MoodID)
+	if oldVal!=nil{
+		return oldID,oldVal
+	}
+	if id==0{
+		lastVerbalID++
+		id=lastVerbalID
+	}else{
+		//		newW.ID=id
+		if lastVerbalID<id{
+			lastVerbalID=id
+		}
+	}
+
+	var node Verbal
+	node.ID = id
+	node.SimbolID=SimbolID
+	node.PhraseID = PhraseID
+	node.ToneID=ToneID
+	node.MoodID=MoodID
+
+	VerbalFromIdArr[id]=&node
+	return id,&node
+}
+func checkUnicumVerbal(PhraseID []int,ToneID int,MoodID int)(int,*Verbal){
+	for id, v := range VerbalFromIdArr {
+		if !lib.EqualArrs(PhraseID,v.PhraseID) {
+			continue
+		}
+		if ToneID!=v.ToneID || MoodID!=v.MoodID {
+			continue
+		}
+		return id,v
+	}
+
+	return 0,nil
+}
+/////////////////////////////////////////
+// создать новый вербальный образ, если такого еще нет
+func CreateVerbalImage(PhraseID []int,ToneID int,MoodID int)(int,*Verbal){
+	if PhraseID==nil{
+		return 0,nil
+	}
+	// достаем первый символ первой фразы
+	// получить последователньость wordID из уникального идентификатора первой фразы
+/*
+	wordIDarr:=wordSensor.GetWordArrFromPhraseID(PhraseID[0])
+	// первое слово в виде строки
+	if wordIDarr==nil || len(wordIDarr)==0{
+		return 0,nil
+	}
+	word:=wordSensor.GetWordFromWordID(wordIDarr[0])
+	//rw:=[]rune(word)
+	//SimbolID:=wordSensor.GetSymbolIDfromRune(rw[0])
+//	word:=wordSensor.GetPhraseStringsFromPhraseID(PhraseID[0])
+	//SimbolID:=wordSensor.GetSymbolIDfromString(rw[0])
+*/
+	id,verb:=createNewlastVerbalID(0,wordSensor.FirstSimbolID,PhraseID,ToneID,MoodID)
+
+	SaveVerbalFromIdArr()
+
+	return id,verb
+}
+
+/////////////////////////////////////////
+
+//////////////////// сохранить образы сочетаний пусковых стимулов
+//В случае отсуствия пусковых стимулов создается ID такого отсутсвия, пример такой записи: 2|||0|0|
+func SaveVerbalFromIdArr(){
+	var out=""
+	for k, v := range VerbalFromIdArr {
+		out+=strconv.Itoa(k)+"|"
+		out+=strconv.Itoa(v.SimbolID)+"|"
+		for i := 0; i < len(v.PhraseID); i++ {
+			out+=strconv.Itoa(v.PhraseID[i])+","
+		}
+		out+="|"
+		out+=strconv.Itoa(v.ToneID)+"|"
+		out+=strconv.Itoa(v.MoodID)+"|"
+		out+="\r\n"
+	}
+	lib.WriteFileContent(lib.GetMainPathExeFile()+"/memory_psy/verbal_images.txt",out)
+
+}
+////////////////////  загрузить образы сочетаний пусковых стимулов
+func loadVerbalFromIdArr(){
+	VerbalFromIdArr=make(map[int]*Verbal)
+	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_psy/verbal_images.txt")
+	cunt:=len(strArr)
+	for n := 0; n < cunt; n++ {
+		if len(strArr[n])==0{
+			continue
+		}
+		p:=strings.Split(strArr[n], "|")
+		id,_:=strconv.Atoi(p[0])
+		SimbolID,_:=strconv.Atoi(p[1])
+		s:=strings.Split(p[2], ",")
+		var PhraseID[] int
+		for i := 0; i < len(s); i++ {
+			if len(s[i])==0{
+				continue
+			}
+			si,_:=strconv.Atoi(s[i])
+			PhraseID=append(PhraseID,si)
+		}
+		ToneID,_:=strconv.Atoi(p[3])
+		MoodID,_:=strconv.Atoi(p[4])
+
+		createNewlastVerbalID(id,SimbolID,PhraseID,ToneID,MoodID)
+	}
+	return
+
+}
+//////////////////////////////
+
+
+// получить уникальное сочетание в виде int из двух компонентов int
+func getToneMoodID(int1 int,int2 int)(int){
+	// вмето первой 0 (для "обычный") ставим 9 !!!
+	if int1==0{
+		int1=9
+	}
+	s:=strconv.Itoa(int1)
+	s+=strconv.Itoa(int2)
+	ToneMoodID,_:=strconv.Atoi(s)
+	return ToneMoodID
+}
+//////////////////////////////////////////////////
+
+
+///////////////////////////////
+func getToneStrFromID(id int)(string){
+var ret=""
+//0 - обычный, 1 - восклицательный, 2- вопросительный, 3- вялый, 4 - Повышенный
+switch id{
+case 0: ret="обычный"
+case 1: ret="восклицательный"
+case 2: ret="вопросительный"
+case 3: ret="вялый"
+case 4: ret="Повышенный"
+
+}
+return ret
+}
+////////////////////////////////
+func getMoodStrFromID(id int)(string){
+var ret=""
+//20-Хорошее    21-Плохое    22-Игровое    23-Учитель    24-Агрессивное   25-Защитное    26-Протест
+switch id{
+case 20: ret="Хорошее"
+case 21: ret="Плохое"
+case 22: ret="Игровое"
+case 23: ret="Учитель"
+case 24: ret="Агрессивное"
+case 25: ret="Защитное"
+case 26: ret="Протест"
+
+}
+return ret
+}
+////////////////////////////////
+/* дешифратор из значения ToneMoodID 4-го уровня дерева автоматизмов - в строку
+после шифрации:
+// получить уникальное сочетание в виде int из двух компонентов int
+func getToneMoodID(int1 int,int2 int)(int){
+	s:=strconv.Itoa(int1)
+	s+=strconv.Itoa(int2)
+	ToneMoodID,_:=strconv.Atoi(s)
+	return ToneMoodID
+}
+
+например: "922" = "Обычный, Хорошее"
+*/
+func getToneMoodStrFromID(ToneMoodID int)(string){
+	str:=strconv.Itoa(ToneMoodID) //из числа - строку
+	s1,_:=strconv.Atoi(str[:1])
+	if s1==9{
+		s1=0
+	}
+	tone:=getToneStrFromID(s1)
+	s2,_:=strconv.Atoi(str[1:])
+	moode:=getMoodStrFromID(s2)
+return tone+" ("+moode+")"
+}
+////////////////////////////////
