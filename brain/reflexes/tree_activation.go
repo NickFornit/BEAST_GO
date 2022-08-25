@@ -123,9 +123,9 @@ if ActiveCurBaseStyleID==22{
 			//  сообщить на Пульт, что при данных условиях нет б.рефлекса.
 			if EvolushnStage==0 { // только для стадии безусловных рефлексов
 				if isIgnor{
-					NoUnconditionRefles = "IGNORED" + getCurrentConditionsStr() //СТРОКА УСЛОВИЙ ДЛЯ РЕФЛЕКСА
+					NoUnconditionRefles = "IGNORED" + GetCurrentConditionsStr() //СТРОКА УСЛОВИЙ ДЛЯ РЕФЛЕКСА
 				}else {
-					NoUnconditionRefles = "NOREFLEX" + getCurrentConditionsStr() //СТРОКА УСЛОВИЙ ДЛЯ РЕФЛЕКСА
+					NoUnconditionRefles = "NOREFLEX" + GetCurrentConditionsStr() //СТРОКА УСЛОВИЙ ДЛЯ РЕФЛЕКСА
 				}
 				return
 			}
@@ -141,7 +141,7 @@ if ActiveCurBaseStyleID==22{
 	}else{// вообще еще нет такой ветки
 		//  сообщить на Пульт, что при данных условиях нет б.рефлекса.
 		if EvolushnStage==0 { // только для стадии безусловных рефлексов
-			NoUnconditionRefles = "NOREFLEX" + getCurrentConditionsStr() //СТРОКА УСЛОВИЙ ДЛЯ РЕФЛЕКСА
+			NoUnconditionRefles = "NOREFLEX" + GetCurrentConditionsStr() //СТРОКА УСЛОВИЙ ДЛЯ РЕФЛЕКСА
 		}
 // ничего не делать, рефлексы образуют новые ветки условий.
 	}
@@ -332,7 +332,7 @@ func getActiveConditionsArr(lev1 int, lev2 int, lev3 int)([]int){
 
 
 ////СТРОКА УСЛОВИЙ ДЛЯ безусловного РЕФЛЕКСА
-func getCurrentConditionsStr()(string){
+func GetCurrentConditionsStr()(string){
 
 //ID базового состояния (1 уровень)
 	var out=strconv.Itoa(gomeostas.CommonBadNormalWell)+"|"

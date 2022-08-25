@@ -76,7 +76,7 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				outStr := gomeostas.GetCurGomeoParams()
 
 				outStr += "#|#" + gomeostas.GetCurGomeoStatus() + "#|#" + gomeostas.GetCurContextActive() +
-					"#|# " + //место СВОБОДНО, можно что-то передать.
+					"#|# " +  reflexes.GetCurrentConditionsStr() + //чтобы постоянно была инфа о сочетаниях контекстов
 					"#|#" + strconv.Itoa(brain.LifeTime) +
 					"#|#" + reflexes.NoUnconditionRefles
 				brain.IsPultActivnost = false
