@@ -11,6 +11,11 @@
 При возникновении условных рефлексов просто добавляется новый узел
 - образ новых условий (2 или 3-го уровней), запускающих усл.рефлекс.
 
+Дерево обязательно должно иметь три базовых состояния вначале - без рефлексов:
+1|0|1|0|0|0|0
+2|0|2|0|0|0|0
+3|0|3|0|0|0|0
+
 Формат записи безусловного рефлекса: ID|baseID|styleID...|actionID...
 */
 
@@ -26,6 +31,10 @@ import (
 //////////////////////////////////////
 func initReflexTree(){ // после инициализации loadGeneticReflexes()
 	loadReflexTree()
+	if len(ReflexTree.Children)==0{// еще нет никаких веток
+		// создать первые три ветки базовых состояний
+		createBasicReflexTree()
+	}
 	addGeneticReflexesToTree()
 	//SaveReflexesAttributes()
 
@@ -48,7 +57,7 @@ type ReflexNode struct { // узел дерева рефлексов
 	ParentNode *ReflexNode  // адрес родителя
 }
 
-var ReflexTree ReflexNode
+var ReflexTree ReflexNode // дерево рефлексов
 var ReflexTreeFromID=make(map[int]*ReflexNode)
 
 /*запрет показа карты при обновлении против паники типа "одновременная запись и считывание карты"
@@ -153,6 +162,15 @@ func createNulLevelReflexTree(rt *ReflexNode){
 	ReflexTreeFromID[rt.ID]=rt
 	return
 }
+// создать первые три ветки базовых состояний
+func createBasicReflexTree(){
+	createNewReflexNode(&ReflexTree,0,1,0,0,0,0)
+	createNewReflexNode(&ReflexTree,0,2,0,0,0,0)
+	createNewReflexNode(&ReflexTree,0,3,0,0,0,0)
+	saveReflexTree()
+	return
+}
+/////////////////////////////////////
 /////////////////////////////////////
 func saveReflexTree(){
 	var out=""
