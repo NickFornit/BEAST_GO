@@ -95,6 +95,9 @@ func activeReflexTree(){
 	// ЗАПАРИВАЕТ lib.WritePultConsol("Активация дерева рефлексов.")
 	// вытащить 3 уровня условий в виде ID их образов
 	condArr:=getActiveConditionsArr(ActiveCurBaseID, ActiveCurBaseStyleID,ActiveCurTriggerStimulsID)
+//	ActiveCurTriggerStimulsID=1; condArr:=[]int{1, 2, ActiveCurTriggerStimulsID}; // проверка подстановкой произвольных сочетаний
+
+
 if ActiveCurBaseStyleID==22{
 	ActiveCurBaseStyleID=22
 }
@@ -107,10 +110,10 @@ if ActiveCurBaseStyleID==22{
 		if condArr[0] == lev1 {
 			detectedActiveLastNodID=node.ID
 			ost:=condArr[1:]
-
 			findReflexesNodes(1,ost, &node,1)
+			//findReflexesNodes(1,condArr, &node,1)
 
-			//break // только один из Базовых состояний
+			break // только один из Базовых состояний
 		}
 	}
 
@@ -154,138 +157,43 @@ if ActiveCurBaseStyleID==22{
 
 isExactly: 0 - сработал неточный рефлекс, не смотреть блок точного совпадения
  */
-
+// БЕЗ РЕКУРСИИ т.к. всего 2 уровня проверяется
 func findReflexesNodes(level int,cond []int,node *ReflexNode,isExactly int){
 	if len(cond)==0{
 		return
 	}
 
-// для проверки
-	if node.ID==9{
-		node.ID=9
-	}
-
-	////////////////////////////////////////////
-	if conditionReflexesIdArr!=nil{// уже найден условный рефлекс для данных условий
-		return
-	}
+	// если последний уровень Дерева
 	if level==2{// смотреть условные рефлексы
 		if conditionRexlexFound(cond){
 			return
 		}
 	}
 
-	/////////////////////////////////////////////
-
-	ost:=cond[1:]
-	// найти наиболее подходящий следующий узел по точному соотвествию с образом - имеет преимущество над частичным совпадением.
-	if isExactly==1 { // искать точное совпадение
-		for n := 0; n < len(node.Children); n++ {
-			cld := node.Children[n]
-			var levID = 0
-			switch level {
-			case 0:
-				levID = cld.baseID
-			case 1:
-				levID = cld.StyleID
-			case 2:
-				levID = cld.ActionID
-			}
-			if cond[0] == levID {
-				switch level {
-				case 1:
-					// только если нет пусковых стимулов, позволено смотреть древние рефлексы
-					if ActiveCurTriggerStimulsID==0 {
-						if ReflexTreeFromID[cld.ID].GeneticReflexID > 0 {
-							// древний рефлекс
-							oldReflexesIdArr = append(oldReflexesIdArr, ReflexTreeFromID[cld.ID].GeneticReflexID)
-						}
-					}
-				case 2:
-					if ReflexTreeFromID[cld.ID].GeneticReflexID > 0 {
-						geneticReflexesIdArr = append(geneticReflexesIdArr, ReflexTreeFromID[cld.ID].GeneticReflexID)
-					}
-				}
-				detectedActiveLastNodID = cld.ID
-
-				level++
-				findReflexesNodes(level,ost, &cld, isExactly)
-				return // раз совпало, то другие ветки не смотреть
-			}
-		}
-	}//if isExactly==1{// искать точное совпадение
-
-
-
-	/* если не найдено точное соотвествие образа, смотеть по совпадающей части образа
-	как при частичном распознавании персептрона
-	 */
-	isExactly=0
-/////////////////////////////
-// Заплатка: если у узла есть рефлекс, то предварительно учесть его, пока не подставляя в geneticReflexesIdArr
-/*
-var oldReflex=0
-var isPrioritet=false
-//учесть рефлекс если еще нет других рефлексов в geneticReflexesIdArr
-if node.GeneticReflexID>0 && node.ActionID==0 && oldReflexesIdArr==nil{
-	// древний рефлекс
-	oldReflex=node.GeneticReflexID
-}
- */
-/////////////////////////////
-
 	for n := 0; n < len(node.Children); n++ {
-		cld:=node.Children[n]
-		if cld.ID==50{
-			cld.ID=50
-		}
-		var rArr []int
-		switch level{
-		case 1:
-			if BaseStyleArr[cld.StyleID]!=nil {
-				rArr = BaseStyleArr[cld.StyleID].BSarr
-			}
-		case 2:
-			if TriggerStimulsArr[cld.ActionID]!=nil {
-				rArr = TriggerStimulsArr[cld.ActionID].RSarr
-			}
-		}
-		if rArr!=nil {
-			// есть ли частичное совпадение
-			if compareCondImade(level, rArr) {
-				switch level {
-				case 1:
-					// только если нет пусковых стимулов, позволено смотреть древние рефлексы
-					/* Не должно вызывать древний рефлекс при неточном совпадении
-					if ActiveCurTriggerStimulsID == 0 {
-						if ReflexTreeFromID[cld.ID].GeneticReflexID > 0 {
-							// древний рефлекс
-							oldReflexesIdArr = append(oldReflexesIdArr, ReflexTreeFromID[cld.ID].GeneticReflexID)
-							isPrioritet=true
-						}
-					}
-					*/
-				case 2:
-					/*
-					if ReflexTreeFromID[cld.ID].GeneticReflexID > 0 {
-						geneticReflexesIdArr = append(geneticReflexesIdArr, ReflexTreeFromID[cld.ID].GeneticReflexID)
-						isPrioritet=true
-					}
-					*/
+		cld := node.Children[n]
+		if cld.StyleID==cond[0] {
+			// только если нет пусковых стимулов, позволено смотреть древние рефлексы
+			if ActiveCurTriggerStimulsID==0 {
+				if ReflexTreeFromID[cld.ID].GeneticReflexID > 0 {
+					// древний рефлекс
+					oldReflexesIdArr = append(oldReflexesIdArr, ReflexTreeFromID[cld.ID].GeneticReflexID)
+					return
 				}
-				detectedActiveLastNodID = cld.ID
-				level++
-				// иначе игнорирует дубли findReflexesNodes(level, ost, &cld, isExactly)
-				//!!!return
+			}
+			// есть ли условный рефлекс?
+			if conditionRexlexFound(cond[1:]){
+				return
+			}
+			if cld.ActionID==cond[1]{
+				if ReflexTreeFromID[cld.ID].GeneticReflexID > 0{
+					geneticReflexesIdArr = append(geneticReflexesIdArr, ReflexTreeFromID[cld.ID].GeneticReflexID)
+					return
+				}
 			}
 		}
-		findReflexesNodes(level, ost, &cld, isExactly)
 	}
-	/*
-	if !isPrioritet && oldReflex>0  && oldReflexesIdArr==nil{
-		oldReflexesIdArr = append(oldReflexesIdArr, oldReflex)
-	}
-	*/
+
 	return
 }
 ////////////////////////////////////////////////////

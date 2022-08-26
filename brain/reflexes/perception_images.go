@@ -156,6 +156,7 @@ func checkUnicumTriggerStimuls(bArr []int, PhraseID []int, ToneID int, MoodID in
 		if ToneID != v.ToneID || MoodID != v.MoodID {
 			continue
 		}
+//!!!		ActiveCurTriggerStimulsID=id
 		return id, v
 	}
 
