@@ -17,7 +17,10 @@ func UnderstandingTreeInit(){
 
 	loadPurposeImageFromIdArr()
 	loadUnderstandingTree()
-
+	if len(UnderstandingTree.Children)==0{// еще нет никаких веток
+		// создать первые три ветки базовых состояний
+		createBasicUnderstandingTree()
+	}
 }
 /////////////////////////////////////////////////////////////
 

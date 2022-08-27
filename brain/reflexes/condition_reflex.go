@@ -84,7 +84,12 @@ var ConditionReflexesFrom3 = make(map[int]*ConditionReflex)
 
 ////////////////////////////////////////////
 var lastConditionReflexID = 0
-
+/* Детектор нового news_detectior.go выявляет новые условия причинного (предшествовавшего имеющемуся рефлесу) стимула,
+пока не приводящего к рефлексу,
+в дополнение к условиям активного рефлекса (безусловного или условного)
+и обрабатывает это в updateNewsConditions(
+Должно уже быть не менее 2 событий образования нововго условного рефлекса
+ */
 func CreateNewConditionReflex(id int, lev1 int, lev2 []int, lev3 int, ActionIDarr []int, rank int) (int, *ConditionReflex) {
 	// посмотреть, если рефлекс с такими же условиями уже есть
 	idOld, rOld := compareCRUnicum(lev1, lev2, lev3)

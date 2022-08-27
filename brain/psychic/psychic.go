@@ -46,6 +46,9 @@ import (
 // после condition_reflex.go
 func PsychicInit(){
 
+	if EvolushnStage<1{// до рождения нет психики
+		return
+	}
 	automatizmTreeInit()
 	automatizmInit()
 	emotionsInit()

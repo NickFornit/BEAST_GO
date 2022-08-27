@@ -118,6 +118,14 @@ func createNulLevelUnderstandingTree(rt *UnderstandingNode){
 	UnderstandingNodeFromID[rt.ID]=rt
 	return
 }
+///////////////////////////////////////////
+// создать первые три ветки базовых состояний
+func createBasicUnderstandingTree(){
+	createNewUnderstandingNode(&UnderstandingTree,0,1,0,0,0)
+	createNewUnderstandingNode(&UnderstandingTree,0,2,0,0,0)
+	createNewUnderstandingNode(&UnderstandingTree,0,3,0,0,0)
+	SaveUnderstandingTree()
+}
 /////////////////////////////////////
 func SaveUnderstandingTree(){
 	var out=""
