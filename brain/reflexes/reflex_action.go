@@ -264,7 +264,7 @@ return false
 //////////////////////////////////////
 // запустить готовые к выполнению рефлексы
 func toRunRefleses(){
-
+	lastActivnostFromPult=ReflexPulsCount // сбросить отчет времени бездействия
 if len(conditionReflexesIdArr)>0{// есть условные рефлексы
 			//выдать на пульт действия
 			TerminateConditionAllReflaxActions(conditionReflexesIdArr)
@@ -294,6 +294,7 @@ if len(conditionReflexesIdArr)>0{// есть условные рефлексы
 		по сочетаниям редактора http://go/pages/terminal_actions.php
 		Данный редактор связывает действие с тем, какие гомео-параметры улучшает данное действие.
 		*/
+
 		if findAndExecuteSimpeReflex(){
 			return
 		}
