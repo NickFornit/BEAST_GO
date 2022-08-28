@@ -19,7 +19,7 @@ import (
 func findAndExecuteSimpeReflex()(bool){
 	_,actID,_:=TerminalActions.ChooseSimpleReflexexAction()
 	if actID>0{// совершить это действие
-		actStr:="1|"+TerminalActions.TerminalActonsNameFromID[actID]
+		actStr:="0|"+TerminalActions.TerminalActonsNameFromID[actID]
 		lib.SentActionsForPult(actStr)
 	}
 
