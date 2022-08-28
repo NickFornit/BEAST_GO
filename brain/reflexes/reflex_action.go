@@ -82,9 +82,9 @@ func TerminateGeneticAllReflaxActions(reflexesIdArr []int,reflexKind int){
 		return
 	}
 	// очистить буфер передачи действий на пульт
-	lib.ActionsForPultStr = ""
+	//lib.ActionsForPultStr = ""
 	lastActivnostFromPult=ReflexPulsCount // новый период 10 секундного ослеживания
-	
+
 	// оставить только уникальные действия рефлексов и выдать такой список
 	var unicumArr=make(map[int]int)
 //	var rIdArr=make(map[int]int)// привязать действие к ID рефлекса
@@ -268,7 +268,7 @@ return false
 // запустить готовые к выполнению рефлексы
 func toRunRefleses(){
 	// очистить буфер передачи действий на пульт
-	lib.ActionsForPultStr = ""
+	//lib.ActionsForPultStr = ""
 	lastActivnostFromPult=ReflexPulsCount // сбросить отчет времени бездействия
 if len(conditionReflexesIdArr)>0{// есть условные рефлексы
 			//выдать на пульт действия
