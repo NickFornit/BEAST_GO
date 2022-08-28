@@ -19,6 +19,8 @@ import (
 func findAndExecuteSimpeReflex()(bool){
 	_,actID,_:=TerminalActions.ChooseSimpleReflexexAction()
 	if actID>0{// совершить это действие
+		// очистить буфер передачи действий на пульт
+		lib.ActionsForPultStr = ""
 		actStr:="0|"+TerminalActions.TerminalActonsNameFromID[actID]
 		lib.SentActionsForPult(actStr)
 	}
