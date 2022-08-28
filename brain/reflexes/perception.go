@@ -36,6 +36,8 @@ func loadImagesArrs() {
 
 }
 
+//  отслеживане времени с последнего изменения условий с Пульта в пульсах
+var lastActivnostFromPult=0
 /////////////////////////////////////////////
 // ПУЛЬС рефлексов
 var ReflexPulsCount = 0 // передача тика Пульса из brine.go
@@ -53,7 +55,19 @@ func ReflexCountPuls(evolushnStage int, lifeTime int, puls int, isSlipping bool)
 	if activetedPulsCount != ReflexPulsCount { // защита от повторных срабатываний
 		if gomeostas.IsNewConditions { // изменились условия
 			ActiveFromConditionChange()
+			lastActivnostFromPult=ReflexPulsCount
 			return
+		}
+		/* если условия не меняются более 20 сек, то пусть срабатывает простейший инстинкт
+		 только если Базоваое состояние Плохо или Хорошо
+		 */
+		if ReflexPulsCount - lastActivnostFromPult >20{
+			bc:=gomeostas.CommonBadNormalWell
+			if bc!=2 {
+				// найти и выполнить простейший безусловный рефлекс
+				findAndExecuteSimpeReflex()
+			}
+			lastActivnostFromPult=ReflexPulsCount // новый период 10 секундного ослеживания
 		}
 	}
 

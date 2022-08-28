@@ -272,7 +272,7 @@ return out
 
 func checkIgnorOnly(oldReflexesIdArr []int,geneticReflexesIdArr []int)(bool) {
 	var isIgnor = false
-	if GeneticReflexes != nil {
+	if len(GeneticReflexes) >0 {
 		if len(oldReflexesIdArr) == 1 {
 			gr := GeneticReflexes[oldReflexesIdArr[0]]
 			if gr.ActionIDarr[0] == 9 {
