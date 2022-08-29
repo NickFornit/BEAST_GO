@@ -1,6 +1,6 @@
 /*
 Ощущение действий с Пульта
-Могут быть совершены сразу несколько действий, контекст каждого из которых удерживаются в течении 10 секунд.
+Могут быть совершены сразу несколько действий.
 Так что возникает образ действий (а далее - и общий образ действий и фраз)
 */
 
@@ -89,42 +89,55 @@ func GetActionNameFromID(id int)(string){
 сопровождается гомеостатическими эффектами GomeostazActionEffectArr =make(map[int]string)
  */
 var FoodPortionForEnergi=0
-func SetActionFromPult(actionID int,energi int){
-	if actionID==5{//  Накормить
-		switch energi {
-		case 1:
-			gomeostas.ChangeGomeostazParametr(1, 20.0)
-		case 2:
-			gomeostas.ChangeGomeostazParametr(1, 50.0)
-		case 3:
-			gomeostas.ChangeGomeostazParametr(1, 80.0)
+func SetActionFromPult(actionList string,energi int){
+	actArr:=strings.Split(actionList, ";")
+	for n := 0; n < len(actArr); n++ {
+		if len(actArr[n])==0{
+			continue;
 		}
-	}else {
-		ge := gomeostas.GomeostazActionEffectArr[actionID]
-		if len(ge)>0{// пример: 2>40,4>50,5>50,6>30,7>-20
-			aeArr:=strings.Split(ge, ",")
-			for i := 0; i < len(aeArr); i++ {
-				p:=strings.Split(aeArr[i], ">")
-				id,_:=strconv.Atoi(p[0]);
-				v,_:=strconv.ParseFloat(p[1], 64);
-				gomeostas.ChangeGomeostazParametr(id, v)
+		actionID, _ := strconv.Atoi(actArr[n])
+
+		if actionID == 5 { //  Накормить
+			switch energi {
+			case 1:
+				gomeostas.ChangeGomeostazParametr(1, 20.0)
+			case 2:
+				gomeostas.ChangeGomeostazParametr(1, 50.0)
+			case 3:
+				gomeostas.ChangeGomeostazParametr(1, 80.0)
+			}
+		} else {
+			ge := gomeostas.GomeostazActionEffectArr[actionID]
+			if len(ge) > 0 { // пример: 2>40,4>50,5>50,6>30,7>-20
+				aeArr := strings.Split(ge, ",")
+				for i := 0; i < len(aeArr); i++ {
+					p := strings.Split(aeArr[i], ">")
+					id, _ := strconv.Atoi(p[0]);
+					v, _ := strconv.ParseFloat(p[1], 64);
+					gomeostas.ChangeGomeostazParametr(id, v)
+				}
 			}
 		}
+		ActionFromPult[0] = 0
+		ActionFromPult[actionID] = pulsCount
+
+		gomeostas.SetGomeostazActionCommonEffectArr(actionID)
 	}
-	ActionFromPult[0]=0
-	ActionFromPult[actionID]=pulsCount
-	// дезактивировать этот контекст через 10 секунд
+
+	// дезактивировать все акции через 10 секунд
 	time.AfterFunc(10*time.Second, func() {
-		ActionFromPult[actionID]=0
+		deactivationTriggers()
 	})
 
-	gomeostas.SetGomeostazActionCommonEffectArr(actionID)
-
-	//// активировать дерево действием
-//	reflexes.ActiveFromAction()
 return
 }
 //////////////////////////////////////////
+// дезактивировать все пусковые стимулы при изменении условий action_sensor.deactivationTriggers() ()
+func deactivationTriggers(){
+	for i := 1; i < 18; i++ {
+		ActionFromPult[i]=0
+	}
+}
 
 // какие акции действуют в данный момент пульса - активные контексты действий с Пульта
 func CheckCurActions()([]int){

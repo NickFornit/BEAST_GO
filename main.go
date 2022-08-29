@@ -236,9 +236,8 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 			set_action := r.FormValue("set_action")
 			if len(set_action) > 0 {
 				brain.IsPultActivnost = true
-				actionID, _ := strconv.Atoi(set_action)
 				enegry, _ := strconv.Atoi(r.FormValue("food_portion"))
-				action_sensor.SetActionFromPult(actionID, enegry)
+				action_sensor.SetActionFromPult(set_action, enegry)
 
 				//// активировать дерево действием
 				reflexes.ActiveFromAction()
