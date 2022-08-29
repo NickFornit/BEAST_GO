@@ -96,6 +96,9 @@ func TerminateGeneticAllReflaxActions(reflexesIdArr []int,reflexKind int){
 			}
 		}
 	}
+	if len(unicumArr)==0{
+		return
+	}
 	var out="1|<b>БЕССМЫСЛЕННЫЙ безусловный рефлекс:</b><br>"
 	var n=0
 	var aImage []int
@@ -135,7 +138,7 @@ out += "<img src=\"/img/edit.png\" style=\"cursor:pointer;\" onClick=\"edit_b_re
 }
 //////////////////////////////////
 func TerminateConditionAllReflaxActions(reflexesIdArr []int){
-	if reflexesIdArr==nil{
+	if reflexesIdArr==nil || len(reflexesIdArr)==0{
 		return
 	}
 	var out="1|<b>БЕССМЫСЛЕННЫЙ условный рефлекс:</b><br>"
@@ -299,10 +302,7 @@ if len(conditionReflexesIdArr)>0{// есть условные рефлексы
 		по сочетаниям редактора http://go/pages/terminal_actions.php
 		Данный редактор связывает действие с тем, какие гомео-параметры улучшает данное действие.
 		*/
-
-		if findAndExecuteSimpeReflex(){
-			return
-		}
+		findAndExecuteSimpeReflex() 
 
 }
 /////////////////////////////////////////
