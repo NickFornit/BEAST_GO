@@ -90,6 +90,9 @@ func GetActionNameFromID(id int)(string){
  */
 var FoodPortionForEnergi=0
 func SetActionFromPult(actionList string,energi int){
+	// очищать прежние акции с пульта перед установкой новых т.к. сочетания передаются сразу.
+	deactivationTriggers()
+
 	actArr:=strings.Split(actionList, ";")
 	for n := 0; n < len(actArr); n++ {
 		if len(actArr[n])==0{
