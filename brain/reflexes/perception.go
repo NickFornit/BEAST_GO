@@ -22,6 +22,7 @@ TriggerStimulsArr - образ сочетаний пусковых стимул�
 package reflexes
 
 import (
+	"BOT/brain/action_sensor"
 	"BOT/brain/gomeostas"
 	"BOT/brain/psychic"
 	"BOT/brain/sleep"
@@ -122,6 +123,9 @@ func ActiveFromConditionChange() {
 	if activetedPulsCount > 0 { // ждет следующего пульса
 		return
 	}
+	// очищать прежние акции с пульта при смене сочетания Базовых контекстов.
+	action_sensor.DeactivationTriggers()
+
 	activetedPulsCount = ReflexPulsCount
 	ActivationTypeSensor = 1
 

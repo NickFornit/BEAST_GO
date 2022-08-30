@@ -91,7 +91,7 @@ func GetActionNameFromID(id int)(string){
 var FoodPortionForEnergi=0
 func SetActionFromPult(actionList string,energi int){
 	// очищать прежние акции с пульта перед установкой новых т.к. сочетания передаются сразу.
-	deactivationTriggers()
+	DeactivationTriggers()
 
 	actArr:=strings.Split(actionList, ";")
 	for n := 0; n < len(actArr); n++ {
@@ -129,14 +129,14 @@ func SetActionFromPult(actionList string,energi int){
 
 	// дезактивировать все акции через 10 секунд
 	time.AfterFunc(10*time.Second, func() {
-		deactivationTriggers()
+		DeactivationTriggers()
 	})
 
 return
 }
 //////////////////////////////////////////
-// дезактивировать все пусковые стимулы при изменении условий action_sensor.deactivationTriggers() ()
-func deactivationTriggers(){
+// дезактивировать все пусковые стимулы при изменении условий action_sensor.DeactivationTriggers() ()
+func DeactivationTriggers(){
 	for i := 1; i < 18; i++ {
 		ActionFromPult[i]=0
 	}
