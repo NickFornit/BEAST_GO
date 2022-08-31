@@ -62,6 +62,18 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				pultMood := r.FormValue("pult_mood")
 				moodID, _ := strconv.Atoi(pultMood)
 				res := word_sensor.VerbalDetection(text_dlg, is_input_rejim, toneID, moodID)
+// если добавлены пусковые стимулы
+				set_img_action := r.FormValue("set_img_action")
+				if len(set_img_action) > 0 {
+					//brain.IsPultActivnost = true
+					enegry, _ := strconv.Atoi(r.FormValue("food_portion"))
+					action_sensor.SetActionFromPult(set_img_action, enegry)
+/*
+					//// активировать дерево действием
+					reflexes.ActiveFromAction()
+					brain.IsPultActivnost = false
+*/
+				}
 
 				reflexes.ActiveFromPhrase() // активировать дерево рефлексов фразой - только для условных рефлексов
 				brain.IsPultActivnost = false

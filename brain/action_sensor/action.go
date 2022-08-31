@@ -93,7 +93,8 @@ func SetActionFromPult(actionList string,energi int){
 	// очищать прежние акции с пульта перед установкой новых т.к. сочетания передаются сразу.
 	DeactivationTriggers()
 
-	actArr:=strings.Split(actionList, ";")
+	actArr:=strings.Split(actionList, "|")
+	//var listID []int
 	for n := 0; n < len(actArr); n++ {
 		if len(actArr[n])==0{
 			continue;
