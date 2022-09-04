@@ -96,21 +96,38 @@ antagonists[id] =append(antagonists[id],aID)
 	BaseContextActive[4]=true
 	BaseContextActive[5]=true
 	BaseContextActive[9]=true
-	var activedC []int
+	var activedC=make(map[int]int)
 	for id, v := range BaseContextActive {
 		if v{
-			if len(activedC)>2{
-				// выбрать  наиболее веские контексты до 3-х
-				for _,idA := range activedC {
-					if BaseContextWeight[idA]<BaseContextWeight[id]{
-						BaseContextActive[id]=false // погасить более слабого
-					}
-				}
-			}
-			activedC=append(activedC,id)
+			activedC[BaseContextWeight[id]]=id
 		}
 	}
- */
+	//отсортировать веса активных контекстов по убыванию и взять первые три
+	keys := make([]int, 0, len(activedC))
+	for k := range activedC {
+		keys = append(keys, k)
+	}
+	//sort.Ints(keys)
+	sort.Slice(keys , func(i, j int) bool {
+		return keys[i] > keys[j]
+	})
+	count:=0
+	index := make(map[int]int)
+	for _,v := range keys {
+		if count>2{
+			break
+		}
+		index[activedC[v]]=v
+		count++
+	}
+
+	for id, _ := range BaseContextActive {
+		BaseContextActive[id]=false
+		if index[id]>0 {
+			BaseContextActive[id] = true
+		}
+	}
+*/
 	return
 }
 ////////////////
@@ -183,6 +200,7 @@ func baseContextUpdate(){
 а лишние будут отсеиваться в порядке убывания весов контекстов.
 Это неплохо имитирует распознаватель с активацией по частично-активному профилю на входе.
 */
+/*  первый вариант - простой, но непонятный
 	var activedC []int
 	for id, v := range BaseContextActive {
 		if v{
@@ -195,6 +213,39 @@ func baseContextUpdate(){
 				}
 			}
 			activedC=append(activedC,id)
+		}
+	}
+ */
+// более понятный вариант, хотя и более накрученный:
+	var activedC=make(map[int]int)
+	for id, v := range BaseContextActive {
+		if v{
+			activedC[BaseContextWeight[id]]=id
+		}
+	}
+	//отсортировать веса активных контекстов по убыванию и взять первые три
+	keys = make([]int, 0, len(activedC))
+	for k := range activedC {
+		keys = append(keys, k)
+	}
+	//sort.Ints(keys)
+	sort.Slice(keys , func(i, j int) bool {
+		return keys[i] > keys[j]
+	})
+	count:=0
+	index := make(map[int]int)
+	for _,v := range keys {
+		if count>2{
+			break
+		}
+		index[activedC[v]]=v
+		count++
+	}
+
+	for id, _ := range BaseContextActive {
+		BaseContextActive[id]=false
+		if index[id]>0 {
+			BaseContextActive[id] = true
 		}
 	}
 
