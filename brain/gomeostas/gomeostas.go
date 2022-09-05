@@ -284,7 +284,12 @@ if IsLevelBeginParam3 {
 	if (GomeostazParams[8]-float64(compareLimites[8]))>0{
 		val3=(GomeostazParams[8])-float64(compareLimites[8])
 	}
-	GomeostazParams[7] += val1+val2+val3
+	add:=val1+val2+val3
+	// ограничить порцию изменения
+	if add>1{
+		add=1
+	}
+	GomeostazParams[7] += add
 	if GomeostazParams[7]<0 {
 		GomeostazParams[7]=0
 	}
