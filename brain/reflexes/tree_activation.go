@@ -36,6 +36,7 @@ notAllowScanInReflexesThisTime=false
 }
 */
 
+
 //////////////////////////////////
 func readyForRecognitionRflexes() { // init() для дерева распознавания рефлексов
 
@@ -63,6 +64,7 @@ var detectedActiveLastNodID=0
 Но если в рефлексе заданы несколько условий и такой образ точно совпадент с текущим образом условий,
 то именно этот рефлекс и сработает.
 */
+var detectedActiveLevel=0 // уровень условий, до которого дошло распознавание в дереве
 
 //собираются рефлексы, подходящие для текущих оразов услвий:
 var oldReflexesIdArr []int //собираются Древние безусловные - у которых в условиях не прописаны пусковые стимулы.
@@ -77,6 +79,7 @@ var NoUnconditionRefles=""
 // распознавание рефлексов
 func activeReflexTree(){
 	detectedActiveLastNodID=0
+	detectedActiveLevel=0
 
 	oldReflexesIdArr=nil
 	geneticReflexesIdArr=nil
@@ -110,7 +113,8 @@ if ActiveCurBaseStyleID==22{
 		if condArr[0] == lev1 {
 			detectedActiveLastNodID=node.ID
 			ost:=condArr[1:]
-			findReflexesNodes(1,ost, &node,1)
+			detectedActiveLevel=1
+			findReflexesNodes(detectedActiveLevel,ost, &node,1)
 			//findReflexesNodes(1,condArr, &node,1)
 
 			break // только один из Базовых состояний
@@ -123,30 +127,49 @@ if ActiveCurBaseStyleID==22{
 		isIgnor:=checkIgnorOnly(oldReflexesIdArr,geneticReflexesIdArr)
 // нет старых или новых безусловных рефлексов для текущих условий и если игнорирует
 		if (len(oldReflexesIdArr)==0 && len(geneticReflexesIdArr)==0) || isIgnor{
-			//  сообщить на Пульт, что при данных условиях нет б.рефлекса.
-			if EvolushnStage==0 { // только для стадии безусловных рефлексов
-				if isIgnor{
-					NoUnconditionRefles = "IGNORED" + GetCurrentConditionsStr() //СТРОКА УСЛОВИЙ ДЛЯ РЕФЛЕКСА
-				}else {
-					NoUnconditionRefles = "NOREFLEX" + GetCurrentConditionsStr() //СТРОКА УСЛОВИЙ ДЛЯ РЕФЛЕКСА
+
+/* если в GeneticReflexes (список всех dnk_reflexes.txt) есть совпадающее условие,
+			то создать узел дерева
+ */
+			addGeneticReflexesToTree(detectedActiveLastNodID,condArr)
+
+			if (len(oldReflexesIdArr)==0 && len(geneticReflexesIdArr)==0) || isIgnor {
+				//  сообщить на Пульт, что при данных условиях нет б.рефлекса.
+				if EvolushnStage == 0 { // только для стадии безусловных рефлексов
+					if isIgnor {
+						NoUnconditionRefles = "IGNORED" + GetCurrentConditionsStr() //СТРОКА УСЛОВИЙ ДЛЯ РЕФЛЕКСА
+					} else {
+						NoUnconditionRefles = "NOREFLEX" + GetCurrentConditionsStr() //СТРОКА УСЛОВИЙ ДЛЯ РЕФЛЕКСА
+					}
+					return
 				}
-				return
 			}
 		}
-		// передать в психику информацию
+		// в консоль:
+		consol:="<br>__________ РЕФЛЕКС: "
+		for c := 0; c < len(oldReflexesIdArr); c++ {
+			consol+="ID="+strconv.Itoa(oldReflexesIdArr[c])+"; "
+		}
+		for c := 0; c < len(geneticReflexesIdArr); c++ {
+			consol+="ID="+strconv.Itoa(geneticReflexesIdArr[c])+"; "
+		}
+		//consol+="<br>"
+		lib.WritePultConsol(consol)
+
 		veryActual,targetArrID,acrArr:=GetActualReflexAction()
+		// передать в психику информацию
 		psychic.GetReflexInformation(veryActual,targetArrID,acrArr)
 
 		if EvolushnStage<2 {// сразу запустить имеющиеся рефлексы
 			toRunRefleses()
 		}// иначе сначала будут проверены автоматизмы в perception.go
 
-	}else{// вообще еще нет такой ветки
+	}else{// вообще еще нет такого случая :) т.к. всегда есть нулевая
 			//  сообщить на Пульт, что при данных условиях нет б.рефлекса.
-		if EvolushnStage==0 { // только для стадии безусловных рефлексов
-			NoUnconditionRefles = "NOREFLEX" + GetCurrentConditionsStr() //СТРОКА УСЛОВИЙ ДЛЯ РЕФЛЕКСА
-		}
-// ничего не делать, рефлексы образуют новые ветки условий.
+	//	if EvolushnStage==0 { // только для стадии безусловных рефлексов
+	//		NoUnconditionRefles = "NOREFLEX" + GetCurrentConditionsStr() //СТРОКА УСЛОВИЙ ДЛЯ РЕФЛЕКСА
+	//	}
+// ничего не делать
 	}
 }
 /* На каждом уровне допускаются ветвления его дочек - для нахождения не точного соотвествия, если не было найдено точное.
@@ -159,6 +182,7 @@ isExactly: 0 - сработал неточный рефлекс, не смотр
  */
 // БЕЗ РЕКУРСИИ т.к. всего 2 уровня проверяется
 func findReflexesNodes(level int,cond []int,node *ReflexNode,isExactly int){
+	detectedActiveLevel=level
 	if len(cond)==0{
 		return
 	}
@@ -178,6 +202,8 @@ func findReflexesNodes(level int,cond []int,node *ReflexNode,isExactly int){
 				if ReflexTreeFromID[cld.ID].GeneticReflexID > 0 {
 					// древний рефлекс
 					oldReflexesIdArr = append(oldReflexesIdArr, ReflexTreeFromID[cld.ID].GeneticReflexID)
+					detectedActiveLevel=level+1
+					detectedActiveLastNodID=cld.ID
 					return
 				}
 			}
@@ -188,6 +214,8 @@ func findReflexesNodes(level int,cond []int,node *ReflexNode,isExactly int){
 			if cld.ActionID==cond[1]{
 				if ReflexTreeFromID[cld.ID].GeneticReflexID > 0{
 					geneticReflexesIdArr = append(geneticReflexesIdArr, ReflexTreeFromID[cld.ID].GeneticReflexID)
+					detectedActiveLastNodID=cld.ID
+					detectedActiveLevel=level+1
 					return
 				}
 			}

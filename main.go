@@ -58,6 +58,11 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 			if len(text_dlg) > 0 {
 				brain.IsPultActivnost = true
 				is_input_rejim, _ := strconv.Atoi(r.FormValue("is_input_rejim"))
+				if is_input_rejim==0 { // наоборот
+					reflexes.IsUnlimitedMode = 1
+				}else{
+					reflexes.IsUnlimitedMode = 0
+				}
 				toneID, _ := strconv.Atoi(r.FormValue("pult_tone"))
 				pultMood := r.FormValue("pult_mood")
 				moodID, _ := strconv.Atoi(pultMood)

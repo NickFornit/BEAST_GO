@@ -32,12 +32,21 @@ type GeneticReflex struct {
 	ActionIDarr []int
 	// Result int - у безусловных рефлексов нет конкуренции, кроме того, что они подавляются более высокоуровневыми рефлексами и автоматизмами
 }
-
 var GeneticReflexes = make(map[int]*GeneticReflex)
+
+// для быстрого поиска по совпадениям строк
+type geneticReflexStr struct {
+ID int
+lev1 string
+lev2 string
+lev3 string
+lev4 string
+actions string
+}
+var geneticReflexesStr = make(map[int]*geneticReflexStr)
 
 //////////////////////////////////////////
 var lastGeneticReflexID = 0
-
 func CreateNewGeneticReflex(id int, lev1 int, lev2 []int, lev3 []int, ActionIDarr []int) (int, *GeneticReflex) {
 	// посмотреть, если рефлекс с такими же условиями уже есть
 	idOld, rOld := compareUnicum(lev1, lev2, lev3)
@@ -79,6 +88,7 @@ func compareUnicum(lev1 int, lev2 []int, lev3 []int) (int, *GeneticReflex) {
 
 // P.S. безусловные рефлексы создаются в редакторе и поэтому здесь нет функции их сохранения.
 // а только загрузка имеющихся в формате ID|lev1|lev2_1,lev2_2,...|lev3_1,lev3_2,...|actin_1,actin_2,...:
+
 func loadGeneticReflexes() {
 	path := lib.GetMainPathExeFile()
 	lines, _ := lib.ReadLines(path + "/memory_reflex/dnk_reflexes.txt")
@@ -98,7 +108,7 @@ func loadGeneticReflexes() {
 				lev2 = append(lev2, b)
 			}
 		}
-		createNewBaseStyle(0, lev2)
+		// НЕ СОЗДАВАТЬ ЗАРАНЕЕ createNewBaseStyle(0, lev2)
 		// третий уровень
 		pn = strings.Split(p[3], ",")
 		var lev3 []int
@@ -119,6 +129,13 @@ func loadGeneticReflexes() {
 			}
 		}
 		CreateNewGeneticReflex(id, lev1, lev2, lev3, ActionIDarr)
+		var newS geneticReflexStr
+		newS.ID=id
+		newS.lev1=p[1]
+		newS.lev2=p[2]
+		newS.lev3=p[3]
+		newS.actions=p[4]
+		geneticReflexesStr[id]=&newS
 	}
 	return
 }

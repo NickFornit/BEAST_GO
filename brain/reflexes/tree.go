@@ -23,7 +23,6 @@ package reflexes
 
 import (
 	"BOT/lib"
-	"sort"
 	"strconv"
 	"strings"
 )
@@ -35,7 +34,6 @@ func initReflexTree(){ // после инициализации loadGeneticRefle
 		// создать первые три ветки базовых состояний
 		createBasicReflexTree()
 	}
-	addGeneticReflexesToTree()
 	//SaveReflexesAttributes()
 
 	readyForRecognitionRflexes() // ини для дерева распознавания рефлексов
@@ -164,10 +162,12 @@ func createNulLevelReflexTree(rt *ReflexNode){
 }
 // создать первые три ветки базовых состояний
 func createBasicReflexTree(){
+	notAllowScanInReflexesThisTime=true // запрет показа карты при обновлении
 	createNewReflexNode(&ReflexTree,0,1,0,0,0,0)
 	createNewReflexNode(&ReflexTree,0,2,0,0,0,0)
 	createNewReflexNode(&ReflexTree,0,3,0,0,0,0)
 	saveReflexTree()
+	notAllowScanInReflexesThisTime=false // запрет показа карты при обновлении
 	return
 }
 /////////////////////////////////////
@@ -228,7 +228,7 @@ func ConditionsDetection(condArr []int){
 			break // только один из Базовых состояний
 		}
 	}
-	// результат распознавания обрабатывается в func addGeneticReflexesToTree()
+
 	return
 }
 /////////////////////
@@ -287,72 +287,69 @@ return id
 
 
 /////////////////////////////////////////////////////////////////////
-/*  создать и добавить безусловные рефлексы в дерево, если таких узлов еще нет
+/*  Сразу создать и добавить все имеющиеся в /memory_reflex/reflex_tree.txt безусловные рефлексы в дерево, если таких узлов еще нет
 т.к. безусловные рефлексы уже прописаны заранее, то нужно их всех прогнать для вставки в дерево
-Условные рефлексы будут добавляться по мере возникновения.
+Условные рефлексы будут добавляться по мере возникновения новых в /memory_reflex/reflex_tree.txt.
 Формат записи безусловного рефлекса: ID|baseID|styleID...|actionID...
 Если у рефлекса пропущены условия, то этот рефлекс нужно привязать ко всем узлам пропущенного уровня.
  */
-func addGeneticReflexesToTree(){
+func addGeneticReflexesToTree(detectedActiveLastNodID int,condArr []int){
 	notAllowScanInReflexesThisTime=true // запрет показа карты при обновлении
-	keys := make([]int, 0, len(GeneticReflexes))
-	for k := range GeneticReflexes {
-		keys = append(keys, k)
-	}
-	sort.Ints(keys)
-	for _, id := range keys {
-		v:=GeneticReflexes[id]
-// вытащить 3 уровня условий в виде ID их образов
-		condArr:=getConditionsArr(v.lev1, v.lev2, v.lev3, nil,0,0)
-		if v.lev3==nil{// если в рефлексе нет пускового стимула
-			// иначе прописывает образ ID=2
-			condArr[2]=0
-		}
 
-
-// поиск в дереве такого сочетания условий
-		ConditionsDetection(condArr)
-
-		if id==48{
-			id=48
-		}
-
-// результат поиска:
-		if detectedLastNodID > 0 {
-			lastNode:=ReflexTreeFromID[detectedLastNodID]
-			if lastNode!=nil {
-				//насколько найденное соотвествует condArr?
-					if lastNode.StyleID==0{
-						// если уже есть такой узел, то ничего не делать с ним
-						idOld,_:=FindReflexTreeNodeFromCondition(condArr[0], condArr[1], condArr[2])
-						if idOld==0 {
-							formingBranch(id, detectedLastNodID, 1, condArr)
-						}
-					}else{
-						if condArr[2]>0 && lastNode.ActionID==0{
-							// если уже есть такой узел, то ничего не делать с ним
-							idOld,_:=FindReflexTreeNodeFromCondition(condArr[0], condArr[1], condArr[2])
-							if idOld==0 {
-								formingBranch(id, detectedLastNodID, 2, condArr)
-							}
-						}
-					}
+	// найти ID GeneticReflexes (список всех dnk_reflexes.txt) по условиям
+	reflexID:=findGeneticReflexFromCondinion(strconv.Itoa(condArr[0]),condArr[1],condArr[2])
+	if reflexID>0 {
+		//v := GeneticReflexes[reflexID]
+		//trigger:=v.ActionIDarr
+		level:=getLevelFromNodeID(detectedActiveLastNodID)
+		lastNodeID:=formingBranch(reflexID, detectedActiveLastNodID, level, condArr)
+		detectedActiveLastNodID=lastNodeID
+			if ReflexTreeFromID[detectedActiveLastNodID].GeneticReflexID > 0 {
+				if condArr[2]==0 { // древний рефлекс
+					oldReflexesIdArr = append(oldReflexesIdArr, ReflexTreeFromID[detectedActiveLastNodID].GeneticReflexID)
+				}else{// нормальный безусловный рефлекс (с пусковым стимулом)
+					geneticReflexesIdArr = append(geneticReflexesIdArr, ReflexTreeFromID[detectedActiveLastNodID].GeneticReflexID)
+				}
 			}
-		}else{// вообще нет, нарастить все с нуля
-			formingBranch(id,ReflexTree.ID,0,condArr)
-		}
 	}
-	// сохранение
+	// сохранение  - учти, что срабатывает - после пятого пульса
 	SaveReflexesAttributes()
-//	SaveReflexesAttributes()
 
 	notAllowScanInReflexesThisTime=false
+}
+// найти ID GeneticReflexes (список всех dnk_reflexes.txt) по условиям
+func findGeneticReflexFromCondinion(basic string,img1id int,img2id int)(int){
+	img1:=BaseStyleArr[img1id]
+	var img2 *TriggerStimuls
+	if img2id>0 {
+		img2 = TriggerStimulsArr[img2id]
+	}
+	lev1str:=""
+	for i := 0; i < len(img1.BSarr); i++ {
+		if len(lev1str)>0 { lev1str+=","	}
+		lev1str+=strconv.Itoa(img1.BSarr[i])
+	}
+	lev2str:=""
+	if img2!=nil {
+		for i := 0; i < len(img2.RSarr); i++ {
+			if len(lev2str) > 0 {
+				lev2str += ","
+			}
+			lev2str += strconv.Itoa(img2.RSarr[i])
+		}
+	}
+
+	for id, v:= range geneticReflexesStr {
+if v.lev1==basic && v.lev2==lev1str && v.lev3==lev2str{
+	return id
+}
+	}
+return 0
 }
 /////////////////////////////////////
 
 
-
-func formingBranch(reflexID int,fromID int,lastLevel int,condArr []int){
+func formingBranch(reflexID int,fromID int,lastLevel int,condArr []int)(int){
 	// нарастить ветку недостающим
 	lastNode:=ReflexTreeFromID[fromID]
 
@@ -361,8 +358,20 @@ func formingBranch(reflexID int,fromID int,lastLevel int,condArr []int){
 	//!!! НЕТ !!! ReflexTreeFromID[lastNodeID].ParentID=lastNode.ID
 	//привязать рефлекс
 	ReflexTreeFromID[lastNodeID].GeneticReflexID=reflexID
-}
 
+	return lastNodeID
+}
+// найти уровень вложения данного узла в ветке
+func getLevelFromNodeID(nodeID int)(int){
+	lastNode:=ReflexTreeFromID[nodeID]
+	var level=0
+	for lastNode.ParentNode!=nil {
+		level++
+		lastNode=lastNode.ParentNode
+	}
+	return level
+}
+//////////////////////////////////
 
 
 

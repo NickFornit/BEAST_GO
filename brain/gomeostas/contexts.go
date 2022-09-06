@@ -93,31 +93,48 @@ antagonists[id] =append(antagonists[id],aID)
 /* // проверка ограничителя
 	BaseContextActive[1]=true
 	BaseContextActive[2]=true
-	BaseContextActive[4]=true
+	BaseContextActive[3]=true
 	BaseContextActive[5]=true
 	BaseContextActive[9]=true
+	var activedC []int
+	for id, v := range BaseContextActive {
+		if v{
+			if len(activedC)>2{
+				// выбрать  наиболее веские контексты до 3-х
+				for _,idA := range activedC {
+					if BaseContextWeight[idA]<BaseContextWeight[id]{
+						BaseContextActive[id]=false // погасить более слабого
+					}
+				}
+			}
+			activedC=append(activedC,id)
+		}
+	}
+ */
+	/* Недолелал с использованием сортировки...
 	var activedC=make(map[int]int)
 	for id, v := range BaseContextActive {
 		if v{
-			activedC[BaseContextWeight[id]]=id
+			activedC[id]=BaseContextWeight[id]
 		}
 	}
 	//отсортировать веса активных контекстов по убыванию и взять первые три
 	keys := make([]int, 0, len(activedC))
-	for k := range activedC {
-		keys = append(keys, k)
+	for _,v := range activedC {
+		keys = append(keys, v)
 	}
 	//sort.Ints(keys)
 	sort.Slice(keys , func(i, j int) bool {
 		return keys[i] > keys[j]
 	})
+	// ограничить
 	count:=0
 	index := make(map[int]int)
-	for _,v := range keys {
+	for k,v := range keys {
 		if count>2{
 			break
 		}
-		index[activedC[v]]=v
+		index[v]=activedC[k];//tivedC[k]
 		count++
 	}
 
@@ -127,7 +144,8 @@ antagonists[id] =append(antagonists[id],aID)
 			BaseContextActive[id] = true
 		}
 	}
-*/
+	*/
+
 	return
 }
 ////////////////
@@ -200,7 +218,7 @@ func baseContextUpdate(){
 а лишние будут отсеиваться в порядке убывания весов контекстов.
 Это неплохо имитирует распознаватель с активацией по частично-активному профилю на входе.
 */
-/*  первый вариант - простой, но непонятный
+//  первый вариант - простой, но непонятный
 	var activedC []int
 	for id, v := range BaseContextActive {
 		if v{
@@ -215,8 +233,9 @@ func baseContextUpdate(){
 			activedC=append(activedC,id)
 		}
 	}
- */
+ /*
 // более понятный вариант, хотя и более накрученный:
+	Недолелал с использованием сортировки...
 	var activedC=make(map[int]int)
 	for id, v := range BaseContextActive {
 		if v{
@@ -257,7 +276,7 @@ if IsContextActive()==false{
   BaseContextActive[6] = true
 }
 	}
-
+*/
 	return
 }
 //активируем или пассивируем контексты по заданному правилу в http://go/pages/gomeostaz.php
