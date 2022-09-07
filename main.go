@@ -58,26 +58,26 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 			if len(text_dlg) > 0 {
 				brain.IsPultActivnost = true
 				is_input_rejim, _ := strconv.Atoi(r.FormValue("is_input_rejim"))
-				if is_input_rejim==0 { // наоборот
+				if is_input_rejim == 0 { // наоборот
 					reflexes.IsUnlimitedMode = 1
-				}else{
+				} else {
 					reflexes.IsUnlimitedMode = 0
 				}
 				toneID, _ := strconv.Atoi(r.FormValue("pult_tone"))
 				pultMood := r.FormValue("pult_mood")
 				moodID, _ := strconv.Atoi(pultMood)
 				res := word_sensor.VerbalDetection(text_dlg, is_input_rejim, toneID, moodID)
-// если добавлены пусковые стимулы
+				// если добавлены пусковые стимулы
 				set_img_action := r.FormValue("set_img_action")
 				if len(set_img_action) > 0 {
 					//brain.IsPultActivnost = true
 					enegry, _ := strconv.Atoi(r.FormValue("food_portion"))
 					action_sensor.SetActionFromPult(set_img_action, enegry)
-/*
-					//// активировать дерево действием
-					reflexes.ActiveFromAction()
-					brain.IsPultActivnost = false
-*/
+					/*
+						//// активировать дерево действием
+						reflexes.ActiveFromAction()
+						brain.IsPultActivnost = false
+					*/
 				}
 
 				reflexes.ActiveFromPhrase() // активировать дерево рефлексов фразой - только для условных рефлексов
@@ -93,7 +93,7 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				outStr := gomeostas.GetCurGomeoParams()
 
 				outStr += "#|#" + gomeostas.GetCurGomeoStatus() + "#|#" + gomeostas.GetCurContextActive() +
-					"#|# " +  reflexes.GetCurrentConditionsStr() + //чтобы постоянно была инфа о сочетаниях контекстов
+					"#|# " + reflexes.GetCurrentConditionsStr() + //чтобы постоянно была инфа о сочетаниях контекстов
 					"#|#" + strconv.Itoa(brain.LifeTime) +
 					"#|#" + reflexes.NoUnconditionRefles
 				brain.IsPultActivnost = false
@@ -189,7 +189,7 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 			if len(setExpParam) > 0 {
 				brain.IsPultActivnost = true
 				if setExpParam == "1" {
-					if update.ExportFileUpdate() == true {
+					if update.ExportFileUpdate([]int{1}) == true {
 						setExpParam = "yes"
 					} else {
 						setExpParam = "no"
@@ -294,9 +294,9 @@ func init() {
 	lib.GetMainPathExeFile()
 	log.SetFlags(log.Lshortfile | log.LstdFlags)
 
-// тестирование комбинаций. Если бы время работы было приемлемо,
-//то можно было бы запускать процесс из Пульта в меню Инструменты (шестеренка)
-// 	tools.MakeContextCombinations()
+	// тестирование комбинаций. Если бы время работы было приемлемо,
+	//то можно было бы запускать процесс из Пульта в меню Инструменты (шестеренка)
+	// 	tools.MakeContextCombinations()
 }
 
 // старт

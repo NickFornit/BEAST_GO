@@ -71,6 +71,7 @@ type FileMod struct {
 	ID       int       // ID записи
 	FileName string    // имя файла
 	LastMod  time.Time // дата-время последнего изменения
+	LastID   int       // ID последней импортированной записи
 	Compat   int       // совместимость файлов обменна: 0 - не совместмый, 1 - совместимый
 }
 
@@ -81,7 +82,7 @@ var FileUpdateDir = make(map[int]*FileMod) // подкаталог обмена
 func LoadFileUpdate() {
 	var sArr []string
 	var tArr []string
-	var i, id, MaxNum, Compat int
+	var i, id, MaxNum, Compat, LastID int
 	var FileName, botNameBuf, idList string
 	var LastMod time.Time
 
@@ -109,18 +110,20 @@ func LoadFileUpdate() {
 		FileName = tArr[2]
 		id, _ = strconv.Atoi(tArr[0])
 		LastMod, _ = time.Parse(Layout, tArr[3]) // строка в дату/время
-		Compat, _ = strconv.Atoi(tArr[4])
-		EditAddFileUpdate(id, FileName, LastMod, Compat)
+		LastID, _ = strconv.Atoi(tArr[4])
+		Compat, _ = strconv.Atoi(tArr[5])
+		EditAddFileUpdate(id, FileName, LastMod, LastID, Compat)
 	}
 }
 
 /* Обновить каталог обмена */
-func EditAddFileUpdate(ID int, FileName string, LastMod time.Time, Compat int) *FileMod {
+func EditAddFileUpdate(ID int, FileName string, LastMod time.Time, LastID int, Compat int) *FileMod {
 	var node FileMod
 
 	node.ID = ID
 	node.FileName = FileName
 	node.LastMod = LastMod
+	node.LastID = LastID
 	node.Compat = Compat
 	FileUpdateDir[ID] = &node
 
@@ -131,7 +134,7 @@ func EditAddFileUpdate(ID int, FileName string, LastMod time.Time, Compat int) *
 func SaveFileUpdateDir() {
 	var sArr []string
 	var i, id int
-	var out, fileName, LastMod, compat string
+	var out, fileName, LastMod, LastID, compat string
 
 	for BotName, idList := range FileUpdate {
 		sArr = strings.Split(idList, "|")
@@ -139,8 +142,9 @@ func SaveFileUpdateDir() {
 			id, _ = strconv.Atoi(sArr[i])
 			fileName = FileUpdateDir[id].FileName
 			LastMod = FileUpdateDir[id].LastMod.Format(Layout)
+			LastID = strconv.Itoa(FileUpdateDir[id].LastID)
 			compat = strconv.Itoa(FileUpdateDir[id].Compat)
-			out += strconv.Itoa(id) + "|" + BotName + "|" + fileName + "|" + LastMod + "|" + compat + "\r\n"
+			out += strconv.Itoa(id) + "|" + BotName + "|" + fileName + "|" + LastMod + "|" + LastID + "|" + compat + "\r\n"
 		}
 	}
 	out = strings.TrimSuffix(out, "\r\n")
@@ -405,12 +409,12 @@ func ImportFileUpdate(NoCheckWordCount bool) bool {
 }
 
 /* Экспорт в файл обмена
-Выгружаем все типы файлов, которые встречаются в каталоге по одному разу */
-func ExportFileUpdate() bool {
+Выгружаем типы файлов, указанные через номера строк flieArr[] в каталоге "memory_save/update_dir.txt" по одному разу */
+func ExportFileUpdate(flieArr []int) bool {
 	var sArr []string
-	var out, outBuf, FileName, FileNameList, msgTxt string
-	var i, id int
-	var flgExp bool
+	var out, outBuf, FileName, FileNameList, msgTxt, msgTxt1 string
+	var i, id, LastID, UpdateLastID int
+	var flgExp, IsNoAllExp bool
 
 	_, err := os.Stat(pathUpdate)
 	if os.IsNotExist(err) {
@@ -423,20 +427,33 @@ func ExportFileUpdate() bool {
 		sArr = strings.Split(ListId, "|")
 		for i = 0; i < len(sArr); i++ {
 			id, _ = strconv.Atoi(sArr[i])
+			if !lib.ExistsValInArr(flieArr, id) {
+				continue
+			} // обрабатываем только заданные файлы
 			FileName = FileUpdateDir[id].FileName
 			if lib.ExistsValStrInList(FileNameList, FileName, "|") == true {
-				continue
+				continue // уже выгружали в этом сеансе
 			}
 			FileNameList += FileName + "|"
 			switch FileName {
 			case updatePhraseName: // дерево фраз
 				cnt := len(word_sensor.PhraseTreeFromID)
 				if cnt == 0 {
-					continue
+					msgTxt1 = ". Файл фраз пустой, нет данных для обновления."
+					break
 				}
 				// добавляем самую длинную фразу ветки, конечный узел
+				UpdateLastID = FileUpdateDir[id].LastID
+				if word_sensor.PhraseTreeFromID[cnt-1].ID <= UpdateLastID {
+					msgTxt1 = ". Нет новых данных для обновления."
+					break
+				}
 				for n := 0; n < cnt; n++ {
-					outBuf = word_sensor.GetPhraseStringsFromPhraseID(word_sensor.PhraseTreeFromID[n].ID)
+					LastID = word_sensor.PhraseTreeFromID[n].ID
+					if LastID <= UpdateLastID {
+						continue
+					} // выводим узлы дерева от последнего экспорта
+					outBuf = word_sensor.GetPhraseStringsFromPhraseID(LastID)
 					if word_sensor.PhraseTreeFromID[n].Children == nil {
 						if outBuf != "" {
 							out += outBuf + "\r\n"
@@ -445,6 +462,7 @@ func ExportFileUpdate() bool {
 					}
 					outBuf = ""
 				}
+				FileUpdateDir[id].LastID = LastID
 			case updateActonsName: // список действий
 				PathFileExport := lib.MainPathExeFile + "/memory_reflex/terminal_actons.txt"
 				flgExp = CopyFileToExport(PathFileExport, FileName)
@@ -482,6 +500,7 @@ func ExportFileUpdate() bool {
 			if out != "" {
 				out = strings.TrimSuffix(out, "\r\n")
 				lib.WriteFileContent(pathUpdate+"/"+botName+"_"+FileName+".txt", out)
+				SaveFileUpdateDir()
 				out = ""
 			}
 			if flgExp == true {
@@ -489,11 +508,12 @@ func ExportFileUpdate() bool {
 				flgExp = false
 			} else {
 				msgTxt = "Не удачный экспорт: "
+				IsNoAllExp = true
 			}
-			lib.WritePultConsol(msgTxt + botName + "_" + FileName)
+			lib.WritePultConsol(msgTxt + botName + "_" + FileName + msgTxt1)
 		}
 	}
-	return true
+	return !IsNoAllExp
 }
 
 /* Копировать файл данных в общий каталог */
