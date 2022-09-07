@@ -274,6 +274,10 @@ func toRunRefleses(){
 	//lib.ActionsForPultStr = ""
 	lastActivnostFromPult=ReflexPulsCount // сбросить отчет времени бездействия
 if len(conditionReflexesIdArr)>0{// есть условные рефлексы
+	// удалить более низкоуровневые рефлексы
+	geneticReflexesIdArr=nil
+	oldReflexesIdArr=nil
+
 			//выдать на пульт действия
 			TerminateConditionAllReflaxActions(conditionReflexesIdArr)
 			//ОБНУЛЯЕТСЯ при активации дерева рефлексов, если вызвало какое-то действие
