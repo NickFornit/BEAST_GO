@@ -4,7 +4,12 @@
 1 - энергия 2 - стресс 3 - гон 4-потребность в общении 5-потребность в обучении
 6- Поиск, 7- Самосохранение, 8 - Повреждения
 файл сохранения состояния параметров: files/GomeostazParams.txt
- */
+
+Для параметров гомеостаза, напрямую не связанных с жизнеобеспечением (parMaxPulsCount: гон, потребность в общении,
+потребность в обучении и любопытство) организована цикличность: при нарастании параметра до максимума,
+он удерживается в течении 20 секунд, а потом сбрасывается.
+Это позволяет создавать достаточные по времени периоды специфических контекстов реагирования.
+*/
 package gomeostas
 
 //import word_sensor "BOT/brain/words_sensor"
@@ -51,7 +56,12 @@ func SetGomeostazActionCommonEffectArr(actionID int){
 	CommonMoodAfterAction=GomeostazActionCommonEffectArr[actionID]
 	CommonMoodAfterActionPulsCount=PulsCount
 }
+
+var PeriodPulsCount=20 // 20 пульсов удерживается максимальное значение некритичных для жизни 4-х параметров
+var parMaxPulsCount=make([]int, 4)// 0- гон, 1-потребность в общении, 2-потребность в обучении, 3- любопытство
+
 /////////////////////////////////////////////////////////////
+
 
 func init(){
 
@@ -303,6 +313,54 @@ if IsLevelBeginParam3 {
 		SaveCurrentGomeoParams()
 	}
 	baseContextUpdate()
+
+	/*Для параметров гомеостаза, напрямую не связанных с жизнеобеспечением (parMaxPulsCount: гон, потребность в общении,
+		потребность в обучении и любопытство) организована цикличность: при нарастании параметра до максимума,
+		он удерживается в течении 20 секунд, а потом сбрасывается.
+		Это позволяет создавать достаточные по времени периоды специфических контекстов реагирования.
+	*/
+	if GomeostazParams[3]>90 && parMaxPulsCount[0]==0 {
+		parMaxPulsCount[0]=PulsCount
+	}
+	if GomeostazParams[4]>90 && parMaxPulsCount[1]==0 {
+		parMaxPulsCount[1]=PulsCount
+	}
+	if GomeostazParams[5]>90 && parMaxPulsCount[2]==0 {
+		parMaxPulsCount[2]=PulsCount
+	}
+	if GomeostazParams[6]>90 && parMaxPulsCount[3]==0 {
+		parMaxPulsCount[3]=PulsCount
+	}
+	// сброс после периода удержания
+	if GomeostazParams[3]>90 {
+		if parMaxPulsCount[0]+PeriodPulsCount < PulsCount {
+			parMaxPulsCount[0] = 0
+			GomeostazParams[3] = 0
+		}
+	}else{
+		parMaxPulsCount[0] = 0
+	}
+
+	if GomeostazParams[4]>90 {
+		if parMaxPulsCount[1]+PeriodPulsCount < PulsCount {
+			parMaxPulsCount[1] = 0
+			GomeostazParams[4] = 0
+		}
+	}else{parMaxPulsCount[1] = 0}
+
+	if GomeostazParams[5]>90 {
+		if parMaxPulsCount[2]+PeriodPulsCount < PulsCount {
+			parMaxPulsCount[2] = 0
+			GomeostazParams[5] = 0
+		}
+	}else{parMaxPulsCount[2] = 0}
+
+	if GomeostazParams[6]>90 {
+		if parMaxPulsCount[3]+PeriodPulsCount < PulsCount {
+			parMaxPulsCount[3] = 0
+			GomeostazParams[6] = 0
+		}
+	}else{parMaxPulsCount[3] = 0}
 }
 /////////////////////////////////
 func SaveCurrentGomeoParams(){
