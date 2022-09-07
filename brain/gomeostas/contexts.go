@@ -92,59 +92,40 @@ antagonists[id] =append(antagonists[id],aID)
 
 /* // проверка ограничителя
 	BaseContextActive[1]=true
-	BaseContextActive[2]=true
-	BaseContextActive[3]=true
-	BaseContextActive[5]=true
+	BaseContextActive[6]=true
 	BaseContextActive[9]=true
-	var activedC []int
-	for id, v := range BaseContextActive {
-		if v{
-			if len(activedC)>2{
-				// выбрать  наиболее веские контексты до 3-х
-				for _,idA := range activedC {
-					if BaseContextWeight[idA]<BaseContextWeight[id]{
-						BaseContextActive[id]=false // погасить более слабого
-					}
-				}
-			}
-			activedC=append(activedC,id)
-		}
-	}
- */
-	/* Недолелал с использованием сортировки...
+	BaseContextActive[12]=true
+	BaseContextActive[9]=true
 	var activedC=make(map[int]int)
 	for id, v := range BaseContextActive {
 		if v{
 			activedC[id]=BaseContextWeight[id]
 		}
 	}
-	//отсортировать веса активных контекстов по убыванию и взять первые три
+	//карта только активных контекстов
 	keys := make([]int, 0, len(activedC))
-	for _,v := range activedC {
-		keys = append(keys, v)
+	for k := range activedC {
+		keys = append(keys, k)
 	}
-	//sort.Ints(keys)
-	sort.Slice(keys , func(i, j int) bool {
-		return keys[i] > keys[j]
+	//СОРТИРОВКА ПО ЗНАЧЕНИЮ даже если значения повторяются
+	sort.SliceStable(keys , func(i, j int) bool {
+		return activedC[keys[i]] > activedC[keys[j]]
 	})
-	// ограничить
-	count:=0
-	index := make(map[int]int)
-	for k,v := range keys {
-		if count>2{
-			break
-		}
-		index[v]=activedC[k];//tivedC[k]
-		count++
+	// ограничить только первыми тремя
+	if len(keys)>3 {
+		keys = keys[:3]
 	}
-
 	for id, _ := range BaseContextActive {
 		BaseContextActive[id]=false
-		if index[id]>0 {
-			BaseContextActive[id] = true
+		for i := 0; i < len(keys); i++ {
+			if id == keys[i]{
+				BaseContextActive[id]=true
+			}
 		}
 	}
-	*/
+ */
+
+
 
 	return
 }
@@ -218,66 +199,34 @@ func baseContextUpdate(){
 а лишние будут отсеиваться в порядке убывания весов контекстов.
 Это неплохо имитирует распознаватель с активацией по частично-активному профилю на входе.
 */
-//  первый вариант - простой, но непонятный
-	var activedC []int
-	for id, v := range BaseContextActive {
-		if v{
-			if len(activedC)>2{
-				// выбрать  наиболее веские контексты до 3-х
-				for _,idA := range activedC {
-					if BaseContextWeight[idA]<BaseContextWeight[id]{
-						BaseContextActive[id]=false // погасить более слабого
-					}
-				}
-			}
-			activedC=append(activedC,id)
-		}
-	}
- /*
-// более понятный вариант, хотя и более накрученный:
-	Недолелал с использованием сортировки...
 	var activedC=make(map[int]int)
 	for id, v := range BaseContextActive {
 		if v{
-			activedC[BaseContextWeight[id]]=id
+			activedC[id]=BaseContextWeight[id]
 		}
 	}
-	//отсортировать веса активных контекстов по убыванию и взять первые три
+	//карта только активных контекстов
 	keys = make([]int, 0, len(activedC))
 	for k := range activedC {
 		keys = append(keys, k)
 	}
-	//sort.Ints(keys)
-	sort.Slice(keys , func(i, j int) bool {
-		return keys[i] > keys[j]
+	//СОРТИРОВКА ПО ЗНАЧЕНИЮ даже если значения повторяются
+	sort.SliceStable(keys , func(i, j int) bool {
+		return activedC[keys[i]] > activedC[keys[j]]
 	})
-	count:=0
-	index := make(map[int]int)
-	for _,v := range keys {
-		if count>2{
-			break
-		}
-		index[activedC[v]]=v
-		count++
+	// ограничить только первыми тремя
+	if len(keys)>3 {
+		keys = keys[:3]
 	}
-
 	for id, _ := range BaseContextActive {
 		BaseContextActive[id]=false
-		if index[id]>0 {
-			BaseContextActive[id] = true
+		for i := 0; i < len(keys); i++ {
+			if id == keys[i]{
+				BaseContextActive[id]=true
+			}
 		}
 	}
 
-	// если активен сон, все остальные неактивны
-	if !IsSlipping{
-		// При бодрствовании обязательно должен быть определен базовый контекст,
-		// поэтому делаем по умолчанию Лень и гасим его в нужных случаях: BaseContextActive[6]=false
-if IsContextActive()==false{
-  BaseContextActive[6] = true
-}
-	}
-*/
-	return
 }
 //активируем или пассивируем контексты по заданному правилу в http://go/pages/gomeostaz.php
 func activeOrPassiveContext(rule string){
