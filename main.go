@@ -204,10 +204,11 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 			if len(setImpParam) > 0 {
 				brain.IsPultActivnost = true
 				if setImpParam == "1" {
-					if update.ImportFileUpdate(true) == true {
+					IsImpParam, impTxt := update.ImportFileUpdate([]int{1})
+					if IsImpParam == true {
 						setImpParam = "yes"
 					} else {
-						setImpParam = "no"
+						setImpParam = impTxt
 					}
 				}
 				brain.IsPultActivnost = false

@@ -154,12 +154,12 @@ func SaveFileUpdateDir() {
 /* Импорт из файла обмена
 Загружаем поочередно все типы файлов от ботов, которые прописаны в каталоге
 */
-func ImportFileUpdate(NoCheckWordCount bool) bool {
+func ImportFileUpdate(flieArr []int) (bool, string) {
 	var sArr []string
 	var tArr []string
 	var IsMod, IsNoCompat, IsNoAllImport, IsCompat, FlgBreak bool
 	var i, j, id, compat, aktIdCur int
-	var FileName, updateName, FilePathUpdate, msgTxt, nameAkt string
+	var FileName, updateName, FilePathUpdate, msgTxt, outTxt, nameAkt string
 
 	// смотрим каталог обмена и закачиваем согласно списку ботов их файлы
 	for BotName, ListId := range FileUpdate {
@@ -176,7 +176,7 @@ func ImportFileUpdate(NoCheckWordCount bool) bool {
 			// смотрим дату последнего изменения файла обмена
 			file, err := os.Stat(FilePathUpdate)
 			if err != nil || file.Size() == 0 {
-				lib.WritePultConsol("Файл не найден или пустой: " + BotName + "_" + FileName)
+				outTxt += "Файл не найден или пустой: " + BotName + "_" + FileName + "</br>"
 				IsNoAllImport = true
 				continue
 			}
@@ -203,10 +203,8 @@ func ImportFileUpdate(NoCheckWordCount bool) bool {
 						switch FileName {
 						case updatePhraseName: // дерево фраз
 							updateName = updatePhraseName
-							if NoCheckWordCount == true {
-								// включаем флаг авторитарной записи новой фразы, без выдержки в tempArr
-								word_sensor.NoCheckWordCount = true
-							}
+							// включаем флаг авторитарной записи новой фразы, без выдержки в tempArr
+							word_sensor.NoCheckWordCount = true
 							word_sensor.SetNewPhraseTreeNode(tArr[j])
 							word_sensor.NoCheckWordCount = false
 						case updateActonsName: // список действий
@@ -251,7 +249,7 @@ func ImportFileUpdate(NoCheckWordCount bool) bool {
 						case updateDnkReflexes: // список рефлексов
 							updateName = updateDnkReflexes
 							if len(ActonsSincID) == 0 { // если массив соответствий пустой, нет смысла проверять
-								lib.WritePultConsol("Массив соотвествий ID действий пустой!")
+								msgTxt = "Массив соотвествий ID действий пустой: "
 								FlgBreak = true
 								break
 							}
@@ -282,7 +280,7 @@ func ImportFileUpdate(NoCheckWordCount bool) bool {
 						case updateTriggerStimulsImages: // список пусковых стимулов У-рефлексов
 							updateName = updateTriggerStimulsImages
 							if len(ActonsSincID) == 0 { // если массив соответствий пустой, нет смысла проверять
-								lib.WritePultConsol("Массив соотвествий ID действий пустой!")
+								msgTxt = "Массив соотвествий ID действий пустой!"
 								FlgBreak = true
 								break
 							}
@@ -307,9 +305,7 @@ func ImportFileUpdate(NoCheckWordCount bool) bool {
 								} // настроение не совпадает
 							}
 							if rt[2] != "" {
-								if NoCheckWordCount == true {
-									word_sensor.NoCheckWordCount = true
-								}
+								word_sensor.NoCheckWordCount = true
 								phr := strings.Split(rt[2], "#")
 								for p := 0; p < len(phr); p++ {
 									word_sensor.SetNewPhraseTreeNode(phr[p])
@@ -322,12 +318,12 @@ func ImportFileUpdate(NoCheckWordCount bool) bool {
 						case updateConditionReflexes: // список У-рефлексов
 							updateName = updateConditionReflexes
 							if len(ActonsSincID) == 0 { // если массив соответствий пустой, нет смысла проверять
-								lib.WritePultConsol("Массив соотвествий ID действий пустой!")
+								msgTxt = "Массив соотвествий ID действий пустой: "
 								FlgBreak = true
 								break
 							}
 							if len(TriggerSincID) == 0 { // если массив соответствий пустой, нет смысла проверять
-								lib.WritePultConsol("Массив соотвествий ID пусковых стимулов пустой!")
+								msgTxt = "Массив соотвествий ID пусковых стимулов пустой!"
 								FlgBreak = true
 								break
 							}
@@ -396,16 +392,16 @@ func ImportFileUpdate(NoCheckWordCount bool) bool {
 				ActonsSincID = make(map[int]int)
 				TriggerSincID = make(map[int]int)
 			}
-			lib.WritePultConsol(msgTxt + BotName + "_" + FileName)
+			outTxt += msgTxt + BotName + "_" + FileName + "</br>"
 		}
 	}
 	// все файлы заблокированы, нечего обновлять
 	if IsCompat == false {
-		lib.WritePultConsol("Все файлы в списке обмена не совместимы для импорта!")
+		outTxt = "Все файлы в списке обмена не совместимы для импорта!"
 		IsNoAllImport = true
 	}
 
-	return !IsNoAllImport
+	return !IsNoAllImport, outTxt
 }
 
 /* Экспорт в файл обмена
@@ -507,7 +503,7 @@ func ExportFileUpdate(flieArr []int) (bool, string) {
 				flgExp = false
 			} else {
 				IsNoAllExp = true
-				outTxt += botName + "_" + FileName + ": " + msgTxt + "\r\n"
+				outTxt += botName + "_" + FileName + ": " + msgTxt + "</br>"
 			}
 		}
 	}
