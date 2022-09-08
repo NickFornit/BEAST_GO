@@ -294,6 +294,7 @@ func init() {
 	lib.GetMainPathExeFile()
 	log.SetFlags(log.Lshortfile | log.LstdFlags)
 
+
 	// тестирование комбинаций. Если бы время работы было приемлемо,
 	//то можно было бы запускать процесс из Пульта в меню Инструменты (шестеренка)
 	// 	tools.MakeContextCombinations()

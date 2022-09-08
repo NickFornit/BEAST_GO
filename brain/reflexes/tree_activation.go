@@ -123,46 +123,53 @@ if ActiveCurBaseStyleID==22{
 
 	// результат поиска:
 	if detectedActiveLastNodID > 0 {// найден узел
-	// единственная реакция 9. Игнорирует? - для диалога Пульта чтобы сформировать рефлекс
-		isIgnor:=checkIgnorOnly(oldReflexesIdArr,geneticReflexesIdArr)
-// нет старых или новых безусловных рефлексов для текущих условий и если игнорирует
-		if (len(oldReflexesIdArr)==0 && len(geneticReflexesIdArr)==0) || isIgnor{
+// если есть фраза или условный рефлекс, то погасить б.рефлексы
+		if ActivationTypeSensor==3 || len(conditionReflexesIdArr)>0 {
+			// удалить более низкоуровневые рефлексы
+			geneticReflexesIdArr = nil
+			oldReflexesIdArr = nil
+		}else {
+			// единственная реакция 9. Игнорирует? - для диалога Пульта чтобы сформировать рефлекс
+			isIgnor := checkIgnorOnly(oldReflexesIdArr, geneticReflexesIdArr)
+			// нет старых или новых безусловных рефлексов для текущих условий и если игнорирует
+			if (len(oldReflexesIdArr) == 0 && len(geneticReflexesIdArr) == 0) || isIgnor {
 
-/* если в GeneticReflexes (список всех dnk_reflexes.txt) есть совпадающее условие,
-			то создать узел дерева
- */
-			addGeneticReflexesToTree(detectedActiveLastNodID,condArr)
+				/* если в GeneticReflexes (список всех dnk_reflexes.txt) есть совпадающее условие,
+				то создать узел дерева
+				*/
+				addGeneticReflexesToTree(detectedActiveLastNodID, condArr)
 
-			if (len(oldReflexesIdArr)==0 && len(geneticReflexesIdArr)==0) || isIgnor {
-				//  сообщить на Пульт, что при данных условиях нет б.рефлекса.
-				if EvolushnStage == 0 { // только для стадии безусловных рефлексов
-					if isIgnor {
-						NoUnconditionRefles = "IGNORED" + GetCurrentConditionsStr() //СТРОКА УСЛОВИЙ ДЛЯ РЕФЛЕКСА
-					} else {
-						NoUnconditionRefles = "NOREFLEX" + GetCurrentConditionsStr() //СТРОКА УСЛОВИЙ ДЛЯ РЕФЛЕКСА
+				if (len(oldReflexesIdArr) == 0 && len(geneticReflexesIdArr) == 0) || isIgnor {
+					//  сообщить на Пульт, что при данных условиях нет б.рефлекса.
+					if EvolushnStage == 0 { // только для стадии безусловных рефлексов
+						if isIgnor {
+							NoUnconditionRefles = "IGNORED" + GetCurrentConditionsStr() //СТРОКА УСЛОВИЙ ДЛЯ РЕФЛЕКСА
+						} else {
+							NoUnconditionRefles = "NOREFLEX" + GetCurrentConditionsStr() //СТРОКА УСЛОВИЙ ДЛЯ РЕФЛЕКСА
+						}
+						return
 					}
-					return
 				}
 			}
-		}
-		// в консоль:
-		consol:="<br>__________ РЕФЛЕКС: "
-		for c := 0; c < len(oldReflexesIdArr); c++ {
-			consol+="ID="+strconv.Itoa(oldReflexesIdArr[c])+"; "
-		}
-		for c := 0; c < len(geneticReflexesIdArr); c++ {
-			consol+="ID="+strconv.Itoa(geneticReflexesIdArr[c])+"; "
-		}
-		//consol+="<br>"
-		lib.WritePultConsol(consol)
+			// в консоль:
+			consol := "<br>__________ РЕФЛЕКС: "
+			for c := 0; c < len(oldReflexesIdArr); c++ {
+				consol += "ID=" + strconv.Itoa(oldReflexesIdArr[c]) + "; "
+			}
+			for c := 0; c < len(geneticReflexesIdArr); c++ {
+				consol += "ID=" + strconv.Itoa(geneticReflexesIdArr[c]) + "; "
+			}
+			//consol+="<br>"
+			lib.WritePultConsol(consol)
 
-		veryActual,targetArrID,acrArr:=GetActualReflexAction()
-		// передать в психику информацию
-		psychic.GetReflexInformation(veryActual,targetArrID,acrArr)
+			veryActual, targetArrID, acrArr := GetActualReflexAction()
+			// передать в психику информацию
+			psychic.GetReflexInformation(veryActual, targetArrID, acrArr)
 
-		if EvolushnStage<2 {// сразу запустить имеющиеся рефлексы
-			toRunRefleses()
-		}// иначе сначала будут проверены автоматизмы в perception.go
+			if EvolushnStage < 2 { // сразу запустить имеющиеся рефлексы
+				toRunRefleses()
+			} // иначе сначала будут проверены автоматизмы в perception.go
+		}
 
 	}else{// вообще еще нет такого случая :) т.к. всегда есть нулевая
 			//  сообщить на Пульт, что при данных условиях нет б.рефлекса.

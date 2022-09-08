@@ -7,23 +7,46 @@
 package tools
 
 import (
-	"BOT/brain/gomeostas"
 	"BOT/lib"
-	"sort"
 	"strconv"
-	"strings"
 )
 
 func init(){
 
+
 }
 /////////////////////////////////////////////////////
+
+func MakeContextCombinations() {
+	var cellArr []string
+	for i := 1; i < 18; i++ {
+			cellArr=append(cellArr,strconv.Itoa(i))
+	}
+	arr:=Combinations(cellArr,1)
+	//arr:=All(cellArr)
+
+	out:=""
+
+	for _, v := range arr {
+		for i := 0; i < len(v); i++ {
+			out+=v[i]+","
+		}
+		out+="\r\n"
+	}
+
+	lib.WriteFileContent(lib.GetMainPathExeFile()+"/combination.txt", out)
+	if len(out)>0{
+
+	}
+	return
+}
 
 var nid []int
 var outArr []string
 var cols int
 var gCArr=make(map[int][]string)
 // сейчас вызов из main.init()
+/*
 func MakeContextCombinations() {
 
 	gCArr = gomeostas.GomeostazActivnostArr
@@ -73,6 +96,7 @@ out +=arr1[n1]+"|"+arr2[n2]+"|"+arr3[n3]+"|"+arr4[n4]+"|"+arr5[n5]+"|"+arr6[n6]+
 
 	return
 }
+ */
 
 
 /////////////////////////////////////////////////////

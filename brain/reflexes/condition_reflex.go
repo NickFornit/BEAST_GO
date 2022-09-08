@@ -35,6 +35,9 @@
 
 Формат записи:
 ID|lev1|lev2 через ,|lev3 типа TriggerStimulsID|ActionIDarr через ,|rank|lastActivation|activationTime
+
+для набивки у.рефылексов Сначала (А НЕ ОДНОВРЕМЕННО!) стимул, потом рефлекс:
+ПЕРЕД ПУСКОВЫМ СТИМУЛОМ НУЖНО ЗАПОСТИТЬ СЛОВО
 */
 
 package reflexes
