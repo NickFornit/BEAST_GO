@@ -189,10 +189,11 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 			if len(setExpParam) > 0 {
 				brain.IsPultActivnost = true
 				if setExpParam == "1" {
-					if update.ExportFileUpdate([]int{1}) == true {
+					IsExpTrue, expTxt := update.ExportFileUpdate([]int{1})
+					if IsExpTrue == true {
 						setExpParam = "yes"
 					} else {
-						setExpParam = "no"
+						setExpParam = expTxt
 					}
 				}
 				brain.IsPultActivnost = false

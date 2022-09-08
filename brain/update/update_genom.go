@@ -410,16 +410,16 @@ func ImportFileUpdate(NoCheckWordCount bool) bool {
 
 /* Экспорт в файл обмена
 Выгружаем типы файлов, указанные через номера строк flieArr[] в каталоге "memory_save/update_dir.txt" по одному разу */
-func ExportFileUpdate(flieArr []int) bool {
+func ExportFileUpdate(flieArr []int) (bool, string) {
 	var sArr []string
-	var out, outBuf, FileName, FileNameList, msgTxt, msgTxt1 string
+	var out, outBuf, FileName, FileNameList, msgTxt, outTxt string
 	var i, id, LastID, UpdateLastID int
 	var flgExp, IsNoAllExp bool
 
 	_, err := os.Stat(pathUpdate)
 	if os.IsNotExist(err) {
 		lib.WritePultConsol("Каталог обмена не найден: " + pathUpdate)
-		return false
+		return false, ""
 	}
 
 	// смотрим каталог обмена и выгружаем согласно списку ботов файлы для них
@@ -439,13 +439,13 @@ func ExportFileUpdate(flieArr []int) bool {
 			case updatePhraseName: // дерево фраз
 				cnt := len(word_sensor.PhraseTreeFromID)
 				if cnt == 0 {
-					msgTxt1 = ". Файл фраз пустой, нет данных для обновления."
+					msgTxt = "файл фраз пустой, нет данных для обновления."
 					break
 				}
 				// добавляем самую длинную фразу ветки, конечный узел
 				UpdateLastID = FileUpdateDir[id].LastID
 				if word_sensor.PhraseTreeFromID[cnt-1].ID <= UpdateLastID {
-					msgTxt1 = ". Нет новых данных для обновления."
+					msgTxt = "нет новых данных для обновления."
 					break
 				}
 				for n := 0; n < cnt; n++ {
@@ -504,16 +504,14 @@ func ExportFileUpdate(flieArr []int) bool {
 				out = ""
 			}
 			if flgExp == true {
-				msgTxt = "Успешный экспорт: "
 				flgExp = false
 			} else {
-				msgTxt = "Не удачный экспорт: "
 				IsNoAllExp = true
+				outTxt += botName + "_" + FileName + ": " + msgTxt + "\r\n"
 			}
-			lib.WritePultConsol(msgTxt + botName + "_" + FileName + msgTxt1)
 		}
 	}
-	return !IsNoAllExp
+	return !IsNoAllExp, outTxt
 }
 
 /* Копировать файл данных в общий каталог */
