@@ -4,16 +4,19 @@
 bot1_update_phrase_tree.txt.
 2. В каталоге memory_save создается файл каталога обмена update_dir.txt, в котором указывается список файлов для
 обновления:
-1|bot2|update_phrase_tree|2022-07-12 09:40:48|1
+1|bot2|update_phrase_tree|2022-07-12 09:40:48|200|1
 1 - номер очередности загрузки. ВАЖНО: сначала файл действий, потом рефлексов.
 bot2 - имя внешнего бота
 update_phrase_tree - имя файла обмена (см. константы ниже)
 2022-07-12 09:40:48 - дата/время, заполняется автоматом после успешного обновления
+200 - ID последней записи при экспорте.
 1 - статус блокировки записи: 0 - обмен заблокирован, 1 - обмен разрешен
 3. Каждый бот следит за своим файлом, обновляя их. Чужие только читает. При обновлени делается проверка на
 совместимость БП и БК, список действий.
 Прочий обмен это обмен первичными сенсорами: чтобы бот правильно расположил их по дереву надо ему просто скормить
 дерево фраз другого бота.
+При экпорте фиксируется ID последней записи массива, и при следующем экспорте будут выводиться записи начианая
+с ID + 1.
 */
 package update
 
@@ -166,6 +169,9 @@ func ImportFileUpdate(flieArr []int) (bool, string) {
 		sArr = strings.Split(ListId, "|")
 		for i = 0; i < len(sArr); i++ {
 			id, _ = strconv.Atoi(sArr[i])
+			if !lib.ExistsValInArr(flieArr, id) {
+				continue // обрабатываем только заданные файлы
+			}
 			compat = FileUpdateDir[id].Compat
 			if compat == 0 {
 				continue // не совместимый для обмена файл
@@ -424,8 +430,8 @@ func ExportFileUpdate(flieArr []int) (bool, string) {
 		for i = 0; i < len(sArr); i++ {
 			id, _ = strconv.Atoi(sArr[i])
 			if !lib.ExistsValInArr(flieArr, id) {
-				continue
-			} // обрабатываем только заданные файлы
+				continue // обрабатываем только заданные файлы
+			}
 			FileName = FileUpdateDir[id].FileName
 			if lib.ExistsValStrInList(FileNameList, FileName, "|") == true {
 				continue // уже выгружали в этом сеансе
