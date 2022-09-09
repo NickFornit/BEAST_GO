@@ -138,6 +138,14 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 			_, _ = fmt.Fprint(resp, "POST")
 		} else {
 			brain.NotAllowAnyActions = true
+
+			// Сформировать условные рефлексы на основе списка фраз-синонимов
+			file_for_condition_reflexes := r.FormValue("file_for_condition_reflexes")
+			if len(file_for_condition_reflexes) > 0 {
+				reflexes.FormingConditionsRefleaxFromList(file_for_condition_reflexes)
+				_, _ = fmt.Fprint(resp, "OK")
+			}
+
 		}
 		//fmt.Println("EMPTY")
 	}

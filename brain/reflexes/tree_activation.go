@@ -48,6 +48,9 @@ func readyForRecognitionRflexes() { // init() для дерева распозн
 	}
  */
 	initConditionReflex()
+
+
+//	FormingConditionsRefleaxFromList("")
 }
 //////////////////////////////////////
 
