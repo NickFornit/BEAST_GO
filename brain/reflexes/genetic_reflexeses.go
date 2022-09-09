@@ -10,20 +10,12 @@ import (
 	"strings"
 )
 
-/////////////////////////////////////////
-
-////////////////////////////////////////
 func init() {
 	loadGeneticReflexes()
-
 	loadImagesArrs()
-
 	initReflexTree()
 }
 
-/////////////////////////////////////////
-
-////////////////////////////////////////////
 type GeneticReflex struct {
 	ID          int
 	lev1        int
@@ -43,10 +35,10 @@ lev3 string
 lev4 string
 actions string
 }
-var geneticReflexesStr = make(map[int]*geneticReflexStr)
 
-//////////////////////////////////////////
+var geneticReflexesStr = make(map[int]*geneticReflexStr)
 var lastGeneticReflexID = 0
+
 func CreateNewGeneticReflex(id int, lev1 int, lev2 []int, lev3 []int, ActionIDarr []int) (int, *GeneticReflex) {
 	// посмотреть, если рефлекс с такими же условиями уже есть
 	idOld, rOld := compareUnicum(lev1, lev2, lev3)
@@ -83,8 +75,6 @@ func compareUnicum(lev1 int, lev2 []int, lev3 []int) (int, *GeneticReflex) {
 	}
 	return 0, nil
 }
-
-////////////////////////////////////////////////////////
 
 // P.S. безусловные рефлексы создаются в редакторе и поэтому здесь нет функции их сохранения.
 // а только загрузка имеющихся в формате ID|lev1|lev2_1,lev2_2,...|lev3_1,lev3_2,...|actin_1,actin_2,...:
@@ -148,13 +138,17 @@ func SaveGeneticReflexes() {
 	if EvolushnStage > 0 {
 		return
 	}
-
 	for i := 1; i < len(GeneticReflexes)+1; i++ {
-		out += strconv.Itoa(GeneticReflexes[i].ID) + "|" +
-			strconv.Itoa(GeneticReflexes[i].lev1) + "|" +
-			strings.Join(lib.StrArrToIntArr(GeneticReflexes[i].lev2), ",") + "|" +
-			strings.Join(lib.StrArrToIntArr(GeneticReflexes[i].lev3), ",") + "|" +
-			strings.Join(lib.StrArrToIntArr(GeneticReflexes[i].ActionIDarr), ",") + "\r\n"
+		out += ListDnkReflex(i) + "\r\n"
 	}
 	lib.WriteFileContent(lib.GetMainPathExeFile()+"/memory_reflex/dnk_reflexes.txt", out)
+}
+
+// Получить строку ДНК-рефлекса по ID
+func ListDnkReflex(ID int)string{
+	return strconv.Itoa(GeneticReflexes[ID].ID) + "|" +
+		strconv.Itoa(GeneticReflexes[ID].lev1) + "|" +
+		strings.Join(lib.StrArrToIntArr(GeneticReflexes[ID].lev2), ",") + "|" +
+		strings.Join(lib.StrArrToIntArr(GeneticReflexes[ID].lev3), ",") + "|" +
+		strings.Join(lib.StrArrToIntArr(GeneticReflexes[ID].ActionIDarr), ",")
 }

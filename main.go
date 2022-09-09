@@ -189,11 +189,11 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 			if len(setExpParam) > 0 {
 				brain.IsPultActivnost = true
 				if setExpParam == "1" {
-					IsExpTrue, expTxt := update.ExportFileUpdate([]int{1})
+					IsExpTrue, expTxt := update.ExportFileUpdate([]int{1,2,3,4})
 					if IsExpTrue == true {
-						setExpParam = "yes"
+						setExpParam = "yes|" + expTxt
 					} else {
-						setExpParam = expTxt
+						setExpParam = "no|" + expTxt
 					}
 				}
 				brain.IsPultActivnost = false
@@ -204,11 +204,11 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 			if len(setImpParam) > 0 {
 				brain.IsPultActivnost = true
 				if setImpParam == "1" {
-					IsImpParam, impTxt := update.ImportFileUpdate([]int{1})
+					IsImpParam, impTxt := update.ImportFileUpdate([]int{1,2,3,4})
 					if IsImpParam == true {
-						setImpParam = "yes"
+						setImpParam = "yes|" + impTxt
 					} else {
-						setImpParam = impTxt
+						setImpParam = "no|" + impTxt
 					}
 				}
 				brain.IsPultActivnost = false

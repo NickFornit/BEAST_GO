@@ -398,7 +398,7 @@ func ImportFileUpdate(flieArr []int) (bool, string) {
 				ActonsSincID = make(map[int]int)
 				TriggerSincID = make(map[int]int)
 			}
-			outTxt += msgTxt + BotName + "_" + FileName + "</br>"
+			outTxt += "<div align='left'>" + msgTxt + BotName + "_" + FileName + "</div>"
 		}
 	}
 	// все файлы заблокированы, нечего обновлять
@@ -411,7 +411,9 @@ func ImportFileUpdate(flieArr []int) (bool, string) {
 }
 
 /* Экспорт в файл обмена
-Выгружаем типы файлов, указанные через номера строк flieArr[] в каталоге "memory_save/update_dir.txt" по одному разу */
+Выгружаем типы файлов, указанные через номера строк flieArr[] в каталоге "memory_save/update_dir.txt" по одному разу
+Блокировка файлов при экспорте не учитывается
+*/
 func ExportFileUpdate(flieArr []int) (bool, string) {
 	var sArr []string
 	var out, outBuf, FileName, FileNameList, msgTxt, outTxt string
@@ -437,24 +439,23 @@ func ExportFileUpdate(flieArr []int) (bool, string) {
 				continue // уже выгружали в этом сеансе
 			}
 			FileNameList += FileName + "|"
+			UpdateLastID = FileUpdateDir[id].LastID
 			switch FileName {
 			case updatePhraseName: // дерево фраз
 				cnt := len(word_sensor.PhraseTreeFromID)
 				if cnt == 0 {
-					msgTxt = "файл фраз пустой, нет данных для обновления."
+					msgTxt = "файл пустой, нет данных для обновления."
 					break
 				}
 				// добавляем самую длинную фразу ветки, конечный узел
-				UpdateLastID = FileUpdateDir[id].LastID
 				if word_sensor.PhraseTreeFromID[cnt-1].ID <= UpdateLastID {
 					msgTxt = "нет новых данных для обновления."
 					break
 				}
 				for n := 0; n < cnt; n++ {
 					LastID = word_sensor.PhraseTreeFromID[n].ID
-					if LastID <= UpdateLastID {
-						continue
-					} // выводим узлы дерева от последнего экспорта
+					if LastID <= UpdateLastID {continue}
+					// выводим узлы дерева от последнего экспорта
 					outBuf = word_sensor.GetPhraseStringsFromPhraseID(LastID)
 					if word_sensor.PhraseTreeFromID[n].Children == nil {
 						if outBuf != "" {
@@ -464,20 +465,48 @@ func ExportFileUpdate(flieArr []int) (bool, string) {
 					}
 					outBuf = ""
 				}
-				FileUpdateDir[id].LastID = LastID
 			case updateActonsName: // список действий
+				// список не большой, просто смотрим число строк, если есть новые - экспортируем
 				PathFileExport := lib.MainPathExeFile + "/memory_reflex/terminal_actons.txt"
+				lines, _ := lib.ReadLines(PathFileExport)
+				LastID = len(lines)
+				if LastID == 0 {
+					msgTxt = "файл пустой, нет данных для обновления."
+					break
+				}
+				if LastID <= UpdateLastID {
+					msgTxt = "нет новых данных для обновления."
+					break
+				}
 				flgExp = CopyFileToExport(PathFileExport, FileName)
 			case updateDnkReflexes: // список рефлексов
-				PathFileExport := lib.MainPathExeFile + "/memory_reflex/dnk_reflexes.txt"
-				flgExp = CopyFileToExport(PathFileExport, FileName)
+				cnt := len(reflexes.GeneticReflexes)
+				if cnt == 0 {
+					msgTxt = "файл пустой, нет данных для обновления."
+					break
+				}
+				if reflexes.GeneticReflexes[cnt-1].ID <= UpdateLastID {
+					msgTxt = "нет новых данных для обновления."
+					break
+				}
+				for n := 1; n < cnt + 1; n++{
+					if rf, ok := reflexes.GeneticReflexes[n]; ok{
+						LastID = rf.ID
+						if LastID <= UpdateLastID {continue}
+						out += reflexes.ListDnkReflex(n) + "\r\n"
+						flgExp = true
+					}
+				}
 			case updateTriggerStimulsImages: // список пусковых стимулов У-рефлексов
 				cnt := len(word_sensor.PhraseTreeFromID)
 				if cnt == 0 {
-					continue
+					msgTxt = "файл пустой, нет данных для обновления."
+					break
 				}
 				out = ""
 				for k, v := range reflexes.TriggerStimulsArr {
+					if k > LastID {LastID = k}
+					if k <= UpdateLastID {continue}
 					out += strconv.Itoa(k) + "|"
 					for i := 0; i < len(v.RSarr); i++ {
 						out += strconv.Itoa(v.RSarr[i]) + ","
@@ -490,9 +519,7 @@ func ExportFileUpdate(flieArr []int) (bool, string) {
 						}
 					}
 					out += "|"
-					out += strconv.Itoa(v.ToneID) + "|"
-					out += strconv.Itoa(v.MoodID)
-					out += "\r\n"
+					out += strconv.Itoa(v.ToneID) + "|" + strconv.Itoa(v.MoodID) + "\r\n"
 					flgExp = true
 				}
 			case updateConditionReflexes: // список у-рефлексов
@@ -502,15 +529,17 @@ func ExportFileUpdate(flieArr []int) (bool, string) {
 			if out != "" {
 				out = strings.TrimSuffix(out, "\r\n")
 				lib.WriteFileContent(pathUpdate+"/"+botName+"_"+FileName+".txt", out)
-				SaveFileUpdateDir()
 				out = ""
 			}
 			if flgExp == true {
 				flgExp = false
+				outTxt += "<div align='left'>" + botName + "_" + FileName + ": ОК</div>"
+				FileUpdateDir[id].LastID = LastID
 			} else {
 				IsNoAllExp = true
-				outTxt += botName + "_" + FileName + ": " + msgTxt + "</br>"
+				outTxt += "<div align='left'>" + botName + "_" + FileName + ": " + msgTxt + "</div>"
 			}
+			SaveFileUpdateDir()
 		}
 	}
 	return !IsNoAllExp, outTxt
