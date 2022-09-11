@@ -6,6 +6,7 @@ package reflexes
 
 import (
 	"BOT/lib"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -135,11 +136,15 @@ func SaveGeneticReflexes() {
 	var out string
 
 	// сохранение только в режиме Larva
-	if EvolushnStage > 0 {
-		return
+	if EvolushnStage > 0 {return}
+
+	keys := make([]int, 0, len(GeneticReflexes))
+	for k := range GeneticReflexes {
+		keys = append(keys, k)
 	}
-	for i := 1; i < len(GeneticReflexes)+1; i++ {
-		out += ListDnkReflex(i) + "\r\n"
+	sort.Ints(keys)
+	for _, k := range keys {
+		out += ListDnkReflex(k) + "\r\n"
 	}
 	lib.WriteFileContent(lib.GetMainPathExeFile()+"/memory_reflex/dnk_reflexes.txt", out)
 }

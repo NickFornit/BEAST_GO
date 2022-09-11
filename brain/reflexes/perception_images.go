@@ -174,7 +174,7 @@ func CreateNewTriggerStimulsImage() {
 	setOldActiveCurTriggerStimulsVal(ActiveCurTriggerStimulsID)
 	ActiveCurTriggerStimulsID, _ = CreateNewlastTriggerStimulsID(0, RSarr, PhraseID, ToneID, MoodID)
 
-	saveTriggerStimulsArr()
+	SaveTriggerStimulsArr()
 }
 
 /////////////////////////////////////////
@@ -182,7 +182,7 @@ func CreateNewTriggerStimulsImage() {
 //////////////////// сохранить образы сочетаний пусковых стимулов
 //В случае отсуствия пусковых стимулов создается ID такого отсутсвия, пример такой записи: 2|||0|0|
 // ID|RSarr через ,|PhraseID через ,|ToneID|MoodID|
-func saveTriggerStimulsArr() {
+func SaveTriggerStimulsArr() {
 	var out = ""
 	for k, v := range TriggerStimulsArr {
 		out += strconv.Itoa(k) + "|"

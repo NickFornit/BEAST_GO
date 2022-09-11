@@ -398,7 +398,7 @@ func SaveReflexesAttributes(){
 	}
 	// сохранить образы восприятия и пусковых стимулов после прохода всех безусловных рефлексов
 	SaveBaseStyleArr()
-	saveTriggerStimulsArr()
+	SaveTriggerStimulsArr()
 
 	saveReflexTree()
 	SaveConditionReflex()

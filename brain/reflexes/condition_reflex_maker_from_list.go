@@ -49,7 +49,7 @@ if len(list)<5{
 		PhraseID := wordSensor.CurrentPhrasesIDarr
 		ActiveCurTriggerStimulsID, _ = CreateNewlastTriggerStimulsID(0, nil, PhraseID, 0, 0)
 
-		saveTriggerStimulsArr()
+		SaveTriggerStimulsArr()
 		lev3:= ActiveCurTriggerStimulsID
 
 		pn = strings.Split(p[4], ",")

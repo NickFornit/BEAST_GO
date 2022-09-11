@@ -27,6 +27,7 @@ import (
 	"BOT/lib"
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -133,7 +134,7 @@ func EditAddFileUpdate(ID int, FileName string, LastMod time.Time, LastID int, C
 	return &node
 }
 
-// сохранить изменения в каталоге обмена в файл
+// сохранить изменения в файле обмена
 func SaveFileUpdateDir() {
 	var sArr []string
 	var i, id int
@@ -244,6 +245,13 @@ func ImportFileUpdate(flieArr []int) (bool, string) {
 									continue
 								}
 							}
+							// если попалась хотя бы одна НОВАЯ запись в режиме 0 - то отбой
+							// массив соответствий будет пустой, импорт бу/у рефлексов и пусковых стимулов так же откатится
+							if reflexes.EvolushnStage > 0 {
+								msgTxt = "Обнаружено новое Действие. Импорт новых Действий возможен только в начальной стадии 0: "
+								FlgBreak = true
+								break
+							}
 							// если дошло до этого места, значит все проверки прошли и такого действия нет в базе текущего бота
 							// и его можно залить, зафиксировав при этом связь между ID действий ботов
 							termineteAction.LastTerminalActons++
@@ -254,14 +262,18 @@ func ImportFileUpdate(flieArr []int) (bool, string) {
 							termineteAction.UpdateActionsTargetsFromID(aktIdNew, akt[3])
 						case updateDnkReflexes: // список рефлексов
 							updateName = updateDnkReflexes
-							if len(ActonsSincID) == 0 { // если массив соответствий пустой, нет смысла проверять
-								msgTxt = "Массив соотвествий ID действий пустой: "
+							if len(ActonsSincID) == 0 { // если массив соответствий ID действий пустой, нет смысла проверять
+								if reflexes.EvolushnStage > 0 {
+									msgTxt = "Импорт новых БУ-рефлексов возможен только в начальной стадии 0: "
+								} else {
+									msgTxt = "Массив соотвествий ID действий пустой. БУ-рефлексы импортируются в одном пакете в очередности: действия, рефлексы: "
+								}
 								FlgBreak = true
 								break
 							}
 							// делаем проверки на совместимость
 							rf := strings.Split(tArr[j], "|")
-							// совместимость базовых эмоций
+							// совместимость базовых состояний
 							lev1, _ := strconv.Atoi(rf[1])
 							if lib.ExistsValInArr([]int{1, 2, 3}, lev1) == false {
 								continue
@@ -271,22 +283,26 @@ func ImportFileUpdate(flieArr []int) (bool, string) {
 								continue
 							}
 							// совместимость пусковых стимулов
-							if IsCompareArrValue(rf[3], 8) == false {
+							if IsCompareArrValue(rf[3], 17) == false {
 								continue
 							}
 							// совместимость рефлекторных действий
 							rf[4] = IsActionIdToBot(rf[4])
 							if rf[4] == "-1" {
 								continue
-							} // не нашлось соответствий в массиве
+							} // проверка наличия рефлекса в базе делается в CreateNewGeneticReflex(), где создаются только новые
 							lev2 := lib.IntArrToStrArr(strings.Split(rf[2], ","))
 							lev3 := lib.IntArrToStrArr(strings.Split(rf[3], ","))
 							aktArr := strings.Split(rf[4], ",")
 							reflexes.CreateNewGeneticReflex(0, lev1, lev2, lev3, lib.IntArrToStrArr(aktArr))
 						case updateTriggerStimulsImages: // список пусковых стимулов У-рефлексов
 							updateName = updateTriggerStimulsImages
-							if len(ActonsSincID) == 0 { // если массив соответствий пустой, нет смысла проверять
-								msgTxt = "Массив соотвествий ID действий пустой!"
+							if len(ActonsSincID) == 0 { // если массив соответствий ID действий пустой, нет смысла проверять
+								if reflexes.EvolushnStage != 1 {
+									msgTxt = "Импорт новых пусковых стимулов У-рефлексов возможен только в стадии 1: "
+								} else {
+									msgTxt = "Массив соотвествий ID действий пустой. Пусковые стимулы У-рефлексов импортируются в одном пакете в очередности: действия, стимулы: "
+								}
 								FlgBreak = true
 								break
 							}
@@ -300,17 +316,17 @@ func ImportFileUpdate(flieArr []int) (bool, string) {
 							if rt[3] != "" {
 								ton, _ = strconv.Atoi(rt[3])
 								if lib.ExistsValInArr([]int{0, 3, 4}, ton) == false {
-									continue
-								} // тон не совпадает
+									continue // тон не совпадает
+								}
 							}
 							mod := 0
 							if rt[4] != "" {
 								mod, _ = strconv.Atoi(rt[4])
 								if lib.ExistsValInArr([]int{0, 20, 21, 22, 23, 24, 25, 26}, mod) == false {
-									continue
-								} // настроение не совпадает
+									continue // настроение не совпадает
+								}
 							}
-							if rt[2] != "" {
+							if rt[2] != "" { // под вопросом: надо ли позволять создавать триггер без кода фразы
 								word_sensor.NoCheckWordCount = true
 								phr := strings.Split(rt[2], "#")
 								for p := 0; p < len(phr); p++ {
@@ -319,24 +335,29 @@ func ImportFileUpdate(flieArr []int) (bool, string) {
 								word_sensor.NoCheckWordCount = false
 								rsr := strings.Split(rt[1], ",")
 								rsar := lib.IntArrToStrArr(rsr)
+								// проверка наличия пускового стимула в базе делается в CreateNewlastTriggerStimulsID(), где создаются только новые
 								TriggerSincID[trId], _ = reflexes.CreateNewlastTriggerStimulsID(0, rsar, word_sensor.CurrentPhrasesIDarr, ton, mod)
 							}
 						case updateConditionReflexes: // список У-рефлексов
 							updateName = updateConditionReflexes
 							if len(ActonsSincID) == 0 { // если массив соответствий пустой, нет смысла проверять
-								msgTxt = "Массив соотвествий ID действий пустой: "
+								if reflexes.EvolushnStage != 1 {
+									msgTxt = "Импорт новых У-рефлексов возможен только в стадии 1: "
+								} else {
+									msgTxt = "Массив соотвествий ID действий пустой. У-рефлексы импортируются в одном пакете в очередности: действия, бу-рефлексы, стимулы, у-рефлексы: "
+								}
 								FlgBreak = true
 								break
 							}
 							if len(TriggerSincID) == 0 { // если массив соответствий пустой, нет смысла проверять
-								msgTxt = "Массив соотвествий ID пусковых стимулов пустой!"
+								msgTxt = "Массив соотвествий ID пусковых стимулов пустой. У-рефлексы импортируются в одном пакете в очередности: действия, бу-рефлексы, стимулы, у-рефлексы"
 								FlgBreak = true
 								break
 							}
 							// делаем проверки на совместимость
 							rcf := strings.Split(tArr[j], "|")
 							rfuId, _ := strconv.Atoi(rcf[0])
-							// совместимость базовых эмоций
+							// совместимость базовых состояний
 							lev1, _ := strconv.Atoi(rcf[1])
 							if lib.ExistsValInArr([]int{1, 2, 3}, lev1) == false {
 								continue
@@ -372,7 +393,7 @@ func ImportFileUpdate(flieArr []int) (bool, string) {
 				LastModeUpdate(BotName, updateName, ModTime)
 				SaveFileUpdateDir()
 			}
-			// обновляем данные в каталоге обмена
+			// сохраняем данные
 			if IsMod == true {
 				IsMod = false
 				switch updateName {
@@ -380,6 +401,10 @@ func ImportFileUpdate(flieArr []int) (bool, string) {
 					termineteAction.SaveTerminalActons()
 				case updateDnkReflexes:
 					reflexes.SaveGeneticReflexes()
+				case updateTriggerStimulsImages:
+					reflexes.SaveTriggerStimulsArr()
+				case updateConditionReflexes:
+					reflexes.SaveConditionReflex()
 				}
 				msgTxt = "Успешный импорт: "
 			} else {
@@ -440,6 +465,7 @@ func ExportFileUpdate(flieArr []int) (bool, string) {
 			}
 			FileNameList += FileName + "|"
 			UpdateLastID = FileUpdateDir[id].LastID
+			LastID = 0
 			switch FileName {
 			case updatePhraseName: // дерево фраз
 				cnt = len(word_sensor.PhraseTreeFromID)
@@ -467,17 +493,22 @@ func ExportFileUpdate(flieArr []int) (bool, string) {
 				if cnt == 0 {break}
 				if cnt <= UpdateLastID {break}
 				flgExp = CopyFileToExport(PathFileExport, FileName)
-			case updateDnkReflexes: // список рефлексов
+			case updateDnkReflexes: // список бу-рефлексов
 				cnt = len(reflexes.GeneticReflexes)
 				if cnt == 0 {break}
+				// так как txt список рефлексов отсортирован, просто смотрим последний номер
 				if reflexes.GeneticReflexes[cnt-1].ID <= UpdateLastID {break}
-				for n := 1; n < cnt + 1; n++{
-					if rf, ok := reflexes.GeneticReflexes[n]; ok{
-						LastID = rf.ID
-						if LastID <= UpdateLastID {continue}
-						out += reflexes.ListDnkReflex(n) + "\r\n"
-						flgExp = true
-					}
+				keys := make([]int, 0, len(reflexes.GeneticReflexes))
+				for k, v := range reflexes.GeneticReflexes {
+					if v.ID <= UpdateLastID {continue}
+					keys = append(keys, k)
+				}
+				sort.Ints(keys)
+				for _, k := range keys {
+					rf := reflexes.GeneticReflexes[k]
+					LastID = rf.ID
+					out += reflexes.ListDnkReflex(k) + "\r\n"
+					flgExp = true
 				}
 			case updateTriggerStimulsImages: // список пусковых стимулов У-рефлексов
 				if reflexes.EvolushnStage == 0 {
@@ -561,7 +592,7 @@ func CopyFileToExport(PathFileExport string, updateName string) bool {
 	return false
 }
 
-/* Обновить дату/время в каталоге обмена */
+/* Обновить дату/время в файле списка обмена */
 func LastModeUpdate(BotName string, FileName string, TimeUpdate time.Time) {
 	var sArr []string
 	var ListID string
