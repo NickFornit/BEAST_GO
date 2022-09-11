@@ -56,15 +56,11 @@ import (
  */
 var IsUnlimitedMode=0
 
-////////////////////////////////////////////////////
 func initConditionReflex() {
-
 	loadConditionReflexes()
-
 	psychic.PsychicInit()
 }
 
-////////////////////////////////////////////
 type ConditionReflex struct {
 	ID   int
 	lev1 int
@@ -86,13 +82,9 @@ type ConditionReflex struct {
 }
 
 var ConditionReflexes = make(map[int]*ConditionReflex)
-
 // у.рефлекс - по значению ConditionReflex.lev3 (ID пускового стимула )
 var ConditionReflexesFrom3 = make(map[int]*ConditionReflex)
 
-//////////////////////////////////////////
-
-////////////////////////////////////////////
 var lastConditionReflexID = 0
 /* Детектор нового news_detectior.go выявляет новые условия причинного (предшествовавшего имеющемуся рефлесу) стимула,
 пока не приводящего к рефлексу,
@@ -149,39 +141,44 @@ func compareCRUnicum(lev1 int, lev2 []int, lev3 int) (int, *ConditionReflex) {
 	return 0, nil
 }
 
-////////////////////////////////////////////////////////
-
-//////////////////// сохранить имеющиеся условные рефлексы
+// сохранить имеющиеся условные рефлексы
 /* формат такой же как у безусловных (ID|lev1|lev2_1,lev2_2,...|lev3|actin_1,actin_2,...)
 но отличаетсмя для lev3, который есть - только один ID образа пускового стимула типа TriggerStimulsID
 */
 func SaveConditionReflex() {
 	var out = ""
 	for k, v := range ConditionReflexes {
-		out += strconv.Itoa(k) + "|"
-		out += strconv.Itoa(v.lev1) + "|"
-		for i := 0; i < len(v.lev2); i++ {
-			if i > 0 {
-				out += ","
-			}
-			out += strconv.Itoa(v.lev2[i])
-		}
-		out += "|"
-		out += strconv.Itoa(v.lev3) + "|"
-		for i := 0; i < len(v.ActionIDarr); i++ {
-			if i > 0 {
-				out += ","
-			}
-			out += strconv.Itoa(v.ActionIDarr[i])
-		}
-		out += "|"
-		out += strconv.Itoa(v.rank) + "|"
-		out += strconv.Itoa(v.lastActivation) + "|"
-		out += strconv.Itoa(v.activationTime)
-		out += "\r\n"
+		out += ListConditionReflex(k, v) + "\r\n"
 	}
 	lib.WriteFileContent(lib.GetMainPathExeFile()+"/memory_reflex/condition_reflexes.txt", out)
+}
 
+// Строка условного рефлекса по ID и value
+func ListConditionReflex(k int, v *ConditionReflex)string {
+	var out = ""
+
+	out += strconv.Itoa(k) + "|"
+	out += strconv.Itoa(v.lev1) + "|"
+	for i := 0; i < len(v.lev2); i++ {
+		if i > 0 {
+			out += ","
+		}
+		out += strconv.Itoa(v.lev2[i])
+	}
+	out += "|"
+	out += strconv.Itoa(v.lev3) + "|"
+	for i := 0; i < len(v.ActionIDarr); i++ {
+		if i > 0 {
+			out += ","
+		}
+		out += strconv.Itoa(v.ActionIDarr[i])
+	}
+	out += "|"
+	out += strconv.Itoa(v.rank) + "|"
+	out += strconv.Itoa(v.lastActivation) + "|"
+	out += strconv.Itoa(v.activationTime)
+
+	return out
 }
 
 /*  загрузить  условные рефлексы из файла в формате
@@ -207,7 +204,6 @@ func loadConditionReflexes() {
 				lev2 = append(lev2, b)
 			}
 		}
-
 		// третий уровень
 		lev3, _ := strconv.Atoi(p[3])
 
@@ -229,5 +225,3 @@ func loadConditionReflexes() {
 	}
 	return
 }
-
-///////////////////////////////////////////////////////////////////////////

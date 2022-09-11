@@ -197,7 +197,7 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 			if len(setExpParam) > 0 {
 				brain.IsPultActivnost = true
 				if setExpParam == "1" {
-					IsExpTrue, expTxt := update.ExportFileUpdate([]int{1,2,3,4})
+					IsExpTrue, expTxt := update.ExportFileUpdate([]int{1,2,3,4,5})
 					if IsExpTrue == true {
 						setExpParam = "yes|" + expTxt
 					} else {
@@ -212,7 +212,7 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 			if len(setImpParam) > 0 {
 				brain.IsPultActivnost = true
 				if setImpParam == "1" {
-					IsImpParam, impTxt := update.ImportFileUpdate([]int{1,2,3,4})
+					IsImpParam, impTxt := update.ImportFileUpdate([]int{1,2,3,4,5})
 					if IsImpParam == true {
 						setImpParam = "yes|" + impTxt
 					} else {
