@@ -16,6 +16,56 @@ func init(){
 
 }
 /////////////////////////////////////////////////////
+// найти все сочетания ряда чисел от 0 до максимального подряд (без перемешивания
+// limit - максимальное число элементов в сочетании
+func GetAllCombinationsOfSeriesNumbers(max int,limit int)([][]int){
+	var out [][]int
+	for i := 0; i < max; i++ {
+		var arr []int
+		end:=limit+i
+		if i > max-limit{
+			end=max
+		}
+		for j := i; j < end; j++ {
+			arr=append(arr,j)
+		}
+		out=append(out,arr)
+		// подсочетания
+		var arr0 []int
+		for n := 2; n < len(arr); n++ {
+			for m := 0; m < n; m++ {
+				arr0=append(arr0,arr[m])
+			}
+			out=append(out,arr0)
+		}
+	}
+	return out
+}
+////////////////////////////////////////////////////
+
+
+// найти все сочетания ряда чисел от 0 до максимального без перемешивания
+// limit - максимальное число элементов в сочетании
+func GetAllCombinationsNumbers(max int,limit int)([][]int){
+	var out [][]int
+	var series []string
+	for i := 0; i < max; i++ {
+		series=append(series,strconv.Itoa(i))
+	}
+	comb:=Combinations(series,limit)
+	for _, v := range comb {
+		var arr []int
+		for n := 0; n < len(v); n++ {
+			nun,_:=strconv.Atoi(v[n])
+			arr=append(arr,nun)
+		}
+		out=append(out,arr)
+	}
+	return out
+}
+////////////////////////////////////////////////////
+
+
 
 func MakeContextCombinations() {
 	var cellArr []string

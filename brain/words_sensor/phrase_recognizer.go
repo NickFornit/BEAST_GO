@@ -169,6 +169,7 @@ func getNodeCountFromLastID(lastID int)(int){
 	}
 	return count
 }
+////////////////////////////////////////////////
 
 
 
@@ -177,14 +178,5 @@ func getNodeCountFromLastID(lastID int)(int){
 
 
 
-///////////////////////////////////////
-// выдать строку из массива wordsArr[]int
-func GetStrFromArrID(wArr []int)(string){
-var out=""
-	for i := 0; i < len(wArr); i++ {
-		out += GetWordFromWordID(wArr[i])+" "
-	}
-	return out
-}
 
 

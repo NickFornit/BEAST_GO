@@ -29,6 +29,9 @@ import (
 
 //////////////////////////////////////
 func initReflexTree(){ // после инициализации loadGeneticReflexes()
+
+//	tools.GetAllCombinationsOfSeriesNumbers(5,3)
+
 	loadReflexTree()
 	if len(ReflexTree.Children)==0{// еще нет никаких веток
 		// создать первые три ветки базовых состояний

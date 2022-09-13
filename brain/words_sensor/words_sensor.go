@@ -25,6 +25,9 @@ func init(){
 	// залить сохранненный tempArr
 	loadTempArr()
 	afterLoadTempArr()
+
+
+//	GetExistsPraseID("дурак")
 }
 //////////////////////////////////////////
 

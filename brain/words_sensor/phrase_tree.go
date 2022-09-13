@@ -260,32 +260,7 @@ func createPhraseTreeNodes(word []int,wt *PhraseTree)(int){
 
 
 
-//////////////////////////////////////////////////
-/// строка из ID фразы дерева фраз
-func GetPhraseStringsFromPhraseID(lastID int)(string){
 
-	var idArr []string
-	for {
-		node:=PhraseTreeFromID[lastID]
-		if node==nil {
-			break
-		}
-		w:=GetWordFromWordID(node.WordID)
-		idArr=append(idArr,w)
-		lastID=node.ParentID
-		if lastID==0{
-			break
-		}
-	}
-
-	var str=""
-	for i := len(idArr)-1; i >=0; i-- {
-		str+=idArr[i]+" "
-	}
-
-	return str
-}
-//////////////////////////////////////////
 
 
 

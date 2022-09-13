@@ -32,6 +32,7 @@ func scanPraseNodes(level int,wt *PhraseTree){
 
 	if wt.ID>0 {
 		praseTreeModel += setShift(level)
+		// получить слово из ID конечного узла дерева слов
 		praseTreeModel += GetWordFromWordID(wt.WordID) + "(" + strconv.Itoa(wt.ID) + ")<br>\r\n"
 	}
 	level++
