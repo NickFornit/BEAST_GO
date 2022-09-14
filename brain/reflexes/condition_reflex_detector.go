@@ -75,7 +75,7 @@ if len(wArr)>1 {
 	if max > 5 {max=5} // не более 5 слов во фразе для подбора условного рефлекса
 	limit:=len(wArr)-1 //максимальное число элементов в сочетании
 		if limit>3{limit=3}
-// найти все сочетания ряда чисел от 0 до максимального подряд (без перемешивания
+// найти все сочетания ряда чисел от 0 до максимального подряд, без перемешивания, не менее чем по 2 слова
 	combArr := tools.GetAllCombinationsNumbers(len(wArr),limit)
 	// передор сочетаний слов combArr
 	for i := 0; i < len(combArr); i++ {
@@ -90,6 +90,17 @@ if len(wArr)>1 {
 		}
 	}
 }
+// напоследок посмотреть по одному длинному слову, > 5 символов (у русских 5*2)
+	for i := 0; i < len(wArr); i++ {
+		if len(wArr[i]) < 10{
+			continue
+		}
+		// есть ли такой образ?
+		reflex=findConditionsReflesFromPrase(wArr[i])
+		if reflex!=nil {
+			return reflex
+		}
+	}
 }
 }
 }
