@@ -5,7 +5,9 @@
 package reflexes
 
 import (
+	"BOT/brain/gomeostas"
 	wordSensor "BOT/brain/words_sensor"
+	"BOT/lib"
 	"BOT/tools"
 	"strings"
 )
@@ -16,11 +18,10 @@ func conditionRexlexFound(cond []int)(bool){
 	if cond==nil || len(cond)==0{
 		return false
 	}
-// var ConditionReflexesFrom3=make(map[int]*ConditionReflex)
-	reflex:=ConditionReflexesFrom3[cond[0]]
+	reflex:=getRightConditionReflexesFrom3(cond[0])
 	if reflex==nil {
 // попробовать найти схожие по образу рефлексы чтобы не так жестко привязываться к точности фразы
-		reflex=findConditionsReflesFromImgID(cond[0])
+		reflex=findConditionsReflesFromImgID(cond,cond[0])
 	}
 	if reflex==nil {
 		return false
@@ -56,17 +57,19 @@ func conditionRexlexFound(cond []int)(bool){
 	упрощая фразу из массива фраз TriggerStimulsArr[cond[0]].PhraseID []int
 перебором массива var TriggerStimulsArr = make(map[int]*TriggerStimuls)
 */
-func findConditionsReflesFromImgID(ImgID int)(*ConditionReflex){
+func findConditionsReflesFromImgID(cond []int,ImgID int)(*ConditionReflex){
 	var reflex *ConditionReflex
 // выделить текущую фразу
 img:=TriggerStimulsArr[ImgID]
-if img!=nil{
+if img==nil || img.PhraseID==nil{
+	return nil
+	}
 prase:=wordSensor.GetPhraseStringsFromPhraseID(img.PhraseID[0])
 if len(prase)>0{
 //если есть не буквенные символы, то убрать их
 prase=wordSensor.ClinerNotAlphavit(prase)
 // есть ли такой образ?
-reflex=findConditionsReflesFromPrase(prase)
+reflex=findConditionsReflesFromPrase(cond,prase)
 if reflex==nil {// все еще не нашли подходящий рефлекс
 // если во фразе несколько слов, то попробовать все сочетания слов фразы по порядку (а не перемещивая)
 wArr:=strings.Split(prase, " ")
@@ -84,7 +87,7 @@ if len(wArr)>1 {
 			words +=wArr[combArr[i][n]]
 		}
 		// есть ли такой образ?
-		reflex=findConditionsReflesFromPrase(words)
+		reflex=findConditionsReflesFromPrase(cond,words)
 		if reflex!=nil {
 			return reflex
 		}
@@ -96,25 +99,24 @@ if len(wArr)>1 {
 			continue
 		}
 		// есть ли такой образ?
-		reflex=findConditionsReflesFromPrase(wArr[i])
+		reflex=findConditionsReflesFromPrase(cond,wArr[i])
 		if reflex!=nil {
 			return reflex
 		}
 	}
 }
 }
-}
 return reflex
 }
 ////////////////////////////////////
 
-func findConditionsReflesFromPrase(prase string)(*ConditionReflex){
+func findConditionsReflesFromPrase(cond []int,prase string)(*ConditionReflex){
 // есть ли такая фраза в Дереве фраз?
 id:=wordSensor.GetExistsPraseID(prase)
 if id>0{// id фразы есть, найти ее образ по TriggerStimulsArr
 for k, v := range TriggerStimulsArr {
 if v.PhraseID[0]==id {// есть образ с такой фразой
-reflex:=ConditionReflexesFrom3[k]
+reflex:=getRightConditionReflexesFrom3(k)
 if reflex!=nil {// есть рефлекс с таким образом
  return reflex
 }
@@ -122,4 +124,22 @@ if reflex!=nil {// есть рефлекс с таким образом
 }
 }
 return nil
+}
+
+
+// выбор наиболее близкого по условиям рефлекса из массива с данным пусковым стимулом
+// var ConditionReflexesFrom3=make(map[int][]*ConditionReflex)
+func getRightConditionReflexesFrom3(imgId3 int)(*ConditionReflex){
+	ActiveCurBaseID = gomeostas.CommonBadNormalWell
+	bsIDarr := gomeostas.GetCurContextActiveIDarr()
+	rArr:=ConditionReflexesFrom3[imgId3]
+	if rArr==nil{
+		return nil
+	}
+	for _, v := range rArr {
+		if v.lev1 == ActiveCurBaseID && lib.EqualArrs(v.lev2,bsIDarr) {
+			return v
+		}
+	}
+	return nil
 }

@@ -82,8 +82,8 @@ type ConditionReflex struct {
 }
 
 var ConditionReflexes = make(map[int]*ConditionReflex)
-// у.рефлекс - по значению ConditionReflex.lev3 (ID пускового стимула )
-var ConditionReflexesFrom3 = make(map[int]*ConditionReflex)
+// у.рефлексы - по значению ConditionReflex.lev3 (ID пускового стимула )
+var ConditionReflexesFrom3 = make(map[int][]*ConditionReflex)
 
 var lastConditionReflexID = 0
 /* Детектор нового news_detectior.go выявляет новые условия причинного (предшествовавшего имеющемуся рефлесу) стимула,
@@ -124,7 +124,7 @@ func CreateNewConditionReflex(id int, lev1 int, lev2 []int, lev3 int, ActionIDar
 	newW.activationTime = LifeTime // время рождения
 
 	ConditionReflexes[id] = &newW
-	ConditionReflexesFrom3[lev3] = &newW
+	ConditionReflexesFrom3[lev3] = append(ConditionReflexesFrom3[lev3],&newW)
 	return id, &newW
 }
 
