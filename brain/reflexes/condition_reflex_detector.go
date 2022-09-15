@@ -115,6 +115,9 @@ func findConditionsReflesFromPrase(cond []int,prase string)(*ConditionReflex){
 id:=wordSensor.GetExistsPraseID(prase)
 if id>0{// id фразы есть, найти ее образ по TriggerStimulsArr
 for k, v := range TriggerStimulsArr {
+	if v.PhraseID==nil{
+		return nil
+	}
 if v.PhraseID[0]==id {// есть образ с такой фразой
 reflex:=getRightConditionReflexesFrom3(k)
 if reflex!=nil {// есть рефлекс с таким образом
