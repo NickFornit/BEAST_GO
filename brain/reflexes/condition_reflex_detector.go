@@ -1,5 +1,14 @@
 /* распознаватель условного рефлекса
 
+1. С помощью findConditionsReflesFromPrase( из всех у.рефлексов с данным ID образа пускового стимула (imgId3)
+выбирается тот, что подходит к данным условиям 1 и 2 уровня.
+2. Если на публьте была вбита фраза, для которой нет imgId3, то фраза очищается от неалфавитных символов
+и снова пробуется найти подходящий imgId3
+3. Если все еще нет подходящего imgId3 то фраза комбинируется:
+перебираются все сочетания слов до максимального числа, без перемешивания, не менее чем по 2 слова
+4. Если все еще нет подходящего imgId3 то пробуются все слова фразы, не менее 5 символов.
+Это позволяет найти у.рефлекс среди длинной фразы, например,
+во фразе "я боюсь тебя" будет найден рефлекс на слово "боюсь".
 */
 
 package reflexes
@@ -64,7 +73,11 @@ img:=TriggerStimulsArr[ImgID]
 if img==nil || img.PhraseID==nil{
 	return nil
 	}
-prase:=wordSensor.GetPhraseStringsFromPhraseID(img.PhraseID[0])
+	var prase=""
+	for i := 0; i < len(img.PhraseID); i++ {
+		prase+=wordSensor.GetPhraseStringsFromPhraseID(img.PhraseID[i])
+	}
+	prase=strings.Trim(prase,"")
 if len(prase)>0{
 //если есть не буквенные символы, то убрать их
 prase=wordSensor.ClinerNotAlphavit(prase)
@@ -72,18 +85,26 @@ prase=wordSensor.ClinerNotAlphavit(prase)
 reflex=findConditionsReflesFromPrase(cond,prase)
 if reflex==nil {// все еще не нашли подходящий рефлекс
 // если во фразе несколько слов, то попробовать все сочетания слов фразы по порядку (а не перемещивая)
-wArr:=strings.Split(prase, " ")
+pArr:=strings.Split(prase, " ")
+var wArr []string
+	for i := 0; i < len(pArr); i++ {
+		if len(pArr[i])==0{
+			continue
+		}
+		wArr=append(wArr,pArr[i])
+	}
 if len(wArr)>1 {
 	max:=len(wArr)
 	if max > 5 {max=5} // не более 5 слов во фразе для подбора условного рефлекса
 	limit:=len(wArr)-1 //максимальное число элементов в сочетании
 		if limit>3{limit=3}
 // найти все сочетания ряда чисел от 0 до максимального подряд, без перемешивания, не менее чем по 2 слова
-	combArr := tools.GetAllCombinationsNumbers(len(wArr),limit)
+	combArr := tools.GetAllCombinationsOfSeriesNumbers(len(wArr),limit)
 	// передор сочетаний слов combArr
 	for i := 0; i < len(combArr); i++ {
 		var words=""
 		for n := 0; n < len(combArr[i]); n++ {
+			if n>0{words +=" "}
 			words +=wArr[combArr[i][n]]
 		}
 		// есть ли такой образ?
@@ -111,13 +132,17 @@ return reflex
 ////////////////////////////////////
 
 func findConditionsReflesFromPrase(cond []int,prase string)(*ConditionReflex){
-// есть ли такая фраза в Дереве фраз?
+	if len(prase)==0{
+		return nil
+	}
+	// есть ли такая фраза в Дереве фраз?
 id:=wordSensor.GetExistsPraseID(prase)
 if id>0{// id фразы есть, найти ее образ по TriggerStimulsArr
 for k, v := range TriggerStimulsArr {
 	if v.PhraseID==nil{
-		return nil
+		continue
 	}
+
 if v.PhraseID[0]==id {// есть образ с такой фразой
 reflex:=getRightConditionReflexesFrom3(k)
 if reflex!=nil {// есть рефлекс с таким образом
