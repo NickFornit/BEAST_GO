@@ -81,6 +81,12 @@ func GetSymbolIDfromRune(r rune)(int){
 ////////////////////////////////////////////////////////////////////
 
 // дерево слов, разбитых на символы
+/*у алфавитных узлов (каждый узел - 1 символ) проявился недостаток:
+в дереве слов невозможно вычленить реальные слова,
+например, слово "приветствую" перекрывает веткой слово "привет".
+Но в дереве фраз все слова имеют ID узла дерева слов, так что список старых (сохраненных) слов
+формируется в виде WordIdFormWord=make(map[string]int) проходом в func getWordIdFormWord()
+*/
 type WordTree struct {
 	ID int // id узла символа
 	Symbol string // один символ
@@ -93,6 +99,9 @@ var VernikeWordTree WordTree // дерево слов
 var WordTreeFromID=make(map[int]*WordTree) // узел дерева от его ID
 var WordTreeFromStr=make(map[string][]*WordTree)// массив узлов с такой SymbolID
 //var WordFromID=make(map[int]string) лучше не пытаться получать это при загрузке дерева, используем GetWordFromWordID
+
+// по слову найти его ID - быстрая проверки уже имеющихся слов
+var WordIdFormWord=make(map[string]int)
 /*
 /////////////// для обеспечения уникальности узлов:
 type WordUnicum struct {
@@ -110,12 +119,12 @@ var lastIDwordTree=0
 func afterLoadTempArr(){
 	loadWordTree()
 	/*
-
 	   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	   	SetNewWordTreeNode("и") // а я нехочу такое дело
 	   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	   	SaveWordTree()
 	*/
+	//SetNewWordTreeNode("привет")
 	//str:=GetWordFromWordID(144)
 	//if len(str)>0{}
 
@@ -191,6 +200,7 @@ func createNewNodeWordTree(parent *WordTree,id int,word string)(*WordTree){
 	// т.к. append меняет длину массива, перетусовывая адреса, то нужно:
 	updateWordTreeFromID(parent)// здесь потому, что при загрузке из файла нужно на лету получать адреса
 //	notAllowScanInThisTime=false  НЕТ, иначе оно прерывает более общий запрет и возникают гонки
+
 	return new
 }
 // корректируем адреса всех узлов
@@ -234,6 +244,7 @@ func loadWordTree(){
 		// новый узел с каждой строкой из файла
 		createNewNodeWordTree(WordTreeFromID[parentID],id,word)
 	}
+
 	return
 }
 ////////////////////////////////////////////
@@ -346,8 +357,46 @@ func GetWordIDfromPhrase(phrase string)([]int){
 	wArr := strings.Split(phrase, " ")
 	for n := 0; n < len(wArr); n++ { // перебор отдельных слов
 		curWord := strings.TrimSpace(wArr[n])
-		wID:=SetNewWordTreeNode(curWord)
+
+	wID:= SetNewWordTreeNode(curWord)
 		out=append(out,wID)
 	}
 	return out
 }
+
+
+/* для старых слов получить WordIdFormWord - для распознавания неточно введенных слов и т.п.
+Проход всего дерева фраз - там выделены известные слова.
+Запускачется при нициализации Дерева фраз,
+а при вставки новых слов в Дерево слов - сразу заполняется WordIdFormWord
+ */
+func getWordIdFormWord(){
+	for _, ph := range PhraseTreeFromID {
+		word := GetWordFromWordID(ph.WordID)
+		WordIdFormWord[word]=ph.WordID
+	}
+	return
+}
+///////////////////////////////////////
+
+/* Cлово проверяется на наличие в списке старых (до сохранения) слов WordIdFormWord=make(map[string]int)
+и если оно есть, то возвращается его ID.
+Если слова нет и оно имеет более 4-х символов, то делается предположение об описке внутренних символов
+(в природном распознавателе слово узнается если точно совпали первая и последняя буквы,
+а внутренние буквы могут быть как угодно перемешаны)
+Если слово распознается, то возвращается ID слова.
+*/
+func tryWordRecognize(word string)(int){
+	id:=WordIdFormWord[word]
+	if id != 0{
+		return id
+	}
+	/////////////////////////
+	id = getAlternative(word)
+	if id != 0 {
+		return id
+	}
+
+	return 0
+}
+/////////////////////////////////////////////////////////////////////

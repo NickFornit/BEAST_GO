@@ -275,7 +275,9 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 
 			get_condition_reflex_info := r.FormValue("get_condition_reflex_info")
 			if len(get_condition_reflex_info) > 0 {
-				ref := reflexes.GetConditionReflexInfo()
+				base := r.FormValue("limitBasicID")
+				limitBasicID,_:=strconv.Atoi(base)
+				ref := reflexes.GetConditionReflexInfo(limitBasicID)
 				_, _ = fmt.Fprint(resp, ref)
 				return
 			}

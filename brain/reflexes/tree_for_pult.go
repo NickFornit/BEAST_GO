@@ -156,9 +156,33 @@ func getReflexActionsStrFromID(reflex *GeneticReflex)(string){
 
 ////////////////////////////////////////////
 // выдать таблицу условных рефлексов для http://go/pages/condition_reflexes.php
-func GetConditionReflexInfo()(string){
+func GetConditionReflexInfo(limitBasicID int)(string){
+	var out=""
+	// сколько рефлексов есть
+	ureflexCount:=len(ConditionReflexes)
+	// если больше 1000 то выдавать только по одному из 3-х базовыз состояний, иначе сильно тормозит
+	if ureflexCount > 1000{
+if limitBasicID==0{
+	limitBasicID=1// начинать с Плохо
+}
+	}
+	// переключатель диапазона вывода
+	if limitBasicID>0{
+		out+="<br>Показывать: "
+		out+="<span style='cursor:pointer;"
+		if limitBasicID==1{out+="background-color:#FFFF9D;font-weight:bold;"}
+		out+="' onClick='show_level(1)'>Плохо</span> "
 
-	var out="<table class='main_table'  cellpadding=0 cellspacing=0 border=1 width='100%' style='font-size:14px;'>" +
+		out+="<span style='cursor:pointer;"
+		if limitBasicID==2{out+="background-color:#FFFF9D;font-weight:bold;"}
+		out+="' onClick='show_level(2)'>Норма</span> "
+
+		out+="<span style='cursor:pointer;"
+		if limitBasicID==3{out+="background-color:#FFFF9D;font-weight:bold;"}
+		out+="' onClick='show_level(3)'>Хорошо</span> "
+	}
+
+	out+="<table class='main_table'  cellpadding=0 cellspacing=0 border=1 width='100%' style='font-size:14px;'>" +
 		"<tr><th width=70 class='table_header'>ID<br>рефлекса</th>" +
 		"<th width=70 class='table_header'>ID (1 уровень)<br><nobr>базового состояния</nobr></th>" +
 		"<th width='25%' class='table_header'>ID (2) актуальных контекстов<br>через запятую</th>" +
@@ -181,13 +205,20 @@ return "<table id='main_table' class='main_table'  cellpadding=0 cellspacing=0 b
 	"<tr class='highlighting' ><td colspan=7 >Еще нет условных рефлексов.</td></tr>"+
 	"</table>"
 	}
-	keys := make([]int, 0, len(ConditionReflexes))
+
+
+
+	keys := make([]int, 0, ureflexCount)
 	for k := range ConditionReflexes {
 		keys = append(keys, k)
 	}
 	sort.Ints(keys)
 	for _, k := range keys {
 		v:=ConditionReflexes[k]
+
+if limitBasicID>0 && v.lev1!=limitBasicID{
+	continue
+}
 		id := strconv.Itoa(k)
 lev1:=gomeostas.GetBaseCondFromID(v.lev1)
 var lev2=""
@@ -208,8 +239,10 @@ if len(act.PhraseID)>0{
 		lev3+="<br>"
 	}
 	for i := 0; i < len(act.PhraseID); i++ {
-		if i>0{lev3+=". "}
-		lev3+="\""+wordsSensor.GetPhraseStringsFromPhraseID(act.PhraseID[i])+"\""
+		if i>0{lev3+="; "}
+		w:=wordsSensor.GetPhraseStringsFromPhraseID(act.PhraseID[i])
+		//w=strings.Trim(w,"")
+		lev3+="\""+w+"\""
 	}
 }
 var tact=""

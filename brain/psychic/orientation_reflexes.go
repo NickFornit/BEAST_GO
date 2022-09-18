@@ -60,9 +60,11 @@ func orientation(automatizmID int)(int){
 		wasRunOrientationReflex=false // покасить сразу
 		var atmtzm *Automatizm
 		if automatizmID == 0 {
+//автоматизма нет, если нужно действовать, то какой-то предположить и сразу проверить
 			atmtzm = orientation_1()
 		}
 		if saveAutomatizmID > 0 {
+//проверить подходит ли автоматизм defAutomatizmID к текущим условиям
 			atmtzm = orientation_2(saveAutomatizmID)
 		}
 		if atmtzm != nil {

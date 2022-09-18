@@ -185,7 +185,6 @@ func ActiveFromPhrase() {
 	ActiveCurBaseID = gomeostas.CommonBadNormalWell
 	// определение текущего сочетания ID Базовых контекстов
 	bsIDarr := gomeostas.GetCurContextActiveIDarr()
-
 	// создаем новый образ Базовых контекстов, если такого еще нет
 	ActiveCurBaseStyleID, _ = createNewBaseStyle(0, bsIDarr)
 

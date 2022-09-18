@@ -6,7 +6,10 @@
 
 package word_sensor
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 /////////////
 func wordRecognizerInit() {
@@ -32,18 +35,31 @@ var currentStepCount = 0  // текущеее число нераспознан�
 /////////////////////////////////////////////////////////
 // проход одного слова - распознавание слова
 // возвращает найденное ID слова или похожей альтернативы
-func WordDetection(text string) int {
-	text = strings.TrimSpace(text)
-	if len(text) == 0 {
+func WordDetection(word string) int {
+	word = strings.TrimSpace(word)
+	if len(word) == 0 {
 		return 0
 	}
+
+	// предварительны попытка распознавания
+	// если обычный режим диалога (на ПУльте не стоит галка "набивка рабочих фраз без отсеивания мусорных слов ")
+	if !NoCheckWordCount {
+		// попробовать найти подходящее слово
+		DetectedUnicumID = tryWordRecognize(word)
+		if DetectedUnicumID >0 {
+			return DetectedUnicumID
+		}
+	}
+	////////////////////////
+
+
 	CurrentVerbalEnd = []rune("")
 	DetectedUnicumID = 0
 	//var pultOut=""
 	detectedCurrentID = 0
 	currentStepCount = 0
 
-	r := []rune(text)
+	r := []rune(word)
 	// основа дерева
 	cnt := len(VernikeWordTree.Children)
 	var curFirstLevelID = 0
@@ -78,8 +94,8 @@ func WordDetection(text string) int {
 	/////////////////////////////////
 	var needSave = false
 	if DetectedUnicumID == 0 {
-
-		// если обычный режим диалога (на ПУльте не стоит галка "набивка работчих фраз без отсеивания мусорных слов ")
+/* лучше это делать до прохода дерева потому как сравнивается только со старыми словами, переместил
+		// если обычный режим диалога (на ПУльте не стоит галка "набивка рабочих фраз без отсеивания мусорных слов ")
 		if !NoCheckWordCount {
 			//отсеивать мусорных (редких - менее 4 повторов в tempArr) слов
 			repeet := getWordTemparrCount(text)
@@ -91,6 +107,7 @@ func WordDetection(text string) int {
 				}
 			}
 		}
+		*/
 
 		//  нераспознанный остаток
 		if len(CurrentVerbalEnd) > 0 {
@@ -103,6 +120,7 @@ func WordDetection(text string) int {
 			}
 			// просто добавить новую ветку - из диалога это стоит делать за 1 раз т.к. слова уже известны
 			node := createNewNodeWordTree(tree, 0, string(r[0]))
+			WordIdFormWord[word]=node.ID // добавить в список слов
 			tree = node
 			id := createWordTreeNodes(r, WordTreeFromID[tree.ID])
 			DetectedUnicumID = id
@@ -120,6 +138,7 @@ func WordDetection(text string) int {
 			node := createNewNodeWordTree(tree, 0, string(r[0]))
 			tree = node
 			if tree != nil {
+				WordIdFormWord[word]=node.ID // добавить в список слов
 				id := createWordTreeNodes(r, WordTreeFromID[tree.ID])
 				DetectedUnicumID = id
 				//SaveWordTree()
@@ -173,84 +192,71 @@ func getWordTemparrCount(word string) int {
 
 //////////////////////////////////////////
 
-/* попробовать найти подходящее слово с альтрнативным ID
+/* ранее - не найдено в WordIdFormWord[word]
+попробовать найти подходящее слово с альтрнативным ID
 Первые буквы должны совпадать, а остальные, кроме последней (разные окончания),
 быть перемешаны, но в наличии >80%.
 Сканирует дерево с начальной буквы строго по числу чимволов слова.
 Это имитирует свойство персептронного распознавателя.
 */
-var smilarlyArr []int // сбор схожих lastID для анализа
 func getAlternative(word string) int {
-	r := []rune(word)
-	var wordSize = len(r)
-	cnt := len(VernikeWordTree.Children)
-	for n := 0; n < cnt; n++ {
-		if VernikeWordTree.Children[n].Symbol == string(r[0]) {
-			alphNode := &VernikeWordTree.Children[n]
-			getWordiSmilarly(wordSize, r, alphNode)
-			break
+	defer func(){// ловим панику
+		if err := recover(); err != nil {
+			fmt.Println(err) // просто выдать сообщение чтобы выловить с breakpointe здесь и пройти по стеку
 		}
-	}
-	if smilarlyArr == nil { // нет подходящих по размеру и начинающихся тождественно
+	}()
+	rw := []rune(word)
+	var rwLen = len(rw)
+	if rwLen<4{
 		return 0
 	}
-	// смотрим схожесть у найденных
-	for n := 0; n < len(smilarlyArr); n++ {
-		str := GetWordFromWordID(smilarlyArr[n])
-		// для сверки берем руны без первых в словах
-		id := chooseSmilarly([]rune(str)[1:], r[1:], smilarlyArr[n])
-		if id > 0 { // выбран подходящий аналог
+	// выбрать известные слова с первой и последней буквой как у word
+	var wArr=make(map[int][]rune)
+	for w, id := range WordIdFormWord {
+		r := []rune(w)
+		rLen:=len(r)
+		if rLen<3 || r[0]!=rw[0] || rLen!=rwLen{
+			continue
+		}
+		if rw[rwLen-1]==r[rLen-1]{
+			r0:=r[1:]
+			r0=r0[:(rLen-1)]
+			wArr[id]=r0
+		}
+	}
+	if len(wArr) == 0{
+		return 0
+	}
+	//	проверять все ли внутренние буквы совпадают
+	rw0:=rw[1:]
+	rw0=rw0[:(rwLen-1)]
+	for id, r := range wArr {
+		// сопоставляются только внутренние части слов (без первой и последней букв)
+		if isEquivalented(r,rw0){
 			return id
 		}
 	}
 
 	return 0
 }
-func getWordiSmilarly(wordSize int, word []rune, wt *WordTree) {
-	if len(word) == 0 { //
-		return
-	}
-
-	ost := word[1:]
-	if wt.Children == nil {
-		count := getSmilarlyCount(wt.ID)
-		if count == wordSize { // совпадение по числу символов
-			smilarlyArr = append(smilarlyArr, wt.ID)
-		}
-		return
-	}
-	for n := 0; n < len(wt.Children); n++ {
-		getWordiSmilarly(wordSize, ost, &wt.Children[n])
-	}
-}
-func getSmilarlyCount(lastID int) int {
-	var count = 0
-	for {
-		node := WordTreeFromID[lastID]
-		if node == nil || lastID == 0 {
-			break
-		}
-		count++
-		lastID = node.ParentID
-	}
-	return count
-}
-
-// подходит ли слово str как аналог word (без учета последних символов)
-func chooseSmilarly(str []rune, word []rune, id int) int {
-	var tCount = 0 // число совпадений
-	for n := 0; n < len(word)-1; n++ {
-		for m := 0; m < len(str)-1; m++ {
-			if str[m] == word[n] {
-				tCount++
+// все внутренние буквы должны присуствовать
+func isEquivalented(r1 []rune,r2 []rune)(bool){
+	for n := 0; n < len(r1); n++ {
+		var isAbsent=1
+		for m := 0; m < len(r2); m++ {
+			if r1[n] == r2[m] {
+				isAbsent=0
 				break
 			}
 		}
+		if isAbsent==1{
+			return false
+		}
 	}
-	if (float64(tCount) / float64(len(word)-1)) > 0.8 { //более 80% совпадений
-		return id
-	}
-	return 0
+	return true
 }
-
 //////////////////////////////////////////////////
+
+
+
+

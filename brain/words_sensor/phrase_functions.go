@@ -10,6 +10,15 @@ import (
 )
 
 //////////////////////////////////////
+// слово из ID узла дерева фраз
+func GetWordFromPraseNodeID(nodeID int)(string){
+	if nodeID==0{
+		return ""
+	}
+	ph:=PhraseTreeFromID[nodeID]
+	word := GetWordFromWordID(ph.WordID)
+	return word
+}
 
 //////////////////////////////////////////////////
 /// строка из ID фразы дерева фраз
@@ -31,7 +40,10 @@ func GetPhraseStringsFromPhraseID(lastID int)(string){
 
 	var str=""
 	for i := len(idArr)-1; i >=0; i-- {
-		str+=idArr[i]+" "
+		if len(str)>0{
+			str+=" "
+		}
+		str+=idArr[i]
 	}
 
 	return str

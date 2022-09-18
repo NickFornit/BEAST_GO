@@ -124,7 +124,10 @@ if len(wArr)>1 {
 		if reflex!=nil {
 			return reflex
 		}
+		// м.б. еще и первая-последняя буквы - точно, остальные впремешку?
+		// TODO
 	}
+
 }
 }
 return reflex
@@ -165,6 +168,7 @@ func getRightConditionReflexesFrom3(imgId3 int)(*ConditionReflex){
 		return nil
 	}
 	for _, v := range rArr {
+		// это - способ прохода дерева без рекурсии, т.к. строго заданы уровни веток:
 		if v.lev1 == ActiveCurBaseID && lib.EqualArrs(v.lev2,bsIDarr) {
 			return v
 		}

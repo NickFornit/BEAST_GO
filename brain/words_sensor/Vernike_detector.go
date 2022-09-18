@@ -8,6 +8,13 @@
 фразы в WordDetection() разбиваются на слова.
 Распознанные (и нераспознанные) последовательности сохраняются в оперативной памяти Beast MemoryDetectedArr.
 где распознанный текст представлен в виде уникального laslID фразы
+
+ОПИСКИ при вводе слова. Если слово не распознается и оно имеет более 3-х символов,
+то делается предположение об описке внутренних символов
+(в природном распознавателе слово узнается если точно совпали первая и последняя буквы,
+а внутренние буквы могут быть как угодно перемешаны)
+Если слово распознается, то подставляется ID слова.
+
 Нераспознанной фразы НЕ БЫВАЕТ т.к. она тут же создается
 
 Тон фразы можно задать 1) с помощью знаков ! и ? в конце фразы
@@ -132,6 +139,7 @@ func VerbalDetection(text string, isDialog int, toneID int, moodID int) string {
 			if n > 0 {
 				pultOut += " "
 			}
+			// проход фразы с распознаванием
 			pultOut += PhraseSeparator(str[n])
 			if DetectedUnicumPhraseID > 0 { // распознанная фраза
 				CurrentPhrasesIDarr = append(CurrentPhrasesIDarr, DetectedUnicumPhraseID)
@@ -161,7 +169,7 @@ func PhraseSeparator(text string) string {
 	text = rp.ReplaceAllString(text, " ")
 	text = strings.TrimSpace(text)
 
-	wordsArr := GetWordIDfromPhrase(text)
+	wordsArr := GetWordIDfromPhrase(text)// распознаватель слов
 	str := PhraseDetection(wordsArr) // распознаватель фразы
 	pultOut += str + "(" + strconv.Itoa(DetectedUnicumPhraseID) + ")"
 

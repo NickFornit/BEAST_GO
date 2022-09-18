@@ -31,6 +31,9 @@ func afterLoadPhraseArr(){
 
 	iniPraseRecognising()
 	afetrInitPhraseTree()
+
+	// для старых слов получить WordIdFormWord
+	getWordIdFormWord()
 }
 /////////////////////////////////////////////////////////
 
