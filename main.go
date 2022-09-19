@@ -248,6 +248,30 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				return
 			}
 
+			get_words_list := r.FormValue("get_words_list")
+			if get_words_list == "1" {
+				brain.IsPultActivnost = true
+				phTree := word_sensor.GetWordsListForPult()
+				brain.IsPultActivnost = false
+				if phTree == "!!!" {
+					return // запрет показа карты во время распознавания и записи
+				}
+				_, _ = fmt.Fprint(resp, phTree)
+				return
+			}
+
+			deleting_word := r.FormValue("deleting_word")
+			if deleting_word =="1"{
+				delete_word := r.FormValue("delete_word")
+				deleteWord,_:=strconv.Atoi(delete_word)
+				brain.IsPultActivnost = true
+				word_sensor.DeleteWord(deleteWord)
+				brain.IsPultActivnost = false
+				_, _ = fmt.Fprint(resp, "OK")
+				return
+			}
+
+
 			get_word_tree := r.FormValue("get_word_tree")
 			if get_word_tree == "1" {
 				brain.IsPultActivnost = true

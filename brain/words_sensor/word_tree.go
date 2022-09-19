@@ -132,6 +132,9 @@ func afterLoadTempArr(){
 
 
 afterLoadPhraseArr()
+
+// приветсвую 634 привет 556   ветвеление - прикалываюсь 483
+//	DeleteWord(483)
 	
 }
 
@@ -316,28 +319,6 @@ func createWordTreeNodes(word []rune,wt *WordTree)(int){
 
 
 
-/////////////////////////////////////////////////
-// получить слово из ID слова (из ID конечного узла дерева слов)
-func GetWordFromWordID(lastID int)(string){
-
-	var idArr []string
-	for {
-		node:=WordTreeFromID[lastID]
-		if node==nil || lastID==0{
-			break
-		}
-		idArr=append(idArr,node.Symbol)
-		lastID=node.ParentID
-	}
-
-	var str=""
-	for i := len(idArr)-1; i >=0; i-- {
-		str+=idArr[i]
-	}
-
-	return str
-}
-////////////////////////////////////////////
 
 
 
@@ -345,58 +326,8 @@ func GetWordFromWordID(lastID int)(string){
 
 
 
-//////////////////////////////////////////////////////////////////
-/* выдать массив wordsArr[]int из фразы (а не абзаца или текста!)
-использовать ТОЛЬКО ДЛЯ func PhraseSeparator !!!
- */
-func GetWordIDfromPhrase(phrase string)([]int){
-	var out []int
-	/*  Делим фразу на слова (в строке нет других разделительных символов,
-	т.к. они уже сработали при разделении на фразы).
-	*/
-	wArr := strings.Split(phrase, " ")
-	for n := 0; n < len(wArr); n++ { // перебор отдельных слов
-		curWord := strings.TrimSpace(wArr[n])
-
-	wID:= SetNewWordTreeNode(curWord)
-		out=append(out,wID)
-	}
-	return out
-}
 
 
-/* для старых слов получить WordIdFormWord - для распознавания неточно введенных слов и т.п.
-Проход всего дерева фраз - там выделены известные слова.
-Запускачется при нициализации Дерева фраз,
-а при вставки новых слов в Дерево слов - сразу заполняется WordIdFormWord
- */
-func getWordIdFormWord(){
-	for _, ph := range PhraseTreeFromID {
-		word := GetWordFromWordID(ph.WordID)
-		WordIdFormWord[word]=ph.WordID
-	}
-	return
-}
-///////////////////////////////////////
 
-/* Cлово проверяется на наличие в списке старых (до сохранения) слов WordIdFormWord=make(map[string]int)
-и если оно есть, то возвращается его ID.
-Если слова нет и оно имеет более 4-х символов, то делается предположение об описке внутренних символов
-(в природном распознавателе слово узнается если точно совпали первая и последняя буквы,
-а внутренние буквы могут быть как угодно перемешаны)
-Если слово распознается, то возвращается ID слова.
-*/
-func tryWordRecognize(word string)(int){
-	id:=WordIdFormWord[word]
-	if id != 0{
-		return id
-	}
-	/////////////////////////
-	id = getAlternative(word)
-	if id != 0 {
-		return id
-	}
 
-	return 0
-}
-/////////////////////////////////////////////////////////////////////
+

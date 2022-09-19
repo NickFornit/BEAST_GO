@@ -5,7 +5,9 @@
 package word_sensor
 
 import (
+	"BOT/lib"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -93,3 +95,38 @@ func GetExistsPraseID(text string) int {
 	}
 	return id
 }
+///////////////////////////////////////////////
+
+// удалить слово все всех упоминаниях в Дереве фраз
+func deleteWordFromPhrase(wordID int){
+	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_reflex/phrase_tree.txt")
+	var out=""
+	var parentNewID=0
+	var parentOdID=0
+	for n := 0; n < len(strArr); n++ {
+		p:=strings.Split(strArr[n], "|")
+		id,_:=strconv.Atoi(p[0])
+		pID,_:=strconv.Atoi(p[1])
+		node:=PhraseTreeFromID[id]
+		if node==nil{
+			return
+		}
+		p=strings.Split(strArr[n], "|#|")
+		wID,_:=strconv.Atoi(p[1])
+		if wID==wordID{
+			if len(node.Children) >0{// всем дочкам переписать родителем - node.ParentID
+				parentNewID=node.ParentID
+				parentOdID=node.ID
+			}// если нет родителя, то можно просто удалить
+			continue // не писать эту строку
+		}
+
+			if pID>0 && pID == parentOdID { // заменить родителя
+				out += strconv.Itoa(id) + "|" + strconv.Itoa(parentNewID) + "|#|" + strconv.Itoa(wID) + "\r\n"
+			} else {
+				out += strArr[n] + "\r\n"
+			}
+	}
+	lib.WriteFileContent(lib.GetMainPathExeFile()+"/memory_reflex/phrase_tree.txt",out)
+}
+//////////////////////////////////////////////

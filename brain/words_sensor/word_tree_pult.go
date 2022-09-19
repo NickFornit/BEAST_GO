@@ -4,11 +4,15 @@
 
 package word_sensor
 
-import "strconv"
+import (
+	"sort"
+	"strconv"
+)
 
 func initWordPult(){
 	//str:=GetPhraseTreeForPult()
 	//if len(str)>0{}
+
 }
 /////////////////////////
 
@@ -48,3 +52,44 @@ var sh=""
 	}
 	return sh
 }
+//////////////////////////////////////////
+
+
+
+// выдать на пульт список слов в алфавитном порядке
+func GetWordsListForPult()(string){
+	if len(WordIdFormWord)==0{
+		return "Еще не готовы данные, обновите чуть позже."
+	}
+
+	wArr := make([]string, 0, len(WordIdFormWord))
+	for w, _ := range WordIdFormWord {
+		wArr=append(wArr,w)
+	}
+	sort.Strings(wArr)
+	var out="<table class='main_table'  cellpadding=0 cellspacing=0 border=1 width='100%' style='font-size:14px;'>"
+	out+="<tr><td class='table_header'>Слово</td>"
+	out+="<td class='table_header' width=100>ID</td>"
+	out+="<td class='table_header'>Слово</td>"
+	out+="<td class='table_header' width=100>ID</td>"
+	out+="<td class='table_header'>Слово</td>"
+	out+="<td class='table_header' width=100>ID</td></tr><tr>"
+	var col=0
+	for n := 0; n < len(wArr); n++ {
+		if len(wArr[n])==0{
+			continue
+		}
+		if col>=3{
+			out+="</tr><tr>"
+			col=0
+		}
+		id:=strconv.Itoa(WordIdFormWord[wArr[n]])
+		out+="<td class='table_cell'>"+wArr[n]+"</td>"
+		out+="<td class='table_cell'>"+id+"<img src='/img/delete.gif' class='select_control' onClick='delete_word("+id+")'></td>"
+		col++
+	}
+	count:=strconv.Itoa(len(wArr))
+	out+="</tr></table><b>Всего: "+count+" слов</b>"
+return out
+}
+////////////////////////////////////////////////////

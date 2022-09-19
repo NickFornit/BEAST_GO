@@ -34,17 +34,21 @@ func afterLoadPhraseArr(){
 
 	// для старых слов получить WordIdFormWord
 	getWordIdFormWord()
+
+
+//	deleteWordFromPhrase(11)
 }
 /////////////////////////////////////////////////////////
 
 
 
-// дерево фраз, разбитых на слова
+// дерево фраз, разбитых на слова, формат записи ID|ParentID|#|WordID
 type PhraseTree struct {
 	ID int // id узла слова
-	WordID int // одно  слово, м.б. пробелорм или любым символом
-	Children []PhraseTree // дочерние узлы (ветвление) НЕ АДРЕСА, А РЕАЛЬНЫЕ ОБЪЕКТЫ
 	ParentID int     // ID родителя
+	WordID int // одно  слово, м.б. пробелорм или любым символом
+
+	Children []PhraseTree // дочерние узлы (ветвление) НЕ АДРЕСА, А РЕАЛЬНЫЕ ОБЪЕКТЫ
 	ParentNode *PhraseTree  // адрес родителя
 }
 
@@ -76,7 +80,7 @@ var lastPhraseTreeID=0
 
 func createNewNodePhraseTree(parent *PhraseTree,id int,wordID int)(*PhraseTree){
 
-//	if parent==nil{	return nil 	}
+	if parent==nil{	return nil 	}
 //	if wordID==0{ return nil }
 
 //	notAllowScanInThisTime=true // запрет показа карты при обновлении
@@ -152,6 +156,9 @@ panic("Сбой загрузки дерева фраз: ["+strconv.Itoa(n) + "] 
 		p:=strings.Split(strArr[n], "|#|")
 		id,_:=strconv.Atoi(p[1])
 		wordID:=id
+		if WordTreeFromID[wordID]==nil{// нет такого узла дерева слов
+			continue
+		}
 		idP:=strings.Split(p[0], "|")
 		id,_=strconv.Atoi(idP[0])
 		parentID,_:=strconv.Atoi(idP[1])
@@ -170,7 +177,7 @@ func initPhraseTree(vt *PhraseTree){
 	//updateWordTreeFromID()
 	return
 }
-////////////////////////////////////////////
+/// ID|ParentID|#|WordID
 func SavePhraseTree(){
 	var out=""
 	cnt:=len(VernikePhraseTree.Children)
