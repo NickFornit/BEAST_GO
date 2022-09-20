@@ -114,11 +114,11 @@ func deleteWordFromPhrase(wordID int){
 		p=strings.Split(strArr[n], "|#|")
 		wID,_:=strconv.Atoi(p[1])
 		if wID==wordID{
-			if len(node.Children) >0{// всем дочкам переписать родителем - node.ParentID
+			if len(node.Children) >0{// всем дочкам переписать родителей - node.ParentID
 				parentNewID=node.ParentID
 				parentOdID=node.ID
 			}// если нет родителя, то можно просто удалить
-			continue // не писать эту строку
+			continue // не писать удаляемую строку
 		}
 
 			if pID>0 && pID == parentOdID { // заменить родителя

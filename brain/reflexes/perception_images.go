@@ -102,6 +102,8 @@ func checkUnicumBaseStyle(bArr []int) (int, *BaseStyle) {
 чтобы только для данного сочетания мог срабатывать данный рефлекс.
 
 Это - образ много-модеального воздействия или просто образ восприятия.
+
+Формат: ID|RSarr через ,|PhraseID через ,|ToneID|MoodID|
 */
 type TriggerStimuls struct {
 	ID    int   // идентификатор данного сочетания пусковых стимулов
