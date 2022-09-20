@@ -165,6 +165,11 @@ func createNewNodeWordTree(parent *WordTree,id int,word string)(*WordTree){
 	if word==""{
 		return nil
 	}
+	// после удаления слова - запрет на вставку новых слов до перезагрузки
+	if blockingNewInsertWordAfterDeleted{
+		lib.WritePultConsol("ПОСЛЕ УДАЛЕНИЯ СЛОВА - ЗАПРЕТ НА ВСТАВКУ НОВЫХ СЛОВ ДО ПЕРЕЗАГРУЗКИ")
+		return nil
+	}
 
 //	notAllowScanInThisTime=true // запрет показа карты при обновлении
 	if id==0{

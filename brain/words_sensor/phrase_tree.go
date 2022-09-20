@@ -83,6 +83,12 @@ func createNewNodePhraseTree(parent *PhraseTree,id int,wordID int)(*PhraseTree){
 	if parent==nil{	return nil 	}
 //	if wordID==0{ return nil }
 
+	// после удаления слова - запрет на вставку новых слов до перезагрузки
+	if blockingNewInsertWordAfterDeleted{
+		lib.WritePultConsol("ПОСЛЕ УДАЛЕНИЯ СЛОВА - ЗАПРЕТ НА ВСТАВКУ НОВЫХ СЛОВ ДО ПЕРЕЗАГРУЗКИ")
+		return nil
+	}
+
 //	notAllowScanInThisTime=true // запрет показа карты при обновлении
 	if id==0{
 		lastPhraseTreeID++

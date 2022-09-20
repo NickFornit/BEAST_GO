@@ -102,6 +102,7 @@ func tryWordRecognize(word string)(int){
 
 !После удаления ряда слов нужно перезагрузить сервер чтобы обновились данные!
  */
+var blockingNewInsertWordAfterDeleted=false // после удаления - запрет на вставку новых слов до перезагрузки
 func DeleteWord(wID int){
 	node:=WordTreeFromID[wID]
 	if node==nil{// уже удалена
@@ -121,7 +122,7 @@ func DeleteWord(wID int){
 		next:=node.ParentNode
 		// удаляем узел прямо из файла word_tree.txt
 		deleteNodeFromFile(node.ID)
-
+		blockingNewInsertWordAfterDeleted=true
 		node=next
 	}
 	return
