@@ -82,7 +82,7 @@ _,CurrentInformationEnvironment.PsyEmotionImg=createNewBaseStyle(0,PsyBaseMood,b
 
 	CurrentInformationEnvironment.veryActualSituation,CurrentInformationEnvironment.curTargetArrID=gomeostas.FindTargetGomeostazID()
 
-	ActID:=action_sensor.CheckCurActions()
+	ActID:=action_sensor.CheckCurActionsContext()
 	_,CurrentInformationEnvironment.PsyActionImg=createNewlastActivityID(0,ActID)// текущий образ сочетания действий с Пульта Activity
 
 if len(word_sensor.CurrentPhrasesIDarr)>0{

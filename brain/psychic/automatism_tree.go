@@ -47,7 +47,7 @@ package psychic
 import (
 	"BOT/brain/action_sensor"
 	"BOT/brain/gomeostas"
-	word_sensor "BOT/brain/words_sensor"
+	wordSensor "BOT/brain/words_sensor"
 )
 
 // инициализирующий блок - в порядке последовательности инициализаций
@@ -134,16 +134,17 @@ func automatizmTreeActivation()(int){
 	bsIDarr:=gomeostas.GetCurContextActiveIDarr()
 	lev2,_:=createNewBaseStyle(0,PsyBaseMood,bsIDarr)
 
-	ActID:=action_sensor.CheckCurActions()
+ActID:=action_sensor.CheckCurActionsContext();//CheckCurActions()
+
 	lev3,_:=createNewlastActivityID(0,ActID)// текущий образ сочетания действий с Пульта Activity
 
 	var lev4=0
 	var lev5=0
 	var lev6=0
-	if len(word_sensor.CurrentPhrasesIDarr)>0{
-		PhraseID := word_sensor.CurrentPhrasesIDarr
-		ToneID := word_sensor.DetectedTone
-		MoodID := word_sensor.CurPultMood
+	if len(wordSensor.CurrentPhrasesIDarr)>0{
+		PhraseID := wordSensor.CurrentPhrasesIDarr
+		ToneID := wordSensor.DetectedTone
+		MoodID := wordSensor.CurPultMood
 		_,verb:= CreateVerbalImage(PhraseID, ToneID, MoodID)
 		lev4= getToneMoodID(verb.ToneID, verb.MoodID)
 		lev5=verb.SimbolID

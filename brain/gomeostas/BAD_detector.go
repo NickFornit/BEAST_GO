@@ -352,6 +352,10 @@ func BetterOrWorseNow()(int,int,[]int){
 	prepBetterOrWorseNow()
 	CommonOldBadValue=CommonBadValue
 
+/* P.S. раньще была попытка учитывать "эффект" кнопок с Пульта (в таблице лн забивался в виде "+" "-"),
+то сейчас не используется, в том числе и потому, что мугут быть нажаты сразу две кнопки.
+ */
+
 	return commonDiffValue,lastBetterOrWorse,GomeoParIdSuccesArr
 	}
 //////////////////////////////////////////

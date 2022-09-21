@@ -190,7 +190,7 @@ func GetAttentionDanger()(bool){
 	}
 	// по опасному действию с Пульта
 
-	aArr:=actionSensor.CheckCurActions()
+	aArr:=actionSensor.CheckCurActionsContext()
 	for i := 0; i < len(aArr); i++ {
 		if aArr[i]==3 || aArr[i]==10 || aArr[i]==12 || aArr[i]==15{
 			return true

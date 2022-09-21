@@ -10,7 +10,6 @@ import (
 	"BOT/brain/gomeostas"
 	"strconv"
 	"strings"
-	"time"
 )
 
 ////////////////////////////////////////
@@ -56,6 +55,8 @@ func ActionSensorPuls(evolushnStage int,lifeTime int,puls int,isSlipping bool){
 17 Вылечить
  */
 var ActionFromPult[18]int
+// сохрянять текущий контекст   ActionFromPultContext=ActionFromPult
+var ActionFromPultContext [18]int // эти не очищаются
 
 // название Базового контекста из его ID str:=action_sensor.GetActionNameFromID(id)
 func GetActionNameFromID(id int)(string){
@@ -92,6 +93,7 @@ var FoodPortionForEnergi=0
 func SetActionFromPult(actionList string,energi int){
 	// очищать прежние акции с пульта перед установкой новых т.к. сочетания передаются сразу.
 	DeactivationTriggers()
+	DeactivationTriggersContext()
 
 	actArr:=strings.Split(actionList, "|")
 	//var listID []int
@@ -124,14 +126,19 @@ func SetActionFromPult(actionList string,energi int){
 		}
 		ActionFromPult[0] = 0
 		ActionFromPult[actionID] = pulsCount
+		ActionFromPultContext[0] = 0
+		ActionFromPultContext[actionID] = pulsCount
 
 		gomeostas.SetGomeostazActionCommonEffectArr(actionID)
 	}
 
 	// дезактивировать все акции через 10 секунд
+	/* вредна, т.к. запущенный таймер может погасить нормальные акции.
+	Акции должны гаситься после текущего использования в perception.go -> action_sensor.DeactivationTriggers()
 	time.AfterFunc(10*time.Second, func() {
 		DeactivationTriggers()
 	})
+	 */
 
 	// тестирование
 	//  gomeostas.BetterOrWorseNow()
@@ -143,6 +150,11 @@ return
 func DeactivationTriggers(){
 	for i := 1; i < 18; i++ {
 		ActionFromPult[i]=0
+	}
+}
+func DeactivationTriggersContext(){
+	for i := 1; i < 18; i++ {
+		ActionFromPultContext[i]=0
 	}
 }
 
@@ -159,4 +171,20 @@ func CheckCurActions()([]int){
 	}
 	return aArr
 }
+
+// какие сохраненные акции действуют в данный момент пульса - активные контексты действий с Пульта
+func CheckCurActionsContext()([]int){
+	var aArr[]int
+	for i := 1; i < 18; i++ {
+		if ActionFromPultContext[i]>0{
+			aArr=append(aArr,i)
+		}
+	}
+	if aArr==nil{
+		ActionFromPultContext[0]=0
+	}
+	return aArr
+}
 ////////////////////////////////////////////////
+
+

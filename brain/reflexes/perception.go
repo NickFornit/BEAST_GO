@@ -146,6 +146,8 @@ func ActiveFromConditionChange() {
 	}
 
 	toRunRefleses()
+	// сбросить контекст акций по кнопкам Пульта
+	action_sensor.DeactivationTriggers()
 }
 
 ////////////////////////
@@ -174,6 +176,8 @@ func ActiveFromAction() {
 
 	toRunRefleses()
 
+	// сбросить контекст акций по кнопкам Пульта
+	action_sensor.DeactivationTriggers()
 }
 
 ////////////////////////
@@ -202,6 +206,9 @@ func ActiveFromPhrase() {
 	}
 
 	toRunRefleses()
+
+	// сбросить контекст акций по кнопкам Пульта
+	 action_sensor.DeactivationTriggers()
 }
 
 /////////////////////////////////////////////////////////
@@ -220,3 +227,14 @@ func getConditionsArr(lev1ID int, lev2 []int, lev3 []int, PhraseID []int, ToneID
 }
 
 ////////////////////////////////////////////////////
+
+
+// получить сохраненное (последнее активное) сочетание пусоквых стимулов-кнопок
+// reflexes.GetCurPultActionsContext()
+func GetCurPultActionsContext()([]int){
+	var ActID []int
+	if ActiveCurTriggerStimulsID>0{
+		ActID=TriggerStimulsArr[ActiveCurTriggerStimulsID].RSarr
+	}
+	return ActID
+}
