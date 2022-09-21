@@ -59,6 +59,9 @@ func RumAutomatizmID(id int)(bool){
 ////////////////////
 // todo = true - выполнить полюбому,
 func RumAutomatizm(am *Automatizm)(bool){
+	if MotorTerminalBlocking { //блокировка моторных терминалов во сне или произвольно
+		return false
+	}
 
 	if am==nil{
 		return false
@@ -71,13 +74,13 @@ func RumAutomatizm(am *Automatizm)(bool){
 		return false
 	}
 
-// блокировка выполнения плохого автоматизма, если только не применен СИЛА ВОЛИ
+// блокировка выполнения плохого автоматизма, если только не применена "ИЛА ВОЛИ"
 if am.Usefulness<0{
 
 	return false
 }
 
-
+	var out="3|"
 	actArr:=ParceAutomatizmSequence(am.Sequence)
 	for i := 0; i < len(actArr); i++ {
 		// строка действий (любого типа) через запятую
@@ -94,7 +97,7 @@ if am.Usefulness<0{
 			if am.Belief!=3 {// не рефлекс мозжечка
 				addE = getCerebellumReflexAddEnergy(am.ID)
 			}
-			TerminatePraseAutomatizmActions(idArr,am.Energy+addE)
+			out+=TerminatePraseAutomatizmActions(idArr,am.Energy+addE)
 		case 2: //Dnn - ID прогрмаммы действий, через запятую
 
 			for n := 0; n < len(aArr); n++ {
@@ -105,7 +108,7 @@ if am.Usefulness<0{
 			if am.Belief!=3 {// не рефлекс мозжечка
 				addE = getCerebellumReflexAddEnergy(am.ID)
 			}
-			TerminateMotorAutomatizmActions(idArr,am.Energy+addE)
+			out+=TerminateMotorAutomatizmActions(idArr,am.Energy+addE)
 
 		case 3: //Ann - последовательный запуск автоматизмов с id1,id2..
 			// НО нужно как-то дожидаться выплнения предыдущего до запуска следующего !!!!!!
@@ -118,6 +121,7 @@ if am.Usefulness<0{
 		///////////////////////////////////////
 		}
 	}
+	lib.SentActionsForPult(out)
 
 	//выполнить мозжечковый рефлекс сразу после выполняющегося автоматизма
 	runCerebellumReflex(am.ID)
@@ -125,7 +129,6 @@ if am.Usefulness<0{
 	MotorTerminalBlocking=true // через 2 пульса погаснет
 	LastRunAutomatizmPulsCount =PulsCount // активность мот.автоматизма в чисде пульсов
 	LastAutomatizmWeiting=am
-
 
 	return true
 }
@@ -138,14 +141,12 @@ if am.Usefulness<0{
 cила действия сначала задается =5, а потот корректируется мозжечковыми рефлексами
 Использование: 	TerminateMotorAutomatizmActions(actIDarr,energy)
  */
-func TerminateMotorAutomatizmActions(actIDarr []int,energy int){
-	if MotorTerminalBlocking { //блокировка моторных терминалов во сне или произвольно
-		return
-	}
+func TerminateMotorAutomatizmActions(actIDarr []int,energy int)(string){
+
 	// energy=1
 	//название силы:
 	enegrName:= termineteAction.EnergyDescrib[energy]
-	var out="3|<b>Действие Beast:</b><br>"
+	var out="Действие: <b>"
 	var isAct=false
 	for i := 0; i < len(actIDarr); i++ {
 
@@ -181,34 +182,30 @@ func TerminateMotorAutomatizmActions(actIDarr []int,energy int){
 		isAct=true
 	}
 if isAct {
-
-	out += "<br><span style=\"font-size:14px;\">Энергичность: " + enegrName+"</span>"
-	lib.SentActionsForPult(out)
+	out += "</b>&nbsp;<span style=\"font-size:14px;\">Энергичность: " + enegrName+"</span><br>"
+	return out
 }
+return ""
 }
 //////////////////////////////////////////////////
 
 /* совершить МОТОРНОЕ (ВЫДАТЬ ФРАЗУ) действие  - Snn-часть автоматизма
 cила действия сначала задается =5, а потот корректируется мозжечковыми рефлексами
 */
-func TerminatePraseAutomatizmActions(IDarr []int,energy int){
-	if MotorTerminalBlocking { //блокировка моторных терминалов во сне или произвольно
-		return
-	}
-
+func TerminatePraseAutomatizmActions(IDarr []int,energy int)(string){
 
 	// при моторном действии  меняются гомео-параметры:
 	//expensesGomeostatParametersAfterAction(aI) болтать можно без устали?
 
 	// выдать на ПУльт
-	var out="2|<b>Фраза Beast:</b><br>"
+	var out="Фраза Beast: <b>"
 	for i := 0; i < len(IDarr); i++ {
 		prase := word_sensor.GetPhraseStringsFromPhraseID(IDarr[i])
 		out += prase
 	}
 	//название силы:
-	out += termineteAction.EnergyDescrib[energy]
-	lib.SentActionsForPult(out)
+	out += termineteAction.EnergyDescrib[energy]+"</b>"
+	return out
 }
 //////////////////////////////////////////////////
 
@@ -240,6 +237,10 @@ if !gomeostas.NotAllowSetGomeostazParams{
 	}
 }
 /////////////////////////////////////////////
+
+
+
+
 
 
 

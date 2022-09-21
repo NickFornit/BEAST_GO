@@ -52,6 +52,8 @@ var BadValue =make(map[int]int) // насколько плохо, значени
 var wellValueStart =make(map[int]int)// время возникновения состояния Хорошо
 var oldBadValue =make(map[int]int) // предыдущие значения BadValue
 
+
+
 // пороги начала выхода параметров из нормы
 var compareLimites=make(map[int]int)
 //////////////////////////////
@@ -93,6 +95,7 @@ func initBadDetector(){
 // время удерхания состояния Хорошо для возврата в Плохо или Норму
 var dinamicTimeFromBad=50 // секунд
 // эти параметры стали лучше
+var curGomeoParIdSuccesArr []int // временный массив, на время измерения, чтобы никогда не было обнуления
 var GomeoParIdSuccesArr []int
 
 /* после Хорошо по PulsCount определяется когда оно истечет и станет Норма
@@ -104,7 +107,7 @@ func badDetecting(){
 	if NotAllowSetGomeostazParams{
 		return
 	}
-	GomeoParIdSuccesArr=nil
+	curGomeoParIdSuccesArr=nil
 
 	for id, _ := range GomeostazParams {
 		cur := int(GomeostazParams[id])
@@ -124,7 +127,7 @@ func badDetecting(){
 			if (id == 1 && dif < -5) || (id > 0 && dif > 5) {
 				BadNormalWell[id] = 3 // хорошо
 				wellValueStart[id] = PulsCount
-				GomeoParIdSuccesArr = append(GomeoParIdSuccesArr, id)
+				curGomeoParIdSuccesArr = append(curGomeoParIdSuccesArr, id)
 			}
 		}
 		if oldBadValue[id] > BadValue[id]{// стало хуже
@@ -144,7 +147,7 @@ func badDetecting(){
 		if (oldBadValue[id] > BadValue[id]) || (oldBadValue[id]>0 && BadValue[id]==0) {// стало лучше
 			BadNormalWell[id]=3 // хорошо
 			wellValueStart[id]=PulsCount
-			GomeoParIdSuccesArr=append(GomeoParIdSuccesArr,id)
+			curGomeoParIdSuccesArr=append(curGomeoParIdSuccesArr,id)
 		}
 		if oldBadValue[id] < BadValue[id]{// стало хуже
 			BadNormalWell[id]=1 // плохо
@@ -155,6 +158,7 @@ func badDetecting(){
 		///////////////////
 		oldBadValue[id]=BadValue[id]
 	}//for id, _ := range GomeostazParams {
+
 
 	commonBadDetecting()
 }
@@ -205,10 +209,19 @@ func commonBadDetecting(){
 	}
 
 	CommonBadValue=0
-	for id, _ := range GomeostazParams {
+	commonPerception=0
+
+	for id, v := range GomeostazParams {
 // насколько плохо умножаем на вес значимости параметра
 		CommonBadValue+=BadValue[id]*GomeostazParamsWeight[id]
+
+		if id==1{// у энергии - чем больше значение параметра - тем лучше
+			commonPerception += int(v) * GomeostazParamsWeight[id]
+		}else {// чем больше значение параметра - тем хуже
+			commonPerception += int(100-v) * GomeostazParamsWeight[id]
+		}
 	}
+
 	if CommonBadValue > compareLevel{
 		if CommonBadNormalWell==3 {// удерживать Хорошо dinamicTimeFromBad сек
 			//  состояние Хорошо протухло, нужно менять на...
@@ -238,9 +251,7 @@ func commonBadDetecting(){
 		CommonBadNormalWell=1 // плохо
 		CommonWellValueStart=0
 	}
-	//перед перекрытием старого значения: стало хуже или лучше теперь
-	prepBetterOrWorseNow()
-	CommonOldBadValue=CommonBadValue
+
 }
 //////////////
 
@@ -263,7 +274,7 @@ func GetCurGomeoStatus()(string) {
 ОСОБЕННОСТЬ: срабатывание только при изменении параметра (любого) от нормы в плохо или наоборот,
 просто изменение нормы не влияет, т.е. реально индицирует, что был выход Б.параметра из нормы или возврат в норму
 и то, на какую условную величину были изменения, влияющие на осознание настроения PsyBaseMood
-Возвращает величину измнения от -10 через 9 до 10
+Возвращает величину измнения от -10 через 0 до 10
 Меняться может не чаще раз в 1 пульс
 Значение экспоненциально стремиться к пределам -10 и 10
 Это имитирует ограничение природных распознавателей на число дискретов распознавания.
@@ -274,10 +285,16 @@ var lastBetterOrWorse=0
 var curBetterOrWorsePulsCount=0
 func prepBetterOrWorseNow(){
 	diff:= int((CommonOldBadValue - CommonBadValue)/10)
-	if diff!=0 && curBetterOrWorsePulsCount!=PulsCount{
+	if diff!=0 && curBetterOrWorsePulsCount!=PulsCount{//
+		//Значение экспоненциально стремится к пределам -10 и 10
 		lastBetterOrWorse=int(10.0 - 10.0/math.Exp(float64(lib.Abs(diff))*0.17))
 		if diff<0{
 			lastBetterOrWorse*=-1
+		}
+		if lastBetterOrWorse>0{// если стало лучше, то и показывать GomeoParIdSuccesArr
+			GomeoParIdSuccesArr=curGomeoParIdSuccesArr
+		}else{
+			GomeoParIdSuccesArr=nil
 		}
 		curBetterOrWorsePulsCount=PulsCount
 	}
@@ -285,29 +302,56 @@ func prepBetterOrWorseNow(){
 	return
 }
 /////////////////////////////////////
+// текущее общее ощущение: сумма произведений параметров на их веса
+var commonPerception =0 // постоянно обновляемое значение
+// предыдущее общее ощущение
+var commonOldPerception =0 // меняется только по запросам психики функции BetterOrWorseNow()
+// насколько изменилось общее состояние, значение от  -10(максимально Плохо) через 0 до 10(максимально Хорошо)
+var commonDiffValue=0
+var curcommonOldPerceptionPulsCount=0
+
+func commonPerceptionNow(){
+	// !!! чтобы точно успело учесть изменения параметров
+	commonBadDetecting()
+
+	if commonOldPerception==0{
+		for id, _ := range GomeostazParams {
+			commonOldPerception += 50 * GomeostazParamsWeight[id]
+		}
+	}
+	diff:= int((commonPerception - commonOldPerception)/10)
+	if  curcommonOldPerceptionPulsCount!=PulsCount{//
+		//Значение экспоненциально стремится к пределам -10 и 10
+		commonDiffValue=int(10.0 - 10.0/math.Exp(float64(lib.Abs(diff))*0.17))
+		if diff<0{
+			commonDiffValue*=-1
+		}
+
+		curcommonOldPerceptionPulsCount=PulsCount
+	}
+
+	return
+}
+/////////////////////////////////////
 /* вызывается из психики res:=gomeostas.BetterOrWorseNow()
 Сканируется с каждым пульсом в func automatizmActionsPuls() во время ожидания
+CommonMoodAfterAction - "+" действия оператора привели к позитиву, "-" к негативу
+ВОЗВРАЩАЕТ:
+commonDiffValue - насколько изменилось общее состояние, значение от  -10(максимально Плохо) через 0 до 10(максимально Хорошо)
+lastBetterOrWorse - стали лучше или хуже: величина измнения от -10 через 0 до 10
+GomeoParIdSuccesArr - стали лучше следующие г.параметры []int гоменостаза
+
+Если было очень плохо, а стало не очень плохо, то commonDiffValue станет позитивным.
  */
-func BetterOrWorseNow()(int,[]int){
-	if lastBetterOrWorse!=0 || CommonMoodAfterAction!="" { // изменилось состояние
-		if CommonMoodAfterAction=="+"{// позитивная оценка Оператора
-			if lastBetterOrWorse<0{// стало хуже
-				lastBetterOrWorse=2 // улучшить
-			}else{
-				lastBetterOrWorse+=2
-				if lastBetterOrWorse > 10{lastBetterOrWorse=10}
-			}
-		}
-		if CommonMoodAfterAction=="-"{// негативная оценка Оператора
-			if lastBetterOrWorse<0{// стало хуже
-				lastBetterOrWorse-=2
-				if lastBetterOrWorse < -10{lastBetterOrWorse=-10}
-			}else{
-				lastBetterOrWorse-=2// ухудшить
-			}
-		}
-		return lastBetterOrWorse,GomeoParIdSuccesArr
+func BetterOrWorseNow()(int,int,[]int){
+	// насколько изменилось общее состояние
+	commonPerceptionNow()
+	commonOldPerception = commonPerception
+
+	//перед перекрытием старого значения: стало хуже или лучше теперь
+	prepBetterOrWorseNow()
+	CommonOldBadValue=CommonBadValue
+
+	return commonDiffValue,lastBetterOrWorse,GomeoParIdSuccesArr
 	}
-	return 0,nil
-}
 //////////////////////////////////////////

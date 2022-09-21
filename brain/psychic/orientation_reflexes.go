@@ -34,14 +34,14 @@ func GetReflexInformation(veryActual bool,targetArrID  []int,acrArr []int){
 
 
 // пульс PulsCount
-var needOrientationReflex=false
-var wasRunOrientationReflex=false
 func orientarionPuls(){
-	// как только отпустит AutomatizmRunningPulsCount - сразу выполнить
-	if wasRunOrientationReflex && AutomatizmRunningPulsCount==0{
+	// // вызывать когда отпустит предыдущий
+	/*  ЧТО ИМЕЛОСЬ В ВИДУ??? не помню
+	if AutomatizmRunningPulsCount==0{//20 сек ожидания (if AutomatizmRunningPulsCount+20 < PulsCount {)
 		orientation(saveAutomatizmID)
 		saveAutomatizmID=0
 	}
+	 */
 }
 ////////////////////////////////////////////////////
 
@@ -50,29 +50,29 @@ func orientarionPuls(){
 /*  Выполнение ориентировочного рефлекса из активной ветки Дерева автоматизмов.
 automatizmID: 0 - в активной ветке нет автоматзма, >0 - есть автоматизм
  */
-var saveAutomatizmID=0
+//var saveAutomatizmID=0
+
+// вызывается из func automatizmTreeActivation()
 func orientation(automatizmID int)(int){
-	wasRunOrientationReflex=true
-	saveAutomatizmID=automatizmID
-	if AutomatizmRunningPulsCount >0{// идет время ожидания результата выполненного автоматизма
-		needOrientationReflex=true
-	}else {// Нет ожидания результата выполненного автоматизма
-		wasRunOrientationReflex=false // покасить сразу
+	if AutomatizmRunningPulsCount>0{// не перебивать ожидание от запущенного автоматизма
+		return 0
+	}
+	// Нет ожидания результата выполненного автоматизма
+//	saveAutomatizmID=automatizmID
 		var atmtzm *Automatizm
 		if automatizmID == 0 {
 //автоматизма нет, если нужно действовать, то какой-то предположить и сразу проверить
 			atmtzm = orientation_1()
 		}
-		if saveAutomatizmID > 0 {
+		if automatizmID > 0 {
 //проверить подходит ли автоматизм defAutomatizmID к текущим условиям
-			atmtzm = orientation_2(saveAutomatizmID)
+			atmtzm = orientation_2(automatizmID)
 		}
 		if atmtzm != nil {
 			atmtzm.BranchID = detectedActiveLastNodID
 			notAllowScanInTreeThisTime = false
 			return atmtzm.ID
 		}
-	}
 
 return 0
 }
@@ -84,6 +84,7 @@ return 0
 Стадия отсуствия опыта в данных условиях.
  */
 func orientation_1()(*Automatizm){
+
 	lib.WritePultConsol("Ориентировочный рефлекс полного непонимания (1 типа)")
 
 	NoveltySituation=CurrentAutomatizTreeEnd // значение сохраняется в savedNoveltySituation

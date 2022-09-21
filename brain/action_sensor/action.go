@@ -133,6 +133,9 @@ func SetActionFromPult(actionList string,energi int){
 		DeactivationTriggers()
 	})
 
+	// тестирование
+	//  gomeostas.BetterOrWorseNow()
+
 return
 }
 //////////////////////////////////////////

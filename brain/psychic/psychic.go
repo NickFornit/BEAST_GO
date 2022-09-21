@@ -46,7 +46,7 @@ import (
 // после condition_reflex.go
 func PsychicInit(){
 
-	if EvolushnStage<1{// до рождения нет психики
+	if EvolushnStage<2{// еще нет психики
 		return
 	}
 	automatizmTreeInit()
@@ -75,6 +75,11 @@ var LifeTime=0
 var EvolushnStage=0 // стадия развития
 var IsSlipping=false
 func PsychicCountPuls(evolushnStage int,lifeTime int,puls int,isSlipping bool){
+
+	if evolushnStage<2 { // недостаточная стадия развития
+		return
+	}
+
 	LifeTime=lifeTime
 	EvolushnStage=evolushnStage
 	PulsCount=puls // передача номера тика из более низкоуровневого пакета

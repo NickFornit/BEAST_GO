@@ -49,7 +49,7 @@ type ActsAutomatizm struct {
 type Automatizm struct {
 	ID         int
 	BranchID   int // id ветки дерева AutomatizmNode к кторой прикреплен автоматизм
-	Usefulness int // (БЕС)ПОЛЕЗНОСТЬ: вред: -10 0 +10 +n польза
+	Usefulness int // (БЕС)ПОЛЕЗНОСТЬ: -10 вред 0 +10 +n польза
 
 	/* Цепочка последовательности реагирования,
 	   включающие элементарные реакции и ID уже имеющихся цепочек автоматизмов
@@ -94,13 +94,15 @@ type Automatizm struct {
 	/* В случае, если в результате автоматизма его Usefulness изменит знак, то
 	Count обнулится, а при таком же знаке - увеличивается на 1.
 	 */
-	Count int // число использований с подтверждением (бес)полезности Usefulness
+	Count int //надежность: число использований с подтверждением (бес)полезности Usefulness
 	/* какие ID гомео-параметров улучшает это действие
 	по аналогии и функциональности с http://go/pages/terminal_actions.php
 	 */
 	GomeoIdSuccesArr []int
 }
 /////////////////////////////////////
+
+
 var AutomatizmFromIdArr=make(map[int]*Automatizm)
 
 // автоматизмы, прикрепленные к ID узла Дерева получать по getAutomatizmFromTreeNodeIdArr(BranchID)
@@ -347,6 +349,7 @@ func getAutomatizmFromTreeNodeIdArr(branchID int)([]*Automatizm){
 /*задать тип автоматизма Belief.
 Только один из автоматизмов, прикрепленных к ветке, может иметь Belief=2 - проверенное собственное знание
 Если задается Belief=2, остальные Belief=2 становится Belief=0.
+ТАК ПРОСТО НЕЛЬЗЯ ЗАДАВАТЬ Belief=2: AutomatizmRunning.Belief=2
  */
 func setAutomatizmBelief(atmzm *Automatizm,belief int){
 	if atmzm==nil || atmzm.BranchID==0{
