@@ -305,7 +305,7 @@ func GetCurrentConditionsStr()(string){
 	out+="|"
 
 //ID (3) пусковых стимулов через запятую
-	as:=action_sensor.CheckCurActions()
+	as:=action_sensor.CheckCurActionsContext()
 	for i := 0; i < len(as); i++ {
 			if i>0{out+=","}
 			out+=strconv.Itoa(as[i])
