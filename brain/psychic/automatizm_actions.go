@@ -59,13 +59,13 @@ func RumAutomatizmID(id int)(bool){
 ////////////////////
 // todo = true - выполнить полюбому,
 func RumAutomatizm(am *Automatizm)(bool){
+	if am==nil{
+		return false
+	}
 	if MotorTerminalBlocking { //блокировка моторных терминалов во сне или произвольно
 		return false
 	}
 
-	if am==nil{
-		return false
-	}
 // NotAllowAnyActions ставится тогда, когда сохранение памяти должно выполняться в тишине, в бездействии
 	if  NotAllowAnyActions{
 		return false

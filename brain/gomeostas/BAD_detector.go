@@ -315,9 +315,15 @@ func commonPerceptionNow(){
 	commonBadDetecting()
 
 	if commonOldPerception==0{
+		/*
 		for id, _ := range GomeostazParams {
 			commonOldPerception += 50 * GomeostazParamsWeight[id]
 		}
+
+В самый первый момент старое значение просто должно равняться текущему вот почему.
+Всегда делается два измерения: 1 - в момент срабатывания автоматизма и потом проверяется изменения от действий.
+		*/
+		commonOldPerception=commonPerception
 	}
 	diff:= int((commonPerception - commonOldPerception)/10)
 	if  curcommonOldPerceptionPulsCount!=PulsCount{//

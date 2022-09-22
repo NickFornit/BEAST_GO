@@ -11,6 +11,14 @@ import (
 )
 
 /////////////////////////////////////////
+
+/* Это используется для определения момента реакция оператора Пульта на действия автоматизма.
+За 20 сек г.параметры могли бы просто натечь и вызывать сработавание при ожидании ответной реакции.
+Флаг сбрасывается через пульс после запуска автоматизма.
+*/
+var WasOperatorActiveted=false
+
+
 var savePsyBaseMood=0 // -1 Плохое настроение, 0 Нормальное, 1 - хорошее настроение
 // для более точной оценки
 var savePsyMood=0//сила Плохо -10 ... 0 ...+10 Хорошо
@@ -36,6 +44,7 @@ func automatizmActionsPuls(){
  */
 	if isPeriodResultWaiting {
 		if (AutomatizmRunningPulsCount+1) == PulsCount {
+			WasOperatorActiveted=false
 			// зафиксировать текущее состояние на момент срабатывания автоматизма
 			oldCommonDiffValue,oldBetterOrWorse,oldParIdSuccesArr = wasChangingMoodCondition()
 			if oldCommonDiffValue>0{}
@@ -52,7 +61,7 @@ func automatizmActionsPuls(){
    	gomeoParIdSuccesArr - стали лучше следующие г.параметры []int гоменостаза
  */
 			lastCommonDiffValue,lastBetterOrWorse,gomeoParIdSuccesArr := wasChangingMoodCondition()
-if lastCommonDiffValue!=0 { // ИЗМЕНИЛОСЬ СОСТОЯНИЕ
+if WasOperatorActiveted { // оператор отреагировал
 				// обработать изменение состояния
 				calcAutomatizmResult(lastCommonDiffValue,lastBetterOrWorse, gomeoParIdSuccesArr)
 				//  clinerAutomatizmRunning()  есть в calcAutomatizmResult
