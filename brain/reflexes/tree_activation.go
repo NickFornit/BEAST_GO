@@ -18,11 +18,11 @@ ActiveFromPhrase()
 package reflexes
 
 import (
-	"BOT/lib"
 	"BOT/brain/action_sensor"
 	"BOT/brain/gomeostas"
 	"BOT/brain/psychic"
 	termineteAction "BOT/brain/terminete_action"
+	"BOT/lib"
 	"strconv"
 )
 
@@ -160,11 +160,23 @@ if ActiveCurBaseStyleID==22{
 				consol += "ID=" + strconv.Itoa(geneticReflexesIdArr[c]) + "; "
 			}
 			//consol+="<br>"
-			lib.WritePultConsol(consol)
+			if (len(oldReflexesIdArr)> 0 || len(geneticReflexesIdArr) > 0) {
+				lib.WritePultConsol(consol)
+			}else{// не прописано никаких реакций
+				lib.WritePultConsol("Не определен рефлекс")
+				NoUnconditionRefles = "NOREFLEX" + GetCurrentConditionsStr() //СТРОКА УСЛОВИЙ ДЛЯ РЕФЛЕКСА
+			}
 
+			//////// ДЛЯ ПСИХИКИ:
 			veryActual, targetArrID, acrArr := GetActualReflexAction()
+			if len(acrArr)>6{// может быть и 64 если
+// просто ограничить 3 предположительными акциями, т.к. есть сортировка по убыванию значимости
+				acrArr=acrArr[:3]
+				// на стадии рефлексов был сигнал NOREFLEX и диалог на пульте
+			}
 			// передать в психику информацию
 			psychic.GetReflexInformation(veryActual, targetArrID, acrArr)
+			//////////////////////
 
 			if EvolushnStage < 2 { // сразу запустить имеющиеся рефлексы
 				toRunRefleses()
@@ -338,8 +350,10 @@ func checkIgnorOnly(oldReflexesIdArr []int,geneticReflexesIdArr []int)(bool) {
 func GetActualReflexAction()(bool,[]int,[]int){
 	var actArtr []int
 
-	// выявить ID парамктров гомеостаза как цели для улучшения в данных условиях
-	//здесь, чтобы сразу получить veryActual и targetArrID для возврата
+	/* выявить ID парамктров гомеостаза как цели для улучшения в данных условиях
+	здесь, чтобы сразу получить veryActual и targetArrID для возврата
+	targetArrID - отсортирован по убыванию значимости
+	 */
 	veryActual,targetArrID:=gomeostas.FindTargetGomeostazID()
 
 	//есть ли подходящий по условиям безусловный или условный рефлекс и сделать автоматизм по его действиям
@@ -380,7 +394,7 @@ func GetActualReflexAction()(bool,[]int,[]int){
 
 	// остались самые древние реации - действия по их цели (Какие ID гомео-параметров
 	//улучшает действие из http://go/pages/terminal_actions.php)
-	// выдать массив возможных действий чтобы выбрать одно из них, пока еще не испытанное
+	// выдать массив возможных действий для данных условий чтобы выбрать одно из них, пока еще не испытанное
 	for aID, gIDarr := range termineteAction.TerminalActionsTargetsFromID {
 		// выбрать подхлдящие ID параметров гомеостаза для данной цели
 		aArr:=lib.GetExistsIntArs(targetArrID,gIDarr)
@@ -392,6 +406,9 @@ func GetActualReflexAction()(bool,[]int,[]int){
 
 	return veryActual,targetArrID,actArtr
 }
+//////////////////////////////////////////////////
+
+
 /* GetActualReflex() возвращает текущие массивы найденных при активации видов рефлексов
 1-conditionReflexesIdArr []int - Условные рефлексы
 2-geneticReflexesIdArr []int - Новые безусловные
@@ -407,3 +424,4 @@ func GetActualReflex()([]int,[]int,[]int){
 
 
 //////////////////////////////////////////////////////
+

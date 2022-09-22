@@ -82,16 +82,23 @@ if WasOperatorActiveted { // оператор отреагировал
 	Реакция ожидается на слелующем пульcе после срабатывания автоматизма	и в течение 20 пульсов
 	 за это время получим уверенное wasChangingMoodCondition() по значению gomeostas.BetterOrWorseNow()
 */
-	if (AutomatizmRunningPulsCountAut+1)<PulsCount && AutomatizmRunningPulsCountAut+20 < PulsCount{
+	if (AutomatizmRunningPulsCountAut+1)<PulsCount{
+		WasOperatorActiveted=false
+		// зафиксировать текущее состояние на момент срабатывания автоматизма
+		oldCommonDiffValue,oldBetterOrWorse,oldParIdSuccesArr = wasChangingMoodCondition()
+	}
+
+
+	if (AutomatizmRunningPulsCountAut+2)<PulsCount && AutomatizmRunningPulsCountAut+20 < PulsCount{
 		// Из МОЗЖУЧКА как-то отреагировать на отсуствие реакции - повторить автоматизм с большей силой Energy
 		if noAutovatizmResult(){// была попытка отреагировать сильнее - в cerebellum.go
 			return
 		}
-		commonDiffValue,res,wellIDarr:=wasChangingMoodCondition()
-// условия нужно сделать - как выше, в if isPeriodResultWaiting {
-		if res!=0 || commonDiffValue!=0 || wellIDarr!=nil{// ИЗМЕНИЛОСЬ СОСТОЯНИЕ
+		// раскомментировать когда дойдешь до отладки этого
+		//lastCommonDiffValue,lastBetterOrWorse,gomeoParIdSuccesArr := wasChangingMoodCondition()
+		if WasOperatorActiveted { // оператор отреагировал
 			// обработать изменение состояния
-			// calcAutomatizmResultAut(commonDiffValue,res,wellIDarr)
+			//calcAutomatizmResult(lastCommonDiffValue,lastBetterOrWorse, gomeoParIdSuccesArr)
 		}
 	}
 	if AutomatizmRunningPulsCountAut+20 < PulsCount {

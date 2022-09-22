@@ -6,16 +6,23 @@
 
 package gomeostas
 
+import "sort"
+
 /////////////////////////////////////////////
 
 
 /* выявить ID парамктров гомеостаза как цели для улучшения в данных условиях
 Возвращает PurposeGenetic.veryActual  gomeostas.FindTargetGomeostazID
+сортировка по уменьшению важности
 */
 func FindTargetGomeostazID()(bool,[]int){
 	var veryActual=false
 	var idArr []int
-	for k, pID := range BadNormalWell {
+// BadNormalWell - состояние каждого параметра гомеостаза: 1 - Похо, 2 - Норма, 3 - Хорошо
+// отсортировать по убыли важности GomeostazParamsWeight
+	badNormalWellImp:=sortingForImpotents()
+
+	for k, pID := range badNormalWellImp {
 		if pID==1 { // плохо для данного параметра гомеостаза
 			idArr = append(idArr, k)
 			if k == 1 || k == 2 || k == 7 || k == 8 {
@@ -24,6 +31,29 @@ func FindTargetGomeostazID()(bool,[]int){
 		}
 	}
 	return veryActual,idArr
+}
+/////////////////////////////////
+func sortingForImpotents()(map[int]int){
+	var impC=make(map[int]int)
+	for id, _ := range BadNormalWell {
+		impC[GomeostazParamsWeight[id]]=id
+	}
+
+	vals := make([]int, 0, len(impC))
+	for k := range impC {
+		vals = append(vals, k)
+	}
+	//СОРТИРОВКА ПО УБЫВАНИЮ
+	sort.Slice(vals , func(i, j int) bool {
+		return vals[i] > vals[j]
+	})
+
+	var arr=make(map[int]int)
+	for _,v := range vals {
+			arr[impC[v]]=BadNormalWell[impC[v]]
+		}
+
+return arr
 }
 //////////////////////////////////////////////
 
