@@ -54,7 +54,7 @@ func ActionSensorPuls(evolushnStage int,lifeTime int,puls int,isSlipping bool){
 16 Простить
 17 Вылечить
  */
-var ActionFromPult[18]int
+var ActionFromPult[18]int // живет на время активации с пульта до завершения прохода дерева
 // сохрянять текущий контекст   ActionFromPultContext=ActionFromPult
 var ActionFromPultContext [18]int // эти не очищаются
 
@@ -158,7 +158,7 @@ func DeactivationTriggersContext(){
 	}
 }
 
-// какие акции действуют в данный момент пульса - активные контексты действий с Пульта
+// какие акции действуют в данный момент действий с пульта - активные контексты действий с Пульта
 func CheckCurActions()([]int){
 	var aArr[]int
 	for i := 1; i < 18; i++ {

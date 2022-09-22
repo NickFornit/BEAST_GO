@@ -92,10 +92,17 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				brain.IsPultActivnost = true
 				outStr := gomeostas.GetCurGomeoParams()
 
+				var waitingPeriod=""
+				res,time:=psychic.WaitingPeriodForActions()
+				if res{
+					waitingPeriod=strconv.Itoa(time)
+				}
+
 				outStr += "#|#" + gomeostas.GetCurGomeoStatus() + "#|#" + gomeostas.GetCurContextActive() +
 					"#|# " + reflexes.GetCurrentConditionsStr() + //чтобы постоянно была инфа о сочетаниях контекстов
 					"#|#" + strconv.Itoa(brain.LifeTime) +
-					"#|#" + reflexes.NoUnconditionRefles
+					"#|#" + reflexes.NoUnconditionRefles +
+					"#|#" + waitingPeriod
 				brain.IsPultActivnost = false
 				_, _ = fmt.Fprint(resp, outStr)
 				return

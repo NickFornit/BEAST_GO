@@ -6,6 +6,8 @@
 
 Автоматизм обязательно привязан к определенной ветке дерева (условиях)
 так что здесь нет каких-то универсальных действий, как в http://go/pages/terminal_actions.php
+
+структура записи: id|BranchID|Usefulness||Sequence||NextID|Energy|Belief
 */
 
 package psychic

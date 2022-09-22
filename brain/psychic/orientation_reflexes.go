@@ -37,7 +37,7 @@ func GetReflexInformation(veryActual bool,targetArrID  []int,acrArr []int){
 func orientarionPuls(){
 	// // вызывать когда отпустит предыдущий
 	/*  ЧТО ИМЕЛОСЬ В ВИДУ??? не помню
-	if AutomatizmRunningPulsCount==0{//20 сек ожидания (if AutomatizmRunningPulsCount+20 < PulsCount {)
+	if LastRunAutomatizmPulsCount==0{//20 сек ожидания (if LastRunAutomatizmPulsCount+20 < PulsCount {)
 		orientation(saveAutomatizmID)
 		saveAutomatizmID=0
 	}
@@ -54,7 +54,14 @@ automatizmID: 0 - в активной ветке нет автоматзма, >0
 
 // вызывается из func automatizmTreeActivation()
 func orientation(automatizmID int)(int){
-	if AutomatizmRunningPulsCount>0{// не перебивать ожидание от запущенного автоматизма
+	if LastRunAutomatizmPulsCount>0{// не перебивать ожидание от запущенного автоматизма
+/* НО! во время периода ожидания реакции оператора на действие автоматизма
+	более важная ориентировочная реакция может превать ожидание ответа (стек прерываний)
+
+	TODO запомнить какой автоматизма прерван и потом вспомнить чтобы снова запустить и как-то обработать.
+		возможно, создать доминанту если это - на достаточной стадии развития
+ */
+
 		return 0
 	}
 	// Нет ожидания результата выполненного автоматизма

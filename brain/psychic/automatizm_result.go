@@ -18,6 +18,9 @@ import (
 */
 var WasOperatorActiveted=false
 
+// период ожидания реакции оператора на действие автоматизма
+const WaitingPeriodForActionsVal=20
+
 
 var savePsyBaseMood=0 // -1 Плохое настроение, 0 Нормальное, 1 - хорошее настроение
 // для более точной оценки
@@ -32,6 +35,9 @@ var oldBetterOrWorse=0 //- стали лучше или хуже: величин
 var oldParIdSuccesArr []int//стали лучше следующие г.параметры []int гоменостаза
 var oldCommonDiffValue=0 // насколько изменилось общее состояние, значение от  -10(максимально Плохо) через 0 до 10(максимально Хорошо)
 func automatizmActionsPuls(){
+	if LastRunAutomatizmPulsCount==0 {
+		return
+	}
 
 	// если был запущен автоматизм, возможно, без ориентировчного рефлека, рефлексы блокируются на 2 пульса
 	if MotorTerminalBlocking && LastRunAutomatizmPulsCount+2 > PulsCount {
@@ -42,14 +48,13 @@ func automatizmActionsPuls(){
 Реакция ожидается на слелующем пульcе после срабатывания автоматизма	и в течение 20 пульсов
  за это время получим уверенное wasChangingMoodCondition() по значению gomeostas.BetterOrWorseNow()
  */
-	if isPeriodResultWaiting {
-		if (AutomatizmRunningPulsCount+1) == PulsCount {
+		if (LastRunAutomatizmPulsCount+1) == PulsCount {
 			WasOperatorActiveted=false
 			// зафиксировать текущее состояние на момент срабатывания автоматизма
 			oldCommonDiffValue,oldBetterOrWorse,oldParIdSuccesArr = wasChangingMoodCondition()
 			if oldCommonDiffValue>0{}
 		}
-		if (AutomatizmRunningPulsCount+2) < PulsCount {// следить со следующего пульса
+		if (LastRunAutomatizmPulsCount+2) < PulsCount {// следить со следующего пульса
 			// Из МОЗЖУЧКА как-то отреагировать на отсуствие реакции - повторить автоматизм с большей силой Energy
 			/*if noAutovatizmResult() { // была попытка отреагировать сильнее - в cerebellum.go
 				return
@@ -67,19 +72,22 @@ if WasOperatorActiveted { // оператор отреагировал
 				//  clinerAutomatizmRunning()  есть в calcAutomatizmResult
 			}
 		}
-		if (AutomatizmRunningPulsCount+20) < PulsCount {
-			//сбрасывать ожидание результата автоматизма если прошло 20 пульсов
+// сбос ожидания, забыть
+		if (LastRunAutomatizmPulsCount+WaitingPeriodForActionsVal) < PulsCount {
+			//сбрасывать ожидание результата автоматизма если прошло WaitingPeriodForActionsVal пульсов
 			clinerAutomatizmRunning()
 		}
-	}
 	//////////////////////////////////////////////
+
+
+
 
 
 /* ПОКА НИКАК НЕ ИСПОЛЬЗУЕТСЯ - после срабатывания актуального автоматизма ветки дерева.
 т.е. активная ветка не сопровождается новизной, но м.б. есть технически невидимая новизна
    и нужно так же оценить последствия, и если они плохие, то задуматься.
    Ожидание результата автоматизма БЕЗ ОРИЕНТИРОВОЧНОГО РЕФЛЕКСА (автоматически запущенного из Дерева).
-	Реакция ожидается на слелующем пульcе после срабатывания автоматизма	и в течение 20 пульсов
+	Реакция ожидается на слелующем пульcе после срабатывания автоматизма	и в течение WaitingPeriodForActionsVal пульсов
 	 за это время получим уверенное wasChangingMoodCondition() по значению gomeostas.BetterOrWorseNow()
 */
 	if (AutomatizmRunningPulsCountAut+1)<PulsCount{
@@ -89,7 +97,7 @@ if WasOperatorActiveted { // оператор отреагировал
 	}
 
 
-	if (AutomatizmRunningPulsCountAut+2)<PulsCount && AutomatizmRunningPulsCountAut+20 < PulsCount{
+	if (AutomatizmRunningPulsCountAut+2)<PulsCount && AutomatizmRunningPulsCountAut+WaitingPeriodForActionsVal < PulsCount{
 		// Из МОЗЖУЧКА как-то отреагировать на отсуствие реакции - повторить автоматизм с большей силой Energy
 		if noAutovatizmResult(){// была попытка отреагировать сильнее - в cerebellum.go
 			return
@@ -98,11 +106,11 @@ if WasOperatorActiveted { // оператор отреагировал
 		//lastCommonDiffValue,lastBetterOrWorse,gomeoParIdSuccesArr := wasChangingMoodCondition()
 		if WasOperatorActiveted { // оператор отреагировал
 			// обработать изменение состояния
-			//calcAutomatizmResult(lastCommonDiffValue,lastBetterOrWorse, gomeoParIdSuccesArr)
+			//calcAutomatizmResultAut(lastCommonDiffValue,lastBetterOrWorse, gomeoParIdSuccesArr)
 		}
 	}
-	if AutomatizmRunningPulsCountAut+20 < PulsCount {
-		//сбрасывать ожидание результата автоматизма если прошло 20 пульсов
+	if AutomatizmRunningPulsCountAut+WaitingPeriodForActionsVal < PulsCount {
+		//сбрасывать ожидание результата автоматизма если прошло WaitingPeriodForActionsVal пульсов
 		clinerAutomatizmRunningAut()
 	}
 }
@@ -110,15 +118,13 @@ if WasOperatorActiveted { // оператор отреагировал
 
 
 /////////////////////////////////////////////////////////////////////
-// отслеживание осознанно запущенных автоматизмов
+// отслеживание запущенных автоматизмов
 var AutomatizmRunning *Automatizm // запущенный автоматизм
-var AutomatizmRunningPulsCount=0 // время запуска автоматизма 20 сек ожидания (if AutomatizmRunningPulsCount+20 < PulsCount {)
+var AutomatizmRunningPulsCount=0 // время запуска автоматизма WaitingPeriodForActionsVal сек ожидания (if AutomatizmRunningPulsCount+WaitingPeriodForActionsVal < PulsCount {)
 var savePurposeGenetic *PurposeGenetic // массив примитивных целей
 
 func setAutomatizmRunning(am *Automatizm,ps *PurposeGenetic){
-	isPeriodResultWaiting=true // игнорировать новое внимание на время ожидания результата автоматизма
 	AutomatizmRunning=am
-	AutomatizmRunningPulsCount=PulsCount
 	savePsyBaseMood=PsyBaseMood
 	savePsyMood=PsyMood
 	savedNoveltySituation=NoveltySituation
@@ -127,9 +133,8 @@ func setAutomatizmRunning(am *Automatizm,ps *PurposeGenetic){
 ///////////////////////////////////
 func clinerAutomatizmRunning(){
 	AutomatizmRunning=nil
-	AutomatizmRunningPulsCount=0
+	LastRunAutomatizmPulsCount=0
 	isReflexesActionBloking=false
-	isPeriodResultWaiting=false
 }
 ///////////////////////////////////
 
@@ -139,10 +144,12 @@ func clinerAutomatizmRunning(){
 
  */
 func calcAutomatizmResult(commonDiffValue int,diffPsyBaseMood int,wellIDarr []int){
+	/*
 	if AutomatizmRunningPulsCount==0 || AutomatizmRunning==nil{
 		clinerAutomatizmRunning()
 		return
 	}
+	 */
 	// commonDiffValue - точно изменился, иначе бы не было вызова calcAutomatizmResult
 	/// если числа имеют разные знаки (одно положительное, другое отрицательное)
 	if lib.IsDiffersOfSign(AutomatizmRunning.Usefulness,commonDiffValue)		{
@@ -211,10 +218,15 @@ return
 
 
 
-
-/////////////////////////////////////////////////////////////////////
+// начало неработающего кода
+//#############################################################################
 /*  ПОКА НИКАК НЕ ИСПОЛЬЗУЕТСЯ ?? TODO
-Отслеживание запущенных автоматизмов ВНЕ ОРИЕНТИРОВОЧНОГО РЕФЛЕКСА.
+Отслеживание запущенных автоматизмов ВНЕ ОРИЕНТИРОВОЧНОГО РЕФЛЕКСА
+должно использовать всю ту же функцию
+func automatizmActionsPuls() !!!!!
+
+ПОКА ОСТАВЛЯЮ ЧТОБЫ СОХРАНИТЬ ИДЕИ....
+
 ЕСЛИ срабатывает автоматизм без ориентировочного рефлекса, значит есть технически невидимая новизна
 и нужно так же оценить последствия, и если они плохие, то задуматься.
 */
@@ -236,9 +248,7 @@ func clinerAutomatizmRunningAut(){
 	AutomatizmRunningPulsCountAut=0
 }
 ///////////////////////////////////////////////////////////////////
-/* При любых изменениях wasChangingMoodCondition() оценивать действие запущенного автоматизма
-
- */
+// При любых изменениях wasChangingMoodCondition() оценивать действие запущенного автоматизма
 func calcAutomatizmResultAut(diffPsyBaseMood int,wellIDarr []int){
 	if AutomatizmRunningPulsCountAut==0 || AutomatizmRunningAut==nil{
 		clinerAutomatizmRunningAut()
@@ -283,7 +293,12 @@ func calcAutomatizmResultAut(diffPsyBaseMood int,wellIDarr []int){
 	clinerAutomatizmRunningAut()
 	return
 }
-/////////////////////////////////////////////////////////////////////////
+//#############################################################################
+// конец неработающего кода
+
+
+
+
 
 
 
@@ -303,5 +318,18 @@ func wasChangingMoodCondition()(int,int,[]int){
 /////////////////////////////////////////////////////////////////////////
 
 
+//////////////////////////////////////////////////////////////////
+// для индикации период ожидания реакции оператора на действие автоматизма
+//   psychicWaitingPeriodForActions()
+func WaitingPeriodForActions()(bool,int){
 
-
+	if LastRunAutomatizmPulsCount>0{
+		time:=WaitingPeriodForActionsVal - (PulsCount-LastRunAutomatizmPulsCount)
+		return true,time
+	}
+	if AutomatizmRunningPulsCountAut>0{
+		time:=WaitingPeriodForActionsVal - (PulsCount-AutomatizmRunningPulsCountAut)
+		return true,time
+	}
+return false,0
+}
