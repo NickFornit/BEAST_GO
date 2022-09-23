@@ -65,6 +65,7 @@ func orientation(automatizmID int)(int){
 		return 0
 	}
 	// Нет ожидания результата выполненного автоматизма
+	notAllowScanInTreeThisTime = true
 //	saveAutomatizmID=automatizmID
 		var atmtzm *Automatizm
 		if automatizmID == 0 {
@@ -80,7 +81,7 @@ func orientation(automatizmID int)(int){
 			notAllowScanInTreeThisTime = false
 			return atmtzm.ID
 		}
-
+notAllowScanInTreeThisTime = false
 return 0
 }
 ///////////////////////////////////////////////////////

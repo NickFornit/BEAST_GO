@@ -98,11 +98,17 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 					waitingPeriod=strconv.Itoa(time)
 				}
 
+				var psichicReady=""
+				if psychic.StartPsichicNow{
+					psichicReady="1"
+				}
+
 				outStr += "#|#" + gomeostas.GetCurGomeoStatus() + "#|#" + gomeostas.GetCurContextActive() +
 					"#|# " + reflexes.GetCurrentConditionsStr() + //чтобы постоянно была инфа о сочетаниях контекстов
 					"#|#" + strconv.Itoa(brain.LifeTime) +
 					"#|#" + reflexes.NoUnconditionRefles +
-					"#|#" + waitingPeriod
+					"#|#" + waitingPeriod +
+					"#|#" + psichicReady
 				brain.IsPultActivnost = false
 				_, _ = fmt.Fprint(resp, outStr)
 				return
@@ -312,6 +318,32 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				_, _ = fmt.Fprint(resp, ref)
 				return
 			}
+
+			get_automatizm_list_info := r.FormValue("get_automatizm_list_info")
+			if len(get_automatizm_list_info) > 0 {
+				base := r.FormValue("limitBasicID")
+				limitBasicID,_:=strconv.Atoi(base)
+				ref := psychic.GetAutomatizmInfo(limitBasicID)
+				_, _ = fmt.Fprint(resp, ref)
+				return
+			}
+
+			get_trigger_info := r.FormValue("get_trigger_info")
+			if len(get_trigger_info) > 0 {
+				triggerID,_:=strconv.Atoi(r.FormValue("triggerID"))
+				ref := reflexes.GetRriggerInfo(triggerID)
+				_, _ = fmt.Fprint(resp, ref)
+				return
+			}
+
+			get_sequence_info := r.FormValue("get_sequence_info")
+			if len(get_sequence_info) > 0 {
+				autmzmID,_:=strconv.Atoi(r.FormValue("autmzmID"))
+				ref := psychic.GetAutomatizmSequenceInfo(autmzmID,r.FormValue("sequence"))
+				_, _ = fmt.Fprint(resp, ref)
+				return
+			}
+
 
 			get_self_perception_info := r.FormValue("get_self_perception_info")
 			if len(get_self_perception_info) > 0 {

@@ -187,6 +187,7 @@ func NotAllowReflexesAction()(bool){
 
 ///////////////////////////////////
 func SaveAllPsihicMemory(){
+	notAllowScanInTreeThisTime = true
 	SaveEmotionArr()
 	SaveActivityFromIdArr()
 	SaveVerbalFromIdArr()
@@ -199,6 +200,7 @@ func SaveAllPsihicMemory(){
 	saveEpisodicMenory()
 	SaveMentalAutomatizms()
 	SaveProblemDominenta()
+	notAllowScanInTreeThisTime = false
 }
 //////////////////////////////////////
 

@@ -61,7 +61,8 @@ type ReflexNode struct { // узел дерева рефлексов
 var ReflexTree ReflexNode // дерево рефлексов
 var ReflexTreeFromID=make(map[int]*ReflexNode)
 
-/*запрет показа карты при обновлении против паники типа "одновременная запись и считывание карты"
+/*запрет показа карты на пульте (func GetReflexesTreeForPult()) при обновлении 
+против паники типа "одновременная запись и считывание карты"
 Использовать для всех операций записи узлов дерева
  */
 var notAllowScanInReflexesThisTime=false

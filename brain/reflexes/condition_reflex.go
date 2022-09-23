@@ -43,7 +43,6 @@ ID|lev1|lev2 через ,|lev3 типа TriggerStimulsID|ActionIDarr через 
 package reflexes
 
 import (
-	"BOT/brain/psychic"
 	"BOT/lib"
 	"strconv"
 	"strings"
@@ -58,7 +57,7 @@ var IsUnlimitedMode=0
 
 func initConditionReflex() {
 	loadConditionReflexes()
-	psychic.PsychicInit()
+	// psychic.PsychicInit()  после 4-го пульса!
 }
 
 type ConditionReflex struct {

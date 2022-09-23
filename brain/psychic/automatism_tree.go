@@ -50,12 +50,19 @@ import (
 	wordSensor "BOT/brain/words_sensor"
 )
 
+// психика инициализирована
+var StartPsichicNow=false
+
 // инициализирующий блок - в порядке последовательности инициализаций
 // из psychic.go
 func automatizmTreeInit(){
 
 	loadAutomatizmTree()
-
+	if len(AutomatizmTree.Children)==0{// еще нет никаких веток
+		// создать первые три ветки базовых состояний
+		createBasicAutomatizmTree()
+	}
+	StartPsichicNow=true
 }
 /////////////////////////////////////////////////////////////
 
@@ -85,15 +92,21 @@ var AutomatizmTreeFromID=make(map[int]*AutomatizmNode)
 // последовательность узлов активной ветки
 var ActiveBranchNodeArr []int
 
-/*запрет показа карты при обновлении против паники типа "одновременная запись и считывание карты"
-Использовать для всех операций записи узлов дерева
- */
-var notAllowScanInTreeThisTime=false
 ////////////////////////////////////////////////
 
 
+// создать первые три ветки базовых состояний
+func createBasicAutomatizmTree(){
+	notAllowScanInTreeThisTime=true // запрет показа карты при обновлении
+	createNewAutomatizmNode(&AutomatizmTree,0,1,0,0,0,0,0)
+	createNewAutomatizmNode(&AutomatizmTree,0,2,0,0,0,0,0)
+	createNewAutomatizmNode(&AutomatizmTree,0,3,0,0,0,0,0)
 
-
+	SaveAutomatizmTree()
+	notAllowScanInTreeThisTime=false // запрет показа карты при обновлении
+	return
+}
+/////////////////////////////////////////////////////
 
 
 

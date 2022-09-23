@@ -17,6 +17,7 @@ import (
 /* Создать новый узел дерева автоматизма.
 Формат записи:
 ID|ParentNode|BaseID|EmotionID|ActivityID|ToneMoodID|SimbolID|VerbalID
+
  */
 var lastAutomatizmNodeID=0
 func createNewAutomatizmNode(parent *AutomatizmNode,id int,baseID int,EmotionID int,
@@ -120,12 +121,14 @@ func createNulLevelAutomatizmTree(rt *AutomatizmNode){
 }
 /////////////////////////////////////
 func SaveAutomatizmTree(){
+	notAllowScanInTreeThisTime = true
 	var out=""
 	cnt:=len(AutomatizmTree.Children)
 	for n := 0; n < cnt; n++ {
 		out+=getAutomatizmNode(&AutomatizmTree.Children[n])
 	}
 	lib.WriteFileContent(lib.GetMainPathExeFile()+"/memory_psy/automatizm_tree.txt",out)
+	notAllowScanInTreeThisTime = false
 	return
 }
 func getAutomatizmNode(wt *AutomatizmNode)(string){

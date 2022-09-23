@@ -14,6 +14,10 @@ import (
 
 
 func GetSelfPerceptionInfo()(string){
+	// против паники типа "одновременная запись и считывание карты"
+	if notAllowScanInTreeThisTime{
+		return "!!!"
+	}
 	ie:=CurrentInformationEnvironment
 var out="Общее базовое состояние: <b>"
 if gomeostas.CommonBadNormalWell==1{

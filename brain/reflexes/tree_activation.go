@@ -164,7 +164,9 @@ if ActiveCurBaseStyleID==22{
 				lib.WritePultConsol(consol)
 			}else{// не прописано никаких реакций
 				lib.WritePultConsol("Не определен рефлекс")
-				NoUnconditionRefles = "NOREFLEX" + GetCurrentConditionsStr() //СТРОКА УСЛОВИЙ ДЛЯ РЕФЛЕКСА
+				if EvolushnStage == 0 { // только для стадии безусловных рефлексов
+					NoUnconditionRefles = "NOREFLEX" + GetCurrentConditionsStr() //СТРОКА УСЛОВИЙ ДЛЯ РЕФЛЕКСА
+				}
 			}
 
 			//////// ДЛЯ ПСИХИКИ:

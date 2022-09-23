@@ -53,6 +53,10 @@ func ReflexCountPuls(evolushnStage int, lifeTime int, puls int, isSlipping bool)
 	ReflexPulsCount = puls // передача номера тика из более низкоуровневого пакета
 	IsSlipping = isSlipping
 
+	if puls==4{
+		psychic.PsychicInit()  // после 3-го пульса!
+	}
+
 	if activetedPulsCount != ReflexPulsCount { // защита от повторных срабатываний
 		if gomeostas.IsNewConditions { // изменились условия
 			ActiveFromConditionChange()

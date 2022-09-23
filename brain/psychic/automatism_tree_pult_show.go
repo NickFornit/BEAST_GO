@@ -16,7 +16,11 @@ import (
 
 ////////////////////////////////////////////
 
-
+/*запрет показа карты на пульте (func GetAutomatizmTreeForPult()) при обновлении
+против паники типа "одновременная запись и считывание карты"
+Использовать для всех операций записи узлов дерева
+*/
+var notAllowScanInTreeThisTime=false
 
 
 // образ дерева автоматизмов для вывода
@@ -27,11 +31,13 @@ func GetAutomatizmTreeForPult()(string){
 	if notAllowScanInTreeThisTime{
 		return "!!!"
 	}
+	if len(AutomatizmTree.Children)==0 { // еще нет никаких веток
+		return "Еще нет Дерева автоматизмов"
+	}
 	automatizmTreeModel=""
 	scanAutomatizmNodes(-1,&AutomatizmTree)
-
 	if len(automatizmTreeModel)<10{
-		return "Еще нет Дерева автоматизмов"
+		return "Еще нет информационных веток дерева"
 	}
 
 	return automatizmTreeModel
@@ -97,7 +103,7 @@ func getStrFromCond(level int,imgID int)(string){
 		out += "<span style='color:red'>несуществующее Базовое состояние ID="+strconv.Itoa(imgID)+"</span>"
 	}
 	case 1: // эмоция
-		out="Эмоция: <b>"+getStrnameFromBaseImageID(imgID)+"</b>"
+		out="Эмоция ("+strconv.Itoa(imgID)+"): <b>"+getStrnameFromBaseImageID(imgID)+"</b>"
 	case 2: // действия
 		out=getStrnameFromStyleImageID(imgID)
 		if len(out)==0{
@@ -133,6 +139,9 @@ func getStrFromCond(level int,imgID int)(string){
 // названия базовых контекстов в их сочетании -из ID эмоции
 func getStrnameFromBaseImageID(id int)(string){
 	var out=""
+	if EmotionFromIdArr[id]==nil{
+		return "Нет эмоций"
+	}
 	img:=EmotionFromIdArr[id].BaseIDarr
 	for i := 0; i < len(img); i++ {
 		if i>0{out +=", "}
@@ -146,6 +155,9 @@ func getStrnameFromBaseImageID(id int)(string){
 }
 // названия Пусковых стимулов в их сочетании -из ID их образа
 func getStrnameFromStyleImageID(id int)(string){
+	if ActivityFromIdArr[id]==nil{
+		return "Нет действий с Пульта"
+	}
 	var out=""
 	img:=ActivityFromIdArr[id].ActID
 	for i := 0; i < len(img); i++ {
@@ -168,14 +180,29 @@ func getStrnameFromStyleImageID(id int)(string){
 Сделано на основе запуска автоматизма на выполнение: func RumAutomatizmID(id int) из automatizm_actions.go
  */
 func TranslateAutomatizmSequence(am *Automatizm)(string){
-	var out=""
 	if am==nil{
-		return out
+		return ""
 	}
 	if len(am.Sequence)==0{
-		return out
+		return ""
 	}
-	actArr:=ParceAutomatizmSequence(am.Sequence)
+
+	out:=GetAutomatizmSequenceInfo(am.ID,am.Sequence)
+
+	return out
+}
+////////////////////////////////////////
+
+
+// действия - в виде строки
+func GetAutomatizmSequenceInfo(idA int,sequence string)(string){
+
+	am:=AutomatizmFromIdArr[idA]
+	if am == nil{
+		return ""
+	}
+	var out=""
+	actArr:=ParceAutomatizmSequence(sequence)
 
 	for i := 0; i < len(actArr); i++ {
 		// строка действий (любого типа) через запятую
@@ -193,8 +220,8 @@ func TranslateAutomatizmSequence(am *Automatizm)(string){
 				addE = getCerebellumReflexAddEnergy(am.ID)
 			}
 			for i := 0; i < len(idArr); i++ {
-				if i==0{out+="<b>Фраза Beast c энергией "+strconv.Itoa(am.Energy+addE)+":</b>"}else{out+=", "}
-				out+= word_sensor.GetPhraseStringsFromPhraseID(idArr[i])
+				if i==0{out+="Фраза Beast c энергией "+strconv.Itoa(am.Energy+addE)+":</b>"}else{out+=", "}
+				out+= "<b>"+word_sensor.GetPhraseStringsFromPhraseID(idArr[i])+"</b>"
 			}
 			//TerminatePraseAutomatizmActions(idArr, am.Energy+addE)
 		case 2: //Dnn - ID прогрмаммы действий, через запятую
@@ -208,8 +235,8 @@ func TranslateAutomatizmSequence(am *Automatizm)(string){
 				addE = getCerebellumReflexAddEnergy(am.ID)
 			}
 			for i := 0; i < len(idArr); i++ {
-				if i==0{out+="<b>Действие Beast c энергией "+strconv.Itoa(am.Energy+addE)+":</b>"}else{out+=", "}
-				out+= termineteAction.TerminalActonsNameFromID[idArr[i]]
+				if i==0{out+="Действие Beast c энергией "+strconv.Itoa(am.Energy+addE)+": "}else{out+=", "}
+				out+= "<b>"+termineteAction.TerminalActonsNameFromID[idArr[i]]+"</b>"
 			}
 
 		case 3: //Ann - последовательный запуск автоматизмов с id1,id2..
@@ -223,6 +250,7 @@ func TranslateAutomatizmSequence(am *Automatizm)(string){
 			///////////////////////////////////////
 		}
 	}
+
+
 	return out
 }
-////////////////////////////////////////

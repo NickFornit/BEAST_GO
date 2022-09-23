@@ -121,19 +121,23 @@ func createNulLevelUnderstandingTree(rt *UnderstandingNode){
 ///////////////////////////////////////////
 // создать первые три ветки базовых состояний
 func createBasicUnderstandingTree(){
+	notAllowScanInTreeThisTime=true // запрет показа карты при обновлении
 	createNewUnderstandingNode(&UnderstandingTree,0,1,0,0,0)
 	createNewUnderstandingNode(&UnderstandingTree,0,2,0,0,0)
 	createNewUnderstandingNode(&UnderstandingTree,0,3,0,0,0)
 	SaveUnderstandingTree()
+	notAllowScanInTreeThisTime = false // запрет показа карты при обновлении
 }
 /////////////////////////////////////
 func SaveUnderstandingTree(){
+	notAllowScanInTreeThisTime=true
 	var out=""
 	cnt:=len(UnderstandingTree.Children)
 	for n := 0; n < cnt; n++ {
 		out+=getUnderstandingNode(&UnderstandingTree.Children[n])
 	}
 	lib.WriteFileContent(lib.GetMainPathExeFile()+"/memory_psy/understanding_tree.txt",out)
+	notAllowScanInTreeThisTime = false
 	return
 }
 func getUnderstandingNode(wt *UnderstandingNode)(string){
