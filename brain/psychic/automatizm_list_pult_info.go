@@ -44,10 +44,10 @@ func GetAutomatizmInfo(limitBasicID int)(string){
 		"<th width=70 class='table_header'>ID <br><nobr>узла Дерева</nobr></th>" +
 		"<th width=70 class='table_header'  title='ID базового состояния'>BaseID</th>" +
 		"<th width='25%' class='table_header'  title='ID образа сочетания эмоций'>Эмоции</th>" +
-		"<th width='25%' class='table_header'  title='ID образа пускового стимула'>Пусковой стимул</th>" +
+		"<th width='30' class='table_header'  title='ID образа пускового стимула'>Пусковой стимул</th>" +
 		"<th width='25%' class='table_header'  title='Действия автоматизма, их может быть много видов.'>Строка действий</th>" +
-		"<th width='25%' class='table_header' title='ID следующего автоматизма в цепочке'>NextID</th>" +
-		"<th width='25%' class='table_header' title='Энергичность'>Energy</th>" +
+		"<th width='30' class='table_header' title='ID следующего автоматизма в цепочке'>NextID</th>" +
+		"<th width='30' class='table_header' title='Энергичность'>Energy</th>" +
 		"<th width='30' class='table_header' title='(БЕС)ПОЛЕЗНОСТЬ: -10 вред 0 +10 +n польза'>Полезность</th>" +
 		"<th width='30' class='table_header' title='Уверенность'>Belief</th></tr>"
 
