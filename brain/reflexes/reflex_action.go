@@ -269,44 +269,43 @@ return false
 
 //////////////////////////////////////
 // запустить готовые к выполнению рефлексы
-func toRunRefleses(){
+func toRunRefleses() {
 	// очистить буфер передачи действий на пульт
 	//lib.ActionsForPultStr = ""
 	lastActivnostFromPult=ReflexPulsCount // сбросить отчет времени бездействия
-if len(conditionReflexesIdArr)>0{// есть условные рефлексы
-	// удалить более низкоуровневые рефлексы
-	geneticReflexesIdArr=nil
-	oldReflexesIdArr=nil
-
-			//выдать на пульт действия
-			TerminateConditionAllReflaxActions(conditionReflexesIdArr)
-			//ОБНУЛЯЕТСЯ при активации дерева рефлексов, если вызвало какое-то действие
-			oldActiveCurTriggerStimulsID=0
-			return
-		}
-		if len(geneticReflexesIdArr)>0{// есть новые безусловные рефлексы
-			NoUnconditionRefles=""
-			//выдать на пульт действия
-			TerminateGeneticAllReflaxActions(geneticReflexesIdArr,2)
-// В TerminateGeneticAllReflaxActions детектор нового updateNewsConditions() вычленяет новые условия по сравненеию с условиями рефлекса и обрабатывает это:
-			//ОБНУЛЯЕТСЯ при активации дерева рефлексов, если вызвало какое-то действие
-			oldActiveCurTriggerStimulsID=0
-			return
-		}
-		if len(oldReflexesIdArr)>0{// есть старые безусловные рефлексы
-			//выдать на пульт действия
-			TerminateGeneticAllReflaxActions(oldReflexesIdArr,1)
-// В TerminateGeneticAllReflaxActions детектор нового updateNewsConditions() вычленяет новые условия по сравненеию с условиями рефлекса и обрабатывает это:
-			//ОБНУЛЯЕТСЯ при активации дерева рефлексов, если вызвало какое-то действие
-			oldActiveCurTriggerStimulsID=0
-			return
-		}
-
-		/* если нет условного и безусловного рефлекса, то совершается самый простейший безусловный рефлекс
-		по сочетаниям редактора http://go/pages/terminal_actions.php
-		Данный редактор связывает действие с тем, какие гомео-параметры улучшает данное действие.
-		*/
-		findAndExecuteSimpeReflex() 
-
+	if len(conditionReflexesIdArr) > 0 {// есть условные рефлексы
+		// удалить более низкоуровневые рефлексы
+		geneticReflexesIdArr=nil
+		oldReflexesIdArr=nil
+		//выдать на пульт действия
+		conditionReflexesIdArr = lib.UniqueArr(conditionReflexesIdArr)
+		TerminateConditionAllReflaxActions(conditionReflexesIdArr)
+		//ОБНУЛЯЕТСЯ при активации дерева рефлексов, если вызвало какое-то действие
+		oldActiveCurTriggerStimulsID=0
+		return
+	}
+	if len(geneticReflexesIdArr) > 0 {// есть новые безусловные рефлексы
+		NoUnconditionRefles=""
+		//выдать на пульт действия
+		geneticReflexesIdArr = lib.UniqueArr(geneticReflexesIdArr)
+		TerminateGeneticAllReflaxActions(geneticReflexesIdArr,2)
+		// В TerminateGeneticAllReflaxActions детектор нового updateNewsConditions() вычленяет новые условия по сравненеию с условиями рефлекса и обрабатывает это:
+		//ОБНУЛЯЕТСЯ при активации дерева рефлексов, если вызвало какое-то действие
+		oldActiveCurTriggerStimulsID=0
+		return
+	}
+	if len(oldReflexesIdArr) > 0 {// есть старые безусловные рефлексы
+		//выдать на пульт действия
+		oldReflexesIdArr = lib.UniqueArr(oldReflexesIdArr)
+		TerminateGeneticAllReflaxActions(oldReflexesIdArr,1)
+		// В TerminateGeneticAllReflaxActions детектор нового updateNewsConditions() вычленяет новые условия по сравненеию с условиями рефлекса и обрабатывает это:
+		//ОБНУЛЯЕТСЯ при активации дерева рефлексов, если вызвало какое-то действие
+		oldActiveCurTriggerStimulsID=0
+		return
+	}
+	/* если нет условного и безусловного рефлекса, то совершается самый простейший безусловный рефлекс
+	по сочетаниям редактора http://go/pages/terminal_actions.php
+	Данный редактор связывает действие с тем, какие гомео-параметры улучшает данное действие.
+	*/
+	findAndExecuteSimpeReflex()
 }
-/////////////////////////////////////////
