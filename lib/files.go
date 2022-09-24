@@ -50,6 +50,11 @@ func ReadLines(path string) ([]string, error) {
 	for scanner.Scan() {
 		lines = append(lines, scanner.Text())
 	}
+	/*  нельзя, т.к. тогда будут срабатывать for n := 0; n < len(lines); n++ {
+	if lines == nil{// всегда позволять считывать хотя бы пустое lines[0]
+		lines = append(lines, "")
+	}
+	*/
 	return lines, scanner.Err()
 }
 

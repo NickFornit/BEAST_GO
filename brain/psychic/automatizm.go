@@ -200,9 +200,6 @@ func loadAutomatizm(){
 	AutomatizmFromIdArr=make(map[int]*Automatizm)
 	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_psy/automatizm_images.txt")
 	for n := 0; n < len(strArr); n++ {
-		if len(strArr[n])==0{
-			continue
-		}
 		main := strings.Split(strArr[n], "||")
 		p := strings.Split(main[0], "|")
 		id, _ := strconv.Atoi(p[0])

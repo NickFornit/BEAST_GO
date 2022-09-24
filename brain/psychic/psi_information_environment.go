@@ -111,7 +111,10 @@ if len(word_sensor.CurrentPhrasesIDarr)>0{
 // записать метку изменения information_environment при каждом обновлении
 func writeInformationEnvironmentMarker(){
 	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_psy/self_perception_count.txt")
-	old,_:=strconv.Atoi(strArr[0])
+	var old=0
+	if strArr != nil{
+	old, _ = strconv.Atoi(strArr[0])
+	}
 	lib.WriteFileContent(lib.GetMainPathExeFile()+"/memory_psy/self_perception_count.txt",strconv.Itoa(old+1))
 }
 //////////////////////////////////////////////////////

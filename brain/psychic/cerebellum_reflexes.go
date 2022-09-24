@@ -106,6 +106,9 @@ func loadCerebellumReflex(){
 	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_psy/cerebellum_reflex.txt")
 	for n := 0; n < len(strArr); n++ {
 		p := strings.Split(strArr[n], "|")
+		if len(p)<5{
+			return
+		}
 		id, _ := strconv.Atoi(p[0])
 		typeAut, _ := strconv.Atoi(p[1])
 		sourceAutomatizmID, _ := strconv.Atoi(p[2])
