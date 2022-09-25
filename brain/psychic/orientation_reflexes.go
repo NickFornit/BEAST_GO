@@ -170,24 +170,42 @@ func orientation_1()(*Automatizm){
 		//  ЗДЕСЬ активировать Дерево Понимания НЕ НУЖНО, действие уже запущено, омысление будет по результату.
 
 	}else{// нет атаса, можно спокойно поэкспериментивроать, если есть любопытсво
-		if gomeostas.BaseContextActive[2] {// активен Поиск или Игра
 
-			// нет действий, попробовать использовать AutomatizmSuccessFromIdArr.GomeoIdSuccesArr
-			// TODO .....................
+		if gomeostas.BaseContextActive[2] || gomeostas.BaseContextActive[3]{// активен Поиск или Игра
+			// тупо метод тыка
+			if EvolushnStage==2 {
+				// нет действий, попробовать использовать AutomatizmSuccessFromIdArr.GomeoIdSuccesArr
+				// TODO .....................
 
-// Тупо поэкспериментировать в контексте поиска или игры для пополнения опыта (не)удачных автоматизмов
-// TODO ................................
+				// Тупо поэкспериментировать в контексте поиска или игры для пополнения опыта (не)удачных автоматизмов
+				// TODO ................................
+			}
 
-			/*
-					// осмыслить ситуацию - Активировать Дерево Понимания
-				autmzmTreeNodeID:=AutomatizmRunning.BranchID// создать образ ситуации
-				id,_:=createSituationImage(0,autmzmTreeNodeID,4)
-				// осмыслить ситуацию - Активировать Дерево Понимания
-				understandingSituation(id,purpose)
-*/
+			if EvolushnStage==3 {
+				/*  на стадии 3 - провоцировать оператора на ответы (почему, зачем, что такое?)
+
+
+				 */
+
+			}
+
+			if EvolushnStage>3 {
+				/*
+					на стадии >3 -
+						// осмыслить ситуацию - Активировать Дерево Понимания
+						autmzmTreeNodeID:=AutomatizmRunning.BranchID// создать образ ситуации
+						id,_:=createSituationImage(0,autmzmTreeNodeID,4)
+						// осмыслить ситуацию - Активировать Дерево Понимания
+						understandingSituation(id,purpose)
+
+					и затем создать новую цель understanding_purpose_image.go
+				*/
+
+			}
 			//return automatizm
 		}
-	}
+	}// else НИЧЕГО НЕ ДЕЛАТЬ, ЛЕНЬ
+
 	isReflexesActionBloking=false
 	return nil
 }
