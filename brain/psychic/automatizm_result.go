@@ -162,9 +162,7 @@ func calcAutomatizmResult(commonDiffValue int,diffPsyBaseMood int,wellIDarr []in
 
 	AutomatizmRunning.Usefulness =commonDiffValue // diffPsyBaseMood
 
-	if commonDiffValue<0{// стало хуже
-		PsyBaseMood=-1
-	}
+
 	if commonDiffValue>0{// стало лучше
 		PsyBaseMood=1
 		// список гомео параметро, которые улучшило это действие
@@ -173,6 +171,13 @@ func calcAutomatizmResult(commonDiffValue int,diffPsyBaseMood int,wellIDarr []in
 		if commonDiffValue>0 {
 			AutomatizmSuccessFromIdArr[AutomatizmRunning.ID] = AutomatizmRunning
 		}
+	}
+	if commonDiffValue<0{// стало хуже
+		PsyBaseMood=-1
+		// очистить списки улучшения
+		AutomatizmRunning.GomeoIdSuccesArr=nil
+		AutomatizmSuccessFromIdArr[AutomatizmRunning.ID] =nil
+
 	}
 
 	// только если серьезно изменилась ситуация

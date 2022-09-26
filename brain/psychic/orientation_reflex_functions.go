@@ -22,21 +22,28 @@ import (
 func createAutomatizm(pc *PurposeGenetic)(*Automatizm){
 
 	BranchID:=detectedActiveLastNodID
-	/*
-		var existsAutomatizmID=0
-		if AutomatizmTreeFromID[BranchID].ActivityID>0{
-			existsAutomatizmID=AutomatizmTreeFromID[BranchID].ActivityID
-		}
-		// у ветки есть автматизм, но в случае  orientation_1() автоматизма нет у недоделанной ветки
-		if existsAutomatizmID>0{
 
-		}
-	*/
+	// Sequence="Snn:24243,1234,0,24234,11234|Fnn:4Dnn:24|Ann:3"
 	var Sequence=""
 	aArr:=pc.actionID.ActID
-	for i := 0; i < len(aArr); i++ {
-		if i>0 {Sequence += "|"}
-		Sequence += "Dnn:" + strconv.Itoa(aArr[i])
+	if len(aArr)>0 {
+		Sequence += "|Dnn:"
+		for i := 0; i < len(aArr); i++ {
+			if i > 0 {
+				Sequence += ","
+			}
+			Sequence += strconv.Itoa(aArr[i])
+		}
+	}
+	sArr:=pc.actionID.PhraseID
+	if len(sArr)>0 {
+		Sequence += "|Snn:"
+		for i := 0; i < len(sArr); i++ {
+			if i > 0 {
+				Sequence += ","
+			}
+			Sequence += strconv.Itoa(sArr[i])
+		}
 	}
 
 	// создать автоматизм, даже если такой уже есть

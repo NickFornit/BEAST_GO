@@ -24,7 +24,8 @@ func UnderstandingTreeInit(){
 }
 /////////////////////////////////////////////////////////////
 
-/* ДЕРЕВО понимания имеет фиксированных 4 уровней (кроме базового нулевого)
+/* ДЕРЕВО понимания или Дерево ментальных автоматизмов.
+Имеет фиксированных 4 уровней (кроме базового нулевого)
 формат записи: ID|Mood|EmotionID|SituationID|PurposeI
 Узлы всех уровней могут произвольно меняться на другие с переактивацией Дерева.
  */
@@ -69,6 +70,9 @@ var currentUnderstandingNodeID[] int
 
 
 func understandingSituation(situationImageID int,ps *PurposeGenetic){
+	if EvolushnStage < 4 { // только со стадии развития 4
+		return
+	}
 	if PulsCount<4{// не активировать пока все не устаканится
 		return
 	}

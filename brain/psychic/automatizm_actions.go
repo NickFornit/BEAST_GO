@@ -146,9 +146,12 @@ func TerminateMotorAutomatizmActions(actIDarr []int,energy int)(string){
 	// energy=1
 	//название силы:
 	enegrName:= termineteAction.EnergyDescrib[energy]
-	var out="Действие: <b>"
+	var out=""
 	var isAct=false
 	for i := 0; i < len(actIDarr); i++ {
+		if len(out) >0{
+			out+=", "
+		}
 
 		// при моторном действии  меняются гомео-параметры:
 		expensesGomeostatParametersAfterAction(actIDarr[i],energy)
@@ -182,7 +185,7 @@ func TerminateMotorAutomatizmActions(actIDarr []int,energy int)(string){
 		isAct=true
 	}
 if isAct {
-	out += "</b>&nbsp;<span style=\"font-size:14px;\">Энергичность: " + enegrName+"</span><br>"
+	out = "Действие: <b></b>"+out+"<br><span style=\"font-size:14px;\">Энергичность: " + enegrName+"</span><br>"
 	return out
 }
 return ""

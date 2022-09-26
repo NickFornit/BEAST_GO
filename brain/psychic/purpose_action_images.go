@@ -157,3 +157,32 @@ func loadActionImageArr(){
 
 }
 ///////////////////////////////////////////
+
+
+
+//////// из действий автоматизма создать новое сочетание пусковых стимулов TriggerStimuls если такого еще нет
+func CreateNewActionImageFromAutomatizm(atmzmAct string)(*ActionImage){
+	var aArr []int
+	var sArr []int
+	actArr:=ParceAutomatizmSequence(atmzmAct)
+	for i := 0; i < len(actArr); i++ {
+		if actArr[i].Type == 1 && len(actArr[i].Acts)>0 { // Snn- перечень ID сенсора слов через запятую
+			p:=strings.Split(actArr[i].Acts, ",")
+			for n := 0; n < len(p); n++ {
+				aID, _ := strconv.Atoi(p[n])
+				sArr = append(sArr, aID)
+			}
+		}
+		if actArr[i].Type == 2  && len(actArr[i].Acts)>0 { //Dnn - ID прогрмаммы действий, через запятую
+			p:=strings.Split(actArr[i].Acts, ",")
+			for n := 0; n < len(p); n++ {
+				aID, _ := strconv.Atoi(p[n])
+				aArr = append(aArr, aID)
+			}
+		}
+	}
+		_,trigger:=CreateNewActionImageImage(aArr,sArr,0,0)
+
+	return trigger
+}
+///////////////////////////////////////////////////////

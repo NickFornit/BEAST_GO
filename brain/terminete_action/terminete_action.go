@@ -108,11 +108,11 @@ func loadTerminalActons() {
 	return
 }
 
-/* Сохранить массив действий в файл */
+/* Сохранить массив действий в файл - НЕ ИСПОЛЬЗУЕТСЯ */
 func SaveTerminalActons() {
 	var out = ""
 
-	// сохранение только в режиме Larva
+	// сохранение только в режиме личинки Larva
 	if gomeostas.EvolushnStage > 0 {
 		return
 	}
@@ -204,20 +204,19 @@ func ChooseSimpleReflexexAction() (bool, int, []int) {
 	// выдать массив возможных действий чтобы выбрать одно из них, пока еще не испытанное
 	for id, gIDarr := range TerminalActionsTargetsFromID {
 		if id > 0 {
-
-		}
-		// выбрать подходящие ID параметров гомеостаза для данной цели
-		aArr = lib.GetExistsIntArs(targetID, gIDarr)
-		if aArr == nil {
-			continue
-		}
-		for i := 0; i < len(aArr); i++ {
-			// исключить те, что уже использовались
-			if lib.ExistsValInArr(usedSimpleReflexexsID, aArr[i]) {
+			// выбрать подходящие ID параметров гомеостаза для данной цели
+			aArr = lib.GetExistsIntArs(targetID, gIDarr)
+			if aArr == nil {
 				continue
 			}
-			//fActsID = append(fActsID, aArr[i])
-			fActsID = append(fActsID, id) // !!! id действия, а не параметр гомеостаза!
+			for i := 0; i < len(aArr); i++ {
+				// исключить те, что уже использовались
+				if lib.ExistsValInArr(usedSimpleReflexexsID, aArr[i]) {
+					continue
+				}
+				//fActsID = append(fActsID, aArr[i])
+				fActsID = append(fActsID, id) // !!! id действия, а не параметр гомеостаза!
+			}
 		}
 	}
 	if len(fActsID) == 0 {
@@ -233,3 +232,30 @@ func ChooseSimpleReflexexAction() (bool, int, []int) {
 	usedSimpleReflexexsID = append(usedSimpleReflexexsID, singleActID)
 	return veryActual, singleActID, targetID
 }
+//////////////////////////////////////////////////
+
+/* выдать массив возможных действий по ID парамктров гомеостаза как цели для улучшения в данных условиях
+*/
+func GetSimpleActionForCurContitions() ([]int,[]int) {
+	// выявить ID парамктров гомеостаза как цели для улучшения в данных условиях
+	_, targetArrID := gomeostas.FindTargetGomeostazID()
+
+	// выявить ID парамктров гомеостаза как цели для улучшения в данных условиях
+	var fActsID []int
+	// выдать массив возможных действий чтобы выбрать одно из них, пока еще не испытанное
+	for id, gIDarr := range TerminalActionsTargetsFromID {
+		if id > 0 {
+			// выбрать подходящие ID параметров гомеостаза для данной цели
+			aArr := lib.GetExistsIntArs(targetArrID, gIDarr)
+			if aArr == nil {
+				continue
+			}
+			for i := 0; i < len(aArr); i++ {
+				fActsID = append(fActsID, id) // !!! id действия, а не параметр гомеостаза!
+			}
+		}
+	}
+
+	return targetArrID,fActsID
+}
+/////////////////////////////////////////////////

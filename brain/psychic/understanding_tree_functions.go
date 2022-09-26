@@ -130,6 +130,9 @@ func createBasicUnderstandingTree(){
 }
 /////////////////////////////////////
 func SaveUnderstandingTree(){
+	if EvolushnStage < 4 { // только со стадии развития 4
+		return
+	}
 	notAllowScanInTreeThisTime=true
 	var out=""
 	cnt:=len(UnderstandingTree.Children)

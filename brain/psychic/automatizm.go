@@ -199,6 +199,9 @@ func loadAutomatizm(){
 	noWarningCreateShow=true
 	AutomatizmFromIdArr=make(map[int]*Automatizm)
 	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_psy/automatizm_images.txt")
+	if strArr == nil{
+		return
+	}
 	for n := 0; n < len(strArr); n++ {
 		main := strings.Split(strArr[n], "||")
 		p := strings.Split(main[0], "|")
@@ -370,6 +373,10 @@ if belief==2{
 
 }
 /////////////////////////////////////////////////////
+
+
+
+
 
 
 

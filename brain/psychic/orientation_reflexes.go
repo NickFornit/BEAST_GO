@@ -10,7 +10,6 @@ package psychic
 
 import (
 	"BOT/lib"
-	"BOT/brain/gomeostas"
 )
 
 ////////////////////////////////////////
@@ -111,101 +110,26 @@ func orientation_1()(*Automatizm){
 	*/
 	isReflexesActionBloking=true // отмена в automatizm_result.go или просто isReflexesActionBloking=false
 
-	/* Определение Цели в данной ситуации - ну уровне наследственных функций
-	Здесь выбирается действие пробного автоматизма из выполнившегося рефлекса actualRelextActon.
-	 */
-	purpose:=getPurposeGenetic()
-	// мозжечковые рефлексы - самый первый уровень осознания - подгонка действий под заданную Цель.
+	if EvolushnStage < 4 {
+		/* Определение Цели в данной ситуации - ну уровне наследственных функций
+		Здесь выбирается действие пробного автоматизма из выполнившегося рефлекса actualRelextActon
+		и запускается автоматизм
+		*/
+		atmzm:=getPurposeGeneticAndRunAutomatizm()// в purpose_genetic.go
+//  ЗДЕСЬ активировать Дерево Понимания НЕ НУЖНО, если действие уже запущено, омысление будет по результату.
+		return atmzm
+	}
 
-	// нужно ли вообще шевелиться?
-	// veryActualSituation: плохо для  1, 2, 7 и/или 8  параметров гомеостаза
-	if purpose.veryActual{// нужно создавать автоматизм и тут же запускать его
-		if purpose.actionID.ID>0 {
-			/* сформировать пробный автоматизм моторного действия и сразу запустить его в действие
-			   Зафиксироваь время действия
-			   10 пульсов следить за измнением состояния и ответными действиями - считать следствием действия
-			   оценить результат и скорректировать силу мозжечком в записи автоматизма.
-
-			Выбрать любое действие, т.к. послед создания автоматизма в данной ветке detectedActiveLastNodID
-			он уже не вызовет orientation_1(), а будет orientation_2()
-			*/
-			atmzm:=createAutomatizm(purpose)
-			// запустить автоматизм
-			if RumAutomatizm(atmzm) {
-				// отслеживать последствия в automatizm_result.go
-				setAutomatizmRunning(atmzm,purpose)
-			}
-// в automatizm_result.go после оценки результата будет осмысление с активацией Дерева Понимания
-
-			return atmzm
-		}
-		///////////////////////////////////////
-		// игнорировать новое внимание на время ожидания результата автоматизма
-		if isPeriodResultWaiting {
-			return AutomatizmRunning
-		}
-
-// нет действий, попробовать использовать AutomatizmSuccessFromIdArr.GomeoIdSuccesArr
-// TODO .....................
-
-// нет действий, попробовать бессмысленно выдать фразы имеющиеся Вериниковские раз нужно что-то срочно делать
-			if purpose.veryActual {
-				// TODO подобрать хоть как-то ассоциирующуюся фразу из имеющизся
-				phraseID:=findSuitablePhrase()
-				if len(phraseID)>0{
-					purpose.actionID.PhraseID=phraseID
-					atmzm:=createAutomatizm(purpose)
-					// запустить автоматизм
-					if RumAutomatizm(atmzm) {
-						// отслеживать последствия в automatizm_result.go
-						setAutomatizmRunning(atmzm,purpose)
-					}
-					// в automatizm_result.go после оценки результата будет осмысление с активацией Дерева Понимания
-					return atmzm
-				}
-
-
-				// return autmzm
-			}
-		//  ЗДЕСЬ активировать Дерево Понимания НЕ НУЖНО, действие уже запущено, омысление будет по результату.
-
-	}else{// нет атаса, можно спокойно поэкспериментивроать, если есть любопытсво
-
-		if gomeostas.BaseContextActive[2] || gomeostas.BaseContextActive[3]{// активен Поиск или Игра
-			// тупо метод тыка
-			if EvolushnStage==2 {
-				// нет действий, попробовать использовать AutomatizmSuccessFromIdArr.GomeoIdSuccesArr
-				// TODO .....................
-
-				// Тупо поэкспериментировать в контексте поиска или игры для пополнения опыта (не)удачных автоматизмов
-				// TODO ................................
-			}
-
-			if EvolushnStage==3 {
-				/*  на стадии 3 - провоцировать оператора на ответы (почему, зачем, что такое?)
-
-
-				 */
-
-			}
-
-			if EvolushnStage>3 {
-				/*
-					на стадии >3 -
-						// осмыслить ситуацию - Активировать Дерево Понимания
-						autmzmTreeNodeID:=AutomatizmRunning.BranchID// создать образ ситуации
-						id,_:=createSituationImage(0,autmzmTreeNodeID,4)
-						// осмыслить ситуацию - Активировать Дерево Понимания
-						understandingSituation(id,purpose)
-
-					и затем создать новую цель understanding_purpose_image.go
-				*/
-
-			}
-			//return automatizm
-		}
-	}// else НИЧЕГО НЕ ДЕЛАТЬ, ЛЕНЬ
-
+	if EvolushnStage >= 4 {
+		/* Определение Цели в данной ситуации - ну уровне дерева понимания
+		Здесь выбирается действие пробного автоматизма из выполнившегося рефлекса actualRelextActon
+		и запускается автоматизм.
+		На стадии 4 - провоцировать оператора на ответы (почему, зачем, что такое?)
+		*/
+		atmzm:=getPurposeUndestandingAndRunAutomatizm() //в understanding_purpose_image.go
+		return atmzm
+	}
+	// else НИЧЕГО НЕ ДЕЛАТЬ: при высокой актуальности - растерянность, при низкой - лень
 	isReflexesActionBloking=false
 	return nil
 }
@@ -326,6 +250,11 @@ func orientation_2(nodeAutomatizmID int)(*Automatizm){
 	return nil
 }
 //////////////////////////////////////////////
+
+
+
+
+
 
 
 

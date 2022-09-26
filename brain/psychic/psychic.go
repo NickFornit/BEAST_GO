@@ -66,6 +66,11 @@ func PsychicInit(){
 		wakingUp()
 
 //	SensorActivation(1,1,[]int{1})
+/*
+	atmzm:=findAnySympleRandActions()
+	if atmzm!=nil{	}
+ */
+
 }
 /////////////////////////////////////////////////////////////
 
@@ -130,6 +135,9 @@ func wakingUp(){
 // осознание самоощущения
 	SensorActivation(1)
 
+	// очистить всякое при просырании
+	usedActIdArr=nil
+	usedPraseIdArr=nil
 }
 /////////////////////////////////////////////////////////////
 
