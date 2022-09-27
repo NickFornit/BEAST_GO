@@ -130,3 +130,15 @@ func deleteWordFromPhrase(wordID int){
 	lib.WriteFileContent(lib.GetMainPathExeFile()+"/memory_reflex/phrase_tree.txt",out)
 }
 //////////////////////////////////////////////
+
+// вытащить первый символ из фразы
+func GetFirstSymbolFromPraseID(PhraseID int)(int){
+	word:=GetWordFromPraseNodeID(PhraseID)
+if len(word)==0 {
+	return 0
+}
+	r := []rune(word)
+	first:= GetSymbolIDfromRune(r[0])
+	return first
+}
+//////////////////////////////////////////////////

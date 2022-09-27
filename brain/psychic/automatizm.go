@@ -29,10 +29,23 @@ func automatizmInit(){
 }
 /////////////////////////////////
 
-// есть ли автоматизм для этой ветки
+// выбрать лучший автоматизм для ветки nodeID
 func getAutomatizmFromNodeID(nodeID int)(int){
-
-	return 0
+	// список всех автоматизмов для ID узла Дерева
+	aArr:=GetMotorsAutomatizmListFromTreeId(nodeID)
+	var usefulness =-10 // полезность, выбрать наилучшую
+	var usefulnessID=0
+	for i := 0; i < len(aArr); i++ {
+		if aArr[i].Belief==2{// есть единственный проверенный автоматизм
+			return aArr[i].ID
+		}
+		if aArr[i].Usefulness > usefulness{
+			usefulness=aArr[i].Usefulness
+			usefulnessID=aArr[i].ID
+		}
+	}
+// выбран самый полезный из всех
+	return usefulnessID
 }
 /////////////////////////////////////
 /* для разделения строки Sequence автоматизма на составляющие
@@ -203,6 +216,9 @@ func loadAutomatizm(){
 		return
 	}
 	for n := 0; n < len(strArr); n++ {
+		if len(strArr[n])==0{
+			continue
+		}
 		main := strings.Split(strArr[n], "||")
 		p := strings.Split(main[0], "|")
 		id, _ := strconv.Atoi(p[0])

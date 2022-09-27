@@ -129,6 +129,10 @@ if am.Usefulness<0{
 	MotorTerminalBlocking=true // через 2 пульса погаснет
 	LastRunAutomatizmPulsCount =PulsCount // активность мот.автоматизма в чисде пульсов
 	LastAutomatizmWeiting=am
+	/* Блокировать выполнение рефлексов на время ожидания результата автоматизма
+	вызывается из reflex_action.go рефлексов
+	*/
+	isReflexesActionBloking=true // отмена в automatizm_result.go или просто isReflexesActionBloking=false
 
 	return true
 }

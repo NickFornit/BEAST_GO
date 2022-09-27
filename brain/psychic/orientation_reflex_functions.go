@@ -102,8 +102,55 @@ func findSuitablePhrase()([]int){
 /* найти важные (по опыту) признаки в новизне NoveltySituation
 Это - чисто рефлексторный процесс поиска в опыте
  */
-func getImportantSigns()([]int){
-	// NoveltySituation
+func getImportantSigns()(bool){
+	lenN:=len(CurrentAutomatizTreeEnd)
+if lenN==0{
+	return false
+}
+	var news []int // выделить новизну
+	for i := 0; i < lenN; i++ {
+		if CurrentAutomatizTreeEnd[i]>0{
+			news=append(news,CurrentAutomatizTreeEnd[i])
+		}
+	}
+	if news==nil{
+		return false
+	}
+// выделить признаки и оценить важность
+switch currentStepCount{
+case 3: //остается после lev3 - ActivityID образ сочетания пусковых стимулов (только кнопок!)
+/* пример CurrentAutomatizTreeEnd:
+   lev4 90   getToneMoodID(verb.ToneID, verb.MoodID)
+   lev5 17   verb.SimbolID
+   lev6 132  verb.PhraseID[0]
+ */
+	ton,mood:=getToneMoodFromImg(90)
+// 1-восклицательный,4 - Повышенный, настроение: 2-Плохое, 5-Агрессивное, 6-Защитное
+	if ton==1 || ton==4 || mood==2 || mood==5 || mood==6{
+		return true
+	}
+	if EvolushnStage >3 {
+		// TODO опредять по словарному запасу в контексте дерева понимания
+	}
+case 4: //SimbolID
+	/* пример CurrentAutomatizTreeEnd:
+	   lev5 17   verb.SimbolID
+	   lev6 132  verb.PhraseID[0]
+	*/
+	if EvolushnStage >3 {
+		// TODO опредять по словарному запасу в контексте дерева понимания
+	}
 
-	return nil
+case 5: // ToneMoodID
+	/* пример CurrentAutomatizTreeEnd:
+	   lev6 132  verb.PhraseID[0]
+	*/
+	if EvolushnStage >3 {
+		// TODO опредять по словарному запасу в контексте дерева понимания
+	}
+
+default: return false
+}
+
+	return false
 }

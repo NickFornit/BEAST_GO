@@ -14,7 +14,6 @@ import (
 
 ////////////////////////////////////////
 var NoveltySituation []int // НОВИЗНА СИТУАЦИИ сохраняет значение CurrentAutomatizTreeEnd[] для решений
-var isPeriodResultWaiting=false // идет период ожидания резйльтата автоматизма
 
 /////////////////////////////////////////
 /* получить инфу после активации дерева рефлексов
@@ -34,8 +33,8 @@ func GetReflexInformation(veryActual bool,targetArrID  []int,acrArr []int){
 
 // пульс PulsCount
 func orientarionPuls(){
-	// // вызывать когда отпустит предыдущий
-	/*  ЧТО ИМЕЛОСЬ В ВИДУ??? не помню
+
+	/*  если еще не запущен автоматизм  НЕ НУЖНО ВЫЗЫВАТЬ ВСЕ ВРЕМЯ!!!
 	if LastRunAutomatizmPulsCount==0{//20 сек ожидания (if LastRunAutomatizmPulsCount+20 < PulsCount {)
 		orientation(saveAutomatizmID)
 		saveAutomatizmID=0
@@ -137,7 +136,7 @@ func orientation_1()(*Automatizm){
 
 
 
-////////////////// ОРИЕНТИРОВОКА в условиях, когда есть автоматизм
+////////////////// ОРИЕНТИРОВОКА, если есть автоматизм - ВЫЗЫВАТЕСЯ ВСЕГДА, не только при новых условиях
 /*проверить подходит ли автоматизм defAutomatizmID к текущим условиям, если нет,
 - по опыту того, к чему приводят новые условия - режим нахождения альтернативы
 Или если автоматизма пока не имеет Belief==2, т.е. еще непроверненный
@@ -146,8 +145,6 @@ func orientation_1()(*Automatizm){
  */
 func orientation_2(nodeAutomatizmID int)(*Automatizm){
 	lib.WritePultConsol("Ориентировочный рефлекс частичного непонимания (2 типа)")
-
-	NoveltySituation=CurrentAutomatizTreeEnd
 
 //  получение текущего состояния информационной среды: отражение Базового состояния и Активных Базовых контекстов
 // только при ориентировчном рефлексе - обновление самоощущения! и запись эпизодической памяти
@@ -158,96 +155,20 @@ func orientation_2(nodeAutomatizmID int)(*Automatizm){
 	// выявить ID парамктров гомеостаза как цели для улучшения в данных условиях
 	curTargetArrID=CurrentInformationEnvironment.curTargetArrID
 
-	/* Блокировать выполнение рефлексов на время ожидания результата автоматизма
-	вызывается из reflex_action.go рефлексов
-	*/
-	isReflexesActionBloking=true // отмена в automatizm_result.go или просто isReflexesActionBloking=false
-
-
-	atmzm:=AutomatizmFromIdArr[nodeAutomatizmID]
-
-	// Определение Цели в данной ситуации - на уровне наследственных функций
-	purpose:=getPurposeGenetic()
-// мозжечковые рефлексы - самый первый уровень осознания - подгонка действий под заданную Цель.
-
-	// если непроверенный автоматизм
-	if  AutomatizmFromIdArr[nodeAutomatizmID].Belief!=2{
-
-		// TODO
-
-	}
-
-	// ПЛОХОЙ АВТОМАТИЗМ ?!
-	if atmzm.Usefulness < 0{ // плохой автоматизм, т.е. в прошлый раз был плохой результат
-		// осмыслить ситуацию - Активировать Дерево Понимания
-		autmzmTreeNodeID:=AutomatizmRunning.BranchID// создать образ ситуации
-		id,_:=createSituationImage(0,autmzmTreeNodeID,3)
-		// осмыслить ситуацию - Активировать Дерево Понимания
-		understandingSituation(id,purpose)
-
-		// если найден лучше автоматизм, то подставить его: atmzm=xxxx и запустить
-
-		//return automatizm
-	}else {
-		// АКТИВАЦИЯ ДЕРЕВА ПОНИМАНИЯ СРАЗУ (и потом при получении результата реагирования)
-		// создать образ ситуации
-		autmzmTreeNodeID := AutomatizmRunning.BranchID
-		id, _ := createSituationImage(0, autmzmTreeNodeID, 1)
-		// осмыслить ситуацию - Активировать Дерево Понимания
-		understandingSituation(id, purpose)
-	}
-
-
-	if purpose.veryActual{// нужно ли вообще шевелиться?
-		// срочность и важность ситуации: если очень срочно и важно - просто оставить имеющийся автоматизм
-		atmzm:=createAutomatizm(purpose)
-		// запустить автоматизм
-		if RumAutomatizm(atmzm) {
-			// отслеживать последствия в automatizm_result.go ИГНОРИРОВАТЬ ДРУГИЕ ПОКА НЕ БУДЕТ РЕЗУЛЬТАТ
-			setAutomatizmRunning(atmzm,purpose)
-		}
-
-		// в automatizm_result.go после оценки результата будет осмысление с активацией Дерева Понимания
+	if EvolushnStage < 4 {
+		/* // обработка автоматизма, рвущегося на выполнение, но в условиях есть новизна news
+		*/
+		atmzm:=getPurposeGenetic2AndRunAutomatizm(nodeAutomatizmID)// в purpose_genetic.go
+		//  ЗДЕСЬ активировать Дерево Понимания НЕ НУЖНО, если действие уже запущено, омысление будет по результату.
 		return atmzm
 	}
-	////////////////////////////
-	// игнорировать новое внимание на время ожидания результата автоматизма
-	if isPeriodResultWaiting {
-		return AutomatizmRunning
+	if EvolushnStage >= 4 {
+		// TODO - осмысление
+		atmzm:=getPurposeUndestanding2AndRunAutomatizm(nodeAutomatizmID) //в understanding_purpose_image.go
+		return atmzm
 	}
 
-	// НЕТ СРОЧНОСТИ, МОЖНО СПОКОЙНО ПОДУМАТЬ или тупо поэкспериментировать
-	/* найти важные (по опыту) признаки в новизне NoveltySituation
-	   Это - чисто рефлексторный процесс поиска в опыте
-	*/
-	is:=getImportantSigns()
-	if is!=nil {
-		/*
-				// осмыслить ситуацию - Активировать Дерево Понимания
-			autmzmTreeNodeID:=AutomatizmRunning.BranchID// создать образ ситуации
-			id,_:=createSituationImage(0,autmzmTreeNodeID,5)
-			// осмыслить ситуацию - Активировать Дерево Понимания
-			understandingSituation(id,purpose)
-		*/
-	}
-
-	// если не найдено решение
-	/*
-			// осмыслить ситуацию - Активировать Дерево Понимания
-		autmzmTreeNodeID:=AutomatizmRunning.BranchID// создать образ ситуации
-		id,_:=createSituationImage(0,autmzmTreeNodeID,1)
-		// осмыслить ситуацию - Активировать Дерево Понимания
-		understandingSituation(id,purpose)
-	*/
-
-	// Тупо поэкспериментировать в контексте поиска или игры для пополнения опыта (не)удачных автоматизмов
-
-	// TODO ................................
-
-
-	////////////  если нет результата
-	isReflexesActionBloking=false
-	return nil
+return nil
 }
 //////////////////////////////////////////////
 

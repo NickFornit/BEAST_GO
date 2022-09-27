@@ -171,6 +171,9 @@ func calcAutomatizmResult(commonDiffValue int,diffPsyBaseMood int,wellIDarr []in
 		if commonDiffValue>0 {
 			AutomatizmSuccessFromIdArr[AutomatizmRunning.ID] = AutomatizmRunning
 		}
+		if EvolushnStage == 3{// отзеркаливания ответа оператора
+			// TODO функция создания автоматизма, повторяющего действия оператора в данных условиях
+		}
 	}
 	if commonDiffValue<0{// стало хуже
 		PsyBaseMood=-1

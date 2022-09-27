@@ -15,6 +15,7 @@ package psychic
 func getPurposeUndestandingAndRunAutomatizm()(*Automatizm) {
 var atmzm *Automatizm
 
+	// мозжечковые рефлексы - самый первый уровень осознания - подгонка действий под заданную Цель.
 	if EvolushnStage == 4 {
 		/*  на стадии 4 - провоцировать оператора на ответы (почему, зачем, что такое?)
 
@@ -34,3 +35,33 @@ var atmzm *Automatizm
 	return atmzm
 }
 ////////////////////////////////////////////////
+
+
+
+// обработка автоматизма, рвущегося на выполнение, но в условиях есть новизна news
+func getPurposeUndestanding2AndRunAutomatizm(atmtzmID int)(*Automatizm){
+
+	atmzm:=AutomatizmFromIdArr[atmtzmID]
+
+	// есть ли очень значимые новые признаки?
+	newsRes:=getImportantSigns()
+	if newsRes{
+
+	}
+
+	// мозжечковые рефлексы - самый первый уровень осознания - подгонка действий под заданную Цель.
+
+	return atmzm // TODO с учетом активации дерева понимания !!!!
+
+
+
+	/// !!!! если не найдено и нельзя выполнять то return nil
+	if false {
+		isReflexesActionBloking = false
+		return nil
+	}
+
+	////////////  если нет результата - выполнить этот автоматизм
+	return atmzm
+}
+//////////////////////////////////////////////////////

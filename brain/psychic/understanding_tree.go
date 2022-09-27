@@ -77,7 +77,7 @@ func understandingSituation(situationImageID int,ps *PurposeGenetic){
 		return
 	}
 	/* может думать в это время!
-	if isPeriodResultWaiting{// не активировать в период ожидания результатов действий!
+	if LastRunAutomatizmPulsCount >0{// не активировать в период ожидания результатов действий!
 		return 0
 	}
 	*/

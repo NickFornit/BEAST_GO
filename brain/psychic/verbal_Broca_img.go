@@ -16,7 +16,6 @@ MemoryDetectedArr - как бы оперативная память фраз д�
 package psychic
 
 import (
-	wordSensor "BOT/brain/words_sensor"
 	"BOT/lib"
 	"strconv"
 	"strings"
@@ -46,7 +45,8 @@ type Verbal struct {
 	PhraseID[] int // массив фразID (DetectedUnicumPhraseID) слова каждой фразы вытаскиваются wordSensor.GetWordArrFromPhraseID(PhraseID[0])
 //0 - обычный, 1 - восклицательный, 2- вопросительный, 3- вялый, 4 - Повышенный	
 	ToneID int // тон сообщения с Пульта
-//20-Хорошее    21-Плохое    22-Игровое    23-Учитель    24-Агрессивное   25-Защитное    26-Протест
+//0 - обычный, 1 (из 20)-Хорошее    2 (21)-Плохое    3(22)-Игровое    4(23)-Учитель
+//5(24)-Агрессивное   6(25)-Защитное    7(26)-Протест
 	MoodID int // настроение оператора
 }
 var VerbalFromIdArr=make(map[int]*Verbal)
@@ -76,6 +76,11 @@ func createNewlastVerbalID(id int,SimbolID int,PhraseID []int,ToneID int,MoodID 
 	node.PhraseID = PhraseID
 	node.ToneID=ToneID
 	node.MoodID=MoodID
+	if MoodID>19 {
+		MoodID= MoodID - 19
+	}else{
+		MoodID=0
+	}
 
 	VerbalFromIdArr[id]=&node
 	return id,&node
@@ -95,7 +100,7 @@ func checkUnicumVerbal(PhraseID []int,ToneID int,MoodID int)(int,*Verbal){
 }
 /////////////////////////////////////////
 // создать новый вербальный образ, если такого еще нет
-func CreateVerbalImage(PhraseID []int,ToneID int,MoodID int)(int,*Verbal){
+func CreateVerbalImage(FirstSimbolID int,PhraseID []int,ToneID int,MoodID int)(int,*Verbal){
 	if PhraseID==nil{
 		return 0,nil
 	}
@@ -113,7 +118,7 @@ func CreateVerbalImage(PhraseID []int,ToneID int,MoodID int)(int,*Verbal){
 //	word:=wordSensor.GetPhraseStringsFromPhraseID(PhraseID[0])
 	//SimbolID:=wordSensor.GetSymbolIDfromString(rw[0])
 */
-	id,verb:=createNewlastVerbalID(0,wordSensor.FirstSimbolID,PhraseID,ToneID,MoodID)
+	id,verb:=createNewlastVerbalID(0,FirstSimbolID,PhraseID,ToneID,MoodID)
 
 	SaveVerbalFromIdArr()
 
@@ -172,17 +177,51 @@ func loadVerbalFromIdArr(){
 //////////////////////////////
 
 
-// получить уникальное сочетание в виде int из двух компонентов int
+/* получить уникальное сочетание в виде int из двух компонентов int
+На входе int2 -  виде ID настроения (jn 20 до 26) преобразуется в диапазон от 1 до 7
+простым вычитанием int2-19
+ */
 func getToneMoodID(int1 int,int2 int)(int){
 	// вмето первой 0 (для "обычный") ставим 9 !!!
 	if int1==0{
 		int1=9
 	}
 	s:=strconv.Itoa(int1)
-	s+=strconv.Itoa(int2)
+	if int2>19 {
+		s += strconv.Itoa((int2 - 19))
+	}else{
+		s += "0"
+	}
 	ToneMoodID,_:=strconv.Atoi(s)
 	return ToneMoodID
 }
+//////////////////////////////////
+// получить тон и настроение из уникального сочетания
+func getToneMoodFromImg(img int)(int,int){
+	tonmoode:=strconv.Itoa(img)
+	var t=0
+	ton:=tonmoode[:1]
+	if ton=="9"{
+		t=0
+	}else{
+		t,_=strconv.Atoi(ton)
+	}
+	m,_:=strconv.Atoi(tonmoode[1:])
+	return t,m
+}
+/* расшифровка в виде строки
+func getToneMoodStrFromID(ToneMoodID int)(string){
+	str:=strconv.Itoa(ToneMoodID) //из числа - строку
+	s1,_:=strconv.Atoi(str[:1])
+	if s1==9{
+		s1=0
+	}
+	tone:=getToneStrFromID(s1)
+	s2,_:=strconv.Atoi(str[1:])
+	moode:=getMoodStrFromID(s2)
+	return tone+" ("+moode+")"
+}
+*/
 //////////////////////////////////////////////////
 
 
@@ -217,27 +256,4 @@ case 26: ret="Протест"
 return ret
 }
 ////////////////////////////////
-/* дешифратор из значения ToneMoodID 4-го уровня дерева автоматизмов - в строку
-после шифрации:
-// получить уникальное сочетание в виде int из двух компонентов int
-func getToneMoodID(int1 int,int2 int)(int){
-	s:=strconv.Itoa(int1)
-	s+=strconv.Itoa(int2)
-	ToneMoodID,_:=strconv.Atoi(s)
-	return ToneMoodID
-}
 
-например: "922" = "Обычный, Хорошее"
-*/
-func getToneMoodStrFromID(ToneMoodID int)(string){
-	str:=strconv.Itoa(ToneMoodID) //из числа - строку
-	s1,_:=strconv.Atoi(str[:1])
-	if s1==9{
-		s1=0
-	}
-	tone:=getToneStrFromID(s1)
-	s2,_:=strconv.Atoi(str[1:])
-	moode:=getMoodStrFromID(s2)
-return tone+" ("+moode+")"
-}
-////////////////////////////////

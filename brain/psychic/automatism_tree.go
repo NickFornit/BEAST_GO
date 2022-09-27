@@ -66,6 +66,9 @@ func automatizmTreeInit(){
 }
 /////////////////////////////////////////////////////////////
 
+
+////////////////////////////////////////////
+
 ////// ДЕРЕВО автоматизмов имеет фиксированных 6 уровней (кроме базового нулевого)
 type AutomatizmNode struct { // узел дерева автоматизмов
 	ID int
@@ -130,8 +133,8 @@ func automatizmTreeActivation()(int){
 	if PulsCount<4{// не активировать пока все не устаканится
 		return 0
 	}
-/* НУЖНО, просто новый ор.рефлекс будет ждать окончания периода isPeriodResultWaiting
-	if isPeriodResultWaiting{// не активировать в период ожидания результатов действий!
+/* НУЖНО, просто новый ор.рефлекс будет ждать окончания периода LastRunAutomatizmPulsCount
+	if LastRunAutomatizmPulsCount >0{// не активировать в период ожидания результатов действий!
 		return 0
 	}
  */
@@ -156,9 +159,10 @@ ActID:=action_sensor.CheckCurActionsContext();//CheckCurActions()
 	var lev6=0
 	if len(wordSensor.CurrentPhrasesIDarr)>0{
 		PhraseID := wordSensor.CurrentPhrasesIDarr
+		FirstSimbolID:=wordSensor.GetFirstSymbolFromPraseID(PhraseID[0])
 		ToneID := wordSensor.DetectedTone
 		MoodID := wordSensor.CurPultMood
-		_,verb:= CreateVerbalImage(PhraseID, ToneID, MoodID)
+		_,verb:= CreateVerbalImage(FirstSimbolID,PhraseID, ToneID, MoodID)
 		lev4= getToneMoodID(verb.ToneID, verb.MoodID)
 		lev5=verb.SimbolID
 		/* для дерева берется только первая фраза, остальные можно восстановить для сопоставлений из
@@ -196,23 +200,28 @@ ActID:=action_sensor.CheckCurActionsContext();//CheckCurActions()
 		CurrentAutomatizTreeEnd=condArr[currentStepCount:] // НОВИЗНА
 		if currentStepCount<conditionsCount { // не пройдено до конца имеющихся условий
 		// нарастить недостающее в ветке дерева - всегда для orientation_1()
+			oldDetectedActiveLastNodID:=detectedActiveLastNodID
 			detectedActiveLastNodID = formingBranch(detectedActiveLastNodID, currentStepCount, condArr)
-				
-			// автоматизма нет у недоделанной ветки
-			automatizmID := orientation(0)
-			return automatizmID // блокировка рефлексов, если automatizmID > 0
+			// ЕСТЬ ЛИ АВТОМАТИЗМ В НЕДОДЕЛАННОЙ ВЕТКЕ? выбрать лучший автоматизм для ветки nodeID
+			automatizmID := getAutomatizmFromNodeID(oldDetectedActiveLastNodID)
+			if automatizmID > 0 { //ориентировочный рефлекс 2
+				// проверить подходит ли автоматизм к текущим условиям, если нет, - режим нахождения альтернативы  - ориентировочный рефлекс 2
+				automatizmID := orientation(automatizmID)
+				return automatizmID // выполнение штатного автоматизма
+			}else {
+				// автоматизма нет у недоделанной ветки
+				automatizmID := orientation(0)
+				return automatizmID // блокировка рефлексов, если automatizmID > 0
+			}
+			return 0
 
 			// если нет неучтенных условий
 		}else{// все условия пойдены, ветка существует,
+			// выбрать лучший автоматизм для ветки nodeID
 			automatizmID := getAutomatizmFromNodeID(detectedActiveLastNodID)
 			if automatizmID > 0 {//ориентировочный рефлекс 2
-				// если нет срочности
-				if !veryActualSituation {
 					// проверить подходит ли автоматизм к текущим условиям, если нет, - режим нахождения альтернативы  - ориентировочный рефлекс 2
-					automatizmID := orientation(automatizmID)
-					return automatizmID // блокировка рефлексов
-					
-				}
+				automatizmID := orientation(automatizmID)
 				return automatizmID// выполнение штатного автоматизма
 			}else{
 				// автоматизма нет у нормальной ветки (условия не требовали срочного его создания)

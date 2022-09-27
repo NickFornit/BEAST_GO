@@ -87,9 +87,10 @@ _,CurrentInformationEnvironment.PsyEmotionImg=createNewBaseStyle(0,PsyBaseMood,b
 
 if len(word_sensor.CurrentPhrasesIDarr)>0{
 		PhraseID := word_sensor.CurrentPhrasesIDarr
+		FirstSimbolID:=word_sensor.GetFirstSymbolFromPraseID(PhraseID[0])
 		ToneID := word_sensor.DetectedTone
 		MoodID := word_sensor.CurPultMood
-		_, CurrentInformationEnvironment.PsyVerbImg = CreateVerbalImage(PhraseID, ToneID, MoodID)
+		_, CurrentInformationEnvironment.PsyVerbImg = CreateVerbalImage(FirstSimbolID,PhraseID, ToneID, MoodID)
 	}
 
 	CurrentInformationEnvironment.danger=GetAttentionDanger()
