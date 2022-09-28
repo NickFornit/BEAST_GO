@@ -25,14 +25,17 @@ import (
 type cerebellumReflex struct {
 	id int
 	typeAut int // тип корректруемого автоматизма: 0 - это ID моторного, 1 - ID ментального
-	sourceAutomatizmID int // корректируемый моторный автоматизм
-	addEnergy int // добавление (-убавление) силы действия Energy
+	sourceAutomatizmID int // корректируемый моторный или ментальный автоматизм
+	addEnergy int // добавление (-убавление) силы действия Energy. Может быть отрицательное число, чтобы уменьшить энергию автоматизма
+// кроме корректирования самого автоматизма по силе действия, могут быть запущены дополнительные автоматизмы:
 	additionalAutomatizmID []int // массив ID дополнительных моторных автоматизмов
 	additionalMentalAutID []int // массив ID дополнительных ментальных автоматизмов
 }
 var cerebellumReflexFromID=make(map[int]*cerebellumReflex)
-
-var cerebellumReflexFromAutomatizmID=make(map[int]*cerebellumReflex)
+// рефлекс по моторному ID
+var cerebellumReflexFromMotorsID=make(map[int]*cerebellumReflex)
+// рефлекс по ментальному ID
+var cerebellumReflexFromMentalsID=make(map[int]*cerebellumReflex)
 //////////////////////////////////////////////////
 
 func cerebellumReflexInit(){
@@ -62,10 +65,14 @@ func createNewCerebellumReflex(id int,typeAut int,sourceAutomatizmID int)(int,*c
 	node.id = id
 	node.typeAut = typeAut
 	node.sourceAutomatizmID = sourceAutomatizmID
-	node.addEnergy = 5
+	node.addEnergy = 5 // сразу придаст максимум, сложившись с энергией автоматизма :)
 	//node.additionalAutomatizmID = additionalAutomatizmID
 	cerebellumReflexFromID[id]=&node
-	cerebellumReflexFromAutomatizmID[sourceAutomatizmID]=&node
+	if typeAut==0 {
+		cerebellumReflexFromMotorsID[sourceAutomatizmID] = &node
+	}else {
+		cerebellumReflexFromMentalsID[sourceAutomatizmID] = &node
+	}
 	SaveCerebellumReflex()
 	return id,&node
 }
@@ -137,8 +144,14 @@ func loadCerebellumReflex(){
 
 
 // вернуть скорректированную силу действия
-func getCerebellumReflexAddEnergy(automatizmID int)(int){
-	e:=cerebellumReflexFromID[automatizmID]
+func getCerebellumReflexAddEnergy(kind int,automatizmID int)(int){
+	var e *cerebellumReflex
+	if kind==0{
+		e=cerebellumReflexFromMotorsID[automatizmID]
+	}else{
+		e=cerebellumReflexFromMentalsID[automatizmID]
+	}
+
 	if e==nil{
 		return 0
 	}
@@ -148,18 +161,27 @@ func getCerebellumReflexAddEnergy(automatizmID int)(int){
 
 
 
-/*  выполнить текущий мозжечковый рефлекс сразу после выполняющегося автоматизма
-
- */
-func runCerebellumReflex(automatizmID int){
-	cr:=cerebellumReflexFromID[automatizmID]
+//  выполнить дополнительные мозжечковые автоматизмы сразу после выполняющегося автоматизма
+func runCerebellumAdditionalAutomatizm(kind int,automatizmID int){
+	var cr *cerebellumReflex
+	if kind==0{
+		cr=cerebellumReflexFromMotorsID[automatizmID]
+	}else{
+		cr=cerebellumReflexFromMentalsID[automatizmID]
+	}
 	if cr==nil{
 		return
 	}
-
-	aArr:=cr.additionalAutomatizmID
-	for i := 0; i < len(aArr); i++ {
-		RumAutomatizmID(aArr[i])
+	if kind==0 {
+		aArr := cr.additionalAutomatizmID
+		for i := 0; i < len(aArr); i++ {
+			RumAutomatizmID(aArr[i])
+		}
+	}else{
+		aArr := cr.additionalMentalAutID
+		for i := 0; i < len(aArr); i++ {
+			RunMentalAutomatizmsID(aArr[i])
+		}
 	}
 
 }

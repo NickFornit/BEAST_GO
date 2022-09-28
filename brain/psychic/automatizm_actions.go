@@ -95,7 +95,7 @@ if am.Usefulness<0{
 			}
 			addE:=0
 			if am.Belief!=3 {// не рефлекс мозжечка
-				addE = getCerebellumReflexAddEnergy(am.ID)
+				addE = getCerebellumReflexAddEnergy(0,am.ID)
 			}
 			out+=TerminatePraseAutomatizmActions(idArr,am.Energy+addE)
 		case 2: //Dnn - ID прогрмаммы действий, через запятую
@@ -106,9 +106,17 @@ if am.Usefulness<0{
 			}
 			addE:=0
 			if am.Belief!=3 {// не рефлекс мозжечка
-				addE = getCerebellumReflexAddEnergy(am.ID)
+				addE = getCerebellumReflexAddEnergy(0,am.ID)
 			}
-			out+=TerminateMotorAutomatizmActions(idArr,am.Energy+addE)
+
+			sumEnergy:=am.Energy+addE
+			if sumEnergy>10{
+				sumEnergy=10
+			}
+			if sumEnergy<1{
+				sumEnergy=1
+			}
+			out+=TerminateMotorAutomatizmActions(idArr,sumEnergy)
 
 		case 3: //Ann - последовательный запуск автоматизмов с id1,id2..
 			// НО нужно как-то дожидаться выплнения предыдущего до запуска следующего !!!!!!
@@ -124,7 +132,7 @@ if am.Usefulness<0{
 	lib.SentActionsForPult(out)
 
 	//выполнить мозжечковый рефлекс сразу после выполняющегося автоматизма
-	runCerebellumReflex(am.ID)
+	runCerebellumAdditionalAutomatizm(0,am.ID)
 
 	MotorTerminalBlocking=true // через 2 пульса погаснет
 	LastRunAutomatizmPulsCount =PulsCount // активность мот.автоматизма в чисде пульсов

@@ -80,6 +80,14 @@ func getPurposeGenetic()(*PurposeGenetic){
 func createAndRunAutomatizmFromPurpose(purpose *PurposeGenetic)(*Automatizm){
 	atmzm := createAutomatizm(purpose)
 	// запустить автоматизм
+
+	// в automatizm_result.go после оценки результата будет осмысление с активацией Дерева Понимания
+	return runAutomatizmFromPurpose(atmzm, purpose)
+}
+//////////////////////////////////////////////////////////
+
+func runAutomatizmFromPurpose(atmzm *Automatizm, purpose *PurposeGenetic)(*Automatizm){
+	// запустить автоматизм
 	if RumAutomatizm(atmzm) {
 		// отслеживать последствия в automatizm_result.go
 		setAutomatizmRunning(atmzm, purpose)

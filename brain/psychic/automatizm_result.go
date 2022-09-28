@@ -128,7 +128,9 @@ func setAutomatizmRunning(am *Automatizm,ps *PurposeGenetic){
 	savePsyBaseMood=PsyBaseMood
 	savePsyMood=PsyMood
 	savedNoveltySituation=NoveltySituation
-	savePurposeGenetic=ps
+	if ps != nil {
+		savePurposeGenetic = ps
+	}
 }
 ///////////////////////////////////
 func clinerAutomatizmRunning(){

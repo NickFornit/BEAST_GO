@@ -47,6 +47,11 @@ func getPurposeUndestanding2AndRunAutomatizm(atmtzmID int)(*Automatizm){
 	newsRes:=getImportantSigns()
 	if newsRes{
 
+	}else{ // нет новизны
+
+		// TODO м.б. есть сила воли, блокирующая выполнение данного автоматизма и подставляющая свой?
+		// просто выполнить автоматизм НО М.Б. задать purpose:=getPurposeGenetic() а не ставить nil ?
+		runAutomatizmFromPurpose(atmzm, nil)
 	}
 
 	// мозжечковые рефлексы - самый первый уровень осознания - подгонка действий под заданную Цель.
