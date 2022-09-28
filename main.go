@@ -164,6 +164,15 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == "GET" {
+
+		// проверка активности Beast, аозвращает текущий brain.PulsCount
+		brain.IsPultActivnost = true
+		check_Beast_activnost := r.FormValue("check_Beast_activnost")
+		if check_Beast_activnost == "1" {
+			_, _ = fmt.Fprint(resp, brain.PulsCount)
+			return
+		}
+
 		// остановка любой активности Beast
 		brain.IsPultActivnost = true
 		stop_activnost := r.FormValue("stop_activnost")
