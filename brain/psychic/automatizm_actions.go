@@ -153,25 +153,21 @@ if am.Usefulness<0{
 cила действия сначала задается =5, а потот корректируется мозжечковыми рефлексами
 Использование: 	TerminateMotorAutomatizmActions(actIDarr,energy)
  */
-func TerminateMotorAutomatizmActions(actIDarr []int,energy int)(string){
-
+func TerminateMotorAutomatizmActions(actIDarr []int,energy int)string{
 	// energy=1
-	//название силы:
+	// название силы:
 	enegrName:= termineteAction.EnergyDescrib[energy]
 	var out=""
 	var isAct=false
 	for i := 0; i < len(actIDarr); i++ {
-		if len(out) >0{
-			out+=", "
+		if len(out) > 0{
+			out += ", "
 		}
-
 		// при моторном действии  меняются гомео-параметры:
 		expensesGomeostatParametersAfterAction(actIDarr[i],energy)
-
-		// выдать на ПУльт:
+		// выдать на Пульт:
 		actName:= termineteAction.TerminalActonsNameFromID[actIDarr[i]]
 		// ЭНЕРГИЧНОСТЬ
-
 		switch energy{
 		case 1:
 			out +="<span style=\"font-size:10px;\">"+actName+"</span>"
@@ -196,38 +192,31 @@ func TerminateMotorAutomatizmActions(actIDarr []int,energy int)(string){
 		}
 		isAct=true
 	}
-if isAct {
-	out = "Действие: <b></b>"+out+"<br><span style=\"font-size:14px;\">Энергичность: " + enegrName+"</span><br>"
-	return out
+	if isAct {
+		out = "Действие: <b></b>"+out+"<br><span style=\"font-size:14px;\">Энергичность: " + enegrName+"</span><br>"
+		return out
+	}
+	return ""
 }
-return ""
-}
-//////////////////////////////////////////////////
 
-/* совершить МОТОРНОЕ (ВЫДАТЬ ФРАЗУ) действие  - Snn-часть автоматизма
-cила действия сначала задается =5, а потот корректируется мозжечковыми рефлексами
+/* совершить МОТОРНОЕ (ВЫДАТЬ ФРАЗУ) действие - Snn-часть автоматизма
+cила действия сначала задается = 5, а потот корректируется мозжечковыми рефлексами
 */
-func TerminatePraseAutomatizmActions(IDarr []int,energy int)(string){
-
+func TerminatePraseAutomatizmActions(IDarr []int, energy int)string{
 	// при моторном действии  меняются гомео-параметры:
-	//expensesGomeostatParametersAfterAction(aI) болтать можно без устали?
+	// expensesGomeostatParametersAfterAction(aI) болтать можно без устали?
 
 	// выдать на ПУльт
-	var out="Фраза Beast: <b>"
+	var out = "Фраза Beast: <b>"
 	for i := 0; i < len(IDarr); i++ {
 		prase := word_sensor.GetPhraseStringsFromPhraseID(IDarr[i])
 		out += prase
 	}
-	//название силы:
-	out += termineteAction.EnergyDescrib[energy]+"</b>"
+	// название силы:
+	out += " " + termineteAction.EnergyDescrib[energy] + "</b>"
 	return out
 }
-//////////////////////////////////////////////////
 
-
-
-
-/////////////////////////////////////////////
 /* изменение гомео-параметров при действии
 сила действия корректирует воздействие на параметр гомеостаза
 */
@@ -235,26 +224,17 @@ func expensesGomeostatParametersAfterAction(actID int,energy int){
 	se :=termineteAction.TerminalActionsExpensesFromID[actID]
 	if se != nil {
 		for j := 0; j < len(se); j++ {
-// (2*aI.Energy/10) при силе==5 коэффициент будет 1, при силе==10 воздействие увеличиться в 2 раза
-
-if !gomeostas.NotAllowSetGomeostazParams{
-			k:=float64(2*energy/10)
-			gomeostas.GomeostazParams[se[j].GomeoID]+=se[j].Diff * k
-			if gomeostas.GomeostazParams[se[j].GomeoID]>100{
-				gomeostas.GomeostazParams[se[j].GomeoID]=100
+			// (2*aI.Energy/10) при силе==5 коэффициент будет 1, при силе==10 воздействие увеличиться в 2 раза
+			if !gomeostas.NotAllowSetGomeostazParams{
+				k := float64(2 * energy / 10)
+				gomeostas.GomeostazParams[se[j].GomeoID] += se[j].Diff * k
+				if gomeostas.GomeostazParams[se[j].GomeoID] > 100{
+					gomeostas.GomeostazParams[se[j].GomeoID] = 100
+				}
+				if gomeostas.GomeostazParams[se[j].GomeoID] < 0{
+					gomeostas.GomeostazParams[se[j].GomeoID] = 0
+				}
 			}
-			if gomeostas.GomeostazParams[se[j].GomeoID]<0{
-				gomeostas.GomeostazParams[se[j].GomeoID]=0
-			}
-
 		}
-}
 	}
 }
-/////////////////////////////////////////////
-
-
-
-
-
-

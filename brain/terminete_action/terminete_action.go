@@ -234,13 +234,13 @@ func ChooseSimpleReflexexAction() (bool, int, []int) {
 }
 //////////////////////////////////////////////////
 
-/* выдать массив возможных действий по ID парамктров гомеостаза как цели для улучшения в данных условиях
-*/
-func GetSimpleActionForCurContitions() ([]int,[]int) {
+/* выдать массив возможных действий по ID парамктров гомеостаза как цели для улучшения в данных условиях */
+func GetSimpleActionForCurContitions() ([]int, []int) {
 	// выявить ID парамктров гомеостаза как цели для улучшения в данных условиях
 	_, targetArrID := gomeostas.FindTargetGomeostazID()
+	if targetArrID == nil {return nil, nil} // если целей нет, незачем дальше проверять - будет nil
 
-	// выявить ID парамктров гомеостаза как цели для улучшения в данных условиях
+	// выявить ID параметров гомеостаза как цели для улучшения в данных условиях
 	var fActsID []int
 	// выдать массив возможных действий чтобы выбрать одно из них, пока еще не испытанное
 	for id, gIDarr := range TerminalActionsTargetsFromID {
@@ -256,6 +256,5 @@ func GetSimpleActionForCurContitions() ([]int,[]int) {
 		}
 	}
 
-	return targetArrID,fActsID
+	return targetArrID, fActsID
 }
-/////////////////////////////////////////////////
