@@ -29,7 +29,7 @@ var automatizmTreeModel=""
 func GetAutomatizmTreeForPult()(string){
 	// против паники типа "одновременная запись и считывание карты"
 	if notAllowScanInTreeThisTime{
-		return "!!!"
+		return "!Временно запрещена работа func GetAutomatizmTreeForPult() т.к. идет параллельная обработка."
 	}
 	if len(AutomatizmTree.Children)==0 { // еще нет никаких веток
 		return "Еще нет Дерева автоматизмов"
@@ -126,13 +126,17 @@ func getStrFromCond(level int,imgID int)(string){
 			out="Первый символ: <b>&quot;"+out+"&quot;</b>"
 		}
 	case 5:// фраза
-		vrbal:=VerbalFromIdArr[imgID]
-		out=word_sensor.GetPhraseStringsFromPhraseID(vrbal.PhraseID[0])
-		if len(out)==0{
-			return "Нет фразы"
-		}else{
-			out="Фраза: <b>&quot;"+out+"&quot;</b>"
-		}
+		//vrbal:=VerbalFromIdArr[imgID]
+		//if vrbal != nil {
+			//out = word_sensor.GetPhraseStringsFromPhraseID(vrbal.PhraseID[0])
+		out = word_sensor.GetPhraseStringsFromPhraseID(imgID)
+		//out = word_sensor.GetWordFromPraseNodeID(imgID)
+			if len(out) == 0 {
+				return "Нет фразы"
+			} else {
+				out = "Фраза: <b>&quot;" + out + "&quot;</b>"
+			}
+		//}
 	}
 	return out
 }
