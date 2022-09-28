@@ -367,6 +367,16 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				_, _ = fmt.Fprint(resp, ref)
 				return
 			}
+
+			make_automatizms_from_reflexes := r.FormValue("make_automatizms_from_reflexes")
+			if len(make_automatizms_from_reflexes) ==1 {
+				ref := psychic.RunMakeAutomatizmsFromReflexes()
+				_, _ = fmt.Fprint(resp, ref)
+				return
+			}
+
+
+
 			_, _ = fmt.Fprint(resp, "GET")
 		}
 	}
