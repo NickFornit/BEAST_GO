@@ -57,7 +57,7 @@ func automatizmActionsPuls(){
 		if (LastRunAutomatizmPulsCount+1) == PulsCount {
 			WasOperatorActiveted=false
 			// зафиксировать текущее состояние на момент срабатывания автоматизма
-			oldCommonDiffValue,oldBetterOrWorse,oldParIdSuccesArr = wasChangingMoodCondition()
+			oldCommonDiffValue,oldBetterOrWorse,oldParIdSuccesArr = wasChangingMoodCondition(1)
 			if oldCommonDiffValue>0{}
 		}
 		if (LastRunAutomatizmPulsCount+2) < PulsCount {// следить со следующего пульса
@@ -72,7 +72,7 @@ func automatizmActionsPuls(){
    	gomeoParIdSuccesArr - стали лучше следующие г.параметры []int гоменостаза
  */
 if WasOperatorActiveted { // оператор отреагировал
-	lastCommonDiffValue,lastBetterOrWorse,gomeoParIdSuccesArr := wasChangingMoodCondition()
+	lastCommonDiffValue,lastBetterOrWorse,gomeoParIdSuccesArr := wasChangingMoodCondition(2)
 				// обработать изменение состояния
 				calcAutomatizmResult(lastCommonDiffValue,lastBetterOrWorse, gomeoParIdSuccesArr)
 				//  clinerAutomatizmRunning()  есть в calcAutomatizmResult
@@ -330,9 +330,9 @@ func calcAutomatizmResultAut(diffPsyBaseMood int,wellIDarr []int){
 res - стали лучше или хуже: величина измнения от -10 через 0 до 10
 wellIDarr - стали лучше следующие г.параметры []int гоменостаза
 */
-func wasChangingMoodCondition()(int,int,[]int){
+func wasChangingMoodCondition(kind int)(int,int,[]int){
 	//стало хуже или лучше теперь, возвращает величину измнения от -10 через 9 до 10
-	res0,res,wellIDarr:=gomeostas.BetterOrWorseNow()
+	res0,res,wellIDarr:=gomeostas.BetterOrWorseNow(kind)
 
 	return res0,res,wellIDarr
 }

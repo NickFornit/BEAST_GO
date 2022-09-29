@@ -349,7 +349,7 @@ GomeoParIdSuccesArr - стали лучше следующие г.парамет
 
 Если было очень плохо, а стало не очень плохо, то commonDiffValue станет позитивным.
  */
-func BetterOrWorseNow()(int,int,[]int){
+func BetterOrWorseNow(kind int)(int,int,[]int){
 	// насколько изменилось общее состояние
 	commonPerceptionNow()
 	commonOldPerception = commonPerception
@@ -358,9 +358,17 @@ func BetterOrWorseNow()(int,int,[]int){
 	prepBetterOrWorseNow()
 	CommonOldBadValue=CommonBadValue
 
-/* P.S. раньще была попытка учитывать "эффект" кнопок с Пульта (в таблице лн забивался в виде "+" "-"),
-то сейчас не используется, в том числе и потому, что мугут быть нажаты сразу две кнопки.
- */
+// применить "эффект" кнопок с Пульта (в таблице лн забивался в виде "+" "-")
+if kind == 2 {// второй вызов при измерении эффекта реакции
+	if commonDiffValue == 0 {
+		if CommonMoodAfterAction == "+" {
+			commonDiffValue = 1
+		}
+		if CommonMoodAfterAction == "-" {
+			commonDiffValue = -1
+		}
+	}
+}
 
 	return commonDiffValue,lastBetterOrWorse,GomeoParIdSuccesArr
 	}

@@ -159,10 +159,13 @@ func GomeostazPuls(evolushnStage int, lifeTime int,puls int,isSlipping bool){
 	PulsCount=puls // передача номера тика из более низкоуровневого пакета
 	IsSlipping=isSlipping
 
-	if CommonMoodAfterActionPulsCount>0 && CommonMoodAfterActionPulsCount+5 >PulsCount{
+	// не нужно гасить
+	/*
+	if CommonMoodAfterActionPulsCount>0 && (CommonMoodAfterActionPulsCount+5 >PulsCount){
 		CommonMoodAfterActionPulsCount=0
 		CommonMoodAfterAction=""
 	}
+	*/
 
 	if EvolushnStage>=3{//Период подражания
 		IsLevelBeginParam5=true // уровень развития для Потребность в обучении достигнут
