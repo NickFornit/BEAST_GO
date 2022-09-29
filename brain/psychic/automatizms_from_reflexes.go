@@ -98,8 +98,9 @@ if lev1>0 && lev2!=nil && lev3>0{
 	}
 
 
-
-
+///////////// убрать мусор
+	strArr=nil
+	autTreeFromID=nil
 return "Процесс нормально завершен, создано "+strconv.Itoa(newCount)+" новых автоматизмов."
 }
 /////////////////////////////////////////
@@ -125,3 +126,4 @@ func setNewAutNode(id int,parentID int,baseID int,EmotionID int,
 	return &node
 }
 ////////////////////////////////////////////////////
+

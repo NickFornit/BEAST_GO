@@ -90,6 +90,7 @@ if nodeA!=nil {
 	/// эмоции
 	emotionID=strconv.Itoa(nodeA.EmotionID)
 	emo:=EmotionFromIdArr[nodeA.EmotionID]
+	if emo == nil {continue}
 	for i := 0; i < len(emo.BaseIDarr); i++ {
 		if i > 0 {
 			emotionTitle += ", "
