@@ -163,7 +163,7 @@ ActID:=action_sensor.CheckCurActionsContext();//CheckCurActions()
 		ToneID := wordSensor.DetectedTone
 		MoodID := wordSensor.CurPultMood
 		_,verb:= CreateVerbalImage(FirstSimbolID,PhraseID, ToneID, MoodID)
-		lev4= getToneMoodID(verb.ToneID, verb.MoodID)
+		lev4= GetToneMoodID(verb.ToneID, verb.MoodID)
 		lev5=verb.SimbolID
 		/* для дерева берется только первая фраза, остальные можно восстановить для сопоставлений из
 		AutomatizmNode.VerbalID.PhraseID[]

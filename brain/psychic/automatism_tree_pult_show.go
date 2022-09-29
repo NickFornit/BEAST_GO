@@ -209,6 +209,14 @@ func GetAutomatizmSequenceInfo(idA int,sequence string)(string){
 	actArr:=ParceAutomatizmSequence(sequence)
 
 	for i := 0; i < len(actArr); i++ {
+		if actArr[i].Type == 5{
+//тон-настроение в виде образа TN как в func GetToneMoodID(  и func getToneMoodFromImg(
+			tInt,_:=strconv.Atoi(actArr[i].Acts)
+			out+="<br>"+getToneMoodStrFromID(tInt)
+			continue
+		}
+
+
 		// строка действий (любого типа) через запятую
 		aArr := strings.Split(actArr[i].Acts, ",")
 		var idArr []int

@@ -23,7 +23,7 @@ func createAutomatizm(pc *PurposeGenetic)(*Automatizm){
 
 	BranchID:=detectedActiveLastNodID
 
-	// Sequence="Snn:24243,1234,0,24234,11234|Fnn:4Dnn:24|Ann:3"
+	// Sequence="Snn:24243,1234,0,24234,11234|Tnn:15|Dnn:24"
 	var Sequence=""
 	aArr:=pc.actionID.ActID
 	if len(aArr)>0 {
@@ -45,6 +45,14 @@ func createAutomatizm(pc *PurposeGenetic)(*Automatizm){
 			Sequence += strconv.Itoa(sArr[i])
 		}
 	}
+	// тон и настроение
+	t:=pc.actionID.PhraseToneID
+	m:=pc.actionID.PhraseMoodID-19
+	if t>0 || m>0{
+		tImg:=GetToneMoodID(t,m)
+		Sequence += "|Tnn:"+strconv.Itoa(tImg)
+	}
+
 
 	// создать автоматизм, даже если такой уже есть
 	_,atzm:=CreateNewAutomatizm(BranchID,Sequence)
@@ -120,7 +128,7 @@ if lenN==0{
 switch currentStepCount{
 case 3: //остается после lev3 - ActivityID образ сочетания пусковых стимулов (только кнопок!)
 /* пример CurrentAutomatizTreeEnd:
-   lev4 90   getToneMoodID(verb.ToneID, verb.MoodID)
+   lev4 90   GetToneMoodID(verb.ToneID, verb.MoodID)
    lev5 17   verb.SimbolID
    lev6 132  verb.PhraseID[0]
  */

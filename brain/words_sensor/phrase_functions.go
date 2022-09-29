@@ -18,6 +18,9 @@ func GetWordFromPraseNodeID(nodeID int)(string){
 		return ""
 	}
 	ph:=PhraseTreeFromID[nodeID]
+	if ph == nil{
+		return ""
+	}
 	word := GetWordFromWordID(ph.WordID)
 	return word
 }

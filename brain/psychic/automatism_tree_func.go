@@ -253,4 +253,53 @@ func getBrangeNodeArr(lastNodeId int)([]*AutomatizmNode){
 //////////////////////////////////////
 
 
+//////////////////////////////////////////////
+/* поиск узла дерева автоматизмов по условиям у.рефлекса для automatizms_from_reflexes.go
+Если нет такого узла - дорастить ветку.
+Выдать  ID узла
 
+ */
+func FindConditionsNode(lev1 int,lev2 []int,actArr []int,tonMood int,fistSymb int,verbalID int)(int){
+	// образ эмоции
+	eID,_:=createNewBaseStyle(0,0,lev2)
+	// образ действий: из TriggerStimuls -> Activity
+	aID,_:=createNewlastActivityID(0,actArr)// конвертировать образ типа reflexes.TriggerStimuls в psychic.Activity
+
+	var lastLevel=0
+	var lastNode *AutomatizmNode
+
+	for k, v := range AutomatizmTreeFromID {
+		if v.BaseID == lev1{
+			lastLevel=1
+			lastNode=AutomatizmTreeFromID[k]
+			if v.EmotionID == eID{
+				lastLevel=2
+				lastNode=AutomatizmTreeFromID[k]
+				if v.ActivityID != aID{
+					lastLevel=3
+					lastNode=AutomatizmTreeFromID[k]
+					if v.ToneMoodID == tonMood{
+						lastLevel=4
+						lastNode=AutomatizmTreeFromID[k]
+						if v.SimbolID == fistSymb{
+							lastLevel=5
+							lastNode=AutomatizmTreeFromID[k]
+							if v.VerbalID == verbalID{
+								return v.ID
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	// не найдено - наращиваем ветку
+	condArr:=[]int{lev1,eID,aID,tonMood,fistSymb,verbalID}
+	lastNodeID:=addNewBranchFromNodes(lastLevel,condArr,lastNode)
+
+	return lastNodeID
+}
+//////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////

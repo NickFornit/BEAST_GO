@@ -190,6 +190,9 @@ func findAnySympleRandActions()(*Automatizm){
 		sequence := "Snn:"+strconv.Itoa(k)
 		var purpose PurposeGenetic
 		purpose.targetID = targID
+//!? При создании нового автоматизма с фразой вписывать Tnn: тон настроение, которое брать из текущего гомеостаза ?
+
+
 		// вытащить действия автоматизма
 		trigID := CreateNewActionImageFromAutomatizm(sequence)
 		purpose.actionID = trigID

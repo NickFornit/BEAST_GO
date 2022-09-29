@@ -164,6 +164,8 @@ func loadActionImageArr(){
 func CreateNewActionImageFromAutomatizm(atmzmAct string)(*ActionImage){
 	var aArr []int
 	var sArr []int
+	var t=0 // тон
+	var m=0 // настроение
 	actArr:=ParceAutomatizmSequence(atmzmAct)
 	for i := 0; i < len(actArr); i++ {
 		if actArr[i].Type == 1 && len(actArr[i].Acts)>0 { // Snn- перечень ID сенсора слов через запятую
@@ -173,6 +175,11 @@ func CreateNewActionImageFromAutomatizm(atmzmAct string)(*ActionImage){
 				sArr = append(sArr, aID)
 			}
 		}
+		if actArr[i].Type == 5  && len(actArr[i].Acts)>0 { //Тnn - тон-настроение в виде образа TN как в func GetToneMoodID(  и func getToneMoodFromImg(
+			aID, _ := strconv.Atoi(actArr[i].Acts)
+			t,m=getToneMoodFromImg(aID)
+
+		}
 		if actArr[i].Type == 2  && len(actArr[i].Acts)>0 { //Dnn - ID прогрмаммы действий, через запятую
 			p:=strings.Split(actArr[i].Acts, ",")
 			for n := 0; n < len(p); n++ {
@@ -181,7 +188,7 @@ func CreateNewActionImageFromAutomatizm(atmzmAct string)(*ActionImage){
 			}
 		}
 	}
-		_,trigger:=CreateNewActionImageImage(aArr,sArr,0,0)
+		_,trigger:=CreateNewActionImageImage(aArr,sArr,t,m)
 
 	return trigger
 }

@@ -1,5 +1,11 @@
 /* Ожидание результата запущенного автоматизма и его обработка
 
+В BAD_detector.go в самом низу есть func BetterOrWorseNow() с комментариями по делу. Я ее отрабатывал как раз для того, чтобы фиксировать любые улучшения или ухудшения для определения эффекта автоматизма.
+Она вызывается (через трансформатор против цицличности wasChangingMoodCondition()) 2 раза: в момент запуска автоматизма и как только совершится любое действие оператора на пульте. Таким образом в automatizm_result.go получается дифферент:
+oldCommonDiffValue,oldBetterOrWorse,oldParIdSuccesArr = wasChangingMoodCondition()
+Т.е. если ты поставишь точку прерывания на
+oldCommonDiffValue,oldBetterOrWorse,oldParIdSuccesArr = wasChangingMoodCondition()
+то и получишь эффект автоматизма.
 */
 
 
@@ -65,8 +71,8 @@ func automatizmActionsPuls(){
    	lastBetterOrWorse - стали лучше или хуже: величина измнения от -10 через 0 до 10
    	gomeoParIdSuccesArr - стали лучше следующие г.параметры []int гоменостаза
  */
-			lastCommonDiffValue,lastBetterOrWorse,gomeoParIdSuccesArr := wasChangingMoodCondition()
 if WasOperatorActiveted { // оператор отреагировал
+	lastCommonDiffValue,lastBetterOrWorse,gomeoParIdSuccesArr := wasChangingMoodCondition()
 				// обработать изменение состояния
 				calcAutomatizmResult(lastCommonDiffValue,lastBetterOrWorse, gomeoParIdSuccesArr)
 				//  clinerAutomatizmRunning()  есть в calcAutomatizmResult
@@ -90,6 +96,7 @@ if WasOperatorActiveted { // оператор отреагировал
 	Реакция ожидается на слелующем пульcе после срабатывания автоматизма	и в течение WaitingPeriodForActionsVal пульсов
 	 за это время получим уверенное wasChangingMoodCondition() по значению gomeostas.BetterOrWorseNow()
 */
+/*
 	if (AutomatizmRunningPulsCountAut+1)<PulsCount{
 		WasOperatorActiveted=false
 		// зафиксировать текущее состояние на момент срабатывания автоматизма
@@ -113,6 +120,10 @@ if WasOperatorActiveted { // оператор отреагировал
 		//сбрасывать ожидание результата автоматизма если прошло WaitingPeriodForActionsVal пульсов
 		clinerAutomatizmRunningAut()
 	}
+	*/
+
+
+
 }
 /////////////////////////////////////////////////////////////////////
 
@@ -154,7 +165,7 @@ func calcAutomatizmResult(commonDiffValue int,diffPsyBaseMood int,wellIDarr []in
 	 */
 	// commonDiffValue - точно изменился, иначе бы не было вызова calcAutomatizmResult
 	/// если числа имеют разные знаки (одно положительное, другое отрицательное)
-	if lib.IsDiffersOfSign(AutomatizmRunning.Usefulness,commonDiffValue)		{
+	if lib.IsDiffersOfSign(AutomatizmRunning.Usefulness,commonDiffValue){
 		AutomatizmRunning.Count=0 // сбрасываем  надежность
 	} else {
 		AutomatizmRunning.Count++

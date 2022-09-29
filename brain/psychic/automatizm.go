@@ -26,6 +26,9 @@ func automatizmInit(){
 
 	loadAutomatizm()
 
+	//res:=RumAutomatizm(AutomatizmFromIdArr[1])
+	//if res{}
+
 }
 /////////////////////////////////
 
@@ -47,6 +50,7 @@ func getAutomatizmFromNodeID(nodeID int)(int){
 // выбран самый полезный из всех
 	return usefulnessID
 }
+
 /////////////////////////////////////
 /* для разделения строки Sequence автоматизма на составляющие
 типы действий:
@@ -54,6 +58,7 @@ func getAutomatizmFromNodeID(nodeID int)(int){
 2 Dnn - ID прогрмаммы действий, через запятую
 3 Ann - последовательный запуск автоматизмов с id1,id2..
 4 Mnn - внутренние произвольные действия с id1,id2...
+5 Tnn - образ тон-настроения одна цифра == образ тона-настроения (как в func GetToneMoodID(  и func getToneMoodFromImg()
 */
 type ActsAutomatizm struct {
 	Type int  // тип совершаемого действия
@@ -121,14 +126,30 @@ type Automatizm struct {
 
 var AutomatizmFromIdArr=make(map[int]*Automatizm)
 
-// автоматизмы, прикрепленные к ID узла Дерева получать по getAutomatizmFromTreeNodeIdArr(BranchID)
-// автоматизмы, прикрепленные к ID узла Дерева с Belief==2 т.е. штатные, выполняющиеся не раздумывая
+// ШТАТНЫЕ автоматизмы, прикрепленные к ID узла Дерева с Belief==2 т.е. ШТАТНЫЕ, выполняющиеся не раздумывая
+// у узла может быть только один штатный автоматизм с Belief==2
 var AutomatizmBelief2FromTreeNodeId=make(map[int]*Automatizm)
 
 /* список удачных автоматизмов, относящихся к определенным условиям (привзяанных к определенной ветке Дерева)
 В этом списке поле Usefulness >0
  */
 var AutomatizmSuccessFromIdArr=make(map[int]*Automatizm)
+///////////////////////////////////////////////////////////////
+
+
+
+
+
+///////////////////////////////////////
+// есть ли штатные автоматизмы автоматизм с Belief==2, привязанные к узлу дерева
+func ExistsAutomatizmForThisNodeID(nodeID int)(bool){
+	aArr:=AutomatizmBelief2FromTreeNodeId[nodeID]
+	if aArr!=nil {
+		return true
+	}
+	return false
+}
+///////////////////////////////////////
 
 //////////////////////////////////////////////////////
 // список всех автоматизмов для ID узла Дерева
@@ -173,7 +194,8 @@ func createNewAutomatizmID(id int,BranchID int,Sequence string)(int,*Automatizm)
 	return id,&node
 }
 /////////////////////////////////////////
-// создать новый автоматизм с записю
+
+// создать новый автоматизм с записю в файл
 func CreateNewAutomatizm(BranchID int,Sequence string)(int,*Automatizm){
 // BranchID может быть ==0 для мозжечковых рефлексов
 	if len(Sequence)==0{
@@ -183,6 +205,18 @@ func CreateNewAutomatizm(BranchID int,Sequence string)(int,*Automatizm){
 	id,verb:=createNewAutomatizmID(0,BranchID,Sequence)
 
 	SaveAutomatizm()
+
+	return id,verb
+}
+/////////////////////////////////////////
+// создать новый автоматизм без записи в файл
+func CreateAutomatizm(BranchID int,Sequence string)(int,*Automatizm){
+	// BranchID может быть ==0 для мозжечковых рефлексов
+	if len(Sequence)==0{
+		return 0,nil
+	}
+
+	id,verb:=createNewAutomatizmID(0,BranchID,Sequence)
 
 	return id,verb
 }
@@ -257,12 +291,15 @@ func loadAutomatizm(){
 }
 ///////////////////////////////////////////
 
+
+
 /* разделить строку Sequence автоматизма на составляющие
 типы действий:
 1 Snn - перечень ID фраз через запятую
 2 Dnn - ID прогрмаммы действий, через запятую
 3 Ann - последовательный запуск автоматизмов с id1,id2..
 4 Mnn - внутренние произвольные действия с id1,id2...
+5 Tnn - образ тон-настроения одна цифра == образ тона-настроения (как в func GetToneMoodID(  и func getToneMoodFromImg()
 */
 func ParceAutomatizmSequence(Sequence string)([]ActsAutomatizm){
 	var acts[] ActsAutomatizm
@@ -280,6 +317,7 @@ func ParceAutomatizmSequence(Sequence string)([]ActsAutomatizm){
 		case "Dnn": act.Type=2
 		case "Ann": act.Type=3
 		case "Mnn": act.Type=4
+		case "Tnn": act.Type=5
 		}
 
 		act.Acts = pArr[1] // строка действий (любого типа) через запятую
@@ -340,6 +378,24 @@ func GetAutomatizmDnn(ma *Automatizm)(string){
 		}
 		pArr:=strings.Split(sArr[i], ":")
 		if pArr[0]=="Dnn"{
+			if len(pArr[1])>0{
+				return pArr[1]
+			}
+		}
+	}
+	return ""
+}
+
+
+func GetAutomatizmTnn(ma *Automatizm)(string){
+	sequence:=ma.Sequence
+	sArr:=strings.Split(sequence, "|")
+	for i := 0; i < len(sArr); i++ {
+		if len(sArr[i])==0{
+			continue
+		}
+		pArr:=strings.Split(sArr[i], ":")
+		if pArr[0]=="Tnn"{
 			if len(pArr[1])>0{
 				return pArr[1]
 			}

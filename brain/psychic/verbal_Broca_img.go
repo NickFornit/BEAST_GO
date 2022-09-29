@@ -184,7 +184,7 @@ func loadVerbalFromIdArr(){
 На входе int2 -  виде ID настроения (jn 20 до 26) преобразуется в диапазон от 1 до 7
 простым вычитанием int2-19
  */
-func getToneMoodID(int1 int,int2 int)(int){
+func GetToneMoodID(int1 int,int2 int)(int){
 	// вмето первой 0 (для "обычный") ставим 9 !!!
 	if int1==0{
 		int1=9
@@ -212,19 +212,15 @@ func getToneMoodFromImg(img int)(int,int){
 	m,_:=strconv.Atoi(tonmoode[1:])
 	return t,m
 }
-/* расшифровка в виде строки
-func getToneMoodStrFromID(ToneMoodID int)(string){
-	str:=strconv.Itoa(ToneMoodID) //из числа - строку
-	s1,_:=strconv.Atoi(str[:1])
-	if s1==9{
-		s1=0
-	}
-	tone:=getToneStrFromID(s1)
-	s2,_:=strconv.Atoi(str[1:])
-	moode:=getMoodStrFromID(s2)
-	return tone+" ("+moode+")"
+// расшифровка в виде строки
+func getToneMoodStrFromID(img int)(string){
+	t,m:=getToneMoodFromImg(img)
+	out:="Тон: "+getToneStrFromID(t)
+	out+=" Настроение: "+getMoodStrFromID(m)
+
+	return out
 }
-*/
+
 //////////////////////////////////////////////////
 
 
@@ -245,15 +241,17 @@ return ret
 ////////////////////////////////
 func getMoodStrFromID(id int)(string){
 var ret=""
-//20-Хорошее    21-Плохое    22-Игровое    23-Учитель    24-Агрессивное   25-Защитное    26-Протест
+// из 20-Хорошее    21-Плохое    22-Игровое    23-Учитель    24-Агрессивное   25-Защитное    26-Протест
+// отнимаем 19
 switch id{
-case 20: ret="Хорошее"
-case 21: ret="Плохое"
-case 22: ret="Игровое"
-case 23: ret="Учитель"
-case 24: ret="Агрессивное"
-case 25: ret="Защитное"
-case 26: ret="Протест"
+case 0: ret="Нормальное"
+case 1: ret="Хорошее"
+case 2: ret="Плохое"
+case 3: ret="Игровое"
+case 4: ret="Учитель"
+case 5: ret="Агрессивное"
+case 6: ret="Защитное"
+case 7: ret="Протест"
 
 }
 return ret

@@ -90,7 +90,12 @@ if nodeA!=nil {
 	/// эмоции
 	emotionID=strconv.Itoa(nodeA.EmotionID)
 	emo:=EmotionFromIdArr[nodeA.EmotionID]
-	if emo == nil {continue}
+	if emo == nil {// так не должно быть! эмоция д.б. всегда
+//lib.WritePultConsol("В emo:=EmotionFromIdArr[nodeA.EmotionID] НЕТ ЭМОЦИИ!!!! Какой-то образ неверен, нужен программист!")
+// лучше бы выкинуть панику: panic("НЕТ ЭМОЦИИ!!!!")
+		emotionTitle += "<span style='color:red'>НЕТ ЭМОЦИИ! нужно разобраться с EmotionFromIdArr[]</span>"
+		continue
+	}
 	for i := 0; i < len(emo.BaseIDarr); i++ {
 		if i > 0 {
 			emotionTitle += ", "
@@ -99,7 +104,7 @@ if nodeA!=nil {
 	}
 	/////////////////////////////
 
-	// пусковой стимуд
+	// пусковой стимул
 	activityID=strconv.Itoa(nodeA.ActivityID)
 
 /*  вызывает ЦИКЛИЧЕСКИЙ ИМПОРТ
