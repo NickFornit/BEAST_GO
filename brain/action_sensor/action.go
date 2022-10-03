@@ -49,7 +49,7 @@ func ActionSensorPuls(evolushnStage int,lifeTime int,puls int,isSlipping bool){
 11 Сделать приятно
 12 Заплакать
 13 Засмеяться
-14 Обрадоваться
+14 Поощрить
 15 Испугаться
 16 Простить
 17 Вылечить
@@ -75,7 +75,7 @@ func GetActionNameFromID(id int)(string){
 	case 11: out="Сделать приятно"
 	case 12: out="Заплакать"
 	case 13: out="Засмеяться"
-	case 14: out="Обрадоваться"
+	case 14: out="Поощрить"
 	case 15: out="Испугаться"
 	case 16: out="Простить"
 	case 17: out="Вылечить"
