@@ -126,7 +126,7 @@ func understandingSituation(situationImageID int,ps *PurposeGenetic){
 		CurrentUnderstandingTreeEnd=condArr[currentUnderstandingStepCount:] // НОВИЗНА
 		if currentUnderstandingStepCount<conditionsCount { // не пройдено до конца имеющихся условий
 			// нарастить недостающее в ветке дерева
-			detectedActiveLastUnderstandingNodID = formingUnderstandingBranch(detectedActiveLastUnderstandingNodID, currentUnderstandingStepCount, condArr)
+			detectedActiveLastUnderstandingNodID = formingUnderstandingBranch(detectedActiveLastUnderstandingNodID, currentUnderstandingStepCount+1, condArr)
 
 			// Ориентировочный рефлекс осознания ситуации - частичная новизна условий
 			orientationConsciousness(1)
@@ -214,6 +214,9 @@ func conditionUnderstandingFound(level int,cond []int,node *UnderstandingNode){
 		if cond[0] == levID {
 			detectedActiveLastUnderstandingNodID=cld.ID
 			ActiveBranchNodeArr=append(ActiveBranchNodeArr,cld.ID)
+		}else {
+			currentUnderstandingStepCount=level-1
+			return
 		}
 
 		level++

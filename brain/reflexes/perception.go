@@ -55,7 +55,8 @@ func ReflexCountPuls(evolushnStage int, lifeTime int, puls int, isSlipping bool)
 
 	if puls==4{
 		psychic.PsychicInit()  // после 3-го пульса!
-
+	}
+	if puls==5{
 		testingRunMakeAutomatizmsFromReflexes()
 	}
 

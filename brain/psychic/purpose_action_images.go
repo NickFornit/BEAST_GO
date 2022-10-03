@@ -175,9 +175,9 @@ func CreateNewActionImageFromAutomatizm(atmzmAct string)(*ActionImage){
 				sArr = append(sArr, aID)
 			}
 		}
-		if actArr[i].Type == 5  && len(actArr[i].Acts)>0 { //Тnn - тон-настроение в виде образа TN как в func GetToneMoodID(  и func getToneMoodFromImg(
+		if actArr[i].Type == 5  && len(actArr[i].Acts)>0 { //Тnn - тон-настроение в виде образа TN как в func GetToneMoodID(  и func GetToneMoodFromImg(
 			aID, _ := strconv.Atoi(actArr[i].Acts)
-			t,m=getToneMoodFromImg(aID)
+			t,m=GetToneMoodFromImg(aID)
 
 		}
 		if actArr[i].Type == 2  && len(actArr[i].Acts)>0 { //Dnn - ID прогрмаммы действий, через запятую

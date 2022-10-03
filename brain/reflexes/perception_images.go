@@ -249,37 +249,7 @@ func loadTriggerStimulsArr() {
 
 ///////////////////////////////////////////
 
-func GetRriggerInfo(triggerID int)(string){
-	var out=""
-	act := TriggerStimulsArr[triggerID]
-	if act == nil {
-		return ""
-	}
 
-	if len(act.RSarr) > 0 {
-		for i := 0; i < len(act.RSarr); i++ {
-			if i > 0 {
-				out += ", "
-			}
-			out += action_sensor.GetActionNameFromID(act.RSarr[i])
-		}
-	}
-	if len(act.PhraseID) > 0 {
-		if len(out) > 0 {
-			out += "<br>"
-		}
-		for i := 0; i < len(act.PhraseID); i++ {
-			if i > 0 {
-				out += "; "
-			}
-			w := wordSensor.GetPhraseStringsFromPhraseID(act.PhraseID[i])
-			//w=strings.Trim(w,"")
-			out += "\"" + w + "\""
-		}
-	}
-	return out
-}
-////////////////////////////////////////////////////
 
 
 

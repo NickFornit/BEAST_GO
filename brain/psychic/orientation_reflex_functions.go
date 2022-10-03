@@ -132,7 +132,7 @@ case 3: //остается после lev3 - ActivityID образ сочета�
    lev5 17   verb.SimbolID
    lev6 132  verb.PhraseID[0]
  */
-	ton,mood:=getToneMoodFromImg(90)
+	ton,mood:=GetToneMoodFromImg(90)
 // 1-восклицательный,4 - Повышенный, настроение: 2-Плохое, 5-Агрессивное, 6-Защитное
 	if ton==1 || ton==4 || mood==2 || mood==5 || mood==6{
 		return true

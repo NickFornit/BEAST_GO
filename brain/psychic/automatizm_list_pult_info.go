@@ -40,12 +40,12 @@ func GetAutomatizmInfo(limitBasicID int)(string){
 		out+="' onClick='show_level(3)'>Хорошо</span> "
 	}
 
-	header:="<tr><th width=70 class='table_header'>ID</th>" +
-		"<th width=70 class='table_header'>ID <br><nobr>узла Дерева</nobr></th>" +
-		"<th width=70 class='table_header'  title='ID базового состояния'>BaseID</th>" +
-		"<th width='25%' class='table_header'  title='ID образа сочетания эмоций'>Эмоции</th>" +
-		"<th width='30' class='table_header'  title='ID образа пускового стимула'>Пусковой стимул</th>" +
-		"<th width='25%' class='table_header'  title='Действия автоматизма, их может быть много видов.'>Строка действий</th>" +
+	header:="<tr><th width=70 class='table_header'>ID ав-ма</th>" +
+		"<th width=70 class='table_header' style='background-color:#CCC5FF;'>ID <br><nobr>узла Дерева</nobr></th>" +
+		"<th width=70 class='table_header' style='background-color:#CCC5FF;'  title='ID базового состояния'>BaseID Дерева</th>" +
+		"<th width='70' class='table_header' style='background-color:#CCC5FF;'  title='ID образа сочетания эмоций'>Эмоции Дерева</th>" +
+		"<th width='10%' class='table_header' style='background-color:#CCC5FF;'  title='ID образа пускового стимула'>ДействияID-ФразаID-НастроениеID</th>" +
+		"<th class='table_header'  title='Действия автоматизма, их может быть много видов.'>Строка действий</th>" +
 		"<th width='30' class='table_header' title='ID следующего автоматизма в цепочке'>NextID</th>" +
 		"<th width='30' class='table_header' title='Энергичность'>Energy</th>" +
 		"<th width='30' class='table_header' title='(БЕС)ПОЛЕЗНОСТЬ: -10 вред 0 +10 +n польза'>Полезность</th>" +
@@ -74,7 +74,7 @@ nodeID:=""
 baseID:=""
 emotionID:=""
 emotionTitle:=""
-activityID:=""
+trStr:=""
 //activityTitle:=""
 
 // узел дерева, к которому прикреплен автоматизм
@@ -105,32 +105,8 @@ if nodeA!=nil {
 	/////////////////////////////
 
 	// пусковой стимул
-	activityID=strconv.Itoa(nodeA.ActivityID)
+	trStr=strconv.Itoa(nodeA.ActivityID)+"-"+strconv.Itoa(nodeA.VerbalID)+"-"+strconv.Itoa(nodeA.ToneMoodID)
 
-/*  вызывает ЦИКЛИЧЕСКИЙ ИМПОРТ
-
-	act := reflexes.TriggerStimulsArr[nodeA.ActivityID]
-	if len(act.RSarr) > 0 {
-		for i := 0; i < len(act.RSarr); i++ {
-			if i > 0 {
-				activityTitle += ", "
-			}
-			activityTitle += actionSensor.GetActionNameFromID(act.RSarr[i])
-		}
-	}
-	if len(act.PhraseID) > 0 {
-		if len(activityTitle) > 0 {
-			activityTitle += "<br>"
-		}
-		for i := 0; i < len(act.PhraseID); i++ {
-			if i > 0 {
-				activityTitle += "; "
-			}
-			w := wordsSensor.GetPhraseStringsFromPhraseID(act.PhraseID[i])
-			//w=strings.Trim(w,"")
-			activityTitle += "\"" + w + "\""
-		}
-	}*/
 }//if nodeA!=nil{
 
 
@@ -139,8 +115,8 @@ out += "<tr >"
 out += "<td class='table_cell' >"+id+"</td>";
 out += "<td class='table_cell' >"+nodeID+"</td>";
 out += "<td class='table_cell' ><nobr>"+baseID+"</nobr></td>";
-out += "<td class='table_cell' title='"+emotionTitle+"'><nobr>"+emotionID+"</nobr></td>";
-out += "<td class='table_cell' title='Информация по клику' onClick='show_trigger("+activityID+")' style='cursor:pointer;color:blue'>"+activityID+"</td>";
+out += "<td class='table_cell' title='"+emotionTitle+"' onClick='show_emotion("+emotionID+")' style='cursor:pointer;color:blue'><nobr>"+emotionID+"</nobr></td>";
+out += "<td class='table_cell' title='Информация по клику' onClick='show_trigger("+nodeID+")' style='cursor:pointer;color:blue'>"+trStr+"</td>";
 out += "<td class='table_cell' title='Информация по клику'  onClick='show_actions("+id+",`"+v.Sequence+"`)' style='cursor:pointer;color:blue'><nobr>"+v.Sequence+"</nobr></td>";
 out += "<td class='table_cell' >"+strconv.Itoa(v.NextID)+"</td>";
 out += "<td class='table_cell' >"+strconv.Itoa(v.Energy)+"</td>";

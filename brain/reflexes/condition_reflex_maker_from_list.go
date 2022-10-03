@@ -45,12 +45,13 @@ if len(list)<5{
 		// третий уровень - создать образ пускового стимула фразы типа TriggerStimulsID
 
 // засунуть фразу в дерево слов и дерево фраз
-		wordSensor.VerbalDetection(p[5], 1, 0, 0)
+prase:=p[5]
+		wordSensor.VerbalDetection(prase, 1, 0, 0)
 		PhraseID := wordSensor.CurrentPhrasesIDarr
-		ActiveCurTriggerStimulsID, _ = CreateNewlastTriggerStimulsID(0, nil, PhraseID, 0, 0)
-
+		tID, vt := CreateNewlastTriggerStimulsID(0, nil, PhraseID, 0, 0)
+if vt != nil{}
 		SaveTriggerStimulsArr()
-		lev3:= ActiveCurTriggerStimulsID
+		lev3:= tID
 
 		pn = strings.Split(p[4], ",")
 		var ActionIDarr []int

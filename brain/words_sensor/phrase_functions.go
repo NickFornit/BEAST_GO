@@ -135,13 +135,45 @@ func deleteWordFromPhrase(wordID int){
 //////////////////////////////////////////////
 
 // вытащить первый символ из фразы
-func GetFirstSymbolFromPraseID(PhraseID int)(int){
-	word:=GetWordFromPraseNodeID(PhraseID)
-if len(word)==0 {
-	return 0
-}
+func GetFirstSymbolFromPraseID(PhraseID []int)(int){
+	if len(PhraseID) == 0 {
+		return 0
+	}
+	// аналогично
+	//	GetPhraseStringsFromPhraseID(PhraseID[0])
+	lastID:=PhraseID[0]
+	word:=""
+	for {
+		node:=PhraseTreeFromID[lastID]
+		if node==nil {
+			break
+		}
+		word=GetWordFromWordID(node.WordID)
+		lastID=node.ParentID
+		if lastID==0{
+			break
+		}
+	}
+	if len(word)==0 {
+		return 0
+	}
 	r := []rune(word)
 	first:= GetSymbolIDfromRune(r[0])
+	 // проверка
+	//w:=GetWordFromWordID(wID); if len(w)>0{}
+	s:=GetSynbolFromID(first); if len(s)>0{}
+
 	return first
+}
+
+// вытащить первый символ из слова
+func GetFirstSymbolFromWordID(wordID int)(int){
+		word:=GetWordFromPraseNodeID(wordID)
+	if len(word)==0 {
+		return 0
+	}
+		r := []rune(word)
+		first:= GetSymbolIDfromRune(r[0])
+		return first
 }
 //////////////////////////////////////////////////

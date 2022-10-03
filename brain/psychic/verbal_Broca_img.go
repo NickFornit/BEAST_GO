@@ -200,7 +200,7 @@ func GetToneMoodID(int1 int,int2 int)(int){
 }
 //////////////////////////////////
 // получить тон и настроение из уникального сочетания
-func getToneMoodFromImg(img int)(int,int){
+func GetToneMoodFromImg(img int)(int,int){
 	tonmoode:=strconv.Itoa(img)
 	var t=0
 	ton:=tonmoode[:1]
@@ -213,8 +213,8 @@ func getToneMoodFromImg(img int)(int,int){
 	return t,m
 }
 // расшифровка в виде строки
-func getToneMoodStrFromID(img int)(string){
-	t,m:=getToneMoodFromImg(img)
+func GetToneMoodStrFromID(img int)(string){
+	t,m:=GetToneMoodFromImg(img)
 	out:="Тон: "+getToneStrFromID(t)
 	out+=" Настроение: "+getMoodStrFromID(m)
 
@@ -234,7 +234,8 @@ case 1: ret="восклицательный"
 case 2: ret="вопросительный"
 case 3: ret="вялый"
 case 4: ret="Повышенный"
-
+default:
+	ret="ощибка (тон = "+strconv.Itoa(id)+")"
 }
 return ret
 }

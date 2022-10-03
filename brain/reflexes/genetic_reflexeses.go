@@ -1,5 +1,8 @@
 /*
 безусловные рефлексы
+
+Формат записи в файл:
+ID|BaseID|BaseStyleID[] через запятую|Triggers[] через запятую|ActionIDarr[] через запятую
 */
 
 package reflexes
@@ -19,10 +22,10 @@ func init() {
 
 type GeneticReflex struct {
 	ID          int
-	lev1        int
-	lev2        []int
-	lev3        []int
-	ActionIDarr []int
+	lev1        int //BaseID
+	lev2        []int // BaseStyleID[]
+	lev3        []int // конпки акций с пульта
+	ActionIDarr []int // действия рефлекса
 	// Result int - у безусловных рефлексов нет конкуренции, кроме того, что они подавляются более высокоуровневыми рефлексами и автоматизмами
 }
 var GeneticReflexes = make(map[int]*GeneticReflex)
@@ -109,8 +112,7 @@ func loadGeneticReflexes() {
 				lev3 = append(lev3, b)
 			}
 		}
-		// создать образ сочетаний пусковых стимулов
-		//actID,_:=createNewlastTriggerStimulsID(0,lev3,nil,0,0)
+		// конпки акций с пульта
 		pn = strings.Split(p[4], ",")
 		var ActionIDarr []int
 		for i := 0; i < len(pn); i++ {

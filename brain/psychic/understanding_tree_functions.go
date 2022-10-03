@@ -166,13 +166,47 @@ func getUnderstandingNode(wt *UnderstandingNode)(string){
 // найти КОНЕЧНЫЙ узел по условиям
 func FindUnderstandingTreeNodeFromCondition(Mood int,EmotionID int,
 	SituationID int,PurposeID int)(int,*UnderstandingNode){
+	/*
 	for k, v := range UnderstandingNodeFromID {
 		if v.Mood==Mood && v.EmotionID==EmotionID &&
 			v.SituationID==SituationID && v.PurposeID==PurposeID{
 			return k, v
 		}
 	}
+	*/
+	var id=0
+	var aut *UnderstandingNode
+	cnt:=len(UnderstandingTree.Children)
+	for n := 0; n < cnt; n++ {
+		id,aut=checkUnderstandingTree(&UnderstandingTree.Children[n],Mood,EmotionID,SituationID,PurposeID)
+		if id >0{
+			return id,aut
+		}
+	}
 	return 0,nil
+}
+////////////
+func checkUnderstandingTree(v *UnderstandingNode,Mood int,EmotionID int,
+	SituationID int,PurposeID int)(int,*UnderstandingNode){
+	var id=v.ID
+	var aut =v
+
+	// как только наткнется в предыдущих на такое услове - выдаст ID этой ветки
+	if v.Mood==Mood && v.EmotionID==EmotionID && v.SituationID==SituationID && v.PurposeID==PurposeID {
+		return v.ID,v
+	}
+
+	if v.Children==nil {// конец
+		return 0,nil
+	}
+	for n := 0; n < len(v.Children); n++ {
+		id,aut=checkUnderstandingTree(&v.Children[n],Mood,EmotionID,SituationID,PurposeID)
+		if id>0{
+			return id,aut
+		}
+	}
+	return 0,nil //v.ID
+
 }
 //////////////////////////////////////
 

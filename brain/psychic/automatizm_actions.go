@@ -85,9 +85,9 @@ if am.Usefulness<0{
 	for i := 0; i < len(actArr); i++ {
 
 		if actArr[i].Type == 5{
-//тон-настроение в виде образа TN как в func GetToneMoodID(  и func getToneMoodFromImg(
+//тон-настроение в виде образа TN как в func GetToneMoodID(  и func GetToneMoodFromImg(
 			tInt,_:=strconv.Atoi(actArr[i].Acts)
-			out+="<br>"+getToneMoodStrFromID(tInt)
+			out+="<br>"+GetToneMoodStrFromID(tInt)
 			continue
 		}
 
@@ -247,3 +247,6 @@ func expensesGomeostatParametersAfterAction(actID int,energy int){
 		}
 	}
 }
+/////////////////////////////////////////////////////////////////////
+
+

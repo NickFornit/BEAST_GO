@@ -171,7 +171,7 @@ func calcAutomatizmResult(commonDiffValue int,diffPsyBaseMood int,wellIDarr []in
 		AutomatizmRunning.Count++
 	}
 	// задать тип автоматизма, 2 - проверенный
-	setAutomatizmBelief(AutomatizmRunning,2)// ТАК ПРОСТО НЕЛЬЗЯ ЗАДАВАТЬ Belief=2: AutomatizmRunning.Belief=2
+	SetAutomatizmBelief(AutomatizmRunning,2)// ТАК ПРОСТО НЕЛЬЗЯ ЗАДАВАТЬ Belief=2: AutomatizmRunning.Belief=2
 
 	AutomatizmRunning.Usefulness =commonDiffValue // diffPsyBaseMood
 
@@ -282,7 +282,7 @@ func calcAutomatizmResultAut(diffPsyBaseMood int,wellIDarr []int){
 	} else {
 		AutomatizmRunningAut.Count=0
 	}
-	setAutomatizmBelief(AutomatizmRunning,2)
+	SetAutomatizmBelief(AutomatizmRunning,2)
 	// ТАК НЕЛЬЗЯ ЗАДАВАТЬ Belief=2: AutomatizmRunning.Belief=2
 	AutomatizmRunningAut.Usefulness =diffPsyBaseMood
 

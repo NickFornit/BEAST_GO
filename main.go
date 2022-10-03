@@ -340,7 +340,7 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 			get_trigger_info := r.FormValue("get_trigger_info")
 			if len(get_trigger_info) > 0 {
 				triggerID,_:=strconv.Atoi(r.FormValue("triggerID"))
-				ref := reflexes.GetRriggerInfo(triggerID)
+				ref := reflexes.GetTreeAutomatizmTriggersInfo(triggerID)
 				_, _ = fmt.Fprint(resp, ref)
 				return
 			}
@@ -349,6 +349,14 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 			if len(get_sequence_info) > 0 {
 				autmzmID,_:=strconv.Atoi(r.FormValue("autmzmID"))
 				ref := psychic.GetAutomatizmSequenceInfo(autmzmID,r.FormValue("sequence"))
+				_, _ = fmt.Fprint(resp, ref)
+				return
+			}
+
+			get_emotion_info := r.FormValue("get_emotion_info")
+			if len(get_emotion_info) > 0 {
+				emotionID,_:=strconv.Atoi(r.FormValue("emotionID"))
+				ref := psychic.GetStrnameFromBaseImageID(emotionID)
 				_, _ = fmt.Fprint(resp, ref)
 				return
 			}
@@ -363,10 +371,20 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 
 			get_automatizm_tree := r.FormValue("get_automatizm_tree")
 			if len(get_automatizm_tree) > 0 {
-				ref := psychic.GetAutomatizmTreeForPult()
+				base := r.FormValue("limitBasicID")
+				limitBasicID,_:=strconv.Atoi(base)
+				ref := psychic.GetAutomatizmTreeForPult(limitBasicID)
 				_, _ = fmt.Fprint(resp, ref)
 				return
 			}
+			get_node_automatizms := r.FormValue("get_node_automatizms")
+			if len(get_node_automatizms) > 0 {
+				nodeID,_:=strconv.Atoi(r.FormValue("autNodeID"))
+				ref := psychic.GetAutomatizmForNodeInfo(nodeID)
+				_, _ = fmt.Fprint(resp, ref)
+				return
+			}
+
 
 			make_automatizms_from_reflexes := r.FormValue("make_automatizms_from_reflexes")
 			if len(make_automatizms_from_reflexes) ==1 {
@@ -374,7 +392,12 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				_, _ = fmt.Fprint(resp, ref)
 				return
 			}
-
+			make_automatizms_from_genetic_reflexes := r.FormValue("make_automatizms_from_genetic_reflexes")
+			if len(make_automatizms_from_genetic_reflexes) ==1 {
+				ref := reflexes.RunMakeAutomatizmsFromGeneticReflexes()
+				_, _ = fmt.Fprint(resp, ref)
+				return
+			}
 
 
 			_, _ = fmt.Fprint(resp, "GET")

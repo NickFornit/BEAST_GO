@@ -20,13 +20,16 @@ ID|ParentNode|BaseID|EmotionID|ActivityID|ToneMoodID|SimbolID|VerbalID
 
  */
 var lastAutomatizmNodeID=0
+var noRunThisOperation=false // не проверять на дубли
 func createNewAutomatizmNode(parent *AutomatizmNode,id int,baseID int,EmotionID int,
 	ActivityID int,ToneMoodID int,SimbolID int,VerbalID int)(int,*AutomatizmNode){
-	// если есть такой узел, то не создавать
-	idOld,nodeOld:=FindAutomatizmTreeNodeFromCondition(baseID,EmotionID,ActivityID,ToneMoodID,SimbolID,VerbalID)
-	if idOld>0{
-		return idOld,nodeOld
-	}
+	//if !noRunThisOperation { НЕЛЬЗЯ ИГНОРИРОВАТЬ ИНАЧЕ СОЗДАЕТ ЛИШНЕЕ
+		// если есть такой узел, то не создавать
+		idOld, nodeOld := FindAutomatizmTreeNodeFromCondition(baseID, EmotionID, ActivityID, ToneMoodID, SimbolID, VerbalID)
+		if idOld > 0 {
+			return idOld, nodeOld
+		}
+	//}
 
 	if id==0{
 		lastAutomatizmNodeID++
@@ -45,6 +48,9 @@ func createNewAutomatizmNode(parent *AutomatizmNode,id int,baseID int,EmotionID 
 	node.BaseID=baseID
 	node.EmotionID=EmotionID
 	node.ActivityID=ActivityID
+	if ToneMoodID==0{
+		//  !!!!! ToneMoodID=90
+	}
 	node.ToneMoodID=ToneMoodID
 	node.SimbolID=SimbolID
 	node.VerbalID=VerbalID
@@ -57,6 +63,7 @@ func createNewAutomatizmNode(parent *AutomatizmNode,id int,baseID int,EmotionID 
 			newN = &parent.Children[i]
 		}
 	}
+	AutomatizmTreeFromID[node.ID]=&node
 	// т.к. append меняет длину массива, перетусовывая адреса, то нужно обновить адреса в AutomatizmTreeFromID:
 	updateAutomatizmTreeFromID(parent)// здесь потому, что при загрузке из файла нужно на лету получать адреса
 
@@ -101,6 +108,12 @@ func loadAutomatizmTree(){
 		p:=strings.Split(strArr[n], "|")
 		id,_:=strconv.Atoi(p[0])
 		parentID,_:=strconv.Atoi(p[1])
+		/*
+		if AutomatizmTreeFromID[parentID]==nil{
+			// сбой загрузки рефлексов
+			return
+		}
+		*/
 		baseID,_:=strconv.Atoi(p[2])
 		EmotionID,_:=strconv.Atoi(p[3])
 		ActivityID,_:=strconv.Atoi(p[4])
@@ -144,7 +157,7 @@ func getAutomatizmNode(wt *AutomatizmNode)(string){
 	out += strconv.Itoa(wt.VerbalID)
 	out +="\r\n"
 	//	}
-	if(wt.Children==nil){// конец
+	if wt.Children==nil{// конец
 		return out
 	}
 	for n := 0; n < len(wt.Children); n++ {
@@ -156,6 +169,8 @@ func getAutomatizmNode(wt *AutomatizmNode)(string){
 // найти КОНЕЧНЫЙ узел по условиям
 func FindAutomatizmTreeNodeFromCondition(baseID int,EmotionID int,
 	ActivityID int,ToneMoodID int,SimbolID int,VerbalID int)(int,*AutomatizmNode){
+	/*
+//	 поиск по дереву, что и эффективнее.
 	for k, v := range AutomatizmTreeFromID {
 		if v.BaseID==baseID && v.EmotionID==EmotionID &&
 			v.ActivityID==ActivityID && ToneMoodID==v.ToneMoodID && v.SimbolID==SimbolID && v.VerbalID==VerbalID{
@@ -163,50 +178,47 @@ func FindAutomatizmTreeNodeFromCondition(baseID int,EmotionID int,
 		}
 	}
 	return 0,nil
+	*/
+	var id=0
+	var aut *AutomatizmNode
+	cnt:=len(AutomatizmTree.Children)
+	for n := 0; n < cnt; n++ {
+		id,aut=checkAutomatizmTree(&AutomatizmTree.Children[n],baseID, EmotionID, ActivityID, ToneMoodID, SimbolID, VerbalID)
+		if id >0{
+			return id,aut
+		}
+	}
+	return 0,nil
+}
+////////////////
+func checkAutomatizmTree(v *AutomatizmNode,baseID int,EmotionID int,
+ActivityID int,ToneMoodID int,SimbolID int,VerbalID int)(int,*AutomatizmNode){
+	var id=v.ID
+	var aut =v
+
+	if v.ID==13{
+	//	v.ID=13
+	}
+// как только наткнется в предыдущих на такое услове - выдаст ID этой ветки
+	if v.BaseID==baseID && v.EmotionID==EmotionID &&
+		v.ActivityID==ActivityID && ToneMoodID==v.ToneMoodID && v.SimbolID==SimbolID && v.VerbalID==VerbalID {
+		return v.ID,v
+	}
+
+	if v.Children==nil {// конец
+		return 0,nil
+	}
+	for n := 0; n < len(v.Children); n++ {
+		id,aut=checkAutomatizmTree(&v.Children[n],baseID, EmotionID, ActivityID, ToneMoodID, SimbolID, VerbalID)
+		if id>0{
+			return id,aut
+		}
+	}
+	return 0,nil //v.ID
+
 }
 //////////////////////////////////////
-// создание новой ветки с новым автоматизмом, начиная с заданного узла
-func addNewBranchFromNodes(level int,cond []int,node *AutomatizmNode)(int){
-	if node==nil {
-		return 0
-	}
-	if level>=len(cond) {
-		return node.ID
-	}
-	var id=0
-	switch(level){
-	case 0:
-		id,_=createNewAutomatizmNode(node,0,cond[0],0,0,0,0,0)
-	case 1:
-		id,_=createNewAutomatizmNode(node,0,cond[0],cond[1],0,0,0,0)
-	case 2:
-		id,_=createNewAutomatizmNode(node,0,cond[0],cond[1],cond[2],0,0,0)
-	case 3:
-		id,_=createNewAutomatizmNode(node,0,cond[0],cond[1],cond[2],cond[3],0,0)
-	case 4:
-		id,_=createNewAutomatizmNode(node,0,cond[0],cond[1],cond[2],cond[3],cond[4],0)
-	case 5:
-		id,_=createNewAutomatizmNode(node,0,cond[0],cond[1],cond[2],cond[3],cond[4],cond[5])
-	}
-	level++
-	id=addNewBranchFromNodes(level,cond, AutomatizmTreeFromID[id])
-	return id
-}
-/////////////////////////////////////
 
-
-// создание ветки, начиная с заданного узла fromID
-func formingBranch(fromID int,lastLevel int,condArr []int)(int){
-	// нарастить ветку недостающим
-	lastNode:=AutomatizmTreeFromID[fromID]
-
-	lastNodeID:=addNewBranchFromNodes(lastLevel,condArr,lastNode)
-	if lastNodeID>0{
-		SaveAutomatizmTree()
-	}
-	return lastNodeID
-}
-/////////////////////////////////////////////////////
 
 
 
@@ -259,47 +271,165 @@ func getBrangeNodeArr(lastNodeId int)([]*AutomatizmNode){
 Выдать  ID узла
 
  */
-func FindConditionsNode(lev1 int,lev2 []int,actArr []int,tonMood int,fistSymb int,verbalID int)(int){
+func FindConditionsNode(lev1 int,lev2 []int,actArr []int, tonMood int,fistSymb int,verbalID int)(int){
 	// образ эмоции
 	eID,_:=createNewBaseStyle(0,0,lev2)
-	// образ действий: из TriggerStimuls -> Activity
+	// образ действий дерева: из TriggerStimuls -> Activity
 	aID,_:=createNewlastActivityID(0,actArr)// конвертировать образ типа reflexes.TriggerStimuls в psychic.Activity
 
-	var lastLevel=0
-	var lastNode *AutomatizmNode
+	// проход дераева автоматизмов:
+	detectedActiveLastNodID=0
+	ActiveBranchNodeArr=nil
+	CurrentAutomatizTreeEnd=nil
+	currentStepCount=0
+	var lastNodeID=0
+	condArr:=getActiveConditionsArr(lev1,eID,aID,tonMood,fistSymb,verbalID)
+	if verbalID==15{
+	//	verbalID=15
+	}
+	// основа дерева
+	cnt := len(AutomatizmTree.Children)
+	for n := 0; n < cnt; n++ {
+		node := AutomatizmTree.Children[n]
+		lev1 := node.BaseID
+		if condArr[0] == lev1 {
+			detectedActiveLastNodID=node.ID
+			ost:=condArr[1:]
+			if len(ost)==0{
 
-	for k, v := range AutomatizmTreeFromID {
-		if v.BaseID == lev1{
-			lastLevel=1
-			lastNode=AutomatizmTreeFromID[k]
-			if v.EmotionID == eID{
-				lastLevel=2
-				lastNode=AutomatizmTreeFromID[k]
-				if v.ActivityID != aID{
-					lastLevel=3
-					lastNode=AutomatizmTreeFromID[k]
-					if v.ToneMoodID == tonMood{
-						lastLevel=4
-						lastNode=AutomatizmTreeFromID[k]
-						if v.SimbolID == fistSymb{
-							lastLevel=5
-							lastNode=AutomatizmTreeFromID[k]
-							if v.VerbalID == verbalID{
-								return v.ID
-							}
-						}
-					}
-				}
 			}
+			//conditionAutomatizmFound2(1,ost, &node)
+			conditionAutomatizmFound(1,ost, &node)
+			break // другие ветки не смотреть
 		}
 	}
-	// не найдено - наращиваем ветку
-	condArr:=[]int{lev1,eID,aID,tonMood,fistSymb,verbalID}
-	lastNodeID:=addNewBranchFromNodes(lastLevel,condArr,lastNode)
 
+	// результат активации Дерева:
+	if detectedActiveLastNodID>0{
+		// есть ли еще неучтенные, нулевые условия? т.е. просто показаь число ненулевых значений condArr
+		conditionsCount:=getConditionsCount(condArr)
+		if currentStepCount<conditionsCount { // не пройдено до конца имеющихся условий
+			noRunThisOperation=true // не проверять на дубли, раз уже проверено
+			lastNodeID = formingBranch(detectedActiveLastNodID, currentStepCount+1, condArr)
+			noRunThisOperation=false
+		}else{// все condArr пойдены, ветка существует,
+			// НО если последнее условие не совпадает, нужно создать ветку на основе предпоследнего узла
+			//lenNcount:=len(ActiveBranchNodeArr)
+			//if lenNcount<8{// остановилось на предпоследнем узле detectedActiveLastNodID
+
+			//}
+
+return detectedActiveLastNodID
+		}
+	}
+
+/*
+	// проверка
+	n:=AutomatizmTreeFromID[lastNodeID];
+	if n.VerbalID == 0{
+		return 0
+	}
+*/
 	return lastNodeID
 }
-//////////////////////////////////////////////
+//.......
+/*
+func conditionAutomatizmFound2(level int,cond []int,node *AutomatizmNode){
+	if cond==nil || len(cond)==0{
+		return
+	}
+
+	ost:=cond[1:]
+
+	if node.ID==6{
+		node.ID=6
+	}
+
+	if level==4 && cond[0]==15{
+		cond[0]=15
+	}
+
+	for n := 0; n < len(node.Children); n++ {
+		cld := node.Children[n]
+		var val = 0
+		switch level {
+		case 0:
+			val = cld.BaseID
+		case 1:
+			val = cld.EmotionID
+		case 2:
+			val = cld.ActivityID
+		case 3:
+			val = cld.ToneMoodID
+		case 4:
+			val = cld.SimbolID
+		case 5:
+			val = cld.VerbalID
+		}
+		if cond[0] == val {
+			detectedActiveLastNodID=cld.ID
+			ActiveBranchNodeArr=append(ActiveBranchNodeArr,cld.ID)
+		}else {
+			currentStepCount=level-1
+			return
+			if level == 5 { // последний не совпадает
 
 
-////////////////////////////////////////////////////
+			}
+		}
+
+		level++
+		currentStepCount=level
+		conditionAutomatizmFound2(level,ost, &node.Children[n])
+		return // раз совпало, то другие ветки не смотреть
+	}
+
+	return
+}
+*/
+////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+// создание ветки, начиная с заданного узла fromID
+func formingBranch(fromID int,lastLevel int,condArr []int)(int){
+	// нарастить ветку недостающим
+	lastNode:=AutomatizmTreeFromID[fromID]
+
+	lastNodeID:=addNewBranchFromNodes(lastLevel,condArr,lastNode)
+	if lastNodeID>0{
+		if !noRunThisOperation {
+			SaveAutomatizmTree()
+		}
+	}
+	return lastNodeID
+}
+/////////////////////////////////////////////////////
+// создание новой ветки с новым автоматизмом, начиная с заданного узла при проходе дерева
+func addNewBranchFromNodes(level int,cond []int,node *AutomatizmNode)(int){
+	if node==nil {
+		return 0
+	}
+	if level>=len(cond) {
+		return node.ID
+	}
+	var id=0
+	switch(level){
+	case 0:
+		id,_=createNewAutomatizmNode(node,0,cond[0],0,0,0,0,0)
+	case 1:
+		id,_=createNewAutomatizmNode(node,0,cond[0],cond[1],0,0,0,0)
+	case 2:
+		id,_=createNewAutomatizmNode(node,0,cond[0],cond[1],cond[2],0,0,0)
+	case 3:
+		id,_=createNewAutomatizmNode(node,0,cond[0],cond[1],cond[2],cond[3],0,0)
+	case 4:
+		id,_=createNewAutomatizmNode(node,0,cond[0],cond[1],cond[2],cond[3],cond[4],0)
+	case 5:
+		id,_=createNewAutomatizmNode(node,0,cond[0],cond[1],cond[2],cond[3],cond[4],cond[5])
+	}
+	level++
+	id=addNewBranchFromNodes(level,cond, AutomatizmTreeFromID[id])
+	return id
+}
+/////////////////////////////////////
+
+

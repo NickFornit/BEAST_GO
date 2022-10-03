@@ -7,7 +7,7 @@
 Автоматизм обязательно привязан к определенной ветке дерева (условиях)
 так что здесь нет каких-то универсальных действий, как в http://go/pages/terminal_actions.php
 
-структура записи: id|BranchID|Usefulness||Sequence||NextID|Energy|Belief
+структура записи: id|BranchID|Usefulness||Sequence||NextID|Energy|Belief|Count
 */
 
 package psychic
@@ -58,7 +58,7 @@ func getAutomatizmFromNodeID(nodeID int)(int){
 2 Dnn - ID прогрмаммы действий, через запятую
 3 Ann - последовательный запуск автоматизмов с id1,id2..
 4 Mnn - внутренние произвольные действия с id1,id2...
-5 Tnn - образ тон-настроения одна цифра == образ тона-настроения (как в func GetToneMoodID(  и func getToneMoodFromImg()
+5 Tnn - образ тон-настроения одна цифра == образ тона-настроения (как в func GetToneMoodID(  и func GetToneMoodFromImg()
 */
 type ActsAutomatizm struct {
 	Type int  // тип совершаемого действия
@@ -141,7 +141,7 @@ var AutomatizmSuccessFromIdArr=make(map[int]*Automatizm)
 
 
 ///////////////////////////////////////
-// есть ли штатные автоматизмы автоматизм с Belief==2, привязанные к узлу дерева
+// есть ли штатный автоматизм (с Belief==2), привязанные к узлу дерева
 func ExistsAutomatizmForThisNodeID(nodeID int)(bool){
 	aArr:=AutomatizmBelief2FromTreeNodeId[nodeID]
 	if aArr!=nil {
@@ -166,7 +166,7 @@ func GetMotorsAutomatizmListFromTreeId(nodeID int)([]*Automatizm){
 /////////////////////////////////////
 // создать новый автоматизм
 var lastAutomatizmID=0
-var noWarningCreateShow=false // true - не выдавать сообщение о новом автоматизме
+var NoWarningCreateShow=false // true - не выдавать сообщение о новом автоматизме
 func createNewAutomatizmID(id int,BranchID int,Sequence string)(int,*Automatizm){
 // автоматизмы могут быть неуникальными, т.е. даже с тождественными Sequence, это не имеет значения.
 // к одной вентке могут быть прикреплены неограниченное число автоматизмов
@@ -188,7 +188,7 @@ func createNewAutomatizmID(id int,BranchID int,Sequence string)(int,*Automatizm)
 
 	AutomatizmFromIdArr[id]=&node
 
-	if !noWarningCreateShow {
+	if !NoWarningCreateShow {
 		lib.WritePultConsol("Создан новый автоматизм.")
 	}
 	return id,&node
@@ -244,7 +244,7 @@ func SaveAutomatizm(){
 }
 // ЗАГРУЗИТЬ структура записи: id|BranchID|Usefulness||Sequence||NextID|Energy|Belief
 func loadAutomatizm(){
-	noWarningCreateShow=true
+	NoWarningCreateShow=true
 	AutomatizmFromIdArr=make(map[int]*Automatizm)
 	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_psy/automatizm_images.txt")
 	if strArr == nil{
@@ -280,16 +280,13 @@ func loadAutomatizm(){
 		a.NextID = NextID
 		a.Usefulness = Usefulness
 		a.Energy = Energy
-		a.Belief = Belief
 		a.Count = Count
-		if Belief==2 {//штатный, выполняющийся не раздумывая
-			AutomatizmBelief2FromTreeNodeId[id]=a
-		}
+		SetAutomatizmBelief(a, Belief)
 	}
-	noWarningCreateShow=false
+	NoWarningCreateShow=false
 	return
 }
-///////////////////////////////////////////
+///////////////////////////////////////
 
 
 
@@ -299,7 +296,7 @@ func loadAutomatizm(){
 2 Dnn - ID прогрмаммы действий, через запятую
 3 Ann - последовательный запуск автоматизмов с id1,id2..
 4 Mnn - внутренние произвольные действия с id1,id2...
-5 Tnn - образ тон-настроения одна цифра == образ тона-настроения (как в func GetToneMoodID(  и func getToneMoodFromImg()
+5 Tnn - образ тон-настроения одна цифра == образ тона-настроения (как в func GetToneMoodID(  и func GetToneMoodFromImg()
 */
 func ParceAutomatizmSequence(Sequence string)([]ActsAutomatizm){
 	var acts[] ActsAutomatizm
@@ -426,7 +423,7 @@ func getAutomatizmFromTreeNodeIdArr(branchID int)([]*Automatizm){
 Если задается Belief=2, остальные Belief=2 становится Belief=0.
 ТАК ПРОСТО НЕЛЬЗЯ ЗАДАВАТЬ Belief=2: AutomatizmRunning.Belief=2
  */
-func setAutomatizmBelief(atmzm *Automatizm,belief int){
+func SetAutomatizmBelief(atmzm *Automatizm,belief int){
 	if atmzm==nil || atmzm.BranchID==0{
 		return
 	}
@@ -434,7 +431,7 @@ if belief==2{
 	aArr:=getAutomatizmFromTreeNodeIdArr(atmzm.BranchID)
 	if len(aArr)>1{
 		for i := 0; i < len(aArr); i++ {
-			if aArr[i]==atmzm && aArr[i].Belief==2{
+			if aArr[i] != atmzm && aArr[i].Belief==2{
 				atmzm.Belief=0
 				AutomatizmBelief2FromTreeNodeId[atmzm.BranchID]=nil
 			}
@@ -443,7 +440,6 @@ if belief==2{
 	AutomatizmBelief2FromTreeNodeId[atmzm.BranchID]=atmzm
 }
 	atmzm.Belief=belief
-
 }
 /////////////////////////////////////////////////////
 

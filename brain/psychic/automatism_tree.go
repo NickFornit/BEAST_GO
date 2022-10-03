@@ -159,7 +159,7 @@ ActID:=action_sensor.CheckCurActionsContext();//CheckCurActions()
 	var lev6=0
 	if len(wordSensor.CurrentPhrasesIDarr)>0{
 		PhraseID := wordSensor.CurrentPhrasesIDarr
-		FirstSimbolID:=wordSensor.GetFirstSymbolFromPraseID(PhraseID[0])
+		FirstSimbolID:=wordSensor.GetFirstSymbolFromPraseID(PhraseID)
 		ToneID := wordSensor.DetectedTone
 		MoodID := wordSensor.CurPultMood
 		_,verb:= CreateVerbalImage(FirstSimbolID,PhraseID, ToneID, MoodID)
@@ -195,13 +195,13 @@ ActID:=action_sensor.CheckCurActionsContext();//CheckCurActions()
 	// результат активации Дерева:
 	if detectedActiveLastNodID>0{
 	notAllowScanInTreeThisTime=true
-// есть ли неучтенные условия?
+// есть ли еще неучтенные, нулевые условия? т.е. просто показаь число ненулевых значений condArr
 		conditionsCount:=getConditionsCount(condArr)
 		CurrentAutomatizTreeEnd=condArr[currentStepCount:] // НОВИЗНА
 		if currentStepCount<conditionsCount { // не пройдено до конца имеющихся условий
 		// нарастить недостающее в ветке дерева - всегда для orientation_1()
 			oldDetectedActiveLastNodID:=detectedActiveLastNodID
-			detectedActiveLastNodID = formingBranch(detectedActiveLastNodID, currentStepCount, condArr)
+			detectedActiveLastNodID = formingBranch(detectedActiveLastNodID, currentStepCount+1, condArr)
 			// ЕСТЬ ЛИ АВТОМАТИЗМ В НЕДОДЕЛАННОЙ ВЕТКЕ? выбрать лучший автоматизм для ветки nodeID
 			automatizmID := getAutomatizmFromNodeID(oldDetectedActiveLastNodID)
 			if automatizmID > 0 { //ориентировочный рефлекс 2
@@ -231,7 +231,7 @@ ActID:=action_sensor.CheckCurActionsContext();//CheckCurActions()
 		}
 	}else{// вообще нет совпадений для данных условий
 // нарастить недостающее в ветке дерева - всегда для orientation_1()
-		detectedActiveLastNodID = formingBranch(detectedActiveLastNodID, currentStepCount, condArr)
+		detectedActiveLastNodID = formingBranch(detectedActiveLastNodID, currentStepCount+1, condArr)
 			
 		// автоматизма нет у недоделанной ветки
 		CurrentAutomatizTreeEnd=condArr // все - новизна
@@ -253,24 +253,27 @@ func conditionAutomatizmFound(level int,cond []int,node *AutomatizmNode){
 
 	for n := 0; n < len(node.Children); n++ {
 		cld := node.Children[n]
-		var levID = 0
+		var val = 0
 		switch level {
 		case 0:
-			levID = cld.BaseID
+			val = cld.BaseID
 		case 1:
-			levID = cld.EmotionID
+			val = cld.EmotionID
 		case 2:
-			levID = cld.ActivityID
+			val = cld.ActivityID
 		case 3:
-			levID = cld.SimbolID
+			val = cld.ToneMoodID
 		case 4:
-			levID = cld.ToneMoodID
+			val = cld.SimbolID
 		case 5:
-			levID = cld.VerbalID
+			val = cld.VerbalID
 		}
-		if cond[0] == levID {
+		if cond[0] == val {
 			detectedActiveLastNodID=cld.ID
 			ActiveBranchNodeArr=append(ActiveBranchNodeArr,cld.ID)
+		}else {
+			currentStepCount=level-1
+			return
 		}
 
 		level++

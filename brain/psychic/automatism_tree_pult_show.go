@@ -10,6 +10,7 @@ import (
 	"BOT/brain/gomeostas"
 	termineteAction "BOT/brain/terminete_action"
 	word_sensor "BOT/brain/words_sensor"
+	"BOT/lib"
 	"strconv"
 	"strings"
 )
@@ -21,12 +22,13 @@ import (
 Использовать для всех операций записи узлов дерева
 */
 var notAllowScanInTreeThisTime=false
-
+// ограничение показа
+var baseConditionIdOnly=0 // 1- только Плохо, ...
 
 // образ дерева автоматизмов для вывода
 var automatizmTreeModel=""
 /////////////////////////////////////////////////
-func GetAutomatizmTreeForPult()(string){
+func GetAutomatizmTreeForPult(limitBasicID int)(string){
 	// против паники типа "одновременная запись и считывание карты"
 	if notAllowScanInTreeThisTime{
 		return "!Временно запрещена работа func GetAutomatizmTreeForPult() т.к. идет параллельная обработка."
@@ -34,17 +36,52 @@ func GetAutomatizmTreeForPult()(string){
 	if len(AutomatizmTree.Children)==0 { // еще нет никаких веток
 		return "Еще нет Дерева автоматизмов"
 	}
-	automatizmTreeModel=""
-	scanAutomatizmNodes(-1,&AutomatizmTree)
+
+//посмотреть число имеющихся узлов дерева
+	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_psy/automatizm_tree.txt")
+	cunt:=len(strArr)
+	// если больше 1000 то выдавать только по одному из 3-х базовыз состояний, иначе сильно тормозит
+	if cunt > 1000{
+		if limitBasicID==0{
+			limitBasicID=1// начинать с Плохо
+		}
+	}
+	// переключатель диапазона вывода
+	if limitBasicID>0{
+		var out=""
+		out+="<br>Показывать: "
+		out+="<span style='cursor:pointer;color:blue"
+		if limitBasicID==1{out+="background-color:#FFFF9D;font-weight:bold;"}
+		out+="' onClick='show_level(1)'>Плохо</span> "
+
+		out+="<span style='cursor:pointer;color:blue"
+		if limitBasicID==2{out+="background-color:#FFFF9D;font-weight:bold;"}
+		out+="' onClick='show_level(2)'>Норма</span> "
+
+		out+="<span style='cursor:pointer;color:blue"
+		if limitBasicID==3{out+="background-color:#FFFF9D;font-weight:bold;"}
+		out+="' onClick='show_level(3)'>Хорошо</span> "
+
+		out+="<span style='padding-left:100px'></span>Автоматизмы узлов показываются по клику на АВТОМАТИЗМЫ<hr>"
+
+		automatizmTreeModel=out
+		baseConditionIdOnly=limitBasicID
+	}
+
+	scanAutomatizmNodes(-1, &AutomatizmTree)
+
 	if len(automatizmTreeModel)<10{
 		return "Еще нет информационных веток дерева"
 	}
 
 	return automatizmTreeModel
+
 }
 //////////////////////
 
 func scanAutomatizmNodes(level int,node *AutomatizmNode){
+
+
 	if node.ID==69{
 		node.ID=69
 	}
@@ -67,16 +104,33 @@ func scanAutomatizmNodes(level int,node *AutomatizmNode){
 		}
 
 		// если есть штатный автоматизм - показать действия
+		/*
 		atmzm:=AutomatizmBelief2FromTreeNodeId[node.ID]
 		if atmzm!=nil{
 			automatizmTreeModel += " <span style='color:blue'>АВТОМАТИЗМ(" + strconv.Itoa(atmzm.ID) + "): "+
 				TranslateAutomatizmSequence(atmzm) + "</span>"
 		}
+		 */
+		//автоматизмы, прикрепленные к ID узла Дерева
+		atmzm:=getAutomatizmFromTreeNodeIdArr(node.ID)
+		if atmzm!=nil{
+var autStr="ID: "
+			for i := 0; i < len(atmzm); i++ {
+				if i>0{autStr+=", "}
+				autStr+=""+strconv.Itoa(atmzm[i].ID)
+			}
+			automatizmTreeModel += " <span style='cursor:pointer;color:blue' onClick='show_automatizms("+strconv.Itoa(node.ID)+")'>АВТОМАТИЗМЫ(" + autStr + "): "+"</span>"
+		}
 		automatizmTreeModel +="<br>\n"
 	}
 	level++
 	for n := 0; n < len(node.Children); n++ {
-		scanAutomatizmNodes(level,&node.Children[n])
+		if baseConditionIdOnly>0{
+			if node.BaseID>0 && node.BaseID != baseConditionIdOnly{
+				continue
+			}
+		}
+		scanAutomatizmNodes(level, &node.Children[n])
 	}
 }
 // отступ
@@ -103,7 +157,7 @@ func getStrFromCond(level int,imgID int)(string){
 		out += "<span style='color:red'>несуществующее Базовое состояние ID="+strconv.Itoa(imgID)+"</span>"
 	}
 	case 1: // эмоция
-		out="Эмоция ("+strconv.Itoa(imgID)+"): <b>"+getStrnameFromBaseImageID(imgID)+"</b>"
+		out="Эмоция ("+strconv.Itoa(imgID)+"): <b>"+GetStrnameFromBaseImageID(imgID)+"</b>"
 	case 2: // действия
 		out=getStrnameFromStyleImageID(imgID)
 		if len(out)==0{
@@ -112,7 +166,7 @@ func getStrFromCond(level int,imgID int)(string){
 			out="Действия с Пульта: <b>"+out+"</b>"
 		}
 	case 3: // тон-настроение фразы
-		out=getToneStrFromID(imgID)
+		out=GetToneMoodStrFromID(imgID) // getToneStrFromID(imgID)
 		if len(out)==0{
 			return "Нормальное настроение"
 		}else{
@@ -141,7 +195,7 @@ func getStrFromCond(level int,imgID int)(string){
 	return out
 }
 // названия базовых контекстов в их сочетании -из ID эмоции
-func getStrnameFromBaseImageID(id int)(string){
+func GetStrnameFromBaseImageID(id int)(string){
 	var out=""
 	if EmotionFromIdArr[id]==nil{
 		return "Нет эмоций"
@@ -210,9 +264,9 @@ func GetAutomatizmSequenceInfo(idA int,sequence string)(string){
 
 	for i := 0; i < len(actArr); i++ {
 		if actArr[i].Type == 5{
-//тон-настроение в виде образа TN как в func GetToneMoodID(  и func getToneMoodFromImg(
+//тон-настроение в виде образа TN как в func GetToneMoodID(  и func GetToneMoodFromImg(
 			tInt,_:=strconv.Atoi(actArr[i].Acts)
-			out+="<br>"+getToneMoodStrFromID(tInt)
+			out+="<br>"+GetToneMoodStrFromID(tInt)
 			continue
 		}
 
@@ -262,7 +316,25 @@ func GetAutomatizmSequenceInfo(idA int,sequence string)(string){
 			///////////////////////////////////////
 		}
 	}
-
-
 	return out
 }
+///////////////////////////////////////////////////
+
+
+// автоматизмы, привязанные к данному узлу дерева
+func GetAutomatizmForNodeInfo(nodeID int)(string){
+	var out=""
+	atmzm:=getAutomatizmFromTreeNodeIdArr(nodeID)
+	if atmzm!=nil {
+		for i := 0; i < len(atmzm); i++ {
+			if i>0{
+				out+="<hr>"
+			}
+			out+="Автоматизм ID="+strconv.Itoa(atmzm[i].ID)+":<br>"+TranslateAutomatizmSequence(atmzm[i])
+		}
+	}else{
+		out+="Нет автоматизмов, привязанных к узлу с ID="+strconv.Itoa(nodeID)
+	}
+	return out
+}
+///////////////////////////////////////
