@@ -159,6 +159,14 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				_, _ = fmt.Fprint(resp, "OK")
 			}
 
+
+			// Формирование зеркальных автоматизмов на основе списка ответов
+			file_for_automayizm_making := r.FormValue("file_for_automayizm_making")
+			if len(file_for_automayizm_making) > 0 {
+				psychic.FormingMirrorAutomatizmFromList(file_for_automayizm_making)
+				_, _ = fmt.Fprint(resp, "OK")
+			}
+
 		}
 		//fmt.Println("EMPTY")
 	}

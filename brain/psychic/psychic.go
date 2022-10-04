@@ -71,6 +71,13 @@ func PsychicInit(){
 	if atmzm!=nil{	}
  */
 
+/*
+	var list="#utf8 bom\r\n"
+	list+="непонятно|1|2|wwwwwwwww|2,1|31,38\r\n"
+	list+="натворил|1|2|xxxxxxx|0,0|6,12\r\n"
+	FormingMirrorAutomatizmFromList(list)
+ */
+
 }
 /////////////////////////////////////////////////////////////
 

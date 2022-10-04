@@ -61,11 +61,6 @@ func automatizmActionsPuls(){
 			if oldCommonDiffValue>0{}
 		}
 		if (LastRunAutomatizmPulsCount+2) < PulsCount {// следить со следующего пульса
-			// Из МОЗЖУЧКА как-то отреагировать на отсуствие реакции - повторить автоматизм с большей силой Energy
-			/*if noAutovatizmResult() { // была попытка отреагировать сильнее - в cerebellum.go
-				return
-			}*/
-
 /* 	Контроль за изменением состояния, возвращает:
 	lastCommonDiffValue - насколько изменилось общее состояние
    	lastBetterOrWorse - стали лучше или хуже: величина измнения от -10 через 0 до 10
@@ -78,8 +73,13 @@ if WasOperatorActiveted { // оператор отреагировал
 				//  clinerAutomatizmRunning()  есть в calcAutomatizmResult
 			}
 		}
-// сбос ожидания, забыть
+// вышло время ожидания реакции
 		if (LastRunAutomatizmPulsCount+WaitingPeriodForActionsVal) < PulsCount {
+			// отреагировать на отсуствие реакции - повторить автоматизм с большей силой Energy
+			// Из МОЗЖУЧКА как-то отреагировать на отсуствие реакции - повторить автоматизм с большей силой Energy
+			if noAutovatizmResult(){// была попытка отреагировать сильнее - в cerebellum.go
+				return // чтобы не сбрасывать clinerAutomatizmRunning()
+			}
 			//сбрасывать ожидание результата автоматизма если прошло WaitingPeriodForActionsVal пульсов
 			clinerAutomatizmRunning()
 		}
@@ -105,10 +105,7 @@ if WasOperatorActiveted { // оператор отреагировал
 
 
 	if (AutomatizmRunningPulsCountAut+2)<PulsCount && AutomatizmRunningPulsCountAut+WaitingPeriodForActionsVal < PulsCount{
-		// Из МОЗЖУЧКА как-то отреагировать на отсуствие реакции - повторить автоматизм с большей силой Energy
-		if noAutovatizmResult(){// была попытка отреагировать сильнее - в cerebellum.go
-			return
-		}
+
 		// раскомментировать когда дойдешь до отладки этого
 		//lastCommonDiffValue,lastBetterOrWorse,gomeoParIdSuccesArr := wasChangingMoodCondition()
 		if WasOperatorActiveted { // оператор отреагировал
@@ -117,6 +114,10 @@ if WasOperatorActiveted { // оператор отреагировал
 		}
 	}
 	if AutomatizmRunningPulsCountAut+WaitingPeriodForActionsVal < PulsCount {
+		// Из МОЗЖУЧКА как-то отреагировать на отсуствие реакции - повторить автоматизм с большей силой Energy
+		if noAutovatizmResult(){// была попытка отреагировать сильнее - в cerebellum.go
+			return
+		}
 		//сбрасывать ожидание результата автоматизма если прошло WaitingPeriodForActionsVal пульсов
 		clinerAutomatizmRunningAut()
 	}
@@ -126,6 +127,16 @@ if WasOperatorActiveted { // оператор отреагировал
 
 }
 /////////////////////////////////////////////////////////////////////
+// отреагировать на отсуствие реакции - повторить автоматизм с большей силой Energy
+func noAutovatizmResult()(bool){
+
+	// TODO: использовать еще так же недописанную func cerebellumCoordination(id int)
+	// и тут же снова запустить реакцию!  setAutomatizmRunning(atmzm, purpose) return true
+	return false
+}
+/////////////////////////////////////////////////////////////////////
+
+
 
 
 /////////////////////////////////////////////////////////////////////
