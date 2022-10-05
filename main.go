@@ -160,12 +160,7 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 			}
 
 
-			// Формирование зеркальных автоматизмов на основе списка ответов
-			file_for_automayizm_making := r.FormValue("file_for_automayizm_making")
-			if len(file_for_automayizm_making) > 0 {
-				psychic.FormingMirrorAutomatizmFromList(file_for_automayizm_making)
-				_, _ = fmt.Fprint(resp, "OK")
-			}
+
 
 		}
 		//fmt.Println("EMPTY")
@@ -219,6 +214,22 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 			brain.IsPultActivnost = true
 			cleanupFunc()
 			closer.Close()
+			return
+		}
+
+		// Формирование зеркальных автоматизмов на основе списка ответов
+		mirror_making_fool := r.FormValue("mirror_making_fool")
+		if len(mirror_making_fool)>0 {
+			res:=psychic.FormingMirrorAutomatizmFromList(mirror_making_fool)
+			_, _ = fmt.Fprint(resp, res)
+			return
+		}
+
+		// Формирование зеркальных автоматизмов на основе общего шаблона
+		mirror_making_temp := r.FormValue("mirror_making_temp")
+		if len(mirror_making_temp)>0 {
+			res:=psychic.FormingMirrorAutomatizmFromTempList(mirror_making_temp)
+			_, _ = fmt.Fprint(resp, res)
 			return
 		}
 
@@ -406,6 +417,8 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				_, _ = fmt.Fprint(resp, ref)
 				return
 			}
+
+
 
 
 			_, _ = fmt.Fprint(resp, "GET")
