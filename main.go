@@ -380,6 +380,14 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				return
 			}
 
+			get_object_info := r.FormValue("get_object_info")
+			if len(get_object_info) > 0 {
+				objectID,_:=strconv.Atoi(r.FormValue("objectID"))
+				ref := psychic.GetStrnameFromobjectID(objectID)
+				_, _ = fmt.Fprint(resp, ref)
+				return
+			}
+
 
 			get_self_perception_info := r.FormValue("get_self_perception_info")
 			if len(get_self_perception_info) > 0 {

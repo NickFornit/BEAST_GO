@@ -71,12 +71,10 @@ func PsychicInit(){
 	if atmzm!=nil{	}
  */
 
-/*
-	var list="#utf8 bom\r\n"
-	list+="непонятно|1|2|wwwwwwwww|2,1|31,38\r\n"
-	list+="натворил|1|2|xxxxxxx|0,0|6,12\r\n"
-	FormingMirrorAutomatizmFromList(list)
- */
+
+//	FormingMirrorAutomatizmFromList("/mirror_reflexes_basic_phrases/1_2.txt")
+
+//	FormingMirrorAutomatizmFromTempList("/lib/mirror_basic_phrases_common.txt")
 
 }
 /////////////////////////////////////////////////////////////

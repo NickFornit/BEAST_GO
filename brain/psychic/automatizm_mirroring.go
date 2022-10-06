@@ -118,7 +118,10 @@ func FormingMirrorAutomatizmFromList(file string)(string){
 //////////////////////////////////
 
 /* на основе общего шаблона ответов
-Без привязки к конкретным условиям первых трех уровней: все три уровня ставятся == 0
+Создаются автоматизмы, привязанные к пусковой фразе, а не к узлу дерева,
+с BranchID > 2000000.
+var AutomatizmIdFromPhraseId=make(map[int] []*Automatizm)
+// тестирование - запуск из psychic.go
  */
 func FormingMirrorAutomatizmFromTempList(file string)(string){
 	path:=lib.GetMainPathExeFile()
@@ -137,7 +140,6 @@ func FormingMirrorAutomatizmFromTempList(file string)(string){
 	      НО ОСТОРОЖНО (понизить силу?)
 	*/
 
-
 	//	strArr:=strings.Split(list, "\r\n")
 	// первую строку пропускаем из-за #utf8 bom
 	for n := 1; n < len(strArr); n++ {
@@ -146,76 +148,48 @@ func FormingMirrorAutomatizmFromTempList(file string)(string){
 		}
 		p := strings.Split(strArr[n], "|")
 		///////// УСЛОВИЯ ДЕРЕВА
-		// базовое состояние
-		baseID,_ := strconv.Atoi(p[1])
+		// пусковая фраза
+		triggerPrase:= p[0]
 
-		// базовые контексты
-		pn := strings.Split(p[2], ",")
-		var lev2 []int
-		for i := 0; i < len(pn); i++ {
-			b, _ := strconv.Atoi(pn[i])
-			if b > 0 {
-				lev2 = append(lev2, b)
-			}
-		}
-		//emotionID,_:=createNewBaseStyle(0,0,lev2)
+		// ответ
+		answerPrase:= p[1]
 
-		// образ отсуствия пусковых
-		//triggID,_:=createNewlastActivityID(0,nil)
-		// образ отсуствия тона и настроения
-		tm:=90
-		//фраза
+		// тон, настроение
+		pt := strings.Split(p[2], ",")
+		t,_ := strconv.Atoi(pt[0])
+		m,_ := strconv.Atoi(pt[1])
+		tm:=GetToneMoodID(t,m+19)
+
 		// засунуть фразу в дерево слов и дерево фраз
-		prase:=p[0]
-		wordSensor.VerbalDetection(prase, 1, 0, 0)
-		PhraseID := wordSensor.CurrentPhrasesIDarr
+		wordSensor.VerbalDetection(triggerPrase, 1, 0, 0)
+		triggerPraseID := wordSensor.CurrentPhrasesIDarr
 
-		//первый симвод ответной фразы
-		FirstSimbolID:=wordSensor.GetFirstSymbolFromPraseID(PhraseID)
-		// создать образ Брока
-		CreateVerbalImage(FirstSimbolID, PhraseID, 0, 0)
+		wordSensor.VerbalDetection(answerPrase, 1, 0, 0)
+		answerPraseID := wordSensor.CurrentPhrasesIDarr
 
-		nodeID := FindConditionsNode(baseID, lev2, nil,tm,PhraseID[0],FirstSimbolID)
-		if nodeID>0{
-			/*
-			если есть привязанный к узлу автоматизм, то он просто перестанет быть штатным,
-			т.к. авторитерный (зеркальный) автоматизм важнее
-						exists:=ExistsAutomatizmForThisNodeID(nodeID)
-						if exists {
-							continue
-						}
-			*/
-			//  создать автоматизм и привязать его к nodeID
-			var sequence="Snn:" // ответная фраза
-			// засунуть фразу в дерево слов и дерево фраз
-			wordSensor.VerbalDetection(p[3], 1, 0, 0)
-			answerID := wordSensor.CurrentPhrasesIDarr
-			sequence+=strconv.Itoa(answerID[0])
+		//  создать автоматизм и привязать его к nodeID
+			var sequence="Snn:"+strconv.Itoa(answerPraseID[0]) // ответная фраза
 
-			sequence+="|Тnn:" // тон и настроение
-			tnArr := strings.Split(p[4], ",")
-			t,_:=strconv.Atoi(tnArr[0])
-			m,_:=strconv.Atoi(tnArr[1])
-			tonMoodID:=GetToneMoodID(t,m)
-			sequence+=strconv.Itoa(tonMoodID)
+			sequence+="|Tnn:"+strconv.Itoa(tm) // тон и настроение
 
 			sequence+="|Dnn:" // перечень ответных действий
-			aD := strings.Split(p[5], ",")
+			aD := strings.Split(p[3], ",")
 			for i := 0; i < len(aD); i++ {
 				if i > 0 {
 					sequence += ","
 				}
 				sequence += aD[i]
 			}
+
 			NoWarningCreateShow=true
-			_,autmzm:=CreateAutomatizm(nodeID,sequence)
+// для фразы triggerPraseID создаем привязанный к ней автоматизм
+			_,autmzm:=CreateAutomatizm(2000000+triggerPraseID[0],sequence)
 			NoWarningCreateShow=false
 			if autmzm!=nil{
 				SetAutomatizmBelief(autmzm, 2)// сделать автоматизм штатным
 				// ?? autmzm.GomeoIdSuccesArr какие ID гомео-параметров улучшает это действие
 				autmzm.Usefulness=1 // полезность
 			}
-		}
 	}
 
 	SaveAllPsihicMemory()

@@ -215,8 +215,8 @@ func GetToneMoodFromImg(img int)(int,int){
 // расшифровка в виде строки
 func GetToneMoodStrFromID(img int)(string){
 	t,m:=GetToneMoodFromImg(img)
-	out:="Тон: "+getToneStrFromID(t)
-	out+=" Настроение: "+getMoodStrFromID(m)
+	out:="Тон: <b>"+getToneStrFromID(t)
+	out+="</b> Настроение: <b>"+getMoodStrFromID(m)+"</b>"
 
 	return out
 }

@@ -6,6 +6,8 @@ package psychic
 
 import (
 	"BOT/brain/gomeostas"
+	termineteAction "BOT/brain/terminete_action"
+	word_sensor "BOT/brain/words_sensor"
 	"sort"
 	"strconv"
 )
@@ -41,7 +43,7 @@ func GetAutomatizmInfo(limitBasicID int)(string){
 	}
 
 	header:="<tr><th width=70 class='table_header'>ID ав-ма</th>" +
-		"<th width=70 class='table_header' style='background-color:#CCC5FF;'>ID <br><nobr>узла Дерева</nobr></th>" +
+		"<th width=70 class='table_header' style='background-color:#CCC5FF;' title='Если <1000000, то - узел ветки дерева\nЕсли <2000000 - ID образа действий\nостальное - ID фразы'>ID <br>объхекта<br>Привязки</th>" +
 		"<th width=70 class='table_header' style='background-color:#CCC5FF;'  title='ID базового состояния'>BaseID Дерева</th>" +
 		"<th width='70' class='table_header' style='background-color:#CCC5FF;'  title='ID образа сочетания эмоций'>Эмоции Дерева</th>" +
 		"<th width='10%' class='table_header' style='background-color:#CCC5FF;'  title='ID образа пускового стимула'>ДействияID-ФразаID-НастроениеID</th>" +
@@ -75,24 +77,28 @@ baseID:=""
 emotionID:=""
 emotionTitle:=""
 trStr:=""
+onclickID:=""
 //activityTitle:=""
+sStyle:="style='cursor:pointer;color:blue'"
+emClick:=""
+actClick:=""
 
 // узел дерева, к которому прикреплен автоматизм
+if v.BranchID<1000000{
 nodeA:=AutomatizmTreeFromID[v.BranchID]
 if nodeA!=nil {
-	nodeID=strconv.Itoa(nodeA.ID)
-	if limitBasicID > 0 && nodeA.BaseID!=limitBasicID{
+	nodeID = strconv.Itoa(nodeA.ID)
+	if limitBasicID > 0 && nodeA.BaseID != limitBasicID {
 		continue
 	}
-
-	baseID = strconv.Itoa(nodeA.BaseID)+" "+gomeostas.GetBaseCondFromID(nodeA.BaseID)
+	baseID = strconv.Itoa(nodeA.BaseID) + " " + gomeostas.GetBaseCondFromID(nodeA.BaseID)
 
 	/// эмоции
-	emotionID=strconv.Itoa(nodeA.EmotionID)
-	emo:=EmotionFromIdArr[nodeA.EmotionID]
-	if emo == nil {// так не должно быть! эмоция д.б. всегда
-//lib.WritePultConsol("В emo:=EmotionFromIdArr[nodeA.EmotionID] НЕТ ЭМОЦИИ!!!! Какой-то образ неверен, нужен программист!")
-// лучше бы выкинуть панику: panic("НЕТ ЭМОЦИИ!!!!")
+	emotionID = strconv.Itoa(nodeA.EmotionID)
+	emo := EmotionFromIdArr[nodeA.EmotionID]
+	if emo == nil { // так не должно быть! эмоция д.б. всегда
+		//lib.WritePultConsol("В emo:=EmotionFromIdArr[nodeA.EmotionID] НЕТ ЭМОЦИИ!!!! Какой-то образ неверен, нужен программист!")
+		// лучше бы выкинуть панику: panic("НЕТ ЭМОЦИИ!!!!")
 		emotionTitle += "<span style='color:red'>НЕТ ЭМОЦИИ! нужно разобраться с EmotionFromIdArr[]</span>"
 		continue
 	}
@@ -107,16 +113,31 @@ if nodeA!=nil {
 	// пусковой стимул
 	trStr=strconv.Itoa(nodeA.ActivityID)+"-"+strconv.Itoa(nodeA.VerbalID)+"-"+strconv.Itoa(nodeA.ToneMoodID)
 
+	emClick="onClick='show_emotion(\"+emotionID+\")'"
+	actClick="onClick='show_trigger(\"+nodeID+\")'"
+
 }//if nodeA!=nil{
+
+//if v.BranchID<1000000{
+}else{
+	nodeID = strconv.Itoa(v.BranchID)
+	onclickID="onClick='show_object("+strconv.Itoa(v.BranchID)+")' style='cursor:pointer;color:blue'"
+	baseID="не"
+	emotionID="привязан"
+//	emotionTitle="привязан"
+	trStr="к дереву"
+	sStyle=""
+
+}
 
 
 //////////////
 out += "<tr >"
 out += "<td class='table_cell' >"+id+"</td>";
-out += "<td class='table_cell' >"+nodeID+"</td>";
+out += "<td class='table_cell' "+onclickID+">"+nodeID+"</td>";
 out += "<td class='table_cell' ><nobr>"+baseID+"</nobr></td>";
-out += "<td class='table_cell' title='"+emotionTitle+"' onClick='show_emotion("+emotionID+")' style='cursor:pointer;color:blue'><nobr>"+emotionID+"</nobr></td>";
-out += "<td class='table_cell' title='Информация по клику' onClick='show_trigger("+nodeID+")' style='cursor:pointer;color:blue'>"+trStr+"</td>";
+out += "<td class='table_cell' title='"+emotionTitle+"' "+emClick+" "+sStyle+"><nobr>"+emotionID+"</nobr></td>";
+out += "<td class='table_cell' title='Информация по клику' "+actClick+" "+sStyle+">"+trStr+"</td>";
 out += "<td class='table_cell' title='Информация по клику'  onClick='show_actions("+id+",`"+v.Sequence+"`)' style='cursor:pointer;color:blue'><nobr>"+v.Sequence+"</nobr></td>";
 out += "<td class='table_cell' >"+strconv.Itoa(v.NextID)+"</td>";
 out += "<td class='table_cell' >"+strconv.Itoa(v.Energy)+"</td>";
@@ -127,4 +148,29 @@ out += "</tr>"
 	out+="</table>"
 	return out
 }
+////////////////////////////////////
+
+
+// показать пусковой стимул, к которому привязан автоматизм
+func GetStrnameFromobjectID(objectID int)(string){
+	if objectID>1000000 && objectID<2000000{// это - действия кнопок с пульта
+		imgID:=objectID-1000000
+		act:=ActivityFromIdArr[imgID]
+		if act == nil{
+			return ""
+		}
+		out:=""
+		for i := 0; i < len(act.ActID); i++ {
+			if i>0{out+=", "}
+			out+=termineteAction.TerminalActonsNameFromID[act.ActID[i]]
+		}
+		return "Пусковые действия:<br><br><b>"+out+"</b>"
+	}
+	if objectID>2000000{// это - фраза
+		imgID:=objectID-2000000
+		return "Пусковая фраза:<br><br><b>"+word_sensor.GetPhraseStringsFromPhraseID(imgID)+"</b>"
+	}
+	return ""
+}
+/////////////////////////////////////
 

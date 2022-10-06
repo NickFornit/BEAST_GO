@@ -112,7 +112,7 @@ func scanAutomatizmNodes(level int,node *AutomatizmNode){
 		}
 		 */
 		//автоматизмы, прикрепленные к ID узла Дерева
-		atmzm:=getAutomatizmFromTreeNodeIdArr(node.ID)
+		atmzm:=GetMotorsAutomatizmListFromTreeId(node.ID)
 		if atmzm!=nil{
 var autStr="ID: "
 			for i := 0; i < len(atmzm); i++ {
@@ -266,7 +266,7 @@ func GetAutomatizmSequenceInfo(idA int,sequence string)(string){
 		if actArr[i].Type == 5{
 //тон-настроение в виде образа TN как в func GetToneMoodID(  и func GetToneMoodFromImg(
 			tInt,_:=strconv.Atoi(actArr[i].Acts)
-			out+="<br>"+GetToneMoodStrFromID(tInt)
+			out+="<br>"+GetToneMoodStrFromID(tInt)+"<br>"
 			continue
 		}
 
@@ -301,7 +301,7 @@ func GetAutomatizmSequenceInfo(idA int,sequence string)(string){
 				addE = getCerebellumReflexAddEnergy(0,am.ID)
 			}
 			for i := 0; i < len(idArr); i++ {
-				if i==0{out+="Действие Beast c энергией "+strconv.Itoa(am.Energy+addE)+": "}else{out+=", "}
+				if i==0{out+="Действие Beast c энергией "+strconv.Itoa(am.Energy+addE)+": <br>"}
 				out+= "<b>"+termineteAction.TerminalActonsNameFromID[idArr[i]]+"</b>"
 			}
 
@@ -324,7 +324,7 @@ func GetAutomatizmSequenceInfo(idA int,sequence string)(string){
 // автоматизмы, привязанные к данному узлу дерева
 func GetAutomatizmForNodeInfo(nodeID int)(string){
 	var out=""
-	atmzm:=getAutomatizmFromTreeNodeIdArr(nodeID)
+	atmzm:=GetMotorsAutomatizmListFromTreeId(nodeID)
 	if atmzm!=nil {
 		for i := 0; i < len(atmzm); i++ {
 			if i>0{
