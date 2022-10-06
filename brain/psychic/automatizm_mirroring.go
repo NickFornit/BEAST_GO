@@ -167,7 +167,7 @@ func FormingMirrorAutomatizmFromTempList(file string)(string){
 		wordSensor.VerbalDetection(answerPrase, 1, 0, 0)
 		answerPraseID := wordSensor.CurrentPhrasesIDarr
 
-		//  создать автоматизм и привязать его к nodeID
+		//  создать автоматизм и привязать его к объекту
 			var sequence="Snn:"+strconv.Itoa(answerPraseID[0]) // ответная фраза
 
 			sequence+="|Tnn:"+strconv.Itoa(tm) // тон и настроение

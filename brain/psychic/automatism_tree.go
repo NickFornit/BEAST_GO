@@ -205,7 +205,7 @@ ActID:=action_sensor.CheckCurActionsContext();//CheckCurActions()
 // ЕСТЬ ЛИ АВТОМАТИЗМ В НЕДОДЕЛАННОЙ ВЕТКЕ и болеее ранних? выбрать лучший автоматизм для ветки nodeID
 			automatizmID := getAutomatizmFromNodeID(oldDetectedActiveLastNodID)
 			if automatizmID > 0 { //ориентировочный рефлекс 2
-				// проверить подходит ли автоматизм к текущим условиям, если нет, - режим нахождения альтернативы  - ориентировочный рефлекс 2
+// проверить подходит ли автоматизм к текущим условиям, если нет, - режим нахождения альтернативы  - ориентировочный рефлекс 2
 				automatizmID := orientation(automatizmID)
 				return automatizmID // выполнение штатного автоматизма
 			}else {
