@@ -1,25 +1,19 @@
-/*   функции использования текущих условий гомесотаза
-
-
+/* функции использования текущих условий гомесотаза
 */
-
 
 package gomeostas
 
 import "sort"
 
-/////////////////////////////////////////////
-
-
-/* выявить ID парамктров гомеостаза как цели для улучшения в данных условиях
-Возвращает PurposeGenetic.veryActual  gomeostas.FindTargetGomeostazID
+/* выявить ID параметров гомеостаза как цели для улучшения в данных условиях
+Возвращает PurposeGenetic.veryActual gomeostas.FindTargetGomeostazID
 сортировка по уменьшению важности
 */
 func FindTargetGomeostazID()(bool,[]int){
 	var veryActual=false
 	var idArr []int
-// BadNormalWell - состояние каждого параметра гомеостаза: 1 - Похо, 2 - Норма, 3 - Хорошо
-// отсортировать по убыли важности GomeostazParamsWeight
+	// BadNormalWell - состояние каждого параметра гомеостаза: 1 - Похо, 2 - Норма, 3 - Хорошо
+	// отсортировать по убыли важности GomeostazParamsWeight
 	badNormalWellImp:=sortingForImpotents()
 
 	for k, pID := range badNormalWellImp {
@@ -32,8 +26,9 @@ func FindTargetGomeostazID()(bool,[]int){
 	}
 	return veryActual,idArr
 }
-/////////////////////////////////
-func sortingForImpotents()(map[int]int){
+
+// Сортировка ID параметров гомеостаза по убыванию значимости GomeostazParamsWeight
+func sortingForImpotents()map[int]int {
 	var impC=make(map[int]int)
 	for id, _ := range BadNormalWell {
 		impC[GomeostazParamsWeight[id]]=id
@@ -43,22 +38,19 @@ func sortingForImpotents()(map[int]int){
 	for k := range impC {
 		vals = append(vals, k)
 	}
-	//СОРТИРОВКА ПО УБЫВАНИЮ
+	// СОРТИРОВКА ПО УБЫВАНИЮ
 	sort.Slice(vals , func(i, j int) bool {
 		return vals[i] > vals[j]
 	})
 
 	var arr=make(map[int]int)
 	for _,v := range vals {
-			arr[impC[v]]=BadNormalWell[impC[v]]
-		}
+		arr[impC[v]]=BadNormalWell[impC[v]]
+	}
 
-return arr
+	return arr
 }
-//////////////////////////////////////////////
 
-
-/////////////////////////////////////////////
 /* в каком из 5 диапазоне нормы находится Базовый параметр
 0 - это не норма
 1 Норма 0-19%
@@ -69,27 +61,24 @@ return arr
  */
 func getNormaDiapason(pID int)(int){
 	gp:=int(GomeostazParams[pID])
-limit:=compareLimites[pID]// порог начала критического выхода параметров из нормы
-if pID==1 && gp <= limit{ 	return 0 }// для энергии - наоборот
-if pID>1 && gp >= limit{ 	return 0 }
-// для нормы
-var norm=0
-	if pID==1 {
-		norm = 100 - limit      // остаток параметра вне критического
-		gp = gp-limit // убираем критическую часть
-	}else{
-		norm = limit            // остаток параметра вне критического
-	}
+	limit:=compareLimites[pID] // порог начала критического выхода параметров из нормы
+	if pID==1 && gp <= limit { return 0 } // для энергии - наоборот
+	if pID>1 && gp >= limit { return 0 }
+	// для нормы
+	var norm=0
+		if pID==1 {
+			norm = 100 - limit	// остаток параметра вне критического
+			gp = gp-limit // убираем критическую часть
+		}else{
+			norm = limit	// остаток параметра вне критического
+		}
 
-// какой процент составляет gp от norm
-proc:=int((gp*100)/norm)
+	// какой процент составляет gp от norm
+	proc:=int((gp*100)/norm)
 	if proc <20 { return 1 }
 	if proc <40 { return 2 }
 	if proc <60 { return 3 }
 	if proc <80 { return 4 }
-return 5
+
+	return 5
 }
-//////////////////////////////////////////
-
-
-

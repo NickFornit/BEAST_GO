@@ -108,7 +108,7 @@ func loadTerminalActons() {
 	return
 }
 
-/* Сохранить массив действий в файл - НЕ ИСПОЛЬЗУЕТСЯ */
+/* Сохранить массив действий в файл - для модуля обновления update_genom.go */
 func SaveTerminalActons() {
 	var out = ""
 
@@ -177,7 +177,7 @@ func UpdateTerminalActionsExpenses(id int, txt string) {
 	TerminalActionsExpensesFromID[id] = expenses
 }
 
-// уже выполнявшиеся при бодствовании простейшие рефлексы
+// уже выполнявшиеся при бодрствовании простейшие рефлексы
 var usedSimpleReflexexsID []int
 
 func pulsSimpleReflexex() {

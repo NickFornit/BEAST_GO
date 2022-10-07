@@ -23,6 +23,7 @@ import (
 	"BOT/brain/psychic"
 	termineteAction "BOT/brain/terminete_action"
 	"BOT/lib"
+	"sort"
 	"strconv"
 )
 
@@ -168,24 +169,23 @@ if ActiveCurBaseStyleID==22{
 					NoUnconditionRefles = "NOREFLEX" + GetCurrentConditionsStr() //СТРОКА УСЛОВИЙ ДЛЯ РЕФЛЕКСА
 				}
 			}
-
-			//////// ДЛЯ ПСИХИКИ:
+			// ДЛЯ ПСИХИКИ:
 			veryActual, targetArrID, acrArr := GetActualReflexAction()
-			if len(acrArr)>6{// может быть и 64 если
-// просто ограничить 3 предположительными акциями, т.к. есть сортировка по убыванию значимости
-				acrArr=acrArr[:3]
+			// сортировка действий рефлексов по убыванию значимости
+			acrArr = sortingForActions(targetArrID, acrArr)
+			if len(acrArr) > 6 { // может быть и 64 если
+				// просто ограничить 3 предположительными акциями
+				acrArr = acrArr[:3]
 				// на стадии рефлексов был сигнал NOREFLEX и диалог на пульте
 			}
 			// передать в психику информацию
 			psychic.GetReflexInformation(veryActual, targetArrID, acrArr)
-			//////////////////////
 
 			if EvolushnStage < 2 { // сразу запустить имеющиеся рефлексы
 				toRunRefleses()
 			} // иначе сначала будут проверены автоматизмы в perception.go
 		}
-
-	}else{// вообще еще нет такого случая :) т.к. всегда есть нулевая
+	}else{ // вообще еще нет такого случая :) т.к. всегда есть нулевая
 			//  сообщить на Пульт, что при данных условиях нет б.рефлекса.
 	//	if EvolushnStage==0 { // только для стадии безусловных рефлексов
 	//		NoUnconditionRefles = "NOREFLEX" + GetCurrentConditionsStr() //СТРОКА УСЛОВИЙ ДЛЯ РЕФЛЕКСА
@@ -193,6 +193,37 @@ if ActiveCurBaseStyleID==22{
 // ничего не делать
 	}
 }
+
+// Сортировка действий рефлексов по убыванию актуальной значимости их целей
+func sortingForActions(targetArrID[]int, acrArr[]int) []int {
+	var impC = make(map[int]int)
+	var arr[]int
+
+	if targetArrID == nil {	return acrArr	}
+
+	for i:=0; i < len(acrArr); i++{
+		for _, val := range termineteAction.TerminalActionsTargetsFromID[acrArr[i]]{
+			if lib.ExistsValInArrSort(targetArrID, val){
+				impC[i] = acrArr[i]
+			}else{
+				impC[i+1000] = acrArr[i] // 1000 рефлекторных действий вряд ли будет
+			}
+		}
+	}
+	vals := make([]int, 0, len(impC))
+	for k := range impC {
+		vals = append(vals, k)
+	}
+	sort.Slice(vals , func(i, j int) bool {
+		return vals[i] < vals[j]
+	})
+
+	for i:=0; i < len(vals); i++{
+		arr = append(arr, impC[vals[i]])
+	}
+	return arr
+}
+
 /* На каждом уровне допускаются ветвления его дочек - для нахождения не точного соотвествия, если не было найдено точное.
 Например, если рефлексы имеет только один Базовый контекст, а текущее состояние Beast - сочетание нескольких,
 то в результате должны сработать все рефлексы, для каждой цифры в сочетании образа текущих условий.
@@ -352,13 +383,13 @@ func checkIgnorOnly(oldReflexesIdArr []int,geneticReflexesIdArr []int)(bool) {
 func GetActualReflexAction()(bool,[]int,[]int){
 	var actArtr []int
 
-	/* выявить ID парамктров гомеостаза как цели для улучшения в данных условиях
+	/* выявить ID параметров гомеостаза как цели для улучшения в данных условиях
 	здесь, чтобы сразу получить veryActual и targetArrID для возврата
 	targetArrID - отсортирован по убыванию значимости
 	 */
 	veryActual,targetArrID:=gomeostas.FindTargetGomeostazID()
 
-	//есть ли подходящий по условиям безусловный или условный рефлекс и сделать автоматизм по его действиям
+	// есть ли подходящий по условиям безусловный или условный рефлекс и сделать автоматизм по его действиям
 	/* возвращает текущие массивы найденных при активации видов рефлексов
 	   1-conditionReflexesIdArr []int - Условные рефлексы
 	   2-geneticReflexesIdArr []int - Новые безусловные

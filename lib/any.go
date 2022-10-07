@@ -121,6 +121,14 @@ func ExistsValInArr(arr []int, val int) bool {
 	return false
 }
 
+// есть такое значение в массиве с учетом его сортировки
+func ExistsValInArrSort(arr []int, val int) bool {
+	for i:=0; i<len(arr); i++{
+		if arr[i] == val { return true }
+	}
+	return false
+}
+
 // есть полное строковое значение в строке значений
 func ExistsValStrInList(List string, val string, razd string) bool {
 	var sArr []string
