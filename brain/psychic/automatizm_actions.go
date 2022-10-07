@@ -87,7 +87,7 @@ if am.Usefulness<0{
 		if actArr[i].Type == 5{
 //тон-настроение в виде образа TN как в func GetToneMoodID(  и func GetToneMoodFromImg(
 			tInt,_:=strconv.Atoi(actArr[i].Acts)
-			out+="<br>"+GetToneMoodStrFromID(tInt)
+			out+="<br>"+GetToneMoodStrFromID(tInt)+"<br>"
 			continue
 		}
 
@@ -202,7 +202,7 @@ func TerminateMotorAutomatizmActions(actIDarr []int,energy int)string{
 		isAct=true
 	}
 	if isAct {
-		out = "Действие: <b></b>"+out+"<br><span style=\"font-size:14px;\">Энергичность: " + enegrName+"</span><br>"
+		out = "Действие: <b>"+out+"</b><br><span style=\"font-size:14px;\">Энергичность: <b>" + enegrName+"</b></span><br>"
 		return out
 	}
 	return ""
@@ -216,10 +216,10 @@ func TerminatePraseAutomatizmActions(IDarr []int, energy int)string{
 	// expensesGomeostatParametersAfterAction(aI) болтать можно без устали?
 
 	// выдать на ПУльт
-	var out = "Фраза Beast: <b>"
+	var out = "Фраза Beast: "
 	for i := 0; i < len(IDarr); i++ {
 		prase := word_sensor.GetPhraseStringsFromPhraseID(IDarr[i])
-		out += prase
+		out += "<b>"+prase+"</b>"
 	}
 	// название силы:
 	out += " " + termineteAction.EnergyDescrib[energy] + "</b>"

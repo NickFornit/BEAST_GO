@@ -21,13 +21,11 @@ func GetAutomatizmInfo(limitBasicID int)(string){
 	// сколько рефлексов есть
 	uAutomatizmCount:=len(AutomatizmFromIdArr)
 	// если больше 1000 то выдавать только по одному из 3-х базовыз состояний, иначе сильно тормозит
-	if uAutomatizmCount > 1000{
+	if uAutomatizmCount > 100{
 		if limitBasicID==0{
-			limitBasicID=1// начинать с Плохо
+		//  теперь 0 - непривязанные	limitBasicID=1// начинать с Плохо
 		}
-	}
 	// переключатель диапазона вывода
-	if limitBasicID>0{
 		out+="<br>Показывать: "
 		out+="<span style='cursor:pointer;"
 		if limitBasicID==1{out+="background-color:#FFFF9D;font-weight:bold;"}
@@ -40,6 +38,10 @@ func GetAutomatizmInfo(limitBasicID int)(string){
 		out+="<span style='cursor:pointer;"
 		if limitBasicID==3{out+="background-color:#FFFF9D;font-weight:bold;"}
 		out+="' onClick='show_level(3)'>Хорошо</span> "
+
+		out+="<span style='cursor:pointer;"
+		if limitBasicID==0{out+="background-color:#FFFF9D;font-weight:bold;"}
+		out+="' onClick='show_level(0)' title='Автоматизмы, не привязанные к определнным условиям состояния Beast.'>Свободные</span> "
 	}
 
 	header:="<tr><th width=70 class='table_header'>ID ав-ма</th>" +
@@ -88,7 +90,7 @@ if v.BranchID<1000000{
 nodeA:=AutomatizmTreeFromID[v.BranchID]
 if nodeA!=nil {
 	nodeID = strconv.Itoa(nodeA.ID)
-	if limitBasicID > 0 && nodeA.BaseID != limitBasicID {
+	if (limitBasicID > 0 && nodeA.BaseID != limitBasicID) || limitBasicID==0{
 		continue
 	}
 	baseID = strconv.Itoa(nodeA.BaseID) + " " + gomeostas.GetBaseCondFromID(nodeA.BaseID)
@@ -120,6 +122,9 @@ if nodeA!=nil {
 
 //if v.BranchID<1000000{
 }else{
+	if limitBasicID!=0{
+		continue
+	}
 	nodeID = strconv.Itoa(v.BranchID)
 	onclickID="onClick='show_object("+strconv.Itoa(v.BranchID)+")' style='cursor:pointer;color:blue'"
 	baseID="не"

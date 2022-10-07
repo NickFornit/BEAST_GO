@@ -385,8 +385,8 @@ func GetActualReflexAction()(bool,[]int,[]int){
 		return veryActual,targetArrID,actArtr
 	}
 	if OldArr!=nil && len(OldArr)>0{
-		for i := 0; i < len(condArr); i++ {
-			act:=GeneticReflexes[condArr[i]]
+		for i := 0; i < len(OldArr); i++ {
+			act:=GeneticReflexes[OldArr[i]]
 			for j := 0; j < len(act.ActionIDarr); j++ {
 				actArtr = append(actArtr, act.ActionIDarr[j])
 			}

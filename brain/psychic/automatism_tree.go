@@ -200,13 +200,14 @@ ActID:=action_sensor.CheckCurActionsContext();//CheckCurActions()
 		CurrentAutomatizTreeEnd=condArr[currentStepCount:] // НОВИЗНА
 		if currentStepCount<conditionsCount { // не пройдено до конца имеющихся условий
 		// нарастить недостающее в ветке дерева - всегда для orientation_1()
-			oldDetectedActiveLastNodID:=detectedActiveLastNodID
+			//oldDetectedActiveLastNodID:=detectedActiveLastNodID
 			detectedActiveLastNodID = formingBranch(detectedActiveLastNodID, currentStepCount+1, condArr)
-// ЕСТЬ ЛИ АВТОМАТИЗМ В НЕДОДЕЛАННОЙ ВЕТКЕ и болеее ранних? выбрать лучший автоматизм для ветки nodeID
-			automatizmID := getAutomatizmFromNodeID(oldDetectedActiveLastNodID)
+// ЕСТЬ ЛИ АВТОМАТИЗМ В НЕДОДЕЛАННОЙ ВЕТКЕ и болеее ранних? выбрать лучший автоматизм для сформированной ветки nodeID
+			automatizmID := getAutomatizmFromNodeID(detectedActiveLastNodID)
 			if automatizmID > 0 { //ориентировочный рефлекс 2
 // проверить подходит ли автоматизм к текущим условиям, если нет, - режим нахождения альтернативы  - ориентировочный рефлекс 2
 				automatizmID := orientation(automatizmID)
+				// если автоматизм прошел проверку, то он уже был запущен
 				return automatizmID // выполнение штатного автоматизма
 			}else {
 				// автоматизма нет у недоделанной ветки
@@ -222,11 +223,16 @@ ActID:=action_sensor.CheckCurActionsContext();//CheckCurActions()
 			if automatizmID > 0 {//ориентировочный рефлекс 2
 					// проверить подходит ли автоматизм к текущим условиям, если нет, - режим нахождения альтернативы  - ориентировочный рефлекс 2
 				automatizmID := orientation(automatizmID)
+				// если автоматизм прошел проверку, то он уже был запущен
 				return automatizmID// выполнение штатного автоматизма
 			}else{
 				// автоматизма нет у нормальной ветки (условия не требовали срочного его создания)
 				automatizmID := orientation(0)
-				return automatizmID // блокировка рефлексов
+				// если автоматизм прошел проверку, то он уже был запущен
+				if automatizmID>0{
+					return automatizmID // блокировка рефлексов
+				}
+				return 0
 			}
 		}
 	}else{// вообще нет совпадений для данных условий

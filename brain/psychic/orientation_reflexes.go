@@ -157,6 +157,7 @@ func orientation_2(nodeAutomatizmID int)(*Automatizm){
 
 	if EvolushnStage < 4 {
 		/* // обработка автоматизма, рвущегося на выполнение, но в условиях есть новизна news
+		Если опасной новизны нет, то
 		*/
 		atmzm:=getPurposeGenetic2AndRunAutomatizm(nodeAutomatizmID)// в purpose_genetic.go
 		//  ЗДЕСЬ активировать Дерево Понимания НЕ НУЖНО, если действие уже запущено, омысление будет по результату.

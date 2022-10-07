@@ -80,8 +80,15 @@ if cr!=nil {
 	return nil
 }
 		}
-	//// новизна: повышенная опасность от оператора
-	}
+
+//if newsRes{// повышенная опасность от оператора
+}else{
+	/* от оператора нет опасности, но высокий purpose.veryActual,
+	нужно выполнить штатный автоматизм, а не придуманный
+	 */
+	runAutomatizmFromPurpose(atmzm, purpose)
+	return atmzm
+}
 //if purpose.veryActual
 }else{// нет опасности и нет опасной новизны
 		// плохой автоматизм,

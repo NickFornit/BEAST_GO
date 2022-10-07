@@ -127,7 +127,7 @@ func FormingMirrorAutomatizmFromTempList(file string)(string){
 	path:=lib.GetMainPathExeFile()
 	strArr,_:=lib.ReadLines(path+file)
 	//	triggPhrase|baseID|ContID_list|answerPhrase|Ton,Mood|actions1,...
-	if len(strArr)<2{
+	if len(strArr)==0{
 		return "Пустой файл"
 	}
 	/* Эти автоматизмы привязываются к baseID|ContID_list|0|, т.е. к нулевому образу пусковых
@@ -141,8 +141,7 @@ func FormingMirrorAutomatizmFromTempList(file string)(string){
 	*/
 
 	//	strArr:=strings.Split(list, "\r\n")
-	// первую строку пропускаем из-за #utf8 bom
-	for n := 1; n < len(strArr); n++ {
+	for n := 0; n < len(strArr); n++ {
 		if len(strArr[n])<10{
 			continue
 		}
