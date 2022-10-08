@@ -74,7 +74,7 @@ func RuneCompare(r1 []rune, r2 []rune) int {
 	if len1 > len2 { return 1	}
 	if len2 > len1 { return 2	}
 	for i := 0; i < len1; i++ {
-		if r1[i]!=r2[i] { return 3 }
+		if r1[i] != r2[i] { return 3 }
 	}
 	return 0
 }
