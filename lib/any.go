@@ -30,7 +30,7 @@ func RemoveDuplicateValues(intSlice []int) []int {
 // случайное из диапазона чисел
 func RandChooseDiapazonQuest(first int, last int) int {
 	rand.Seed(time.Now().UnixNano())
-	n := first + rand.Intn(last-first+1)
+	n := first + rand.Intn(last - first + 1)
 	return n
 }
 
