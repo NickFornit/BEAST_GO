@@ -278,9 +278,9 @@ func GetActiveContextInfo() map[int]int {
 	return activeCW
 }
 
-var IsNewConditions = false // использовать из других пакетов: gomeostas.IsNewConditions
-var oldBaseCondition = 0 // предыдущее базовое состояние
-var oldActiveContextstStr = "" // строка ID старого сочетания активных Базовых контекстов
+var IsNewConditions = false 		// флаг изменения условий (пусковых стимулов)
+var oldBaseCondition = 0 				// предыдущее базовое состояние
+var oldActiveContextstStr = "" 	// строка ID старого сочетания активных Базовых контекстов
 
 /* детектор изменения базового состояния и контекстов - проверка по каждому пульсу */
 func changingConditionsDetector() {

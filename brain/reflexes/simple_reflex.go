@@ -1,9 +1,10 @@
 /*
 самый простейший безусловный рефлекс
-	по сочетаниям редактора http://go/pages/terminal_actions.php
-	Данный редактор связывает действие с тем, какие гомео-параметры улучшает данное действие.
+по сочетаниям редактора http://go/pages/terminal_actions.php
+Данный редактор связывает действие с тем, какие гомео-параметры улучшает данное действие.
+Это внутренний рефлекс самоадаптации, выполняемый, если нет пусковых стимулов для более высокоуровневых рефлексов
+Или рефлекс по умолчанию, что означает - реагирование будет всегда хотя бы на таком уровне
 */
-
 
 package reflexes
 
@@ -12,24 +13,16 @@ import (
 	"BOT/lib"
 )
 
-/////////////////////////////////////
-
 // найти и выполнить простейший безусловный рефлекс
-
-func findAndExecuteSimpeReflex(){
-	if len(lib.ActionsForPultStr)>0 {// только если нет другого рефлекса
+func findAndExecuteSimpeReflex() {
+	if len(lib.ActionsForPultStr) > 0 { // только если нет другого рефлекса
 		return
 	}
-	_,actID,_:=TerminalActions.ChooseSimpleReflexexAction()
-	if actID>0{// совершить это действие
+	_,actID,_ := TerminalActions.ChooseSimpleReflexexAction()
+	if actID > 0{ // совершить это действие
 		// очистить буфер передачи действий на пульт
-		//lib.ActionsForPultStr = ""
-		actStr:="0|"+TerminalActions.TerminalActonsNameFromID[actID]
+		// lib.ActionsForPultStr = ""
+		actStr := "0|" + TerminalActions.TerminalActonsNameFromID[actID]
 		lib.SentActionsForPult(actStr)
 	}
 }
-//////////////////////////////////////
-
-
-
-

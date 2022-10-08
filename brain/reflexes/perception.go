@@ -1,22 +1,18 @@
 /*
-восприятие действий и фраз с Пусльта
+восприятие действий и фраз с Пульта
 
-Все рефлексторные и автоматические активности начинаются отсюда.
-
+Все рефлекторные и автоматические активности начинаются отсюда.
 _____________________________
-Сначала активируестся Дерво рефлексов и собираются рефлексы на выполнение, но пока не выполняются,
-потом активируестся Дерво автоматизмови собираются автоматизмы на выполнение, но пока не выполняются,
-если возникает ориентировчный рефлекс, то
-активируестся Дерво понимания (ментальных автоматизмов) и решается, что делать дальше.
+Сначала активируется Дерево рефлексов и собираются рефлексы на выполнение, но пока не выполняются,
+потом активируется Дерево автоматизмов и собираются автоматизмы на выполнение, но пока не выполняются,
+если возникает ориентировочный рефлекс, то
+активируется Дерево понимания (ментальных автоматизмов) и решается, что делать дальше.
 если нет ориентировочного рефлекса, то
-потом выполняютсяя автоматизмы, если их нет - то рефлексы.
+потом выполняются автоматизмы, если их нет - то рефлексы.
 ________________________________
-
 Создание образов различной иерархии контекстов восприятия:
 BaseStyleArr - образ сочетаний активных Базовых контекстов
 TriggerStimulsArr - образ сочетаний пусковых стимулов
-
-Создание образов сочетаний ID действий:
 */
 
 package reflexes
@@ -28,23 +24,22 @@ import (
 	"BOT/brain/sleep"
 )
 
-///////////////////////////////////////
+// Создание образов сочетаний ID действий:
 func loadImagesArrs() {
-	//  загрузить образы сочетаний базовых стилей
+	// загрузить образы сочетаний базовых стилей
 	loadBaseStyleArr()
-	//  загрузить образы сочетаний пусковых стимулов
+	// загрузить образы сочетаний пусковых стимулов
 	loadTriggerStimulsArr()
-
 }
 
-//  отслеживане времени с последнего изменения условий с Пульта в пульсах
-var lastActivnostFromPult=0
-/////////////////////////////////////////////
+// отслеживане времени с последнего изменения условий с Пульта в пульсах
+var lastActivnostFromPult = 0
+
 // ПУЛЬС рефлексов
 var ReflexPulsCount = 0 // передача тика Пульса из brine.go
-var LifeTime = 0
-var EvolushnStage = 0 // стадия развития
-var IsSlipping = false
+var LifeTime = 0 				// время жизни
+var EvolushnStage = 0 	// стадия развития
+var IsSlipping = false  // флаг фазы сна
 
 // коррекция текущего состояния гомеостаза и базового контекста с каждым пульсом
 func ReflexCountPuls(evolushnStage int, lifeTime int, puls int, isSlipping bool) {
@@ -53,10 +48,10 @@ func ReflexCountPuls(evolushnStage int, lifeTime int, puls int, isSlipping bool)
 	ReflexPulsCount = puls // передача номера тика из более низкоуровневого пакета
 	IsSlipping = isSlipping
 
-	if puls==4{
-		psychic.PsychicInit()  // после 3-го пульса!
+	if puls == 4{
+		psychic.PsychicInit() // после 3-го пульса!
 	}
-	if puls==5{
+	if puls == 5{
 		testingRunMakeAutomatizmsFromReflexes()
 	}
 
@@ -69,13 +64,13 @@ func ReflexCountPuls(evolushnStage int, lifeTime int, puls int, isSlipping bool)
 		/* если условия не меняются более 20 сек, то пусть срабатывает простейший инстинкт
 		 только если Базоваое состояние Плохо или Хорошо
 		 */
-		if ReflexPulsCount - lastActivnostFromPult >20{
-			bc:=gomeostas.CommonBadNormalWell
-			if bc!=2 {
+		if ReflexPulsCount - lastActivnostFromPult > 20{
+			bc := gomeostas.CommonBadNormalWell
+			if bc != 2 {
 				// найти и выполнить простейший безусловный рефлекс
 				findAndExecuteSimpeReflex()
 			}
-			lastActivnostFromPult=ReflexPulsCount // новый период 10 секундного ослеживания
+			lastActivnostFromPult = ReflexPulsCount // новый период 10 секундного ослеживания
 		}
 	}
 
@@ -84,14 +79,12 @@ func ReflexCountPuls(evolushnStage int, lifeTime int, puls int, isSlipping bool)
 	}
 
 	// обнулить причину возможного запуска рефлекса
-	if oldActiveCurTriggerStimulsID > 0 && oldActiveCurTriggerStimulsPulsCount > (ReflexPulsCount+10) {
+	if oldActiveCurTriggerStimulsID > 0 && oldActiveCurTriggerStimulsPulsCount > (ReflexPulsCount + 10) {
 		oldActiveCurTriggerStimulsID = 0
 	}
 }
 
-//////////////////////////////////////////////////////////////
-
-//////  АКТИВАЦИЯ ДЕРЕВА РЕФЛЕКСОВ ПО изменению условий, действиям с Пульта или фразе с Пульта
+// АКТИВАЦИЯ ДЕРЕВА РЕФЛЕКСОВ ПО изменению условий, действиям с Пульта или фразе с Пульта
 
 /*  Вид активации дерева рефлексов:
 1 - изменение сочетания базовых контекстов
@@ -100,10 +93,8 @@ func ReflexCountPuls(evolushnStage int, lifeTime int, puls int, isSlipping bool)
 */
 var ActivationTypeSensor = 0
 
-
-////////////////////////////////////
 // текущее восприятие ID образов
-//обновляющихся при каждом событии с Пульта или достаточно сильном изменении Базовых параметров
+// обновляющихся при каждом событии с Пульта или достаточно сильном изменении Базовых параметров
 var ActiveCurBaseID = 0           // ID Базового состояния CommonBadNormalWell
 var ActiveCurBaseStyleID = 0      // ID сочетания базовых контекстов BaseStyle
 var ActiveCurTriggerStimulsID = 0 // ID теущего активного образа сочетаний пусковых стимулов TriggerStimuls
@@ -114,19 +105,18 @@ var ActiveCurTriggerStimulsID = 0 // ID теущего активного обр
 2) через 10 пульсов после записи значения - типа причина устаревает
 */
 var oldActiveCurTriggerStimulsID = 0
+// момент записи значения в тике Пульса
+var oldActiveCurTriggerStimulsPulsCount = 0
 
+// Сохранить предыдущий образ сочетаний пусковых стимулов
 func setOldActiveCurTriggerStimulsVal(val int) {
 	oldActiveCurTriggerStimulsID = val
 	oldActiveCurTriggerStimulsPulsCount = ReflexPulsCount
 }
 
-// момент записи значения в тике Пульса
-var oldActiveCurTriggerStimulsPulsCount = 0
-
-////////////////////////
-/* Дерево рефлексов активируется при любом изменении условий с проверкой по каждому пульсу.
- */
 var activetedPulsCount = 0 // против многократных срабатываний
+
+/* Активация дерва рефлексов при любом изменении условий с проверкой по каждому пульсу. */
 func ActiveFromConditionChange() {
 	if activetedPulsCount > 0 { // ждет следующего пульса
 		return
@@ -138,6 +128,7 @@ func ActiveFromConditionChange() {
 	ActivationTypeSensor = 1
 
 	ActiveCurBaseID = gomeostas.CommonBadNormalWell
+
 	// определение текущего сочетания ID Базовых контекстов
 	bsIDarr := gomeostas.GetCurContextActiveIDarr()
 
@@ -149,16 +140,17 @@ func ActiveFromConditionChange() {
 
 	// активировать дерево автоматизмов
 	res := psychic.SensorActivation(ActivationTypeSensor)
+
 	if res { // блокировать выполнение рефлексов
 		return
 	}
-
+	// запустить рефлексы
 	toRunRefleses()
+
 	// сбросить контекст акций по кнопкам Пульта
 	action_sensor.DeactivationTriggers()
 }
 
-////////////////////////
 // активировать дерево действием reflexes.ActiveFromAction()
 func ActiveFromAction() {
 	ActivationTypeSensor = 2
@@ -180,7 +172,7 @@ func ActiveFromAction() {
 	За 20 сек г.параметры могут просто натечь и сработает ожидание реакции оператора.
 	Флаг сбрасывается через пульс после запуска автоматизма.
 	*/
-	psychic.WasOperatorActiveted=true
+	psychic.WasOperatorActiveted = true
 
 	// активировать дерево автоматизмов
 	res := psychic.SensorActivation(ActivationTypeSensor)
@@ -194,7 +186,6 @@ func ActiveFromAction() {
 	action_sensor.DeactivationTriggers()
 }
 
-////////////////////////
 // активировать дерево фразой  reflexes.ActiveFromPhrase() - только для условных рефлексов
 // причем, с учетом недавного действия (или нескольких действий) т.к. контекст действий сохраняется 10 сек.
 func ActiveFromPhrase() {
@@ -210,7 +201,6 @@ func ActiveFromPhrase() {
 	CreateNewTriggerStimulsImage()
 
 	// активировать дерево рефлексов
-	//BS:=gomeostas.GetCurContextActiveIDarr() // текущий стиль Бозовых контекстов
 	activeReflexTree()
 
 	/* Это используется для определения момента реакция оператора Пульта на действия автоматизма - для психики.
@@ -231,9 +221,6 @@ func ActiveFromPhrase() {
 	 action_sensor.DeactivationTriggers()
 }
 
-/////////////////////////////////////////////////////////
-
-//////////////////////////////////////////////////////////////
 /* создание иерархии образов контекстов условий и пусковых стимулов в виде ID образов в [3]int
  создать последовательность уровней условий в виде массива  ID последовательности ID уровней
 В случае отсуствия пусковых стимулов создается ID такого отсутсвия, пример такой записи: 2|||0|0|
@@ -246,15 +233,12 @@ func getConditionsArr(lev1ID int, lev2 []int, lev3 []int, PhraseID []int, ToneID
 	return arr
 }
 
-////////////////////////////////////////////////////
-
-
 // получить сохраненное (последнее активное) сочетание пусоквых стимулов-кнопок
 // reflexes.GetCurPultActionsContext()
-func GetCurPultActionsContext()([]int){
+func GetCurPultActionsContext() []int {
 	var ActID []int
-	if ActiveCurTriggerStimulsID>0{
-		ActID=TriggerStimulsArr[ActiveCurTriggerStimulsID].RSarr
+	if ActiveCurTriggerStimulsID > 0{
+		ActID = TriggerStimulsArr[ActiveCurTriggerStimulsID].RSarr
 	}
 	return ActID
 }
