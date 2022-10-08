@@ -26,11 +26,10 @@ import (
 	"strings"
 )
 
-
 func init(){
 
 }
-/////////////////////////////////////
+
 // название Базового контекста из его ID str:=gomeostas.GetBaseContextCondFromID(id)
 func GetBaseContextCondFromID(id int)(string){
 	var out=""
@@ -50,45 +49,42 @@ func GetBaseContextCondFromID(id int)(string){
 	}
 	return out
 }
-//////////////////////////////////////////////
 
 /* масссив активностей базовых контекстов
 активный - true, неактивный - false
  */
 var BaseContextActive [15]bool // index 0 НЕ ИСПОЛЬЗУЕТСЯ! т.е. начинаетсмя с BaseContextActive[1]
+/* массив весов (значимостей) базовых контекстов */
 var BaseContextWeight [15]int // index 0 НЕ ИСПОЛЬЗУЕТСЯ!
 
+// антагонисты контекстов
+var antagonists = make(map[int][]int)
 /* Прошивка несовместимых сочетаний контекстов
 Для каждого основного контекста - антагонисты
- */
-var antagonists =make(map[int][]int)
-
+*/
 func initContextDetector(){
-	antagonists =make(map[int][]int)
-	path:=lib.GetMainPathExeFile()
-	lines,_:=lib.ReadLines(path+"/memory_reflex/base_context_antagonists.txt")
+	antagonists = make(map[int][]int)
+	path := lib.GetMainPathExeFile()
+	lines,_ := lib.ReadLines(path + "/memory_reflex/base_context_antagonists.txt")
 	for i := 0; i < len(lines); i++ {
-p := strings.Split(lines[i], "|")
-id, _ := strconv.Atoi(p[0]) // ID параметра гомеостаза
-a := strings.Split(p[1], ",")
-for n := 0; n < len(a); n++ {
-aID, _ := strconv.Atoi(a[n])
-antagonists[id] =append(antagonists[id],aID)
-}
-}
-
-	lines,_=lib.ReadLines(path+"/memory_reflex/base_context_weight.txt")
-	for i := 0; i < len(lines); i++ {
-		p:=strings.Split(lines[i], "|")
-		id,_:=strconv.Atoi(p[0])
-		val,_:=strconv.Atoi(p[1])
-		BaseContextWeight[id]=val
+		p := strings.Split(lines[i], "|")
+		id, _ := strconv.Atoi(p[0]) // ID параметра гомеостаза
+		a := strings.Split(p[1], ",")
+		for n := 0; n < len(a); n++ {
+			aID, _ := strconv.Atoi(a[n])
+			antagonists[id] = append(antagonists[id],aID)
+		}
 	}
-
+	lines,_ = lib.ReadLines(path + "/memory_reflex/base_context_weight.txt")
+	for i := 0; i < len(lines); i++ {
+		p := strings.Split(lines[i], "|")
+		id,_ := strconv.Atoi(p[0])
+		val,_ := strconv.Atoi(p[1])
+		BaseContextWeight[id] = val
+	}
 	for id, _ := range BaseContextWeight {
-		BaseContextActive[id]=false
+		BaseContextActive[id] = false
 	}
-
 
 /* // проверка ограничителя
 	BaseContextActive[1]=true
@@ -124,12 +120,9 @@ antagonists[id] =append(antagonists[id],aID)
 		}
 	}
  */
-
-
-
 	return
 }
-////////////////
+
 /* состояние базового контекста зависит
 1) от выхода из нормы жизненных параметров
 2) от безусловно прошитых признаков восприятия
@@ -137,46 +130,44 @@ antagonists[id] =append(antagonists[id],aID)
 
 !!! BaseContextActive[6]=true - Ступор регулируется как отсуствие реакций в данном контексте при опасности
  */
-func baseContextUpdate(){
-// сначала все контексты выключены:
+func baseContextUpdate() {
+	// сначала все контексты выключены:
 	for id, _ := range BaseContextWeight {
-		if id!=12 {// сон не гасить
+		if id != 12 { // сон не гасить
 			BaseContextActive[id] = false
 		}
 	}
 	// если активен сон, все остальные неактивны
-	if IsSlipping{
-		//return    но во сне тоже должны быть некоторые рефлексы и эмоции
-	}else {
+	if IsSlipping {
+		// return но во сне тоже должны быть некоторые рефлексы и эмоции
+	} else {
 		// При бодрствовании обязательно должен быть определен базовый контекст,
 		// поэтому делаем по умолчанию Лень и гасим его в нужных случаях: BaseContextActive[6]=false
 		// проверка в самом конце BaseContextActive[6] = true
 	}
-
-// Определяем текущее сочетания активных базовых контекстов:
+	// Определяем текущее сочетания активных базовых контекстов:
 	for i := 1; i < 9; i++ {
-		if BadNormalWell[i]==2 { //НОРМА
-			diapazoN:=getNormaDiapason(i)
+		if BadNormalWell[i] == 2 { // НОРМА
+			diapazoN := getNormaDiapason(i)
 			// правило для данного диапазона
-			rule:=GomeostazActivnostArr[i][diapazoN+1] // +2 из-за 1 и 2 заняты под Хор. и Пл.
-			// активируем или пассивируем контексты по заданному правилу в http://go/pages/gomeostaz.php
-			activeOrPassiveContext(rule)
-		}//НОРМА конец
-// перекрывает предыдущее
-		if BadNormalWell[i]==3 { //ХОРОШО
-			rule:=GomeostazActivnostArr[i][1]
+			rule := GomeostazActivnostArr[i][diapazoN + 1] // +2 из-за 1 и 2 заняты под Хор. и Пл.
 			// активируем или пассивируем контексты по заданному правилу в http://go/pages/gomeostaz.php
 			activeOrPassiveContext(rule)
 		}
-// перекрывает предыдущее
-		if BadNormalWell[i]==1 { //ПЛОХО
-			rule:=GomeostazActivnostArr[i][0]
+		// перекрывает предыдущее
+		if BadNormalWell[i] == 3 { // ХОРОШО
+			rule := GomeostazActivnostArr[i][1]
+			// активируем или пассивируем контексты по заданному правилу в http://go/pages/gomeostaz.php
+			activeOrPassiveContext(rule)
+		}
+		// перекрывает предыдущее
+		if BadNormalWell[i] == 1 { // ПЛОХО
+			rule := GomeostazActivnostArr[i][0]
 			// активируем или пассивируем контексты по заданному правилу в http://go/pages/gomeostaz.php
 			activeOrPassiveContext(rule)
 		}
 	}
-
-// Конкурентность антагонистов
+	// Конкурентность антагонистов
 	keys := make([]int, 0, len(BaseContextActive))
 	for id, v := range BaseContextActive {
 		if v {
@@ -186,103 +177,93 @@ func baseContextUpdate(){
 	sort.Ints(keys)
 	for _, id := range keys {
 		for _, ida := range antagonists[id] {
-			if BaseContextActive[ida] && BaseContextWeight[ida] > BaseContextWeight[id]{// активный антагонист значимее
-			BaseContextActive[id]=false // погасить текущий контекст
-			break // больше не нужно смотреть других антагонистов
-				}else{
+			if BaseContextActive[ida] && BaseContextWeight[ida] > BaseContextWeight[id] {// активный антагонист значимее
+				BaseContextActive[id] = false // погасить текущий контекст
+				break // больше не нужно смотреть других антагонистов
+			} else {
 				BaseContextActive[ida]=false // погасить антогониста
 			}
-			}
-	}
-
-/*ограничение на число компонентов в образе б.контекстов: их число будет не более 3-х,
-а лишние будут отсеиваться в порядке убывания весов контекстов.
-Это неплохо имитирует распознаватель с активацией по частично-активному профилю на входе.
-*/
-	var activedC=make(map[int]int)
-	for id, v := range BaseContextActive {
-		if v{
-			activedC[id]=BaseContextWeight[id]
 		}
 	}
-	//карта только активных контекстов
+	/*ограничение на число компонентов в образе б.контекстов: их число будет не более 3-х,
+	а лишние будут отсеиваться в порядке убывания весов контекстов.
+	Это неплохо имитирует распознаватель с активацией по частично-активному профилю на входе.
+	*/
+	var activedC = make(map[int]int)
+	for id, v := range BaseContextActive {
+		if v {
+			activedC[id] = BaseContextWeight[id]
+		}
+	}
+	// карта только активных контекстов
 	keys = make([]int, 0, len(activedC))
 	for k := range activedC {
 		keys = append(keys, k)
 	}
-	//СОРТИРОВКА ПО ЗНАЧЕНИЮ даже если значения повторяются
-	sort.SliceStable(keys , func(i, j int) bool {
+	// СОРТИРОВКА ПО ЗНАЧЕНИЮ даже если значения повторяются
+	sort.SliceStable(keys, func(i, j int) bool {
 		return activedC[keys[i]] > activedC[keys[j]]
 	})
 	// ограничить только первыми тремя
-	if len(keys)>3 {
+	if len(keys) > 3 {
 		keys = keys[:3]
 	}
 	for id, _ := range BaseContextActive {
 		BaseContextActive[id]=false
 		for i := 0; i < len(keys); i++ {
 			if id == keys[i]{
-				BaseContextActive[id]=true
+				BaseContextActive[id] = true
 			}
 		}
 	}
-
 }
-//активируем или пассивируем контексты по заданному правилу в http://go/pages/gomeostaz.php
-func activeOrPassiveContext(rule string){
-	if len(rule)==0{
-		return
-	}
+
+// активируем или пассивируем контексты по заданному правилу в http://go/pages/gomeostaz.php
+func activeOrPassiveContext(rule string) {
+	if len(rule) == 0 { return }
 	// выделяем ID контекстов
-	p:=strings.Split(rule, ",")
+	p := strings.Split(rule, ",")
 	for n := 0; n < len(p); n++ {
-		p[n]=strings.TrimSpace(p[n])
-		if len(p[n])==0{
-			return
-		}
+		p[n] = strings.TrimSpace(p[n])
+		if len(p[n]) == 0 { return }
 		// активируем или пассивируем контексты
-		cID,_:=strconv.Atoi(p[n])
-		if cID>0{
-			BaseContextActive[cID]=true
-		}else{
-			BaseContextActive[-cID]=false
+		cID,_ := strconv.Atoi(p[n])
+		if cID > 0 {
+			BaseContextActive[cID] = true
+		} else {
+			BaseContextActive[-cID] = false
 		}
 	}
 }
-/////////////////////////////////////////////////////
 
-
-// для определения текущего сочетания ID Безовых контекстов  gomeostas.GetCurContextActiveIDarr()
-func GetCurContextActiveIDarr()([]int) {
+// для определения текущего сочетания ID Безовых контекстов gomeostas.GetCurContextActiveIDarr()
+func GetCurContextActiveIDarr() []int {
 	var out []int
-// concurrent map iteration and map write
+	// concurrent map iteration and map write
 	for id, v := range BaseContextActive {
-		if(v){
-			out=append(out,id)
+		if v {
+			out = append(out, id)
 		}
 	}
 	return out
 }
-/////////////////////////////////////////////////////////
-
 
 // для Пульта
-func GetCurContextActive()(string) {
-	var out=""
+func GetCurContextActive()string {
+	var out = ""
 	for id, v := range BaseContextActive {
-		if(v){
-			out+=strconv.Itoa(id)+";1|"
-		}else{
-			out+=strconv.Itoa(id)+";0|"
+		if v {
+			out += strconv.Itoa(id) + ";1|"
+		} else {
+			out += strconv.Itoa(id) + ";0|"
 		}
 	}
 	return out
 }
-/////////////////////////////////////////////////////////
 
 // контекст распознавания текущей фразы с Пульта для Vernike_detector.go
-func GetActiveContextInfo()(map[int]int){
-	var activeCW =make(map[int]int)
+func GetActiveContextInfo() map[int]int {
+	var activeCW = make(map[int]int)
 
 	keys := make([]int, 0, len(BaseContextActive))
 	for id, v := range BaseContextActive {
@@ -292,29 +273,24 @@ func GetActiveContextInfo()(map[int]int){
 	}
 	sort.Ints(keys)
 	for _, k := range keys {
-		activeCW[k]=BaseContextWeight[k]
+		activeCW[k] = BaseContextWeight[k]
 	}
 	return activeCW
 }
-//////////////////////////////////////////////////////////
 
+var IsNewConditions = false // использовать из других пакетов: gomeostas.IsNewConditions
+var oldBaseCondition = 0 // предыдущее базовое состояние
+var oldActiveContextstStr = "" // строка ID старого сочетания активных Базовых контекстов
 
+/* детектор изменения базового состояния и контекстов - проверка по каждому пульсу */
+func changingConditionsDetector() {
+	if oldBaseCondition != CommonBadNormalWell {
+		oldBaseCondition = CommonBadNormalWell
+		IsNewConditions = true
+		return
+	}
 
-/* детектор изменения базового состояния и контекстов - проверка по каждому пульсу
- */
-var IsNewConditions=false //  использовать из других пакетов: gomeostas.IsNewConditions
-
-var oldBaseCondition=0
-var oldActiveContextstStr=""// строка ID старого сочетания активных Базовых контекстов
-func changingConditionsDetector(){
-
-if oldBaseCondition!=CommonBadNormalWell{
-	oldBaseCondition=CommonBadNormalWell
-	IsNewConditions=true
-	return
-}
-
-var activeContextstStr=""
+	var activeContextstStr = ""
 	keys := make([]int, 0, len(BaseContextActive))
 	for k := range BaseContextActive {
 		keys = append(keys, k)
@@ -322,34 +298,21 @@ var activeContextstStr=""
 	sort.Ints(keys)
 	for k,v := range keys {
 		if BaseContextActive[v] {
-			activeContextstStr += strconv.Itoa(k)+"_" // "_" нужно разделять цифры, иначе будет ошибаться
+			activeContextstStr += strconv.Itoa(k) + "_" // "_" нужно разделять цифры, иначе будет ошибаться
 		}
 	}
-if oldActiveContextstStr!=activeContextstStr{
-	oldActiveContextstStr=activeContextstStr
-	IsNewConditions=true
-	return
+	if oldActiveContextstStr != activeContextstStr {
+		oldActiveContextstStr = activeContextstStr
+		IsNewConditions = true
+		return
+	}
+	IsNewConditions = false
 }
-	IsNewConditions=false
-}
-//////////////////////////////////////////
-
 
 /* Есть ли хоть какая то активность контекстов */
-
-func IsContextActive()bool{
-
-  for _, v :=range BaseContextActive{
-
-   if v{
-
-    return true
-
-   }
-
+func IsContextActive()bool {
+  for _, v :=range BaseContextActive {
+   if v { return true }
  }
-
  return false
-
 }
-////////////////////////////////////////////////////
