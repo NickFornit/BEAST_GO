@@ -66,7 +66,7 @@ func Puls() {
 	})
 }
 
-var NotAllowAnyActions=false // - запрет любой активности  brain.NotAllowAnyActions
+var NotAllowAnyActions = false // - запрет любой активности  brain.NotAllowAnyActions
 // то, что должно выполнять в тишине, в бездействии
 func inaction() {
 	/* Память сохраняется при корректном выключении, попытки автоматизировать - очень геморные и ненадежные

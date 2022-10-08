@@ -1,6 +1,4 @@
-/*
-инициализация при запуске
-*/
+/* инициализация при запуске */
 
 package brain
 
@@ -11,16 +9,13 @@ import (
 )
 
 // самая первая инициализация (из main.go) после всех приготовлений, до запуска пульса в puls.go
-func RunInitialisation(){
-
-	str,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_reflex/life_time.txt")
-	if len(str)>0 {
+func RunInitialisation() {
+	str,_ := lib.ReadLines(lib.GetMainPathExeFile() + "/memory_reflex/life_time.txt")
+	if len(str) > 0 {
 		LifeTime, _ = strconv.Atoi(strings.TrimSpace(str[0]))
-	}else{
-		panic("ОБНУЛИЛОСЬ ВРЕМЯ ЯЖИЗНИ LifeTime")
+	} else {
+		panic("ОБНУЛИЛОСЬ ВРЕМЯ ЖИЗНИ LifeTime")
 	}
-
-	str,_=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_reflex/stages.txt")
-	EvolushnStage,_=strconv.Atoi(strings.TrimSpace(str[0]))
-
+	str,_ = lib.ReadLines(lib.GetMainPathExeFile() + "/memory_reflex/stages.txt")
+	EvolushnStage,_ = strconv.Atoi(strings.TrimSpace(str[0]))
 }
