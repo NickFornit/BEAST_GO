@@ -1,5 +1,13 @@
 /*
 индексная страница http://localhost:8181/index
+
+В проекте много глобальных переменных, что привычно раздражает Свидетелей инкапсуляции и непорочного пространства имен,
+но ТАК НУЖНО (спорно) для одганизации среды,
+схожей с организацией линкующих указателей в мозге (т.е. связей с одного распознавателя к целому ансаблю - объекту).
+Ну и есть немало других вещей, нарушающих Порядок и Традиции Golang.
+Попытки использовать горутины оказались просто неуместными (спорно) и просто ненужными, учитывая вряд ли в чем-то могущий быть выигрыш.
+Короче, код предоставляется на вольное растерзание и свободное экспериментирование, без претензий, сорри за возможный негатив.
+Везде много пространных комментариев, которые запутывают даже меня, но они НУЖНЫ.
 */
 
 package main
@@ -21,15 +29,8 @@ import (
 	"strings"
 )
 
-/* В проекте много глобальных переменных, что привычно раздражает Свидетелей инкапсуляции и непорочного пространства имен,
-но ТАК НУЖНО (спорно) для одганизации среды,
-схожей с организацией линкующих указателей в мозге (т.е. связей с одного распознавателя к целому ансаблю - объекту).
-Ну и есть немало других вещей, нарушающих Порядок и Традиции Golang.
-Попытки использовать горутины оказались просто неуместными (спорно) и просто ненужными, учитывая вряд ли в чем-то могущий быть выигрыш.
-Короче, код предоставляется на вольное растерзание и свободное экспериментирование, без претензий, сорри за возможный негатив.
-Везде много пространных комментариев, которые запутывают даже меня, но они НУЖНЫ.
-*/
-var isGlobalStopAllActivnost = false // true - остановка всей активности для совершения критических глобальных операций
+// true - остановка всей активности для совершения критических глобальных операций
+var isGlobalStopAllActivnost = false
 
 func receiveSend(resp http.ResponseWriter, r *http.Request) {
 	resp.Header().Set("Access-Control-Allow-Origin", "*")
@@ -44,7 +45,7 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 		}
 
 		if !isGlobalStopAllActivnost {
-			// 	текстовый блок для набивки дерева слов-фраз из http://go/pages/words.php
+			// текстовый блок для набивки дерева слов-фраз из http://go/pages/words.php
 			text_block := r.FormValue("text_block")
 			if len(text_block) > 0 {
 				brain.IsPultActivnost = true
@@ -53,28 +54,28 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				_, _ = fmt.Fprint(resp, res)
 				return
 			}
-
+			// текст из окна ввода с пульта
 			text_dlg := r.FormValue("text_dlg")
 			if len(text_dlg) > 0 {
 				brain.IsPultActivnost = true
-				is_input_rejim, _ := strconv.Atoi(r.FormValue("is_input_rejim"))
+				is_input_rejim, _ := strconv.Atoi(r.FormValue("is_input_rejim")) // режим быстрого формирования у-рефлексов
 				if is_input_rejim == 0 { // наоборот
 					reflexes.IsUnlimitedMode = 1
 				} else {
 					reflexes.IsUnlimitedMode = 0
 				}
 				toneID, _ := strconv.Atoi(r.FormValue("pult_tone"))
-				pultMood := r.FormValue("pult_mood")
-				moodID, _ := strconv.Atoi(pultMood)
+				pultMood := r.FormValue("pult_mood") // тон сообщения
+				moodID, _ := strconv.Atoi(pultMood) // настроение сообщения
 				res := word_sensor.VerbalDetection(text_dlg, is_input_rejim, toneID, moodID)
-				// если добавлены пусковые стимулы
+				// если добавлены пусковые стимулы (нажаты кнопки на пульте)
 				set_img_action := r.FormValue("set_img_action")
 				if len(set_img_action) > 0 {
-					//brain.IsPultActivnost = true
+					// brain.IsPultActivnost = true
 					enegry, _ := strconv.Atoi(r.FormValue("food_portion"))
 					action_sensor.SetActionFromPult(set_img_action, enegry)
 					/*
-						//// активировать дерево действием
+						// активировать дерево действием
 						reflexes.ActiveFromAction()
 						brain.IsPultActivnost = false
 					*/
@@ -92,19 +93,19 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				brain.IsPultActivnost = true
 				outStr := gomeostas.GetCurGomeoParams()
 
-				var waitingPeriod=""
-				res,time:=psychic.WaitingPeriodForActions()
-				if res{
-					waitingPeriod=strconv.Itoa(time)
+				var waitingPeriod = ""
+				res,time := psychic.WaitingPeriodForActions()
+				if res {
+					waitingPeriod = strconv.Itoa(time)
 				}
 
-				var psichicReady=""
+				var psichicReady = ""
 				if psychic.StartPsichicNow{
-					psichicReady="1"
+					psichicReady = "1"
 				}
 
 				outStr += "#|#" + gomeostas.GetCurGomeoStatus() + "#|#" + gomeostas.GetCurContextActive() +
-					"#|# " + reflexes.GetCurrentConditionsStr() + //чтобы постоянно была инфа о сочетаниях контекстов
+					"#|# " + reflexes.GetCurrentConditionsStr() + // чтобы постоянно была инфа о сочетаниях контекстов
 					"#|#" + strconv.Itoa(brain.LifeTime) +
 					"#|#" + reflexes.NoUnconditionRefles +
 					"#|#" + waitingPeriod +
@@ -158,16 +159,11 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				reflexes.FormingConditionsRefleaxFromList(file_for_condition_reflexes)
 				_, _ = fmt.Fprint(resp, "OK")
 			}
-
-
-
-
 		}
 		//fmt.Println("EMPTY")
 	}
 
 	if r.Method == "GET" {
-
 		// проверка активности Beast, аозвращает текущий brain.PulsCount
 		brain.IsPultActivnost = true
 		check_Beast_activnost := r.FormValue("check_Beast_activnost")
@@ -175,7 +171,6 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 			_, _ = fmt.Fprint(resp, brain.PulsCount)
 			return
 		}
-
 		// остановка любой активности Beast
 		brain.IsPultActivnost = true
 		stop_activnost := r.FormValue("stop_activnost")
@@ -207,7 +202,6 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 			brain.IsPultActivnost = false
 			return
 		}
-
 		// корректное выключение Beast
 		bot_closing := r.FormValue("bot_closing")
 		if bot_closing == "1" {
@@ -216,7 +210,6 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 			closer.Close()
 			return
 		}
-
 		// Формирование зеркальных автоматизмов на основе списка ответов
 		mirror_making_fool := r.FormValue("mirror_making_fool")
 		if len(mirror_making_fool)>0 {
@@ -224,7 +217,6 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 			_, _ = fmt.Fprint(resp, res)
 			return
 		}
-
 		// Формирование зеркальных автоматизмов на основе общего шаблона
 		mirror_making_temp := r.FormValue("mirror_making_temp")
 		if len(mirror_making_temp)>0 {
@@ -234,7 +226,7 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 		}
 
 		if !isGlobalStopAllActivnost {
-			setExpParam := r.FormValue("set_exp_param")
+			setExpParam := r.FormValue("set_exp_param") // экспорт данных
 			if len(setExpParam) > 0 {
 				brain.IsPultActivnost = true
 				if setExpParam == "1" {
@@ -249,7 +241,8 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				_, _ = fmt.Fprint(resp, setExpParam)
 				return
 			}
-			setImpParam := r.FormValue("set_imp_param")
+
+			setImpParam := r.FormValue("set_imp_param") // импорт данных
 			if len(setImpParam) > 0 {
 				brain.IsPultActivnost = true
 				if setImpParam == "1" {
@@ -312,7 +305,6 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-
 			get_word_tree := r.FormValue("get_word_tree")
 			if get_word_tree == "1" {
 				brain.IsPultActivnost = true
@@ -331,7 +323,7 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				enegry, _ := strconv.Atoi(r.FormValue("food_portion"))
 				action_sensor.SetActionFromPult(set_action, enegry)
 
-				//// активировать дерево действием
+				// активировать дерево действием
 				reflexes.ActiveFromAction()
 				brain.IsPultActivnost = false
 				_, _ = fmt.Fprint(resp, "!")
@@ -388,7 +380,6 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-
 			get_self_perception_info := r.FormValue("get_self_perception_info")
 			if len(get_self_perception_info) > 0 {
 				ref := psychic.GetSelfPerceptionInfo()
@@ -412,23 +403,18 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-
 			make_automatizms_from_reflexes := r.FormValue("make_automatizms_from_reflexes")
-			if len(make_automatizms_from_reflexes) ==1 {
+			if len(make_automatizms_from_reflexes) == 1 {
 				ref := reflexes.RunMakeAutomatizmsFromReflexes()
 				_, _ = fmt.Fprint(resp, ref)
 				return
 			}
 			make_automatizms_from_genetic_reflexes := r.FormValue("make_automatizms_from_genetic_reflexes")
-			if len(make_automatizms_from_genetic_reflexes) ==1 {
+			if len(make_automatizms_from_genetic_reflexes) == 1 {
 				ref := reflexes.RunMakeAutomatizmsFromGeneticReflexes()
 				_, _ = fmt.Fprint(resp, ref)
 				return
 			}
-
-
-
-
 			_, _ = fmt.Fprint(resp, "GET")
 		}
 	}
@@ -439,8 +425,6 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 func init() {
 	lib.GetMainPathExeFile()
 	log.SetFlags(log.Lshortfile | log.LstdFlags)
-
-
 	// тестирование комбинаций. Если бы время работы было приемлемо,
 	//то можно было бы запускать процесс из Пульта в меню Инструменты (шестеренка)
 	// 	tools.MakeContextCombinations()
