@@ -31,21 +31,21 @@ func init(){
 }
 
 // название Базового контекста из его ID str:=gomeostas.GetBaseContextCondFromID(id)
-func GetBaseContextCondFromID(id int)(string){
-	var out=""
-	switch id{
-	case 1: out="Пищевой"
-	case 2: out="Поиск"
-	case 3: out="Игра"
-	case 4: out="Гон"
-	case 5: out="Защита"
-	case 6: out="Лень"
-	case 7: out="Ступор"
-	case 8: out="Страх"
-	case 9: out="Агрессия"
-	case 10: out="Злость"
-	case 11: out="Доброта"
-	case 12: out="Сон"
+func GetBaseContextCondFromID(id int) string {
+	var out = ""
+	switch id {
+	case 1: out = "Пищевой"
+	case 2: out = "Поиск"
+	case 3: out = "Игра"
+	case 4: out = "Гон"
+	case 5: out = "Защита"
+	case 6: out = "Лень"
+	case 7: out = "Ступор"
+	case 8: out = "Страх"
+	case 9: out = "Агрессия"
+	case 10: out = "Злость"
+	case 11: out = "Доброта"
+	case 12: out = "Сон"
 	}
 	return out
 }
@@ -62,7 +62,7 @@ var antagonists = make(map[int][]int)
 /* Прошивка несовместимых сочетаний контекстов
 Для каждого основного контекста - антагонисты
 */
-func initContextDetector(){
+func initContextDetector() {
 	antagonists = make(map[int][]int)
 	path := lib.GetMainPathExeFile()
 	lines,_ := lib.ReadLines(path + "/memory_reflex/base_context_antagonists.txt")
@@ -185,7 +185,7 @@ func baseContextUpdate() {
 			}
 		}
 	}
-	/*ограничение на число компонентов в образе б.контекстов: их число будет не более 3-х,
+	/* ограничение на число компонентов в образе б.контекстов: их число будет не более 3-х,
 	а лишние будут отсеиваться в порядке убывания весов контекстов.
 	Это неплохо имитирует распознаватель с активацией по частично-активному профилю на входе.
 	*/
