@@ -17,89 +17,64 @@ import (
 	_ "fmt"
 )
 
-
 /* сравнение слов
-
 str1 - слово мз введенной фразы, сравнивается со словами из файловой матрицы matrix_utf.txt
 */
-func Wcomp(str1 string, s1Count int,str2 string) int {
+func Wcomp(str1 string, s1Count int, str2 string) int {
+	// s1:="привет"; 	s2:="привет"; 	if s1==s2{return 222}else{return 111}
+	// if s1[4:5] == s2[4:5]{return 222}else{return 111}
+	if str1 == str2 { // точное соотвествие
+	return 1
+	} else { // неточное
+		//	s1_count:=len(str1)
+		s2Count := len(str2)
+		//	return int8(s1_count);
 
-//	s1:="привет"; 	s2:="привет"; 	if s1==s2{return 222}else{return 111}
-//if s1[4:5] == s2[4:5]{return 222}else{return 111}
+		//если число букв str1 меньше 4-х, то - только точное сравнение
+		if s1Count < 8 { return 0}
 
+		// число символов не равно
+		if s1Count != s2Count { return 0 }
 
-if str1==str2{
-	// точное соотвествие
-return 1
-}else{ // неточное
-//	s1_count:=len(str1)
-	s2Count :=len(str2)
-//	return int8(s1_count);
+		// не выделить первую и последнюю в 1 и 2 символьном слове и нет точного соотвествия (ранее)
+		if s1Count <4 { return 0 }
 
-//если число букв str1 меньше 4-х, то - только точное сравнение
-if s1Count < 8{return 0}
-
-// число символов не равно
-if s1Count != s2Count {
-	return 0
-}
-
-	// не выделить первую и последнюю в 1 и 2 символьном слове и нет точного соотвествия (ранее)
-	if s1Count <4{
-	return 0
-	}
-
-	// первые буквы и последние буквы равны
-if str1[:2]!=str2[:2] || str1[s1Count-2:]!=str2[s2Count-2:] {
-	// первая и/или последняя не совпадают
-return 0
-}else{// первая и последняя совпадают,нужно оченить промежуточные
-//	return 111;
-
-var found int
-	found= 0
-for i := 1; i < s1Count/2-1; i++ {
-for j := 1; j < s2Count/2-1; j++ {
-		if str1[2*i-2:2*i]==str2[2*j-2:2*j] {
-			found++
+		// первые буквы и последние буквы равны
+		if str1[:2] != str2[:2] || str1[s1Count - 2:] != str2[s2Count - 2:] { // первая и/или последняя не совпадают
+			return 0
+		} else { // первая и последняя совпадают,нужно оченить промежуточные
+			// return 111
+			var found int
+			found= 0
+			for i := 1; i < s1Count/2-1; i++ {
+				for j := 1; j < s2Count/2-1; j++ {
+					if str1[2 * i - 2:2 * i] == str2[2 * j - 2:2 * j] {
+						found++
+					}
+				}
+			}
+			// если число найденных во втором слове не совпадает с числом букв первого, то - 2
+			if (s1Count / 2 - 2) != found {
+				return 0
+			}
+			// если число найденных во втором слове совпадает с числом букв первого, то - 2
+			return 2
 		}
+		//return 0
 	}
+	//return 0
 }
-// если число найденных во втором слове не совпадает с числом букв первого, то - 2
-if s1Count/2-2  != found {
-	return 0
-}
-	// если число найденных во втором слове совпадает с числом букв первого, то - 2
-return 2
-}
-
-//return 0
-}
-//return 0
-}
-
-//////////////////////////////////////
-
 
 /* сравненеие двух строк в виде rune
-0 - строки равны, 1 - первая длинее, 2- вторая длинее, 3 - строки не равны при одмнаковой длине, 4 - не равня с самого начала
+0 - строки равны, 1 - первая длинее, 2 - вторая длинее, 3 - строки не равны при одмнаковой длине, 4 - не равня с самого начала
 */
-func RuneCompare(r1 []rune,r2 []rune)(int){
-	len1:=len(r1)
-	len2:=len(r2)
-	if len1>len2{
-		return 1
-	}
-	if len2>len1{
-		return 2
-	}
+func RuneCompare(r1 []rune, r2 []rune) int {
+	len1 := len(r1)
+	len2 := len(r2)
+	if len1 > len2 { return 1	}
+	if len2 > len1 { return 2	}
 	for i := 0; i < len1; i++ {
-		if r1[i]!=r2[i]{
-			return 3
-		}
+		if r1[i]!=r2[i] { return 3 }
 	}
 	return 0
 }
-
-
-
