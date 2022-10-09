@@ -76,7 +76,7 @@ type ConditionReflex struct {
 	conditionRexlexFound().
 	*/
 	lastActivation int
-	// время активации в LifeTime т.к. более "молодые" и непрочные условные рефлексы угасают быстрее, чем более "старые".
+	// время рождения в LifeTime
 	activationTime int
 }
 
