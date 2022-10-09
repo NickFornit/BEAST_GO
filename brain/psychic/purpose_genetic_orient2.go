@@ -48,34 +48,10 @@ if newsRes{// повышенная опасность от оператора
 		// плохой автоматизм, попробовать оптимизировать с помощью рефлексов МОЗЖЕЧКА
 		if atmzm.Usefulness < 0{
 			// была ли уже оптимизация?
-var cr *cerebellumReflex
-			if atmzm.Belief == 3{// была неудачная попытка оптимизации (т.к. atmzm.Usefulness < 0)
-cr=cerebellumReflexFromMotorsID[atmzm.ID]
-if cr!=nil { // уже имеющийся мозжечковый рефлекс
-	// в прошлый раз было добавлено энергии
-	oldEnerg:=cr.addEnergy
-	if oldEnerg+atmzm.Energy >9{// был добавлено лишее, нужно постепенно уменьшить, а не скакать от плюса к минусу
-		cr.addEnergy-- // может быть отрицательное число, чтобы уменьшить энергию автоматизма
-	}
-	if oldEnerg+atmzm.Energy <1{// был добавлено лишее, нужно постепенно добавлять, а не скакать от плюса к минусу
-		cr.addEnergy++
-	}
-	SaveCerebellumReflex()// может не стоит, пусть записывается вместе со всеми сохранениями
-}
-			}else{// еще не было мозжечкового рефлекса
-// добавить
-				_,cr=createNewCerebellumReflex(0,0,atmzm.ID)
-				if cr !=nil {
-					// добавить энергичность по максимум
-					cr.addEnergy=10-atmzm.Energy // хотя при выполнении автоматизма будет подрезана лишняя энергия
-					atmzm.Belief = 3
-					SaveCerebellumReflex()// может не стоит, пусть записывается вместе со всеми сохранениями
-				}
-			}
-if cr!=nil {
-	runAutomatizmFromPurpose(atmzm, purpose)
-	return atmzm
-}else{
+			if cerebellumCoordination(atmzm,0){
+				runAutomatizmFromPurpose(atmzm, purpose)
+				return atmzm
+			}else{
 	// просто не выполнять плохой автоматизм, раз что-то не так с рефлексами мозжечка
 	return nil
 }

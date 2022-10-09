@@ -129,9 +129,13 @@ if WasOperatorActiveted { // оператор отреагировал
 /////////////////////////////////////////////////////////////////////
 // отреагировать на отсуствие реакции - повторить автоматизм с большей силой Energy
 func noAutovatizmResult()(bool){
+	// реакция была, но но оператор не обратил на нее внимания, нужно усилить силу действия
+	if cerebellumCoordination(AutomatizmRunning,1){
+		// и тут же снова запустить реакцию!
+		setAutomatizmRunning(AutomatizmRunning, &CurrentPurposeGenetic)
+		return true
+	}
 
-	// TODO: использовать еще так же недописанную func cerebellumCoordination(id int)
-	// и тут же снова запустить реакцию!  setAutomatizmRunning(atmzm, purpose) return true
 	return false
 }
 /////////////////////////////////////////////////////////////////////

@@ -32,15 +32,56 @@ https://scorcher.ru/diary/topic.php?id=892&page_txt=43
 
 package psychic
 
+import "BOT/brain/gomeostas"
+
 ///////////////////////////////////////
 
 
 /////////////////////////
-/* Создать или дополнить рефлекс cerebellumReflexFromID[LastAutomatizmWeiting.ID] другими корректирующими действиеями
-
+/* Создать или дополнить автоматизм рефлексом мозжечка cerebellumReflexFromID[LastAutomatizmWeiting.ID]
+другими корректирующими действиеями
+У автоматзма есть свой параметр Energy, но т.к. автоматизм может использоваться в разных случаях,
+   лучше для этих конкретных случаев использования уточнять энергичность
+   с помощью мозжечковых рефлексов.
+Возвращает екгу, если была оптимизация и нужно запустить такой автоматизм на новое исполнение для проверки.
+todo - типа запроса на оптимизацию:
+0 - оптимизировать в зависимости от предыдущего значения
+1 - усилить
  */
-func cerebellumCoordination(id int){
-	// TODO: учитывать энергосбережение и самосохранение !!!
-
+func cerebellumCoordination(atmzm *Automatizm,todo int)(bool) {
+	// TODO: учитывать энергосбережение и самосохранение !!!???
+	cr := cerebellumReflexFromMotorsID[atmzm.ID]
+	if cr != nil { // уже есть мозжечковый рефлекс
+		// в прошлый раз было добавлено энергии
+		oldEnerg := cr.addEnergy
+		if oldEnerg+atmzm.Energy > 9 { // был добавлено лишее, нужно постепенно уменьшить, а не скакать от плюса к минусу
+			if todo==1{
+				return false
+			}
+			// если остро не хватает энергии
+			if gomeostas.GomeostazParams[0] < 10.0{
+				return false
+			}
+			cr.addEnergy-- // может быть отрицательное число, чтобы уменьшить энергию автоматизма
+		}
+		if todo==1 || oldEnerg+atmzm.Energy < 1 { // был добавлено лишее, нужно постепенно добавлять, а не скакать от плюса к минусу
+			cr.addEnergy++
+		}
+		return true
+	} else { // нет мозжечкового рефлекса
+		// добавить мозжечковый рефлекс
+		_, cr = createNewCerebellumReflex(0, 0, atmzm.ID)
+		if cr != nil {
+				if todo==1{
+					return false
+				}
+			// добавить энергичность по максимуму
+			cr.addEnergy = 10 - atmzm.Energy // хотя при выполнении автоматизма будет подрезана лишняя энергия
+			atmzm.Belief = 3
+			//SaveCerebellumReflex() // может не стоит, пусть записывается вместе со всеми сохранениями
+			return true
+		}
+	}
+	return false
 }
 //////////////////////////////////////////////////////////
