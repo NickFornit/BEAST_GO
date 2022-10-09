@@ -38,8 +38,8 @@ if newsRes{// повышенная опасность от оператора
 		runAutomatizmFromPurpose(atmzm, purpose)
 		return atmzm
 	}else{//....................................... не очень актуально
-		// проверенный автоматизм не трогать
-		if  AutomatizmFromIdArr[atmtzmID].Belief == 2{
+		// проверенный и хороший автоматизм не трогать
+		if  atmzm.Belief == 2 && atmzm.Usefulness>0{
 			//просто выполнить автоматизм и отслеживать последствия
 			runAutomatizmFromPurpose(atmzm, purpose)
 			return atmzm
