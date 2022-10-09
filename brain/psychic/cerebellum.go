@@ -49,6 +49,9 @@ todo - типа запроса на оптимизацию:
 1 - усилить
  */
 func cerebellumCoordination(atmzm *Automatizm,todo int)(bool) {
+	if atmzm == nil{
+		return false
+	}
 	// TODO: учитывать энергосбережение и самосохранение !!!???
 	cr := cerebellumReflexFromMotorsID[atmzm.ID]
 	if cr != nil { // уже есть мозжечковый рефлекс
