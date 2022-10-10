@@ -130,11 +130,23 @@ if WasOperatorActiveted { // оператор отреагировал
 // отреагировать на отсуствие реакции - повторить автоматизм с большей силой Energy
 func noAutovatizmResult()(bool){
 
-	// создать образ ситуации
-	autmzmTreeNodeID:=AutomatizmRunning.BranchID
-	id,_:=createSituationImage(0,autmzmTreeNodeID,6)
-	// осмыслить ситуацию - Активировать Дерево Понимания
-	understandingSituation(id,savePurposeGenetic)
+	// не опасная ситуация, можно поэкспериментировать
+	if EvolushnStage == 3 && !CurrentPurposeGenetic.veryActual{
+	/* в случае отсуствия автоматизма в данных условиях - послать оператору те же стимулы, чтобы посмотреть его реакцию.
+		   Создание автоматизма, повторяющего действия оператора в данных условиях
+	*/
+		provokatorMirrorAutomatizm(AutomatizmRunning,&CurrentPurposeGenetic)
+		return true
+	}
+
+	if EvolushnStage > 3 {
+		// создать образ ситуации
+		autmzmTreeNodeID := AutomatizmRunning.BranchID
+		id, _ := createSituationImage(0, autmzmTreeNodeID, 6)
+		// осмыслить ситуацию - Активировать Дерево Понимания
+		understandingSituation(id, savePurposeGenetic)
+		return true
+	}
 
 	// реакция была, но но оператор не обратил на нее внимания, нужно усилить силу действия
 	if cerebellumCoordination(AutomatizmRunning,1){
@@ -206,10 +218,15 @@ func calcAutomatizmResult(commonDiffValue int,diffPsyBaseMood int,wellIDarr []in
 		if commonDiffValue>0 {
 			AutomatizmSuccessFromIdArr[AutomatizmRunning.ID] = AutomatizmRunning
 		}
-		if EvolushnStage == 3{// отзеркаливания ответа оператора
-			// TODO функция создания автоматизма, повторяющего действия оператора в данных условиях
-		}
 	}
+	if EvolushnStage == 3{
+/* отзеркаливание ответа оператора не зависимо от того, стало хуже или лучше
+потому, что это был ответ оператора на действия автоматизма, значит - авторитетный ответ
+   Создание автоматизма, повторяющего действия оператора в данных условиях
+ */
+		createNewMirrorAutomatizm(AutomatizmRunning)
+	}
+
 	if commonDiffValue<0{// стало хуже
 		PsyBaseMood=-1
 		// очистить списки улучшения
@@ -225,11 +242,13 @@ func calcAutomatizmResult(commonDiffValue int,diffPsyBaseMood int,wellIDarr []in
 		// переактивировать дерево рефлексов
 		automatizmTreeActivation()//и возникает новый цикл активации Дерева, уже по внутренним причинам
 	}
-// создать образ ситуации
-autmzmTreeNodeID:=AutomatizmRunning.BranchID
-	id,_:=createSituationImage(0,autmzmTreeNodeID,1)
-	// осмыслить ситуацию - Активировать Дерево Понимания
-	understandingSituation(id,savePurposeGenetic)
+	if EvolushnStage > 3 {
+		// создать образ ситуации
+		autmzmTreeNodeID := AutomatizmRunning.BranchID
+		id, _ := createSituationImage(0, autmzmTreeNodeID, 1)
+		// осмыслить ситуацию - Активировать Дерево Понимания
+		understandingSituation(id, savePurposeGenetic)
+	}
 
 // оценить значимость поизнесенной фразы в VerbalFromIdArr структурах Дерева Понимания??
 
@@ -317,11 +336,13 @@ func calcAutomatizmResultAut(diffPsyBaseMood int,wellIDarr []int){
 	if diffPsyBaseMood>0{// стало лучше
 		PsyBaseMood=1
 	}
-	// создать образ ситуации
-	autmzmTreeNodeID:=AutomatizmRunning.BranchID
-	id,_:=createSituationImage(0,autmzmTreeNodeID,2)
-	// осмыслить ситуацию - Активировать Дерево Понимания
-	understandingSituation(id,savePurposeGenetic)
+	if EvolushnStage > 3 {
+		// создать образ ситуации
+		autmzmTreeNodeID := AutomatizmRunning.BranchID
+		id, _ := createSituationImage(0, autmzmTreeNodeID, 2)
+		// осмыслить ситуацию - Активировать Дерево Понимания
+		understandingSituation(id, savePurposeGenetic)
+	}
 
 	// оценить значимость поизнесенной фразы в VerbalFromIdArr структурах Дерева Понимания??
 

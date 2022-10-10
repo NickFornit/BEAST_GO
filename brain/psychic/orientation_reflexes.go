@@ -131,13 +131,14 @@ func orientation_1()(*Automatizm){
 	// else НИЧЕГО НЕ ДЕЛАТЬ: при высокой актуальности - растерянность, при низкой - лень
 
 	if veryActualSituation {// нужно осмысление
-		// создать образ ситуации
-		autmzmTreeNodeID:=detectedActiveLastNodID
-		id,_:=createSituationImage(0,autmzmTreeNodeID,0)
-		// осмыслить ситуацию - Активировать Дерево Понимания
-		understandingSituation(id,savePurposeGenetic)
-		// м.б. были совершены действия, тогда isReflexesActionBloking был выставлен
+		if EvolushnStage > 3 {
+			// создать образ ситуации
+			id, _ := createSituationImage(0, detectedActiveLastNodID, 0)
+			// осмыслить ситуацию - Активировать Дерево Понимания
+			understandingSituation(id, savePurposeGenetic)
+			// м.б. были совершены действия, тогда isReflexesActionBloking был выставлен
 		}
+	}
 
 	isReflexesActionBloking=false
 	return nil
@@ -180,12 +181,13 @@ func orientation_2(nodeAutomatizmID int)(*Automatizm){
 	}
 
 	if veryActualSituation {// нужно осмысление
-		// создать образ ситуации
-		autmzmTreeNodeID:=detectedActiveLastNodID
-		id,_:=createSituationImage(0,autmzmTreeNodeID,0)
-		// осмыслить ситуацию - Активировать Дерево Понимания
-		understandingSituation(id,savePurposeGenetic)
-		// м.б. были совершены действия, тогда isReflexesActionBloking был выставлен
+		if EvolushnStage > 3 {
+			// создать образ ситуации
+			id, _ := createSituationImage(0, detectedActiveLastNodID, 0)
+			// осмыслить ситуацию - Активировать Дерево Понимания
+			understandingSituation(id, savePurposeGenetic)
+			// м.б. были совершены действия, тогда isReflexesActionBloking был выставлен
+		}
 	}
 
 return nil

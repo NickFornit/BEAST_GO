@@ -165,7 +165,10 @@ cила действия сначала задается =5, а потот ко�
 func TerminateMotorAutomatizmActions(actIDarr []int,energy int)string{
 	// energy=1
 	// название силы:
-	enegrName:= termineteAction.EnergyDescrib[energy]
+	var enegrName=""
+	if energy < len(termineteAction.EnergyDescrib) {
+		enegrName = termineteAction.EnergyDescrib[energy]
+	}
 	var out=""
 	var isAct=false
 	for i := 0; i < len(actIDarr); i++ {
@@ -222,7 +225,9 @@ func TerminatePraseAutomatizmActions(IDarr []int, energy int)string{
 		out += "<b>"+prase+"</b>"
 	}
 	// название силы:
-	out += " " + termineteAction.EnergyDescrib[energy] + "</b>"
+	if energy < len(termineteAction.EnergyDescrib) {
+		out += " " + termineteAction.EnergyDescrib[energy] + "</b>"
+	}
 	return out
 }
 

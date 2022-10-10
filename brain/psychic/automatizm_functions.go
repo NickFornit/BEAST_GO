@@ -70,7 +70,7 @@ func getAutomatizmFromNodeID(nodeID int)(int){
 	}
 	/////////// нет никаких автоматизмов хоть как-то относящийся к данному узлу
 	// найти у предыдущих узел действий
-	for i := len(ActiveBranchNodeArr); i >2 ; i-- {
+	for i := len(ActiveBranchNodeArr)-1; i >2 ; i-- {
 		node=AutomatizmTreeFromID[ActiveBranchNodeArr[i]]
 		if node.ActivityID>0{
 			atmzA:=GetAutomatizmBeliefFromActionId(node.ActivityID)

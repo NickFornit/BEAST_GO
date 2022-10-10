@@ -47,6 +47,13 @@ func getPurposeUndestanding2AndRunAutomatizm(atmtzmID int)(*Automatizm){
 	newsRes:=getImportantSigns()
 	if newsRes{
 
+		// создать образ ситуации
+		autmzmTreeNodeID:=detectedActiveLastNodID
+		id,_:=createSituationImage(0,autmzmTreeNodeID,5)
+		// осмыслить ситуацию - Активировать Дерево Понимания
+		understandingSituation(id,savePurposeGenetic)
+		// м.б. были совершены действия, тогда isReflexesActionBloking был выставлен
+
 	}else{ // нет новизны
 
 		// TODO м.б. есть сила воли, блокирующая выполнение данного автоматизма и подставляющая свой?

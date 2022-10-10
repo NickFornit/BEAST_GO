@@ -195,3 +195,90 @@ func FormingMirrorAutomatizmFromTempList(file string)(string){
 	return "OK"
 }
 //////////////////////////////////
+
+
+
+/* создание зеркального автоматизма, повторяющего действия оператора в данных условиях
+в ответ на действия sourceAtmzm - причина ответа оператора
+Только что действиями оператора была активирована ветка detectedActiveLastNodID дерева и
+есть информация об этих действиях в curActiveActions
+*/
+func createNewMirrorAutomatizm(sourceAtmzm *Automatizm){
+	if sourceAtmzm == nil{
+		return
+	}
+	var sequence =""
+//  создать автоматизм и привязать его к объекту
+	if len(curActiveActions.phraseID)>0 {
+		sequence += "Snn:" + strconv.Itoa(curActiveActions.phraseID[0]) // ответная фраза
+
+		// тон, настроение
+		tm:=GetToneMoodID(curActiveActions.toneID,curActiveActions.moodID+19)
+		sequence+="|Tnn:"+strconv.Itoa(tm) // тон и настроение
+	}
+
+	sequence+="|Dnn:" // перечень ответных действий
+	for i := 0; i < len(curActiveActions.actID); i++ {
+		if i > 0 {
+			sequence += ","
+		}
+		sequence += strconv.Itoa(curActiveActions.actID[i])
+	}
+
+//	NoWarningCreateShow=true
+	// для фразы triggerPraseID создаем привязанный к ней автоматизм
+	_,autmzm:=CreateAutomatizm(detectedActiveLastNodID,sequence)
+//	NoWarningCreateShow=false
+	if autmzm!=nil{
+		SetAutomatizmBelief(autmzm, 2)// сделать автоматизм штатным, т.к. действия авторитарно верные
+		autmzm.Usefulness=1 // авторитарная полезность
+	}
+}
+/////////////////////////////////////////////////////
+
+
+/* в случае отсуствия автоматизма в данных условиях - послать оператору те же стимулы, чтобы посмотреть его реакцию.
+   Создание автоматизма, повторяющего действия оператора в данных условиях
+*/
+func provokatorMirrorAutomatizm(sourceAtmzm *Automatizm,purposeGenetic *PurposeGenetic){
+	if sourceAtmzm == nil || purposeGenetic == nil{
+		return
+	}
+
+	var linkID=0
+	var sequence =""
+	//  создать автоматизм и привязать его к объекту
+
+	sequence+="|Dnn:" // перечень ответных действий
+	for i := 0; i < len(curActiveActions.actID); i++ {
+		if i > 0 {
+			sequence += ","
+		}
+		sequence += strconv.Itoa(curActiveActions.actID[i])
+		// образ пусковых
+		linkID=1000000+curActiveActions.triggID
+	}
+
+	if len(curActiveActions.phraseID)>0 {
+		verbID:=curActiveActions.phraseID[0]
+		sequence += "Snn:" + strconv.Itoa(verbID) // ответная фраза
+		// тон, настроение
+		tm:=GetToneMoodID(curActiveActions.toneID,curActiveActions.moodID+19)
+		sequence+="|Tnn:"+strconv.Itoa(tm) // тон и настроение
+		linkID=2000000+verbID
+	}
+
+	//	NoWarningCreateShow=true
+	// для фразы triggerPraseID создаем привязанный к ней автоматизм
+	_,autmzm:=CreateAutomatizm(detectedActiveLastNodID,sequence)
+	//	NoWarningCreateShow=false
+	if autmzm!=nil{
+		autmzm.BranchID+=linkID // не привязывать к узлу
+		SetAutomatizmBelief(autmzm, 2)// сделать автоматизм штатным, т.к. действия авторитарно верные
+		autmzm.Usefulness=1 // авторитарная полезность
+	}
+
+	// и тут же запустить реакцию с ожиданием ответа
+	setAutomatizmRunning(autmzm, purposeGenetic)
+}
+//////////////////////////////////////////////////////
