@@ -52,7 +52,7 @@ func FormingMirrorAutomatizmFromList(file string) string {
 		wordSensor.VerbalDetection(prase, 1, 0, 0)
 		PhraseID := wordSensor.CurrentPhrasesIDarr
 
-		// первый симвод ответной фразы
+		// первый символ ответной фразы
 		FirstSimbolID := wordSensor.GetFirstSymbolFromPraseID(PhraseID)
 		// создать образ Брока
 		CreateVerbalImage(FirstSimbolID, PhraseID, 0, 0)
@@ -66,11 +66,11 @@ func FormingMirrorAutomatizmFromList(file string) string {
 		}	*/
 		if nodeID > 0 {
 			// создать автоматизм и привязать его к nodeID
-			var sequence="Snn:" // ответная фраза
+			var sequence = "Snn:" // ответная фраза
 			// засунуть фразу в дерево слов и дерево фраз
 			wordSensor.VerbalDetection(p[3], 1, 0, 0)
 			answerID := wordSensor.CurrentPhrasesIDarr
-			sequence+=strconv.Itoa(answerID[0])
+			sequence += strconv.Itoa(answerID[0])
 
 			sequence += "|Тnn:" // тон и настроение
 			tnArr := strings.Split(p[4], ",")
@@ -79,7 +79,7 @@ func FormingMirrorAutomatizmFromList(file string) string {
 			tonMoodID := GetToneMoodID(t, m)
 			sequence += strconv.Itoa(tonMoodID)
 
-			sequence+="|Dnn:" // перечень ответных действий
+			sequence += "|Dnn:" // перечень ответных действий
 			aD := strings.Split(p[5], ",")
 			for i := 0; i < len(aD); i++ {
 				if i > 0 { sequence += "," }
