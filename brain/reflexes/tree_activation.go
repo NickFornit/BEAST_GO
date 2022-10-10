@@ -75,12 +75,12 @@ var conditionReflexesIdArr []int 	// собираются Условные ре�
 var NoUnconditionRefles = ""
 
 // распознавание рефлексов
-func activeReflexTree(){
-	detectedActiveLastNodID=0
-	detectedActiveLevel=0
-	oldReflexesIdArr=nil
-	geneticReflexesIdArr=nil
-	conditionReflexesIdArr=nil
+func activeReflexTree() {
+	detectedActiveLastNodID = 0
+	detectedActiveLevel = 0
+	oldReflexesIdArr = nil
+	geneticReflexesIdArr = nil
+	conditionReflexesIdArr = nil
 
 	// для частичного распознавания нужен массив текущих активных Базовых контекстов
 	curBaseCondArr = gomeostas.GetCurContextActiveIDarr()
@@ -88,7 +88,7 @@ func activeReflexTree(){
 		return
 	}
 	// массив текущих пусковых стимулов
-	curPultActionsArr=action_sensor.CheckCurActions()
+	curPultActionsArr = action_sensor.CheckCurActions()
 	// для условныз реф-в
 	//=GetActiveContextInfo()
 
