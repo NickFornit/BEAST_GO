@@ -68,17 +68,22 @@ var currentUnderstandingStepCount=0
 var currentUnderstandingNodeID[] int
 
 
+/* вызывается из:
+automatizm_result.go - в calcAutomatizmResult(
+на 4-й стадии и позже - при любых действиях с пульта, не сопровождающихся срабатыванием автоматизма
 
-func understandingSituation(situationImageID int,ps *PurposeGenetic){
+Если были совершены действия, то нужно выставлять isReflexesActionBloking=true !!!
+ */
+func understandingSituation(situationImageID int,ps *PurposeGenetic)(bool){
 	if EvolushnStage < 4 { // только со стадии развития 4
-		return
+		return false
 	}
 	if PulsCount<4{// не активировать пока все не устаканится
-		return
+		return false
 	}
 	/* может думать в это время!
 	if LastRunAutomatizmPulsCount >0{// не активировать в период ожидания результатов действий!
-		return 0
+		return false
 	}
 	*/
 	detectedActiveLastUnderstandingNodID=0
@@ -129,7 +134,7 @@ func understandingSituation(situationImageID int,ps *PurposeGenetic){
 			detectedActiveLastUnderstandingNodID = formingUnderstandingBranch(detectedActiveLastUnderstandingNodID, currentUnderstandingStepCount+1, condArr)
 
 			// Ориентировочный рефлекс осознания ситуации - частичная новизна условий
-			orientationConsciousness(1)
+			res:=orientationConsciousness(1)
 			/*
 			// автоматизма нет у недоделанной ветки
 			automatizm := orientation_1()
@@ -140,11 +145,11 @@ func understandingSituation(situationImageID int,ps *PurposeGenetic){
 			}
 			 */
 			newEpisodeMemory()
-			return
+			return res
 		}else{// все условия пойдены,. ветка существует,
 			//МЕНТ.АВТОМАТИЗМ может и не БЫТЬ
 			// Ориентировочный рефлекс осознания ситуации - только новизна ситуации
-			orientationConsciousness(2)
+			res:=orientationConsciousness(2)
 			/*
 			automatizmID := getAutomatizmFromNodeID(detectedActiveLastUnderstandingNodID)
 			if automatizmID > 0 {//ориентировочный рефлекс 2
@@ -159,11 +164,11 @@ func understandingSituation(situationImageID int,ps *PurposeGenetic){
 			}
 			*/
 			newEpisodeMemory()
-			return
+			return res
 		}
 	}else{// вообще нет совпадений для данных условий
 		// Ориентировочный рефлекс осознания ситуации полная новизна условий
-		orientationConsciousness(0)
+		res:=orientationConsciousness(0)
 		//нарастить недостающую ветку
 		// нарастить недостающее в ветке дерева
 		detectedActiveLastUnderstandingNodID = formingUnderstandingBranch(detectedActiveLastUnderstandingNodID, currentUnderstandingStepCount, condArr)
@@ -174,13 +179,13 @@ func understandingSituation(situationImageID int,ps *PurposeGenetic){
 		if automatizm !=nil {
 			automatizm.BranchID = detectedActiveLastUnderstandingNodID
 			// сразу запустить МОТОРНОЕ действие - в  orientation_1()
-			return
+			return true
 		}
 		newEpisodeMemory()
-		return
+		return res
 	}
 
-	return
+	return false
 }
 /////////// НОВЫЙ ЭПИЗОД ПАМЯТИ
 func newEpisodeMemory(){

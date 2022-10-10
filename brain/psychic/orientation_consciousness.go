@@ -27,13 +27,16 @@ package psychic
 
 
 // нераспознанный остаток - НОВИЗНА: var CurrentUnderstandingTreeEnd []int
+
+return true - заблокировать все более низкоуровневые действия
 */
-func orientationConsciousness(kind int){
+func orientationConsciousness(kind int)(bool){
 
+//Если были совершены действия, то нужно выставлять isReflexesActionBloking=true !!!
+	//return true //- заблокировать все более низкоуровневые действия
 
+	return false // ничего не произвошло
 }
 ////////////////////////////////////
 
 
-/*
- */

@@ -212,6 +212,7 @@ ActID:=action_sensor.CheckCurActionsContext();//CheckCurActions()
 			}else {
 				// автоматизма нет у недоделанной ветки
 				automatizmID := orientation(0)
+
 				return automatizmID // блокировка рефлексов, если automatizmID > 0
 			}
 			return 0

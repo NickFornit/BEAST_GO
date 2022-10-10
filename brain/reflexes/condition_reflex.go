@@ -248,7 +248,7 @@ func checkReflexLifeTime(reflex *ConditionReflex)(bool){
 	}
 	// время жизни рефлекса
 	life:= reflex.lastActivation - reflex.birthTime
-	if life!=0 && life < 50{// рефлекс угас и не должен использоваться
+	if life!=0 && life > 50{// рефлекс угас и не должен использоваться
 		return false
 	}
 	// последняя активация

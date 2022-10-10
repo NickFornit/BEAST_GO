@@ -129,6 +129,13 @@ if WasOperatorActiveted { // оператор отреагировал
 /////////////////////////////////////////////////////////////////////
 // отреагировать на отсуствие реакции - повторить автоматизм с большей силой Energy
 func noAutovatizmResult()(bool){
+
+	// создать образ ситуации
+	autmzmTreeNodeID:=AutomatizmRunning.BranchID
+	id,_:=createSituationImage(0,autmzmTreeNodeID,6)
+	// осмыслить ситуацию - Активировать Дерево Понимания
+	understandingSituation(id,savePurposeGenetic)
+
 	// реакция была, но но оператор не обратил на нее внимания, нужно усилить силу действия
 	if cerebellumCoordination(AutomatizmRunning,1){
 		// и тут же снова запустить реакцию!
@@ -147,7 +154,7 @@ func noAutovatizmResult()(bool){
 // отслеживание запущенных автоматизмов
 var AutomatizmRunning *Automatizm // запущенный автоматизм
 var AutomatizmRunningPulsCount=0 // время запуска автоматизма WaitingPeriodForActionsVal сек ожидания (if AutomatizmRunningPulsCount+WaitingPeriodForActionsVal < PulsCount {)
-var savePurposeGenetic *PurposeGenetic // массив примитивных целей
+var savePurposeGenetic *PurposeGenetic // массив примитивных целей, создающих контекст ситуации
 
 func setAutomatizmRunning(am *Automatizm,ps *PurposeGenetic){
 	AutomatizmRunning=am
