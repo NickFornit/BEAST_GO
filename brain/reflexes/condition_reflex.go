@@ -71,8 +71,8 @@ type ConditionReflex struct {
 	rank int
 
 	/* время последней активации в числе пульсов времени жизни
-	- для отключения рефлекса при неиспользовании в течении 10 суток жизни 3600*24*10 = 864000 пульсов,
-	но каждые 10 дней укрепляют рефлекс в 2 раза:
+	- для отключения рефлекса при неиспользовании в течении 50 суток жизни 3600*24*10 = 864000 пульсов,
+	но каждое использование укрепляют рефлекс на 10 дней жизни:
 	conditionRexlexFound().
 	*/
 	lastActivation int
@@ -119,8 +119,8 @@ func CreateNewConditionReflex(id int, lev1 int, lev2 []int, lev3 int, ActionIDar
 	newW.lev3 = lev3
 	newW.ActionIDarr = ActionIDarr
 	newW.rank = rank
-	newW.lastActivation = LifeTime // последняя активация
-	newW.birthTime = LifeTime // время рождения
+	newW.lastActivation = int(LifeTime/(3600*24)) // последняя активация
+	newW.birthTime = int(LifeTime/(3600*24)) // время рождения
 
 	ConditionReflexes[id] = &newW
 	ConditionReflexesFrom3[lev3] = append(ConditionReflexesFrom3[lev3],&newW)
@@ -132,8 +132,8 @@ func compareCRUnicum(lev1 int, lev2 []int, lev3 int) (int, *ConditionReflex) {
 	for k, v := range ConditionReflexes {
 		if v.lev1 == lev1 && lib.EqualArrs(v.lev2, lev2) && v.lev3 == lev3 {
 			// если это просроченный рефлекс, то установить его lastActivation в актуальное состояние
-			v.lastActivation = LifeTime // последняя активация
-			v.birthTime = LifeTime // время рождения
+			v.lastActivation = int(LifeTime/(3600*24)) // последняя активация
+			v.birthTime = int(LifeTime/(3600*24)) // время рождения
 			return k, v
 		}
 	}
@@ -243,20 +243,18 @@ func loadConditionReflexes() {
 func checkReflexLifeTime(reflex *ConditionReflex)(bool){
 // рефлексы, только что созданные автоматически не проверять, они всегда новые:
 	if reflex.lastActivation ==0  {// !!! только только что созданные || (reflex.lastActivation - reflex.birthTime)==0
-		reflex.lastActivation = LifeTime // последняя активация
+		reflex.lastActivation = int(LifeTime/(3600*24)) // последняя активация
 		return true
 	}
-	// 50 дней в секундах
-	d50:=3600*24*50
 	// время жизни рефлекса
 	life:= reflex.lastActivation - reflex.birthTime
-	if life!=0 && life < d50{// рефлекс угас и не должен использоваться
+	if life!=0 && life < 50{// рефлекс угас и не должен использоваться
 		return false
 	}
 	// последняя активация
-	reflex.lastActivation = LifeTime
+	reflex.lastActivation = int(LifeTime/(3600*24))
 	// удлинить время жизни на 10 дней
-	reflex.birthTime-=3600*24*10
+	reflex.birthTime-=10
 	if reflex.birthTime <0{
 		reflex.birthTime=0
 	}
@@ -269,8 +267,8 @@ func checkReflexLifeTime(reflex *ConditionReflex)(bool){
 // обновить время жизни всех рефлексов
 func ClinerTimeConditionReflex()(string){
 	for _, v := range ConditionReflexes {
-		v.lastActivation = LifeTime // последняя активация
-		v.birthTime = LifeTime // время рождения
+		v.lastActivation = int(LifeTime/(3600*24)) // последняя активация
+		v.birthTime = int(LifeTime/(3600*24)) // время рождения
 	}
 	SaveConditionReflex()
 	return "Обновлено время жизни всех рефлексов"
