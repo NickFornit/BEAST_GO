@@ -250,8 +250,9 @@ func GetConditionReflexInfo(limitBasicID int) string {
 		t := v.birthTime
 		y := int(t / (3600 * 24 * 365))
 		d := int((t - y * 3600 * 24 * 365) / (3600 * 24))
-		s := t - (y * 3600 * 24 * 365) - (d * 3600 * 24)
-		old := strconv.Itoa(y) + "лет " + strconv.Itoa(d) + "дней " + strconv.Itoa(s) + "сек"
+		//s := t - (y * 3600 * 24 * 365) - (d * 3600 * 24)
+		old := strconv.Itoa(y) + "лет " + strconv.Itoa(d) + "дней "
+
 
 		out += "<tr >"
 		out += "<td class='table_cell' >"+id+"</td>"

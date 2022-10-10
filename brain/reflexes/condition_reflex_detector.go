@@ -24,7 +24,7 @@ import (
 /* есть ли условный рефлекс при активации дерева в tree_activation.go */
 func conditionRexlexFound(cond []int) bool {
 	if cond == nil || len(cond) == 0 { return false	}
-	reflex:=getRightConditionReflexesFrom3(cond[0])
+	reflex := getRightConditionReflexesFrom3(cond[0])
 	if reflex == nil {
 		// попробовать найти схожие по образу рефлексы чтобы не так жестко привязываться к точности фразы
 		reflex = findConditionsReflesFromImgID(cond, cond[0])
@@ -42,7 +42,7 @@ func conditionRexlexFound(cond []int) bool {
 упрощая фразу из массива фраз TriggerStimulsArr[cond[0]].PhraseID []int
 перебором массива var TriggerStimulsArr = make(map[int]*TriggerStimuls)
 */
-func findConditionsReflesFromImgID(cond []int,ImgID int) *ConditionReflex {
+func findConditionsReflesFromImgID(cond []int, ImgID int) *ConditionReflex {
 	var reflex *ConditionReflex
 
 	// выделить текущую фразу
