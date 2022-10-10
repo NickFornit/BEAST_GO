@@ -330,6 +330,15 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				return
 			}
 
+			cliner_time_condition_reflex := r.FormValue("cliner_time_condition_reflex")
+			if len(cliner_time_condition_reflex) > 0 {
+				isGlobalStopAllActivnost = true
+				ret := reflexes.ClinerTimeConditionReflex()
+				isGlobalStopAllActivnost = false
+				_, _ = fmt.Fprint(resp, ret)
+				return
+			}
+
 			get_condition_reflex_info := r.FormValue("get_condition_reflex_info")
 			if len(get_condition_reflex_info) > 0 {
 				base := r.FormValue("limitBasicID")

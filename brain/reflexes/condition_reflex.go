@@ -34,7 +34,7 @@
 По умолчаню у безусловных рефлексов rank равен 0.
 
 Формат записи:
-ID|lev1|lev2 через ,|lev3 типа TriggerStimulsID|ActionIDarr через ,|rank|lastActivation|activationTime
+ID|lev1|lev2 через ,|lev3 типа TriggerStimulsID|ActionIDarr через ,|rank|lastActivation|birthTime
 
 для набивки у.рефылексов Сначала (А НЕ ОДНОВРЕМЕННО!) стимул, потом рефлекс:
 ПЕРЕД ПУСКОВЫМ СТИМУЛОМ НУЖНО ЗАПОСТИТЬ СЛОВО
@@ -76,8 +76,8 @@ type ConditionReflex struct {
 	conditionRexlexFound().
 	*/
 	lastActivation int
-	// время активации в LifeTime т.к. более "молодые" и непрочные условные рефлексы угасают быстрее, чем более "старые".
-	activationTime int
+	// время рождения в LifeTime т.к. более "молодые" и непрочные условные рефлексы угасают быстрее, чем более "старые".
+	birthTime int
 }
 
 var ConditionReflexes = make(map[int]*ConditionReflex)
@@ -120,7 +120,7 @@ func CreateNewConditionReflex(id int, lev1 int, lev2 []int, lev3 int, ActionIDar
 	newW.ActionIDarr = ActionIDarr
 	newW.rank = rank
 	newW.lastActivation = LifeTime // последняя активация
-	newW.activationTime = LifeTime // время рождения
+	newW.birthTime = LifeTime // время рождения
 
 	ConditionReflexes[id] = &newW
 	ConditionReflexesFrom3[lev3] = append(ConditionReflexesFrom3[lev3],&newW)
@@ -133,7 +133,7 @@ func compareCRUnicum(lev1 int, lev2 []int, lev3 int) (int, *ConditionReflex) {
 		if v.lev1 == lev1 && lib.EqualArrs(v.lev2, lev2) && v.lev3 == lev3 {
 			// если это просроченный рефлекс, то установить его lastActivation в актуальное состояние
 			v.lastActivation = LifeTime // последняя активация
-			v.activationTime = LifeTime // время рождения
+			v.birthTime = LifeTime // время рождения
 			return k, v
 		}
 	}
@@ -175,13 +175,13 @@ func ListConditionReflex(k int, v *ConditionReflex)string {
 	out += "|"
 	out += strconv.Itoa(v.rank) + "|"
 	out += strconv.Itoa(v.lastActivation) + "|"
-	out += strconv.Itoa(v.activationTime)
+	out += strconv.Itoa(v.birthTime)
 
 	return out
 }
 
 /*  загрузить  условные рефлексы из файла в формате
-ID|lev1|lev2 через ,|lev3 типа TriggerStimulsID|ActionIDarr через ,|rank|lastActivation|activationTime
+ID|lev1|lev2 через ,|lev3 типа TriggerStimulsID|ActionIDarr через ,|rank|lastActivation|birthTime
  в отличие от безусловного рефлекссв, а только один ID образа пускового стимула типа TriggerStimulsID
 */
 func loadConditionReflexes() {
@@ -216,11 +216,63 @@ func loadConditionReflexes() {
 		}
 		rank, _ := strconv.Atoi(p[5])
 		lastActivation, _ := strconv.Atoi(p[6])
-		activationTime, _ := strconv.Atoi(p[7])
+		birthTime, _ := strconv.Atoi(p[7])
 
 		_, r := CreateNewConditionReflex(id, lev1, lev2, lev3, ActionIDarr, rank)
 		r.lastActivation = lastActivation
-		r.activationTime = activationTime
+		r.birthTime = birthTime
 	}
 	return
 }
+//////////////////////////////////////////////////////
+
+/*  Угас ли рефлекс или его можно использовать?
+Вызывается:
+1) при каждом срабатывании рефлекса
+2) для проверки состояния рефлекса
+В первом случае рефлекс продлевает время жизни,
+во втором случае он может быть пассивирован, если время жизни превысило период его угасания
+Возвращает true если рефлекс активен, - false - если рефлекс угас.
+Принцип:
+при каждой активации рефлекса (в conditionRexlexFound()) его время жизни продлевается
+за счет перезаписывания времени рождения birthTime - уменьшая его вплоть до 0.
+
+Если рефлекс пересоздается (его актуальность подтверждается новым сочетанием причины и следствия),
+то его время жизни обновляется в func compareCRUnicum(
+ */
+func checkReflexLifeTime(reflex *ConditionReflex)(bool){
+// рефлексы, только что созданные автоматически не проверять, они всегда новые:
+	if reflex.lastActivation ==0  {// !!! только только что созданные || (reflex.lastActivation - reflex.birthTime)==0
+		reflex.lastActivation = LifeTime // последняя активация
+		return true
+	}
+	// 50 дней в секундах
+	d50:=3600*24*50
+	// время жизни рефлекса
+	life:= reflex.lastActivation - reflex.birthTime
+	if life!=0 && life < d50{// рефлекс угас и не должен использоваться
+		return false
+	}
+	// последняя активация
+	reflex.lastActivation = LifeTime
+	// удлинить время жизни на 10 дней
+	reflex.birthTime-=3600*24*10
+	if reflex.birthTime <0{
+		reflex.birthTime=0
+	}
+	// SaveConditionReflex() reflex записывается при текущем сеансе сохранения памяти
+
+	return true
+}
+////////////////////////////////////////////////////
+
+// обновить время жизни всех рефлексов
+func ClinerTimeConditionReflex()(string){
+	for _, v := range ConditionReflexes {
+		v.lastActivation = LifeTime // последняя активация
+		v.birthTime = LifeTime // время рождения
+	}
+	SaveConditionReflex()
+	return "Обновлено время жизни всех рефлексов"
+}
+///////////////////////////////////////////////////
