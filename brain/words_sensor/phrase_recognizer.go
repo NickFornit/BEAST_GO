@@ -1,4 +1,4 @@
-/*  распознавание фразы
+/* распознавание фразы
 вербальная иерархия распознавателей
 
 Распознавание фраз начинается в main.go с word_sensor.VerbalDetection(text_dlg, is_input_rejim, moodID)
@@ -12,19 +12,9 @@ import (
 	_ "strings"
 )
 
-///////////////////////////////////////////////////
-
 func iniPraseRecognising(){
-	/*
-
-
-	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-	*/
-	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 }
-//////////////////////////////////////////////////////
 
 // текущий уникальный ID последней активной ветки дерева - результат детекции фразы - для дальнейшего использования
 var DetectedUnicumPhraseID=0
@@ -35,31 +25,20 @@ var DetectedCurrentPhraseID=0
 // текущий номер слова распознаваемой фразы
 var currentStepPhraseCount=0
 
-/////////////////////////////////////////////////////////////////////////
-
 /* переносим в дерево слов достаточно повторяющиеся из tempArr для trees_former.go
-
 Распознать и вставить новое слово-фразу в дерево:
 найти подходящий узел и если еще нет - вставить новый.
  */
 
-
-/////////////////////////////////////////////////////////
 // проход одной фразы - распознавание ID слов фразы
-func PhraseDetection(words []int)(string) {
-
-	if len(words) == 0 {
-		return ""
-	}
-	if len(words) == 1 && words[0]==0 {// пустые строки не писать
-		return ""
-	}
+func PhraseDetection(words []int) string {
+	if len(words) == 0 { return "" }
+	if len(words) == 1 && words[0] == 0 {	return ""	} // пустые строки не писать
 	CurrentVerbalPhraseEnd = nil
 	DetectedUnicumPhraseID = 0
-	//var pultOut=""
+	// var pultOut=""
 	DetectedCurrentPhraseID = 0
 	currentStepPhraseCount = len(words)
-
 	r := words
 	// основа дерева
 	cnt := len(VernikePhraseTree.Children)
@@ -70,24 +49,19 @@ func PhraseDetection(words []int)(string) {
 			cldrn := VernikePhraseTree.Children[n] //.Children
 			getPhraseTreeNode(r, &cldrn)
 		}
-
-		if currentStepPhraseCount==0 { // распознанно точно, не смотреть другие
-			break
-		}
+		if currentStepPhraseCount == 0 { break } // распознанно точно, не смотреть другие
 	}
-
-	//////////////// результат распознавания
+	// результат распознавания
 	if DetectedCurrentPhraseID > 0 {
-		if currentStepPhraseCount==0 { // полностью распознан
-			DetectedUnicumPhraseID=DetectedCurrentPhraseID
-		}else{
-			var nr=len(r)-currentStepPhraseCount
-			CurrentVerbalPhraseEnd=r[nr:]
+		if currentStepPhraseCount == 0 { // полностью распознан
+			DetectedUnicumPhraseID = DetectedCurrentPhraseID
+		} else {
+			var nr = len(r) - currentStepPhraseCount
+			CurrentVerbalPhraseEnd = r[nr:]
 		}
 	}
-	/////////////////////////////////
-	var needSave=false
-	if DetectedUnicumPhraseID ==0 {
+	var needSave = false
+	if DetectedUnicumPhraseID == 0 {
 		// нераспознанный остаток
 		if len(CurrentVerbalPhraseEnd) > 0 {
 			r := CurrentVerbalPhraseEnd
@@ -105,9 +79,8 @@ func PhraseDetection(words []int)(string) {
 			needSave=true
 		}
 	}
-
 	// нет вообще такого, добавить все слово
-	if DetectedUnicumPhraseID ==0{
+	if DetectedUnicumPhraseID == 0 {
 		tree := PhraseTreeFromID[0]
 		// сразу создать первый узел
 		if len(r) > 0 {
@@ -120,63 +93,36 @@ func PhraseDetection(words []int)(string) {
 			}
 		}
 	}
-	if needSave{
-		SavePhraseTree()
-	}
-
-
-	out:=GetPhraseStringsFromPhraseID(DetectedUnicumPhraseID)
-
-return out//pultOut+"{"+strconv.Itoa(DetectedUnicumPhraseID)+")"
+	if needSave { SavePhraseTree() }
+	out := GetPhraseStringsFromPhraseID(DetectedUnicumPhraseID)
+	return out //pultOut+"{"+strconv.Itoa(DetectedUnicumPhraseID)+")"
 }
-/////////////////////////////////////////////
 
-
-func getPhraseTreeNode(words []int,wt *PhraseTree){
-
-	if len(words)==0{
-		return
-	}
-	ost:=words[1:]
-
-	if words[0] != wt.WordID {// пошло не туда
-		return
-	}
-
-	DetectedCurrentPhraseID=wt.ID
-	currentStepPhraseCount=len(ost)
+// получить ID фразы - конечный узел дерева фраз
+func getPhraseTreeNode(words []int, wt *PhraseTree) {
+	if len(words) == 0 { return	}
+	ost := words[1:]
+	if words[0] != wt.WordID { return } // пошло не туда
+	DetectedCurrentPhraseID = wt.ID
+	currentStepPhraseCount = len(ost)
 
 	for n := 0; n < len(wt.Children); n++ {
-			getPhraseTreeNode(ost, &wt.Children[n])
+		getPhraseTreeNode(ost, &wt.Children[n])
 	}
 	return
 }
-//////////////////////////////////////////////////////////////////////
 
-
-func getNodeCountFromLastID(lastID int)(int){
-	if lastID==0{
-		return 0
-	}
-	var count=0
+// получить число узлов в ветке
+func getNodeCountFromLastID(lastID int) int {
+	if lastID == 0 { return 0	}
+	var count = 0
 	for {
-		node:=PhraseTreeFromID[lastID]
-		if node==nil || node.WordID==0 {
+		node := PhraseTreeFromID[lastID]
+		if node == nil || node.WordID == 0 {
 			break
 		}
 		count++
-		lastID=node.ParentID
+		lastID = node.ParentID
 	}
 	return count
 }
-////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-

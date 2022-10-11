@@ -221,7 +221,7 @@ func provokatorMirrorAutomatizm(sourceAtmzm *Automatizm, purposeGenetic *Purpose
 		sequence += "Snn:" + strconv.Itoa(verbID) // ответная фраза
 		// тон, настроение
 		tm := GetToneMoodID(curActiveActions.toneID, curActiveActions.moodID + 19)
-		sequence += "|Tnn:"+strconv.Itoa(tm) // тон и настроение
+		sequence += "|Tnn:" + strconv.Itoa(tm) // тон и настроение
 		linkID = 2000000 + verbID
 	}
 

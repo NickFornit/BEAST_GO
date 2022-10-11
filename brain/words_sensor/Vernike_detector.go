@@ -38,76 +38,65 @@ var notAllowScanInThisTime = false
 // подошла очередь инициализации
 func afetrInitPhraseTree() {
 	wordRecognizerInit() //
-
-	//	VerbalDetection("привет новая абзаца",1) // текст с пульта
-	//  PhraseSeparator("привет") // распознавание фразы
+	// VerbalDetection("привет новая абзаца",1) // текст с пульта
+	// PhraseSeparator("привет") // распознавание фразы
 	// WordDetection("привет") // распознавание слова
-
 	isReadyWordSensorLevel = 1
 	initWordPult()
 	initPrasePult()
 }
 
-//////////////////////////////////////////////
-
 // индикация, что дерево загружено, можно вводить тексты
 var isReadyWordSensorLevel = 0
 
 func IsReadyWordSensorLevel() bool {
-	if isReadyWordSensorLevel > 0 { // связь с корнями проекта
-		return true
-	}
+	if isReadyWordSensorLevel > 0 { return true	} // связь с корнями проекта
 	return false
 }
 
-//////////////////////////////////////////  word_sensor.VerbalDetectin("активностный")
+// word_sensor.VerbalDetectin("активностный")
+// для использования в SetNewWordTreeNode
 
-//для использования в SetNewWordTreeNode
-
-// здесь набирается массив lastID распознанных фраз.
+// здесь набирается массив lastID распознанных фраз
 var CurrentPhrasesIDarr []int
-
+// тон сообщения с Пульта при передаче фразы
 var CurPultTone = 0
-
-// настроение с ПУльта при передаче фразы
+// настроение с Пульта при передаче фразы
 var CurPultMood = 0
-
-// текущий тон фразы: 0 - обычный, 1 - восклицательный, 2- вопросительный
+// текущий тон фразы: 0-обычный, 1-восклицательный, 2-вопросительный
 var DetectedTone = 0
 
 // Память о воспринятых фразах в текущем активном контексте:
 type MemoryDetected struct {
 	//распознанный текст в виде lastID выделенных фраз
 	PhrasesID []int // массив структур распознанных фраз
-	Tone      int   //Тон: 0 - обычный, 1 - восклицательный, 2- вопросительный, 3- вялый, 4 - Повышенный
-	Mood      int   // настроение при передаче фразы с Пульта: 20-Хорошее    21-Плохое    22-Игровое    23-Учитель    24-Агрессивное   25-Защитное    26-Протест
+	Tone      int   // Тон: 0-обычный, 1-восклицательный, 2-вопросительный, 3-вялый, 4-Повышенный
+	Mood      int   // настроение при передаче фразы с Пульта: 20-Хорошее 21-Плохое 22-Игровое 23-Учитель 24-Агрессивное 25-Защитное 26-Протест
 	// индекс==ID активного базового контекста, значение - вес этого контекста
 	ActveContextWeight map[int]int
 }
 
-//  массив памяти накапливается в течении дня, обрабатывается и очищается во сне
+// массив памяти накапливается в течении дня, обрабатывается и очищается во сне
 var MemoryDetectedArr []MemoryDetected
 
+// добавить строку в массив памяти о воспринятых фразах в текущем активном контексте
 func addNewMemoryDetected() {
-	var new MemoryDetected
-	new.PhrasesID = CurrentPhrasesIDarr
+	var newM MemoryDetected
+	newM.PhrasesID = CurrentPhrasesIDarr
 	// тон может указываться 1) в виде ! или ? во фразе - DetectedTone 	И/ИЛИ 2) в виде радиокнопки Тон с Пульта - CurPultTone
 	var tone = 0
-	if DetectedTone > 0 { // преимуещство - у задатчика тона 2)
+	if DetectedTone > 0 { // преимущество - у задатчика тона 2)
 		tone = DetectedTone
 	} else { // есть ! или ? во фразе
 		tone = CurPultTone
 	}
-	new.Tone = tone
-	new.Mood = CurPultMood // настроение с Пульта: -повышенный -нормальный -вялый  -Хорошее    -Плохое    -Игровое    -Учитель    -Агрессивное   -Защитное    -Протест
-	new.ActveContextWeight = gomeostas.GetActiveContextInfo()
-	MemoryDetectedArr = append(MemoryDetectedArr, new)
+	newM.Tone = tone
+	newM.Mood = CurPultMood // настроение с Пульта: повышенный нормальный вялый Хорошее Плохое Игровое Учитель Агрессивное Защитное Протест
+	newM.ActveContextWeight = gomeostas.GetActiveContextInfo()
+	MemoryDetectedArr = append(MemoryDetectedArr, newM)
 }
 
-//////////////////////////////////////////////
-
 /*  распознавание фразы с Пульта - бывает только в нижнем регистре
-
  */
 var wlev = 0
 var pultOut = ""
@@ -122,7 +111,6 @@ func VerbalDetection(text string, isDialog int, toneID int, moodID int) string {
 		// игнорировать getWordTemparrCount и всегда распознавать слова
 		NoCheckWordCount = true
 	}
-
 	CurPultTone = toneID
 	CurPultMood = moodID
 
@@ -131,14 +119,10 @@ func VerbalDetection(text string, isDialog int, toneID int, moodID int) string {
 	// разделяем на фразы
 	strArr := strings.Split(text, "|#") // а не |#| - чтобы оставлять разделитель "|"
 	for i := 0; i < len(strArr); i++ {
-		if i > 0 {
-			pultOut += "<br>"
-		}
+		if i > 0 { pultOut += "<br>" }
 		str := addNewtempArr(strArr[i])
 		for n := 0; n < len(str); n++ {
-			if n > 0 {
-				pultOut += " "
-			}
+			if n > 0 { pultOut += " " }
 			// проход фразы с распознаванием
 			pultOut += PhraseSeparator(str[n])
 			if DetectedUnicumPhraseID > 0 { // распознанная фраза
@@ -148,18 +132,13 @@ func VerbalDetection(text string, isDialog int, toneID int, moodID int) string {
 			}
 		}
 	}
-
 	// добавить в стек памяти распознанных
 	addNewMemoryDetected()
-
-	//	reflexes.ActiveFromPhrase() // активировать дерево рефлексов фразой - только для условных рефлексов
-
+	// reflexes.ActiveFromPhrase() // активировать дерево рефлексов фразой - только для условных рефлексов
 	// ответ на Пульт:
 	notAllowScanInThisTime = false
 	return pultOut
 }
-
-////////////////////////////////////////////
 
 // проход одной фразы (т.е. по разделителям в предложении, а не пр \r\n)
 func PhraseSeparator(text string) string {
@@ -169,7 +148,7 @@ func PhraseSeparator(text string) string {
 	text = rp.ReplaceAllString(text, " ")
 	text = strings.TrimSpace(text)
 
-	wordsArr := GetWordIDfromPhrase(text)// распознаватель слов
+	wordsArr := GetWordIDfromPhrase(text) // распознаватель слов
 	str := PhraseDetection(wordsArr) // распознаватель фразы
 	pultOut += str + "(" + strconv.Itoa(DetectedUnicumPhraseID) + ")"
 
@@ -185,9 +164,6 @@ func PhraseSeparator(text string) string {
 	return pultOut
 }
 
-//////////////////////////////////////////////
-
-/////////////////////////////////////////////
 // получить последователньость wordID из уникального идентификатора фразы CurrentPhrasesIDarr[i]
 func GetWordArrFromPhraseID(PhraseID int) []int {
 	var wordIDarr []int
@@ -198,5 +174,3 @@ func GetWordArrFromPhraseID(PhraseID int) []int {
 	}
 	return wordIDarr
 }
-
-//////////////////////////////////////////////////////////////////
