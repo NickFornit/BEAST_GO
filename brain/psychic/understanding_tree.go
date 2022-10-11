@@ -70,7 +70,11 @@ var currentUnderstandingNodeID[] int
 
 /* вызывается из:
 automatizm_result.go - в calcAutomatizmResult(
-на 4-й стадии и позже - при любых действиях с пульта, не сопровождающихся срабатыванием автоматизма
+на 4-й стадии и позже - при любых действиях с пульта, не сопровождающихся срабатыванием моторного автоматизма
+Аналогично дереву моторных автоматзмов, после активации могут быть ориентировочные рефлексы привлечения внимания,
+или просто срабатывают привязанные к узлам ментальные автоматизмы.
+
+При вызове может быть определен situationImageID или проставлен 0 и тогда образ ситуации определяется в самой функции.
 
 Если были совершены действия, то нужно выставлять isReflexesActionBloking=true !!!
  */
@@ -86,6 +90,11 @@ func understandingSituation(situationImageID int,ps *PurposeGenetic)(bool){
 		return false
 	}
 	*/
+	if situationImageID == 0{
+		// определить ID ситуации: настроение при посылке сообщения, нажатые кнопки и т.п.
+		// TODO ......
+	}
+
 	detectedActiveLastUnderstandingNodID=0
 	ActiveBranchNodeArr=nil
 	CurrentUnderstandingTreeEnd=nil

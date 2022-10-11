@@ -31,10 +31,10 @@ func RunMentalAutomatizmsID(mentID int){
 	am:=MentalAutomatizmsFromID[mentID]
 
 	// вернуть скорректированную силу действия
-	addE:=0
-	if am.Belief!=3 {// не рефлекс мозжечка
-		addE = getCerebellumReflexAddEnergy(1,am.ID)
-	}
+	//addE:=0
+	//if am.Belief!=3 {// не рефлекс мозжечка
+		addE := getCerebellumReflexAddEnergy(1,am.ID)
+	//}
 	if addE>0{
 
 	}

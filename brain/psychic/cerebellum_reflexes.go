@@ -17,10 +17,8 @@ import (
 /*  по результатам выполнения автоматизма выбираются дополнительные действи
 или изменяется сила действия автоматизма.
 Это - средство не переписывать автоматизм, а оптимизировать его.
-В качестве дополнительных действий используются имеющиеся автоматизмы на основе которых сохдаются
-автоматизмы мозжечковые, с Belief==3, наследующие ID ветки
-Или создаются совершенно новые автоматизмы с Belief==3, и НЕ наследующие ID ветки с BranchID==0
-
+В качестве дополнительных действий используются имеющиеся автоматизмы на основе которых создаются
+ мозжечковые рефлексы
  */
 type cerebellumReflex struct {
 	id int
@@ -87,7 +85,7 @@ func checkUnicumCerebellumReflex(typeAut int,sourceAutomatizmID int)(int,*cerebe
 }
 /////////////////////////////////////////
 
-// СОХРАНИТЬ структура записи: id|BranchID|Usefulness||Sequence||NextID|Energy|Belief
+// СОХРАНИТЬ структура записи: id|typeAut|sourceAutomatizmID||addEnergy|additionalAutomatizmID|additionalMentalAutID
 //В случае отсуствия пусковых стимулов создается ID такого отсутсвия, пример такой записи: 2|||0|0|
 func SaveCerebellumReflex(){
 	var out=""
@@ -107,7 +105,7 @@ func SaveCerebellumReflex(){
 	}
 	lib.WriteFileContent(lib.GetMainPathExeFile()+"/memory_psy/cerebellum_reflex.txt",out)
 }
-// ЗАГРУЗИТЬ структура записи: id|BranchID|Usefulness||Sequence||NextID|Energy|Belief
+// ЗАГРУЗИТЬ структура записи: id|typeAut|sourceAutomatizmID||addEnergy|additionalAutomatizmID|additionalMentalAutID
 func loadCerebellumReflex(){
 	cerebellumReflexFromID=make(map[int]*cerebellumReflex)
 	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_psy/cerebellum_reflex.txt")

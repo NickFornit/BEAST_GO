@@ -119,7 +119,7 @@ func orientation_1()(*Automatizm){
 		return atmzm
 	}
 
-	if EvolushnStage >= 4 {
+	if EvolushnStage > 3 {
 		/* Определение Цели в данной ситуации - ну уровне дерева понимания
 		Здесь выбирается действие пробного автоматизма из выполнившегося рефлекса actualRelextActon
 		и запускается автоматизм.
@@ -130,15 +130,6 @@ func orientation_1()(*Automatizm){
 	}
 	// else НИЧЕГО НЕ ДЕЛАТЬ: при высокой актуальности - растерянность, при низкой - лень
 
-	if veryActualSituation {// нужно осмысление
-		if EvolushnStage > 3 {
-			// создать образ ситуации
-			id, _ := createSituationImage(0, detectedActiveLastNodID, 0)
-			// осмыслить ситуацию - Активировать Дерево Понимания
-			understandingSituation(id, savePurposeGenetic)
-			// м.б. были совершены действия, тогда isReflexesActionBloking был выставлен
-		}
-	}
 
 	isReflexesActionBloking=false
 	return nil
@@ -174,20 +165,10 @@ func orientation_2(nodeAutomatizmID int)(*Automatizm){
 		//  ЗДЕСЬ активировать Дерево Понимания НЕ НУЖНО, если действие уже запущено, омысление будет по результату.
 		return atmzm
 	}
-	if EvolushnStage >= 4 {
+	if EvolushnStage > 3 {
 		// TODO - осмысление
 		atmzm:=getPurposeUndestanding2AndRunAutomatizm(nodeAutomatizmID) //в understanding_purpose_image.go
 		return atmzm
-	}
-
-	if veryActualSituation {// нужно осмысление
-		if EvolushnStage > 3 {
-			// создать образ ситуации
-			id, _ := createSituationImage(0, detectedActiveLastNodID, 0)
-			// осмыслить ситуацию - Активировать Дерево Понимания
-			understandingSituation(id, savePurposeGenetic)
-			// м.б. были совершены действия, тогда isReflexesActionBloking был выставлен
-		}
 	}
 
 return nil

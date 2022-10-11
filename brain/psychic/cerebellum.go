@@ -80,7 +80,7 @@ func cerebellumCoordination(atmzm *Automatizm,todo int)(bool) {
 				}
 			// добавить энергичность по максимуму
 			cr.addEnergy = 10 - atmzm.Energy // хотя при выполнении автоматизма будет подрезана лишняя энергия
-			atmzm.Belief = 3
+			// atmzm.Belief = 3
 			//SaveCerebellumReflex() // может не стоит, пусть записывается вместе со всеми сохранениями
 			return true
 		}

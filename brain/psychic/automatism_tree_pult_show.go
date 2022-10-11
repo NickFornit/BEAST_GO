@@ -281,10 +281,10 @@ func GetAutomatizmSequenceInfo(idA int,sequence string)(string){
 				aID, _ := strconv.Atoi(aArr[n])
 				idArr = append(idArr, aID)
 			}
-			addE := 0
-			if am.Belief != 3 { // не рефлекс мозжечка
-				addE = getCerebellumReflexAddEnergy(0,am.ID)
-			}
+			//addE := 0
+			//if am.Belief != 3 { // не рефлекс мозжечка
+				addE := getCerebellumReflexAddEnergy(0,am.ID)
+			//}
 			for i := 0; i < len(idArr); i++ {
 				if i==0{out+="Фраза Beast c энергией "+strconv.Itoa(am.Energy+addE)+":</b>"}else{out+=", "}
 				out+= "<b>"+word_sensor.GetPhraseStringsFromPhraseID(idArr[i])+"</b>"
@@ -296,10 +296,10 @@ func GetAutomatizmSequenceInfo(idA int,sequence string)(string){
 				aID, _ := strconv.Atoi(aArr[n])
 				idArr = append(idArr, aID)
 			}
-			addE := 0
-			if am.Belief != 3 { // не рефлекс мозжечка
-				addE = getCerebellumReflexAddEnergy(0,am.ID)
-			}
+			//addE := 0
+			//if am.Belief != 3 { // не рефлекс мозжечка
+				addE := getCerebellumReflexAddEnergy(0,am.ID)
+			//}
 			for i := 0; i < len(idArr); i++ {
 				if i==0{out+="Действие Beast c энергией "+strconv.Itoa(am.Energy+addE)+": <br>"}
 				out+= "<b>"+termineteAction.TerminalActonsNameFromID[idArr[i]]+"</b>"

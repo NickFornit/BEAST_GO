@@ -292,6 +292,8 @@ func automatizmActionsPuls() !!!!!
 ЕСЛИ срабатывает автоматизм без ориентировочного рефлекса, значит есть технически невидимая новизна
 и нужно так же оценить последствия, и если они плохие, то задуматься.
 */
+
+/*
 var savePsyBaseMoodAut=0 // -1 Плохое настроение, 0 Нормальное, 1 - хорошее настроение
 // для более точной оценки
 var savePsyMoodAut=0//сила Плохо -10 ... 0 ...+10 Хорошо
@@ -329,9 +331,8 @@ func calcAutomatizmResultAut(diffPsyBaseMood int,wellIDarr []int){
 
 	if diffPsyBaseMood<0{// СТАЛО ХУЖЕ В ПРИВЫЧНОМ АВТОМАТИЗМЕ !!!! криминал
 		PsyBaseMood=-1
-		/* значит есть технически невидимая новизна и нужно ОСМЫСЛИТЬ ТАКУЮ СИТУАЦИЮ
+		// значит есть технически невидимая новизна и нужно ОСМЫСЛИТЬ ТАКУЮ СИТУАЦИЮ
 
-		 */
 	}
 	if diffPsyBaseMood>0{// стало лучше
 		PsyBaseMood=1
@@ -346,20 +347,44 @@ func calcAutomatizmResultAut(diffPsyBaseMood int,wellIDarr []int){
 
 	// оценить значимость поизнесенной фразы в VerbalFromIdArr структурах Дерева Понимания??
 
-	/* !!!!!! допонение cerebellumReflexFromID[LastAutomatizmWeiting.ID] другими корректирующими действиеями
-	   если это еще получается, но при отсуствии эффекта нужно создавать новый автоматизм.
-	   Это - только на уровне осмысления в Дереве Понимания:
-	      cerebellumCoordination(AutomatizmRunning.ID)
-	   Должна быть осознание цели и перебеора-недобора!!!!!!
-	      В каждом автоматизме есть параметр силы: Automatizm.Energy вот он и корректируется.
-	*/
+	// !!!!!! допонение cerebellumReflexFromID[LastAutomatizmWeiting.ID] другими корректирующими действиеями
+	 //  если это еще получается, но при отсуствии эффекта нужно создавать новый автоматизм.
+	 //  Это - только на уровне осмысления в Дереве Понимания:
+	 //     cerebellumCoordination(AutomatizmRunning.ID)
+	  // Должна быть осознание цели и перебеора-недобора!!!!!!
+	  //    В каждом автоматизме есть параметр силы: Automatizm.Energy вот он и корректируется.
+
 
 	clinerAutomatizmRunningAut()
 	return
 }
+*/
 //#############################################################################
 // конец неработающего кода
 
+
+
+
+
+
+
+//////////////////////////////////////////////////////////////////
+// для индикации период ожидания реакции оператора на действие автоматизма
+//   psychicWaitingPeriodForActions()
+func WaitingPeriodForActions()(bool,int){
+
+	if LastRunAutomatizmPulsCount>0{
+		time:=WaitingPeriodForActionsVal - (PulsCount-LastRunAutomatizmPulsCount)
+		return true,time
+	}
+	/*
+	if AutomatizmRunningPulsCountAut>0{
+		time:=WaitingPeriodForActionsVal - (PulsCount-AutomatizmRunningPulsCountAut)
+		return true,time
+	}
+	 */
+	return false,0
+}
 
 
 
@@ -380,20 +405,3 @@ func wasChangingMoodCondition(kind int)(int,int,[]int){
 	return res0,res,wellIDarr
 }
 /////////////////////////////////////////////////////////////////////////
-
-
-//////////////////////////////////////////////////////////////////
-// для индикации период ожидания реакции оператора на действие автоматизма
-//   psychicWaitingPeriodForActions()
-func WaitingPeriodForActions()(bool,int){
-
-	if LastRunAutomatizmPulsCount>0{
-		time:=WaitingPeriodForActionsVal - (PulsCount-LastRunAutomatizmPulsCount)
-		return true,time
-	}
-	if AutomatizmRunningPulsCountAut>0{
-		time:=WaitingPeriodForActionsVal - (PulsCount-AutomatizmRunningPulsCountAut)
-		return true,time
-	}
-return false,0
-}

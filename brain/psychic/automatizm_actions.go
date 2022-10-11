@@ -101,10 +101,11 @@ if am.Usefulness<0{
 				aID, _ := strconv.Atoi(aArr[n])
 				idArr=append(idArr, aID)
 			}
-			addE:=0
-			if am.Belief!=3 {// не рефлекс мозжечка
-				addE = getCerebellumReflexAddEnergy(0,am.ID)
-			}
+			//addE:=0
+			//if am.Belief!=3 {// не рефлекс мозжечка
+			// учесть рефлекс мозжечка
+				addE := getCerebellumReflexAddEnergy(0,am.ID)
+			//}
 			out+=TerminatePraseAutomatizmActions(idArr,am.Energy+addE)
 		case 2: //Dnn - ID прогрмаммы действий, через запятую
 
@@ -112,10 +113,11 @@ if am.Usefulness<0{
 				aID, _ := strconv.Atoi(aArr[n])
 				idArr=append(idArr, aID)
 			}
-			addE:=0
-			if am.Belief!=3 {// не рефлекс мозжечка
-				addE = getCerebellumReflexAddEnergy(0,am.ID)
-			}
+			//addE:=0
+			//if am.Belief!=3 {// не рефлекс мозжечка
+			// учесть рефлекс мозжечка
+				addE := getCerebellumReflexAddEnergy(0,am.ID)
+			//}
 
 			sumEnergy:=am.Energy+addE
 			if sumEnergy>10{
