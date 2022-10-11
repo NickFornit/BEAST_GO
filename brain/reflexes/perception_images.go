@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-/////////////////  сохранить образы сочетаний базовых стилей
+// сохранить образы сочетаний базовых стилей
 func SaveBaseStyleArr() {
 	var out = ""
 	for k, v := range BaseStyleArr {
@@ -22,10 +22,10 @@ func SaveBaseStyleArr() {
 		}
 		out += "\r\n"
 	}
-	lib.WriteFileContent(lib.GetMainPathExeFile()+"/memory_reflex/base_style_images.txt", out)
+	lib.WriteFileContent(lib.GetMainPathExeFile() + "/memory_reflex/base_style_images.txt", out)
 }
 
-//////////////////  загрузить образы сочетаний базовых стилей
+// загрузить образы сочетаний базовых стилей
 func loadBaseStyleArr() {
 	BaseStyleArr = make(map[int]*BaseStyle)
 	strArr, _ := lib.ReadLines(lib.GetMainPathExeFile() + "/memory_reflex/base_style_images.txt")
@@ -50,9 +50,6 @@ func loadBaseStyleArr() {
 	return
 }
 
-/////////////////////////////////////////////////////////////////////
-
-/////////////////////////////////////////
 // базовый стиль - Образ сочетаний Базовых Контекстов гомеостаза
 type BaseStyle struct {
 	ID    int // идентификатор данного сочетания контекстов
@@ -66,14 +63,11 @@ var lastBaseStyleID = 0
 
 func createNewBaseStyle(id int, BSarr []int) (int, *BaseStyle) {
 	oldID, oldVal := checkUnicumBaseStyle(BSarr)
-	if oldVal != nil {
-		return oldID, oldVal
-	}
+	if oldVal != nil { return oldID, oldVal	}
 	if id == 0 {
 		lastBaseStyleID++
 		id = lastBaseStyleID
 	} else {
-		//		newW.ID=id
 		if lastBaseStyleID < id {
 			lastBaseStyleID = id
 		}
@@ -82,8 +76,8 @@ func createNewBaseStyle(id int, BSarr []int) (int, *BaseStyle) {
 	var node BaseStyle
 	node.ID = id
 	node.BSarr = BSarr
-
 	BaseStyleArr[id] = &node
+
 	return id, &node
 }
 func checkUnicumBaseStyle(bArr []int) (int, *BaseStyle) {
@@ -94,8 +88,6 @@ func checkUnicumBaseStyle(bArr []int) (int, *BaseStyle) {
 	}
 	return 0, nil
 }
-
-////////////////////////////////////////
 
 /* Образ текущего сочетания пусковых (Trigger) стимулов в восприятии
 Сочетание пусковых стимулов, включая фразы и включая тон, настроение - должны быть уникальными
@@ -114,14 +106,14 @@ type TriggerStimuls struct {
 	MoodID   int   // настроение оператора
 }
 
+// образы сочетаний пусковых стимулов
 var TriggerStimulsArr = make(map[int]*TriggerStimuls)
 
-//////////////////////////////////////////
-
 // создать образ сочетаний пусковых стимулов
-//В случае отсуствия пусковых стимулов создается ID такого отсутсвия, пример такой записи: 2|||0|0| - ID=2
+// В случае отсуствия пусковых стимулов создается ID такого отсутсвия, пример такой записи: 2|||0|0| - ID=2
 var lastTriggerStimulsID = 0
 
+// Создать новый образ сочетаний пусковых стимулов
 func CreateNewlastTriggerStimulsID(id int, RSarr []int, PhraseID []int, ToneID int, MoodID int) (int, *TriggerStimuls) {
 	oldID, oldVal := checkUnicumTriggerStimuls(RSarr, PhraseID, ToneID, MoodID)
 	if oldVal != nil {
@@ -131,7 +123,6 @@ func CreateNewlastTriggerStimulsID(id int, RSarr []int, PhraseID []int, ToneID i
 		lastTriggerStimulsID++
 		id = lastTriggerStimulsID
 	} else {
-		//		newW.ID=id
 		if lastTriggerStimulsID < id {
 			lastTriggerStimulsID = id
 		}
@@ -147,25 +138,19 @@ func CreateNewlastTriggerStimulsID(id int, RSarr []int, PhraseID []int, ToneID i
 	TriggerStimulsArr[id] = &node
 	return id, &node
 }
+
+// проверка наличия образа сочетаний пусковых стимулов
 func checkUnicumTriggerStimuls(bArr []int, PhraseID []int, ToneID int, MoodID int) (int, *TriggerStimuls) {
 	for id, v := range TriggerStimulsArr {
-		if !lib.EqualArrs(bArr, v.RSarr) {
-			continue
-		}
-		if !lib.EqualArrs(PhraseID, v.PhraseID) {
-			continue
-		}
-		if ToneID != v.ToneID || MoodID != v.MoodID {
-			continue
-		}
-//!!!		ActiveCurTriggerStimulsID=id
+		if !lib.EqualArrs(bArr, v.RSarr) { continue	}
+		if !lib.EqualArrs(PhraseID, v.PhraseID) {	continue }
+		if ToneID != v.ToneID || MoodID != v.MoodID {	continue }
 		return id, v
 	}
 
 	return 0, nil
 }
 
-/////////////////////////////////////////
 // создать новое сочетание пусковых стимулов если такого еще нет
 func CreateNewTriggerStimulsImage() {
 	PhraseID := wordSensor.CurrentPhrasesIDarr
@@ -179,10 +164,8 @@ func CreateNewTriggerStimulsImage() {
 	SaveTriggerStimulsArr()
 }
 
-/////////////////////////////////////////
-
-//////////////////// сохранить образы сочетаний пусковых стимулов
-//В случае отсуствия пусковых стимулов создается ID такого отсутсвия, пример такой записи: 2|||0|0|
+// сохранить образы сочетаний пусковых стимулов
+// В случае отсуствия пусковых стимулов создается ID такого отсутсвия, пример такой записи: 2|||0|0|
 // ID|RSarr через ,|PhraseID через ,|ToneID|MoodID|
 func SaveTriggerStimulsArr() {
 	var out = ""
@@ -201,10 +184,9 @@ func SaveTriggerStimulsArr() {
 		out += "\r\n"
 	}
 	lib.WriteFileContent(lib.GetMainPathExeFile()+"/memory_reflex/trigger_stimuls_images.txt", out)
-
 }
 
-////////////////////  загрузить образы сочетаний пусковых стимулов
+// загрузить образы сочетаний пусковых стимулов
 // ID|RSarr через ,|PhraseID через ,|ToneID|MoodID|
 func loadTriggerStimulsArr() {
 	TriggerStimulsArr = make(map[int]*TriggerStimuls)
@@ -220,9 +202,7 @@ func loadTriggerStimulsArr() {
 		s := strings.Split(p[1], ",")
 		var RSarr []int
 		for i := 0; i < len(s); i++ {
-			if len(s[i]) == 0 {
-				continue
-			}
+			if len(s[i]) == 0 { continue }
 			si, _ := strconv.Atoi(s[i])
 			RSarr = append(RSarr, si)
 		}
@@ -230,9 +210,7 @@ func loadTriggerStimulsArr() {
 		s = strings.Split(p[2], ",")
 		var PhraseID []int
 		for i := 0; i < len(s); i++ {
-			if len(s[i]) == 0 {
-				continue
-			}
+			if len(s[i]) == 0 {	continue }
 			si, _ := strconv.Atoi(s[i])
 			PhraseID = append(PhraseID, si)
 		}
@@ -244,12 +222,4 @@ func loadTriggerStimulsArr() {
 		CreateNewlastTriggerStimulsID(id, RSarr, PhraseID, ToneID, MoodID)
 	}
 	return
-
 }
-
-///////////////////////////////////////////
-
-
-
-
-
