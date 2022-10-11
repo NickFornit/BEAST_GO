@@ -14,7 +14,6 @@
 3. При отсутствии “подкрепления” после совершенного действия. Но безусловные рефлексы не угасают при этом, они безусловны и по отношению к тому, что происходит после действия и их “подкрепление” – обусловлено наследственной эволюцией: безусловные рефлексы постоянны, даны от рождения и не угасают на протяжении всей жизни.. У условных рефлексов точно та же функциональная задача, только с новыми стимулами, значит, им так же не нужно последующее подкреплением. В литературе часто путается отсутствие подкрепления с дезадаптация, а так же условные рефлексы и автоматизмы, образующиеся при осознании.
 4. Разные условные рефлексы без подкрепления угасают с неодинаковой скоростью. Более "молодые" и непрочные условные рефлексы угасают быстрее, чем более "старые", прочные условно-рефлекторные связи (func conditionRexlexFound).
 
-
 Условный рефлекс может образовывать на основе безусловного
 или на основе имеющегося безусловного,
 используя действия исходного рефлекса для новых условий.
@@ -64,12 +63,11 @@ type ConditionReflex struct {
 	ID   int
 	lev1 int
 	lev2 []int
-// ID образа пускового стимула типа TriggerStimulsID, в отличие от безусловного рефлекса, а только один пусковой
+	// ID образа пускового стимула типа TriggerStimulsID, в отличие от безусловного рефлекса, а только один пусковой
 	lev3 int
 	ActionIDarr []int
 	// ранг рефлекса (число цепочки родителей), чем он выше, тем рефлекс приоритетнее среди других условных
 	rank int
-
 	/* время последней активации в числе пульсов времени жизни
 	- для отключения рефлекса при неиспользовании в течении 50 суток жизни 3600*24*10 = 864000 пульсов,
 	но каждое использование укрепляют рефлекс на 10 дней жизни:
@@ -80,10 +78,12 @@ type ConditionReflex struct {
 	birthTime int
 }
 
+// у-рефлексы
 var ConditionReflexes = make(map[int]*ConditionReflex)
 // у.рефлексы - по значению ConditionReflex.lev3 (ID пускового стимула )
 var ConditionReflexesFrom3 = make(map[int][]*ConditionReflex)
 
+// последний ID в массиве у-рефлексов
 var lastConditionReflexID = 0
 /* Детектор нового news_detectior.go выявляет новые условия причинного (предшествовавшего имеющемуся рефлесу) стимула,
 пока не приводящего к рефлексу,
@@ -106,7 +106,6 @@ func CreateNewConditionReflex(id int, lev1 int, lev2 []int, lev3 int, ActionIDar
 		lastConditionReflexID++
 		id = lastConditionReflexID
 	} else {
-		//		newW.ID=id
 		if lastConditionReflexID < id {
 			lastConditionReflexID = id
 		}
@@ -159,17 +158,13 @@ func ListConditionReflex(k int, v *ConditionReflex)string {
 	out += strconv.Itoa(k) + "|"
 	out += strconv.Itoa(v.lev1) + "|"
 	for i := 0; i < len(v.lev2); i++ {
-		if i > 0 {
-			out += ","
-		}
+		if i > 0 { out += ","	}
 		out += strconv.Itoa(v.lev2[i])
 	}
 	out += "|"
 	out += strconv.Itoa(v.lev3) + "|"
 	for i := 0; i < len(v.ActionIDarr); i++ {
-		if i > 0 {
-			out += ","
-		}
+		if i > 0 { out += "," }
 		out += strconv.Itoa(v.ActionIDarr[i])
 	}
 	out += "|"
@@ -188,9 +183,7 @@ func loadConditionReflexes() {
 	path := lib.GetMainPathExeFile()
 	lines, _ := lib.ReadLines(path + "/memory_reflex/condition_reflexes.txt")
 	for i := 0; i < len(lines); i++ {
-		if len(lines[i]) < 4 {
-			continue
-		}
+		if len(lines[i]) < 4 { continue	}
 		p := strings.Split(lines[i], "|")
 		id, _ := strconv.Atoi(p[0])
 		lev1, _ := strconv.Atoi(p[1])
@@ -224,9 +217,8 @@ func loadConditionReflexes() {
 	}
 	return
 }
-//////////////////////////////////////////////////////
 
-/*  Угас ли рефлекс или его можно использовать?
+/* Угас ли рефлекс или его можно использовать?
 Вызывается:
 1) при каждом срабатывании рефлекса
 2) для проверки состояния рефлекса
@@ -240,37 +232,34 @@ func loadConditionReflexes() {
 Если рефлекс пересоздается (его актуальность подтверждается новым сочетанием причины и следствия),
 то его время жизни обновляется в func compareCRUnicum(
  */
-func checkReflexLifeTime(reflex *ConditionReflex)(bool){
-// рефлексы, только что созданные автоматически не проверять, они всегда новые:
-	if reflex.lastActivation ==0  {// !!! только только что созданные || (reflex.lastActivation - reflex.birthTime)==0
-		reflex.lastActivation = int(LifeTime/(3600*24)) // последняя активация
+func checkReflexLifeTime(reflex *ConditionReflex) bool {
+	// рефлексы, только что созданные автоматически не проверять, они всегда новые:
+	if reflex.lastActivation == 0  { // !!! только только что созданные || (reflex.lastActivation - reflex.birthTime)==0
+		reflex.lastActivation = int(LifeTime / (3600 * 24)) // последняя активация
 		return true
 	}
 	// время жизни рефлекса
 	life:= reflex.lastActivation - reflex.birthTime
-	if life!=0 && life > 50{// рефлекс угас и не должен использоваться
+	if life != 0 && life > 50 { // рефлекс угас и не должен использоваться
 		return false
 	}
 	// последняя активация
-	reflex.lastActivation = int(LifeTime/(3600*24))
+	reflex.lastActivation = int(LifeTime / (3600 * 24))
 	// удлинить время жизни на 10 дней
-	reflex.birthTime-=10
-	if reflex.birthTime <0{
-		reflex.birthTime=0
+	reflex.birthTime -= 10
+	if reflex.birthTime < 0 {
+		reflex.birthTime = 0
 	}
 	// SaveConditionReflex() reflex записывается при текущем сеансе сохранения памяти
-
 	return true
 }
-////////////////////////////////////////////////////
 
 // обновить время жизни всех рефлексов
-func ClinerTimeConditionReflex()(string){
+func ClinerTimeConditionReflex() string {
 	for _, v := range ConditionReflexes {
-		v.lastActivation = int(LifeTime/(3600*24)) // последняя активация
-		v.birthTime = int(LifeTime/(3600*24)) // время рождения
+		v.lastActivation = int(LifeTime / (3600 * 24)) // последняя активация
+		v.birthTime = int(LifeTime / (3600 * 24)) // время рождения
 	}
 	SaveConditionReflex()
 	return "Обновлено время жизни всех рефлексов"
 }
-///////////////////////////////////////////////////

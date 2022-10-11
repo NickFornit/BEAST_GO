@@ -192,15 +192,15 @@ func sortingForActions(targetArrID[]int, acrArr[]int) []int {
 	var act[]int
 
 	if targetArrID == nil {	return acrArr	}
-	for i:=0; i < len(acrArr); i++{
+	for i:=0; i < len(acrArr); i++ {
 		act = termineteAction.TerminalActionsTargetsFromID[acrArr[i]]
 		if act == nil {
 			impC[i + 1000] = acrArr[i] // 1000 рефлекторных действий вряд ли будет
-		}else{
-			for _, val := range act{
-				if lib.ExistsValInArrSort(targetArrID, val){
+		} else {
+			for _, val := range act {
+				if lib.ExistsValInArrSort(targetArrID, val) {
 					impC[i] = acrArr[i]
-				}else{
+				} else {
 					impC[i + 1000] = acrArr[i] // 1000 рефлекторных действий вряд ли будет
 				}
 			}
@@ -214,7 +214,7 @@ func sortingForActions(targetArrID[]int, acrArr[]int) []int {
 		return vals[i] < vals[j]
 	})
 
-	for i:=0; i < len(vals); i++{
+	for i:=0; i < len(vals); i++ {
 		arr = append(arr, impC[vals[i]])
 	}
 	return arr
