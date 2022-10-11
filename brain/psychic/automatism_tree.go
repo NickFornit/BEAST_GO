@@ -111,10 +111,10 @@ func createBasicAutomatizmTree(){
 }
 /////////////////////////////////////////////////////
 
-// структура действий при активации дерева автоматизмов - для создания зеркального автоматизма
+// структура действий при активации дерева автоматизмов
 type activeActions struct {
-	actID []int
-	triggID int
+	actID []int // массив действийID с Пульта
+	triggID int // // текущий образ сочетания действий с Пульта Activity
 	phraseID []int
 	toneID int
 	moodID int

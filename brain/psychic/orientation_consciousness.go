@@ -25,12 +25,18 @@ package psychic
 1 - частино есть ветка - частичная новизна условий
 2 - ветка полностью есть, только новизна ситуации
 
+Инфа:
+curActiveActions - структура действий при активации дерева автоматизмов
+savePurposeGenetic
+saveSituationImageID
+currentMentalAutomatizmID
 
 // нераспознанный остаток - НОВИЗНА: var CurrentUnderstandingTreeEnd []int
 
-return true - заблокировать все более низкоуровневые действия
+return true - были совершены моторные действия - заблокировать все более низкоуровневые действия
 */
 func orientationConsciousness(kind int)(bool){
+
 
 //Если были совершены действия, то нужно выставлять isReflexesActionBloking=true !!!
 	//return true //- заблокировать все более низкоуровневые действия

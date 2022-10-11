@@ -142,7 +142,7 @@ func noAutovatizmResult()(bool){
 	if EvolushnStage > 3 {
 		// создать образ ситуации
 		autmzmTreeNodeID := AutomatizmRunning.BranchID
-		id, _ := createSituationImage(0, autmzmTreeNodeID, 6)
+		id, _ := createSituationImage(0, autmzmTreeNodeID, 6,true)
 		// осмыслить ситуацию - Активировать Дерево Понимания
 		understandingSituation(id, savePurposeGenetic)
 		return true
@@ -166,7 +166,7 @@ func noAutovatizmResult()(bool){
 // отслеживание запущенных автоматизмов
 var AutomatizmRunning *Automatizm // запущенный автоматизм
 var AutomatizmRunningPulsCount=0 // время запуска автоматизма WaitingPeriodForActionsVal сек ожидания (if AutomatizmRunningPulsCount+WaitingPeriodForActionsVal < PulsCount {)
-var savePurposeGenetic *PurposeGenetic // массив примитивных целей, создающих контекст ситуации
+var savePurposeGenetic *PurposeGenetic // структура примитивных целей, создающих контекст ситуации
 
 func setAutomatizmRunning(am *Automatizm,ps *PurposeGenetic){
 	AutomatizmRunning=am
@@ -245,7 +245,7 @@ func calcAutomatizmResult(commonDiffValue int,diffPsyBaseMood int,wellIDarr []in
 	if EvolushnStage > 3 {
 		// создать образ ситуации
 		autmzmTreeNodeID := AutomatizmRunning.BranchID
-		id, _ := createSituationImage(0, autmzmTreeNodeID, 1)
+		id, _ := createSituationImage(0, autmzmTreeNodeID, 1,true)
 		// осмыслить ситуацию - Активировать Дерево Понимания
 		understandingSituation(id, savePurposeGenetic)
 	}
@@ -340,7 +340,7 @@ func calcAutomatizmResultAut(diffPsyBaseMood int,wellIDarr []int){
 	if EvolushnStage > 3 {
 		// создать образ ситуации
 		autmzmTreeNodeID := AutomatizmRunning.BranchID
-		id, _ := createSituationImage(0, autmzmTreeNodeID, 2)
+		id, _ := createSituationImage(0, autmzmTreeNodeID, 2,true)
 		// осмыслить ситуацию - Активировать Дерево Понимания
 		understandingSituation(id, savePurposeGenetic)
 	}

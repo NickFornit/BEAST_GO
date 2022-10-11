@@ -25,7 +25,7 @@ var atmzm *Automatizm
 /*
 	// осмыслить ситуацию - Активировать Дерево Понимания
 	autmzmTreeNodeID:=AutomatizmRunning.BranchID// создать образ ситуации
-	id,_:=createSituationImage(0,autmzmTreeNodeID,4)
+	id,_:=createSituationImage(0,autmzmTreeNodeID,4,true)
 	// осмыслить ситуацию - Активировать Дерево Понимания
 	understandingSituation(id,purpose)
 	и затем создать новую цель understanding_purpose_image.go
@@ -49,7 +49,7 @@ func getPurposeUndestanding2AndRunAutomatizm(atmtzmID int)(*Automatizm){
 
 		// создать образ ситуации
 		autmzmTreeNodeID:=detectedActiveLastNodID
-		id,_:=createSituationImage(0,autmzmTreeNodeID,5)
+		id,_:=createSituationImage(0,autmzmTreeNodeID,5,true)
 		// осмыслить ситуацию - Активировать Дерево Понимания
 		understandingSituation(id,savePurposeGenetic)
 		// м.б. были совершены действия, тогда isReflexesActionBloking был выставлен

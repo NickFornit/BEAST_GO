@@ -300,3 +300,4 @@ func getBrangeUnderstandingNodeIdArr(lastNodeId int)([]int){
 	return nArr
 }
 //////////////////////////////////////
+

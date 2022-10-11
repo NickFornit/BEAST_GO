@@ -17,7 +17,9 @@ import (
 */
 type SituationImage struct {
 	ID int
+// позволяет получить доступ к конечному узлу ветки дерева моторных автоматизмов и получить все инфу ее узлов
 	autmzmTreeNodeID int
+
 	/* Тип, смысловой контекст ситуации:
 	0 - ничего не делали, но нужно осмысление
 	1 - было действие автоматизма (смотреть в автоматизме ветки Usefulness int - (БЕС)ПОЛЕЗНОСТЬ: вред: -10 0 +10 +n польза diffPsyBaseMood )
@@ -39,18 +41,25 @@ var SituationImageFromIdArr=make(map[int]*SituationImage)
 
 
 var lastSituationImageID=0
-func createSituationImage(id int,autmzmTreeNodeID int,SituationType int)(int,*SituationImage){
+func createSituationImage(id int,autmzmTreeNodeID int,SituationType int,save bool)(int,*SituationImage){
 	oldID,oldVal:=checkUnicumSituationImage(autmzmTreeNodeID,SituationType)
+	if EvolushnStage < 4 { // только со стадии развития 4
+		return 0,nil
+	}
+	if PulsCount<4{// не активировать пока все не устаканится
+		return  0,nil
+	}
+	/////////////////////////////////////
 	if oldVal!=nil{
 		return oldID,oldVal
 	}
 	if id==0{
-		lastActivityID++
-		id=lastActivityID
+		lastSituationImageID++
+		id=lastSituationImageID
 	}else{
 		//		newW.ID=id
-		if lastActivityID<id{
-			lastActivityID=id
+		if lastSituationImageID<id{
+			lastSituationImageID=id
 		}
 	}
 
@@ -61,7 +70,9 @@ func createSituationImage(id int,autmzmTreeNodeID int,SituationType int)(int,*Si
 
 	SituationImageFromIdArr[id]=&node
 
-	SaveSituationImage()
+	if save {
+		SaveSituationImage()
+	}
 
 	return id,&node
 }
@@ -81,12 +92,10 @@ func checkUnicumSituationImage(autmzmTreeNodeID int,SituationType int)(int,*Situ
 
 func SaveSituationImage(){
 	var out=""
-	for k, v := range ActivityFromIdArr {
+	for k, v := range SituationImageFromIdArr {
 		out+=strconv.Itoa(k)+"|"
-		for i := 0; i < len(v.ActID); i++ {
-			out+=strconv.Itoa(v.ActID[i])+","
-		}
-		out+="|"
+		out+=strconv.Itoa(v.autmzmTreeNodeID)+"|"
+		out+=strconv.Itoa(v.SituationType)+"|"
 		out+="\r\n"
 	}
 	lib.WriteFileContent(lib.GetMainPathExeFile()+"/memory_psy/situation_images.txt",out)
@@ -107,9 +116,120 @@ func loadSituationImage(){
 		autmzmTreeNodeID,_:=strconv.Atoi(p[1])
 		SituationType,_:=strconv.Atoi(p[2])
 
-		createSituationImage(id,autmzmTreeNodeID,SituationType)
+		createSituationImage(id,autmzmTreeNodeID,SituationType,false)
 	}
 	return
 
 }
 //////////////////////////////
+
+
+//////////// ПРИОРИТЕТЫ СИТУАЦИЙ
+/* приоритет в зависимости от ID параметра.
+prioritetOfPultButtonActions имеет преимущество перед prioritetOfPultMoodActions
+Это - наследственное пердопределение.
+*/
+// 0-7
+func getPrioritetOfPultMoodActions(moodID int)(int){
+switch moodID{
+case 1: return 1 //Хорошее
+case 6: return 2 //Защитное
+case 7: return 3 //Протест
+case 3: return 4 //Игровое
+case 4: return 5 //Учитель
+case 2: return 6 //Плохое
+case 5: return 7 //Агрессивное
+}
+return 0
+}
+// 1 - 17
+func getPrioritetOfPultButtonActions(actionID int)(int){
+switch actionID{
+case 6: return 1 //Успокоить
+case 16: return 2 //Простить
+case 9: return 3 //Игнорировать
+case 11: return 4 //Сделать приятно
+case 2: return 5 //Наказать
+case 1: return 6  //Непонятно
+case 17: return 7 //Вылечить
+case 5: return 8 //Накормить
+case 14: return 9 //Обрадоваться
+case 15: return 10 //Испугаться
+case 12: return 11 //Заплакать
+case 7: return 12 //Предложить поиграть
+case 8: return 13 //Предложить поучить
+case 13: return 3 //Засмеяться
+case 4: return 15 //Поощрить
+case 10: return 16 //Сделать больно
+case 3: return 17 //Наказать
+}
+return 0
+}
+/////////////////////////////////////////
+
+/* определить ID ситуации: настроение при посылке сообщения, нажатые кнопки и т.п.
+Может быть выбрана только одна из существующих ситуаций, поэтому выбор идет по приоритетам.
+для определения узла SituationID дерева.
+Это определяет контекст ситуации, при вызове активации дерева понимания.
+Если этот контекст не задан в understandingSituation(situationImageID
+то в getCurSituationImageID() по-началу выбирается наугад (для первого приближения) более важные из существующих,
+но потом дерево понимания может переактивироваться с произвольным заданием контекста.
+От этого параметра зависит в каком направлении пойдет информационный поиск решений,
+если не будет запущен штатный автоматизм ветки (ориентировочные реакции).
+Инфа curActiveActions обновляется при каждой активации дерева моторных автоматизмов.
+
+Функция возвращает предположительный ID смыслового контекста ситуации:
+	0 - ничего не делали, но нужно осмысление
+	1 - было действие автоматизма (смотреть в автоматизме ветки Usefulness int - (БЕС)ПОЛЕЗНОСТЬ: вред: -10 0 +10 +n польза diffPsyBaseMood )
+	2 - был автоматический запуск автоматизма без ориентировочного рефлекса.
+	3 - был плохой автоматизм, нужно найти лучше
+	4 - все спокойно, можно экспериментивароть
+	5 - есть важные (по опыту) признаки в новизне NoveltySituation - осмыслить их
+	6 - оператор не прореагировал на действия в течение периода ожидания - игнорирует? нужно достучаться?
+
+	10-17 - оператор выбрал настроение (14 - Учитель при отправке или нажал кнопку Поучить)
+	20-37 - оператор нажал кнопку (17 - Игровое при отправке или нажал кнопку Поиграть)
+	... и т.п.
+
+getCurSituationImageID() вызывается только когда этот ID не определен, так что 0-9 значения здесь не определяются!
+*/
+func getCurSituationImageID()(int){
+	// должен быть после текущей активации дерева моторных автоматизмов
+	autmzmTreeNodeID := AutomatizmRunning.BranchID
+	if autmzmTreeNodeID==0{
+		return -1
+	}
+var sitID=-1
+var max=0
+// сначала настроение, чтобы оно перекрылось кнопками действий если они есть
+	mood:=curActiveActions.moodID
+	if mood != 0{// есть настроение
+		prior:=getPrioritetOfPultMoodActions(mood)
+			if max<prior{
+				sitID=10+mood
+				max=prior
+			}
+	}/////////////////////
+
+// кнопки действий
+aArr:=curActiveActions.actID
+	if aArr != nil{// есть действия кнопок с Пульта
+		max=0 // перекрываем
+		for i := 0; i < len(aArr); i++ {
+			prior:=getPrioritetOfPultButtonActions(aArr[i])
+if max<prior{
+	sitID=20+aArr[i]
+	max=prior
+}
+		}
+	}/////////////////////
+
+if sitID>0 {
+	id, _ := createSituationImage(0, autmzmTreeNodeID, sitID,true)
+	if id > 0 {
+		return id
+	}
+}
+	return -1
+}
+/////////////////////////////////////////////////////////////////////

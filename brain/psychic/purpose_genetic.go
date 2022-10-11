@@ -71,6 +71,7 @@ func getPurposeGenetic()(*PurposeGenetic){
 	PurposeGeneticObject = append(PurposeGeneticObject, &pg)
 	OldPurposeGenetic = CurrentPurposeGenetic
 	CurrentPurposeGenetic = pg
+	savePurposeGenetic=&pg
 	return &pg
 }
 /////////////////////////////////////////////////////////
