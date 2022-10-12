@@ -46,12 +46,10 @@ func FormingMirrorAutomatizmFromList(file string) string {
 
 		// образ отсуствия тона и настроения
 		tm := 90
-
 		// засунуть фразу в дерево слов и дерево фраз
 		prase := p[0]
 		wordSensor.VerbalDetection(prase, 1, 0, 0)
 		PhraseID := wordSensor.CurrentPhrasesIDarr
-
 		// первый символ ответной фразы
 		FirstSimbolID := wordSensor.GetFirstSymbolFromPraseID(PhraseID)
 		// создать образ Брока
@@ -126,10 +124,8 @@ func FormingMirrorAutomatizmFromTempList(file string) string {
 		// УСЛОВИЯ ДЕРЕВА
 		// пусковая фраза
 		triggerPrase := p[0]
-
 		// ответ
 		answerPrase := p[1]
-
 		// тон, настроение
 		pt := strings.Split(p[2], ",")
 		t,_ := strconv.Atoi(pt[0])
@@ -139,7 +135,6 @@ func FormingMirrorAutomatizmFromTempList(file string) string {
 		// засунуть фразу в дерево слов и дерево фраз
 		wordSensor.VerbalDetection(triggerPrase, 1, 0, 0)
 		triggerPraseID := wordSensor.CurrentPhrasesIDarr
-
 		wordSensor.VerbalDetection(answerPrase, 1, 0, 0)
 		answerPraseID := wordSensor.CurrentPhrasesIDarr
 
@@ -153,7 +148,7 @@ func FormingMirrorAutomatizmFromTempList(file string) string {
 			sequence += aD[i]
 		}
 
-		NoWarningCreateShow=true
+		NoWarningCreateShow = true
 		// для фразы triggerPraseID создаем привязанный к ней автоматизм
 		_, autmzm := CreateAutomatizm(2000000 + triggerPraseID[0], sequence)
 		NoWarningCreateShow = false
@@ -170,7 +165,12 @@ func FormingMirrorAutomatizmFromTempList(file string) string {
 /* создание зеркального автоматизма, повторяющего действия оператора в данных условиях
 в ответ на действия sourceAtmzm - причина ответа оператора
 Только что действиями оператора была активирована ветка detectedActiveLastNodID дерева и
-есть информация об этих действиях в curActiveActions
+есть информация об этих действиях в curActiveActions. Пример:
+Beast: как дела?
+Оператор: нормально.
+Формируется автоматизм: пускатель "как дела", реакция "нормально".
+Beast смотрит реакцию оператора на свои действия и записывает ее как истинно правильную, формируя автоматизм.
+Импринтинг - авторитарное повторение за учителем.
 */
 func createNewMirrorAutomatizm(sourceAtmzm *Automatizm) {
 	if sourceAtmzm == nil { return }
