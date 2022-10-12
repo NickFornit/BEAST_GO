@@ -32,7 +32,7 @@ type EpisodeMemory struct {
 	LifeTime int // момент жизни
 
 	Mood int // сила ощущаемого настроения PsyMood (-10..0..10)
-	PsyBaseMood int // ощущаемое настроение (-1,0,1) - база дерева понимания
+	PsyBaseMood int // ощущаемое настроение: -1 Плохое настроение, 0 Нормальное, 1 - хорошее настроение
 
 	NodeID[] int // узлы активных веток Дерева Понимания в последовательности их активации
 
@@ -50,6 +50,14 @@ var EpisodeMemoryActiveFrame *EpisodeMemory
 var EpisodeMemoryLastFrame *EpisodeMemory
 ///////////////////////////////////////////////////////
 
+
+/////////// НОВЫЙ ЭПИЗОД ПАМЯТИ в реализации
+func newEpisodeMemory(){
+	// выдать массив ID узлов ветки по заданному ID узла
+	currentUnderstandingNodeID:=getBrangeUnderstandingNodeIdArr(detectedActiveLastUnderstandingNodID)
+	// новый эпизод памяти
+	createEpisodeMemoryFrame(0,LifeTime,PsyMood,PsyBaseMood,currentUnderstandingNodeID,0)
+}
 
 
 // создать новый образ сочетаний действий, если такого еще нет

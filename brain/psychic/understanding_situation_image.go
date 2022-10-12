@@ -172,8 +172,7 @@ return 0
 Может быть выбрана только одна из существующих ситуаций, поэтому выбор идет по приоритетам.
 для определения узла SituationID дерева.
 Это определяет контекст ситуации, при вызове активации дерева понимания.
-Если этот контекст не задан в understandingSituation(situationImageID
-то в getCurSituationImageID() по-началу выбирается наугад (для первого приближения) более важные из существующих,
+В getCurSituationImageID() по-началу выбирается наугад (для первого приближения) более важные из существующих,
 но потом дерево понимания может переактивироваться с произвольным заданием контекста.
 От этого параметра зависит в каком направлении пойдет информационный поиск решений,
 если не будет запущен штатный автоматизм ветки (ориентировочные реакции).
@@ -215,8 +214,7 @@ if LastRunAutomatizmPulsCount > 0{// был и закончился ответо
 }//if LastRunAutomatizmPulsCount > 0
 
 	// ЕСТЬ ЛИ АВТОМАТИЗМ В моторной ВЕТКЕ и болеее ранних?
-	automatizmID := getAutomatizmFromNodeID(detectedActiveLastNodID)
-	if automatizmID > 0 {
+	if currentAutomatizmAfterTreeActivatedID > 0 {
 		//был запуск автоматизма без ориентировочного рефлекса
 		id, _ := createSituationImage(0, detectedActiveLastNodID, 2,true)
 		if id > 0 {
@@ -257,7 +255,7 @@ if sitID>0 {
 	}
 }//////////////////////////////
 
-	if automatizmID == 0 {
+	if detectedActiveLastNodID == 0 {
 		// ничего не делали, но нужно осмысление
 		id, _ := createSituationImage(0, detectedActiveLastNodID, 3,true)
 		if id > 0 {

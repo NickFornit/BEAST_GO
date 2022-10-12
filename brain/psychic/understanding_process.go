@@ -9,11 +9,13 @@ package psychic
 
 
 //////////////////////////////////////////////////
-/* Определение Цели в данной ситуации - ну уровне дерева понимания
-Здесь выбирается действие пробного автоматизма из выполнившегося рефлекса actualRelextActon.
+/* Определение Цели в данной ситуации - на уровне дерева понимания
+	Здесь выбирается действие пробного автоматизма из выполнившегося рефлекса actualRelextActon
+	и запускается МЕНТАЛЬНЫЙ автоматизм.
+	На стадии 4 - провоцировать оператора на ответы (почему, зачем, что такое?)
 */
-func getPurposeUndestandingAndRunAutomatizm()(*Automatizm) {
-var atmzm *Automatizm
+func getPurposeUndestandingAndRunAutomatizm()(bool) {
+
 
 	// мозжечковые рефлексы - самый первый уровень осознания - подгонка действий под заданную Цель.
 	if EvolushnStage == 4 {
@@ -23,16 +25,13 @@ var atmzm *Automatizm
 		 */
 	}
 /*
-	// осмыслить ситуацию - Активировать Дерево Понимания
-	autmzmTreeNodeID:=LastAutomatizmWeiting.BranchID// создать образ ситуации
-	id,_:=createSituationImage(0,autmzmTreeNodeID,4,true)
-	// осмыслить ситуацию - Активировать Дерево Понимания
-	understandingSituation(id,purpose)
+	// переосмыслить ситуацию - Активировать Дерево Понимания
+	understandingSituation()
 	и затем создать новую цель understanding_purpose_image.go
 */
 
 
-	return atmzm
+	return false
 }
 ////////////////////////////////////////////////
 

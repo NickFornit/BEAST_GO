@@ -50,19 +50,11 @@ automatizmID: 0 - в активной ветке нет автоматзма, >0
  */
 //var saveAutomatizmID=0
 
-// вызывается из func automatizmTreeActivation()
+// вызывается из func afterTreeActivation()
 func orientation(automatizmID int)(int){
-	if LastRunAutomatizmPulsCount>0{// не перебивать ожидание от запущенного автоматизма
-/* НО! во время периода ожидания реакции оператора на действие автоматизма
-	более важная ориентировочная реакция может превать ожидание ответа (стек прерываний)
 
-	TODO запомнить какой автоматизма прерван и потом вспомнить чтобы снова запустить и как-то обработать.
-		возможно, создать доминанту если это - на достаточной стадии развития
- */
+	lib.WritePultConsol("Ориентировчный рефлекс Дерева моторных автоматизмов.")
 
-		return 0
-	}
-	// Нет ожидания результата выполненного автоматизма
 	notAllowScanInTreeThisTime = true
 //	saveAutomatizmID=automatizmID
 		var atmtzm *Automatizm
@@ -91,12 +83,12 @@ return 0
  */
 func orientation_1()(*Automatizm){
 
-	lib.WritePultConsol("Ориентировочный рефлекс полного непонимания (1 типа)")
+	lib.WritePultConsol("Простейший ориентировочный рефлекс полного непонимания (1 типа)")
 
+	// новизна ситуации
 	NoveltySituation=CurrentAutomatizTreeEnd // значение сохраняется в savedNoveltySituation
 
 //  получение текущего состояния информационной среды: отражение Базового состояния и Активных Базовых контекстов
-// только при ориентировчном рефлексе - обновление самоощущения! и запись кадра эпизодической памяти
 	GetCurrentInformationEnvironment()
 
 	// оценка опасности ситуации, необходиомсть срочных действий
@@ -115,15 +107,7 @@ func orientation_1()(*Automatizm){
 		return atmzm
 	}
 
-	if EvolushnStage > 3 {
-		/* Определение Цели в данной ситуации - ну уровне дерева понимания
-		Здесь выбирается действие пробного автоматизма из выполнившегося рефлекса actualRelextActon
-		и запускается автоматизм.
-		На стадии 4 - провоцировать оператора на ответы (почему, зачем, что такое?)
-		*/
-		atmzm:=getPurposeUndestandingAndRunAutomatizm() //в understanding_purpose_image.go
-		return atmzm
-	}
+
 	// else НИЧЕГО НЕ ДЕЛАТЬ: при высокой актуальности - растерянность, при низкой - лень
 
 	return nil
@@ -140,10 +124,9 @@ func orientation_1()(*Automatizm){
 ! важно: если вернуло автоматизм, значит хочет попробовать
  */
 func orientation_2(nodeAutomatizmID int)(*Automatizm){
-	lib.WritePultConsol("Ориентировочный рефлекс частичного непонимания (2 типа)")
+	lib.WritePultConsol("Простейший ориентировочный рефлекс частичного непонимания (2 типа)")
 
 //  получение текущего состояния информационной среды: отражение Базового состояния и Активных Базовых контекстов
-// только при ориентировчном рефлексе - обновление самоощущения! и запись эпизодической памяти
 	GetCurrentInformationEnvironment()
 
 	// оценка опасности ситуации, необходиомсть срочных действий
@@ -151,12 +134,9 @@ func orientation_2(nodeAutomatizmID int)(*Automatizm){
 	// выявить ID парамктров гомеостаза как цели для улучшения в данных условиях
 	curTargetArrID=CurrentInformationEnvironment.curTargetArrID
 
-	if EvolushnStage < 4 {
-		/* // обработка автоматизма, рвущегося на выполнение, но в условиях есть новизна news
-		Если опасной новизны нет, то
-		*/
-		atmzm:=getPurposeGenetic2AndRunAutomatizm(nodeAutomatizmID)// в purpose_genetic.go
-		//  ЗДЕСЬ активировать Дерево Понимания НЕ НУЖНО, если действие уже запущено, омысление будет по результату.
+	// обработка автоматизма, рвущегося на выполнение. Есть ли опасная новизна?
+	atmzm:=getPurposeGenetic2AndRunAutomatizm(nodeAutomatizmID)// в purpose_genetic.go
+	if atmzm != nil {
 		return atmzm
 	}
 

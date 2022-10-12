@@ -6,9 +6,6 @@
 
 package psychic
 
-import (
-	"BOT/lib"
-)
 ///////////////////////////////
 
 // инициализирующий блок - в порядке последовательности инициализаций
@@ -145,8 +142,6 @@ func understandingSituation()(bool){
 		}
 	}
 
-	lib.WritePultConsol("Активировалось Дерево понимания.")
-
 	// результат поиска:
 	if detectedActiveLastUnderstandingNodID>0{
 		// есть ли неучтенные условия?
@@ -158,16 +153,20 @@ func understandingSituation()(bool){
 	//мент.автоматизм может прикрепляться ТОЛЬКО к последнему узлу ветки - при полном понимании ситуации
 			// Ориентировочный рефлекс осознания ситуации - частичная новизна условий
 			res:=orientationConsciousness(1)
-			newEpisodeMemory()
-			// если res==true - были совершены моторные действия, заблокировать все более низкоуровневые действия
+			// если res==true - были совершены действия, заблокировать все более низкоуровневые действия
 			return res
 		}else{// все условия пойдены,. ветка существует,
 			//МЕНТ.АВТОМАТИЗМ может и не БЫТЬ
 			currentMentalAutomatizmID=getMentalAutomatizmFromNodeID(detectedActiveLastUnderstandingNodID)
 			// Ориентировочный рефлекс осознания ситуации - только новизна ситуации
-			res:=orientationConsciousness(2)
-			newEpisodeMemory()
-			return res
+			if currentMentalAutomatizmID>0 {
+				res := orientationConsciousness(2)
+				return res
+			}else{
+				res:=orientationConsciousness(1)
+				return res
+			}
+			return false
 		}
 	}else{// вообще нет совпадений для данных условий
 		// нарастить недостающее в ветке дерева
@@ -176,19 +175,12 @@ func understandingSituation()(bool){
 		CurrentUnderstandingTreeEnd=condArr // все - новизна
 		// Ориентировочный рефлекс осознания ситуации полная новизна условий
 		res:=orientationConsciousness(0)
-		newEpisodeMemory()
 		return res
 	}
 
 	return false
 }
-/////////// НОВЫЙ ЭПИЗОД ПАМЯТИ
-func newEpisodeMemory(){
-	// выдать массив ID узлов ветки по заданному ID узла
-	currentUnderstandingNodeID:=getBrangeUnderstandingNodeIdArr(detectedActiveLastUnderstandingNodID)
-	// новый эпизод памяти
-	createEpisodeMemoryFrame(0,LifeTime,PsyMood,PsyBaseMood,currentUnderstandingNodeID,0)
-}
+
 //////////////////////////////////////////////////////////////////
 
 func conditionUnderstandingFound(level int,cond []int,node *UnderstandingNode){

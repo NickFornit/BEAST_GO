@@ -62,7 +62,7 @@ var OldInformationEnvironment InformationEnvironment
 
 ///////////////////////////////////////////////////////
 /*  получение текущего состояния информационной среды: отражение Базового состояния и Активных Базовых контекстов
-только при ориентировчном рефлексе и осмыслении результатов - обновление самоощущения! и запись кадра эпизодической памяти
+только при ориентировчном рефлексе и осмыслении результатов - обновление самоощущения!
  */
 func GetCurrentInformationEnvironment(){
 	var ie InformationEnvironment
@@ -96,9 +96,6 @@ if len(word_sensor.CurrentPhrasesIDarr)>0{
 	CurrentInformationEnvironment.danger=GetAttentionDanger()
 	CurrentInformationEnvironment.Mood=GetCurMood()
 	CurrentInformationEnvironment.PsyMood=PsyMood
-
-// запись эпизодической памяти
-	saveEpisodicMenory()
 
 	writeInformationEnvironmentMarker()
 	return

@@ -56,10 +56,11 @@ func getAutomatizmFromNodeID(nodeID int)(int){
 		}
 	}
 	//////////// нет штатных автоматизмов, выбрать любой нештатный на пробу
+	/* такого быть не должно, т.к. штатный должен быть всегда
 	if node.VerbalID>0 { // это узел фразы
 		aArr = AutomatizmIdFromPhraseId[node.VerbalID]
 		if aArr != nil {
-			return aArr[0].ID // первый попавшийся не штатный
+			return aArr[0].ID // первый попавшийся не штатный, раз уже не нашелся штатный
 		}
 	}
 	if node.ActivityID>0 && node.ToneMoodID==0 {
@@ -68,6 +69,7 @@ func getAutomatizmFromNodeID(nodeID int)(int){
 			return aArr[0].ID // первый попавшийся не штатный
 		}
 	}
+	*/
 	/////////// нет никаких автоматизмов хоть как-то относящийся к данному узлу
 	// найти у предыдущих узел действий
 	for i := len(ActiveBranchNodeArr)-1; i >2 ; i-- {

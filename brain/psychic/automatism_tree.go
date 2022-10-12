@@ -135,7 +135,7 @@ var detectedActiveLastNodID=0
 // нераспознанный остаток - НОВИЗНА
 var CurrentAutomatizTreeEnd []int
 var currentStepCount=0
-
+var currentAutomatizmAfterTreeActivatedID=0
 
 
 func automatizmTreeActivation()(int){
@@ -151,6 +151,7 @@ func automatizmTreeActivation()(int){
 	ActiveBranchNodeArr=nil
 	CurrentAutomatizTreeEnd=nil
 	currentStepCount=0
+	currentAutomatizmAfterTreeActivatedID=0
 
 	// вытащить 3 уровня условий в виде ID их образов
 	//Еще нет InformationEnvironment т.к. Дерево активруется ДО ор.рефлексов
@@ -295,8 +296,8 @@ func conditionAutomatizmFound(level int,cond []int,node *AutomatizmNode){
  */
 func afterTreeActivation()(bool){
 
-// Был запущен моторный автоматизм (в том числе и ментальным автоматизмом) и идет период ожидания ответа
-	if LastRunAutomatizmPulsCount >0{
+// Был запущен моторный автоматизм (в том числе и ментальным автоматизмом)
+	if LastRunAutomatizmPulsCount >0{// обработка периода ожидания ответа оператора
 		// 	Контроль за изменением состояния, возвращает:
 		//	lastCommonDiffValue - насколько изменилось общее состояние
 		//  	lastBetterOrWorse - стали лучше или хуже: величина измнения от -10 через 0 до 10
@@ -306,6 +307,7 @@ func afterTreeActivation()(bool){
 			// обработать изменение состояния
 			calcAutomatizmResult(lastCommonDiffValue,lastBetterOrWorse, gomeoParIdSuccesArr)
 
+// по результатам обработки, но до очистки 	LastRunAutomatizmPulsCount и LastAutomatizmWeiting
 			if EvolushnStage > 3 {
 // Активировать Дерево Понимания: или запустить ментальный автоматизм или - ориентировочная реакция для осмысления
 				understandingSituation()
@@ -315,9 +317,10 @@ func afterTreeActivation()(bool){
 		}
 // не нужно посылать всякие низкоуровневые реакции в период ожмдания, хотя итак установлен MotorTerminalBlocking
 		return true
-	}
+	}// конец обработки ожидания ответа оператора
 
-	// Была очередная активация дерева моторных автоматизмов
+	// ЕСТЬ ЛИ АВТОМАТИЗМ В ВЕТКЕ и болеее ранних? выбрать лучший автоматизм для сформированной ветки nodeID
+	currentAutomatizmAfterTreeActivatedID = getAutomatizmFromNodeID(detectedActiveLastNodID)
 
 	// всегда сначала активировать дерево понимания, результаты которого могут заблокировать все внизу
 	if EvolushnStage > 3 {
@@ -329,13 +332,11 @@ func afterTreeActivation()(bool){
 			return true
 		}
 	}
-	////////////////////////
-
-	// ЕСТЬ ЛИ АВТОМАТИЗМ В ВЕТКЕ и болеее ранних? выбрать лучший автоматизм для сформированной ветки nodeID
-	automatizmID := getAutomatizmFromNodeID(detectedActiveLastNodID)
-	if automatizmID > 0 { //ориентировочный рефлекс 2
+	//////////////////////
+	//более примитивное реагирование, EvolushnStage < 4
+	if currentAutomatizmAfterTreeActivatedID > 0 { //ориентировочный рефлекс 2
 		// проверить подходит ли автоматизм к текущим условиям, если нет, - режим нахождения альтернативы  - ориентировочный рефлекс 2
-		orientation(automatizmID)
+		orientation(currentAutomatizmAfterTreeActivatedID)
 		// если автоматизм прошел проверку, то он уже был запущен
 		return true // блокировка рефлексов, если automatizmID > 0
 	}else {
