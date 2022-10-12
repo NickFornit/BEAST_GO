@@ -205,7 +205,7 @@ func GetAutomatizmTnn(ma *Automatizm)(string){
 /*задать тип автоматизма Belief.
 Только один из автоматизмов, прикрепленных к ветке или образу, может иметь Belief=2 - проверенное собственное знание
 Если задается Belief=2, остальные Belief=2 становится Belief=0.
-ТАК ПРОСТО НЕЛЬЗЯ ЗАДАВАТЬ Belief=2: AutomatizmRunning.Belief=2
+ТАК ПРОСТО НЕЛЬЗЯ ЗАДАВАТЬ Belief=2: LastAutomatizmWeiting.Belief=2
  */
 func SetAutomatizmBelief(atmzm *Automatizm,belief int){
 	if atmzm==nil || atmzm.BranchID==0{

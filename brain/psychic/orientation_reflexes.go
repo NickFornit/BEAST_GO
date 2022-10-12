@@ -104,10 +104,6 @@ func orientation_1()(*Automatizm){
 	// выявить ID парамктров гомеостаза как цели для улучшения в данных условиях
 	curTargetArrID=CurrentInformationEnvironment.curTargetArrID
 
-	/* Блокировать выполнение рефлексов на время ожидания результата автоматизма
-	вызывается из reflex_action.go рефлексов
-	*/
-	isReflexesActionBloking=true // отмена в automatizm_result.go или просто isReflexesActionBloking=false
 
 	if EvolushnStage < 4 {
 		/* Определение Цели в данной ситуации - ну уровне наследственных функций
@@ -130,8 +126,6 @@ func orientation_1()(*Automatizm){
 	}
 	// else НИЧЕГО НЕ ДЕЛАТЬ: при высокой актуальности - растерянность, при низкой - лень
 
-
-	isReflexesActionBloking=false
 	return nil
 }
 ///////////////////////////////////////
@@ -163,11 +157,6 @@ func orientation_2(nodeAutomatizmID int)(*Automatizm){
 		*/
 		atmzm:=getPurposeGenetic2AndRunAutomatizm(nodeAutomatizmID)// в purpose_genetic.go
 		//  ЗДЕСЬ активировать Дерево Понимания НЕ НУЖНО, если действие уже запущено, омысление будет по результату.
-		return atmzm
-	}
-	if EvolushnStage > 3 {
-		// TODO - осмысление
-		atmzm:=getPurposeUndestanding2AndRunAutomatizm(nodeAutomatizmID) //в understanding_purpose_image.go
 		return atmzm
 	}
 

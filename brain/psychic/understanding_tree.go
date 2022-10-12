@@ -53,8 +53,8 @@ var UnderstandingNodeFromID=make(map[int]*UnderstandingNode)
 var ActiveBranchUnderstandingArr []int
 ////////////////////////////////////////////////
 
-
-
+// если в результате ментальных процессов было действие, то нужно заблокировать обработку активации дерева моторных автоматизмов
+var MentalReasonBlocing=false
 ///////////////////////////////////////////////////////
 
 
@@ -87,27 +87,26 @@ automatizm_result.go - в calcAutomatizmResult(
 
 При вызове может быть определен situationImageID или проставлен 0 и тогда образ ситуации определяется в самой функции.
 
-Если были совершены действия, то нужно выставлять isReflexesActionBloking=true !!!
+Если были совершены действия, то нужно выставлять MotorTerminalBlocking=true !!!
  */
-func understandingSituation(situationImageID int,ps *PurposeGenetic)(bool){
+func understandingSituation()(bool){
+	MentalReasonBlocing=false // освободить обработку дерева моторных автоматизмов
+
 	if EvolushnStage < 4 { // только со стадии развития 4
 		return false
 	}
 	if PulsCount<4{// не активировать пока все не устаканится
 		return false
 	}
-	if situationImageID == 0{
-		// определить ID ситуации: настроение при посылке сообщения, нажатые кнопки и т.п.
-		sID:=getCurSituationImageID()
-		if sID<0{// нет выбранной ситуации
+	// определить ID ситуации: настроение при посылке сообщения, нажатые кнопки и т.п.
+	situationImageID:=getCurSituationImageID()
+	if situationImageID<0{// нет выбранной ситуации
 			return false
 		}
-		situationImageID=sID
-	}
+
 	saveSituationImageID=situationImageID
-	if ps == nil{
-		ps=getPurposeGenetic() // - тут уже сохраняется savePurposeGenetic
-	}
+	ps:=getPurposeGenetic() // - тут уже сохраняется savePurposeGenetic
+
 	savePurposeGenetic=ps
 
 	detectedActiveLastUnderstandingNodID=0

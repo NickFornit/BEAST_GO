@@ -187,9 +187,8 @@ if atomatizmID>0{
 /* Блокировать выполнение рефлексов на время ожидания результата автоматизма
 вызывается из reflex_action.go рефлексов
  */
-var isReflexesActionBloking=false
 func NotAllowReflexesAction()(bool){
-	if isReflexesActionBloking || MotorTerminalBlocking {
+	if MotorTerminalBlocking {
 		return true
 	}
 	return false

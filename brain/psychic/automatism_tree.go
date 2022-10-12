@@ -216,52 +216,27 @@ ActID:=action_sensor.CheckCurActionsContext();//CheckCurActions()
 // есть ли еще неучтенные, нулевые условия? т.е. просто показаь число ненулевых значений condArr
 		conditionsCount:=getConditionsCount(condArr)
 		CurrentAutomatizTreeEnd=condArr[currentStepCount:] // НОВИЗНА
-		if currentStepCount<conditionsCount { // не пройдено до конца имеющихся условий
-		// нарастить недостающее в ветке дерева - всегда для orientation_1()
+		if currentStepCount<conditionsCount {              // не пройдено до конца имеющихся условий
+			// нарастить недостающее в ветке дерева - всегда для orientation_1()
 			//oldDetectedActiveLastNodID:=detectedActiveLastNodID
 			detectedActiveLastNodID = formingBranch(detectedActiveLastNodID, currentStepCount+1, condArr)
-// ЕСТЬ ЛИ АВТОМАТИЗМ В НЕДОДЕЛАННОЙ ВЕТКЕ и болеее ранних? выбрать лучший автоматизм для сформированной ветки nodeID
-			automatizmID := getAutomatizmFromNodeID(detectedActiveLastNodID)
-			if automatizmID > 0 { //ориентировочный рефлекс 2
-// проверить подходит ли автоматизм к текущим условиям, если нет, - режим нахождения альтернативы  - ориентировочный рефлекс 2
-				automatizmID := orientation(automatizmID)
-				// если автоматизм прошел проверку, то он уже был запущен
-				return automatizmID // выполнение штатного автоматизма
-			}else {
-				// автоматизма нет у недоделанной ветки
-				automatizmID := orientation(0)
+		}
 
-				return automatizmID // блокировка рефлексов, если automatizmID > 0
+			if afterTreeActivation(){
+				return 1
 			}
 			return 0
 
-			// если нет неучтенных условий
-		}else{// все условия пойдены, ветка существует,
-			// выбрать лучший автоматизм для ветки nodeID
-			automatizmID := getAutomatizmFromNodeID(detectedActiveLastNodID)
-			if automatizmID > 0 {//ориентировочный рефлекс 2
-					// проверить подходит ли автоматизм к текущим условиям, если нет, - режим нахождения альтернативы  - ориентировочный рефлекс 2
-				automatizmID := orientation(automatizmID)
-				// если автоматизм прошел проверку, то он уже был запущен
-				return automatizmID// выполнение штатного автоматизма
-			}else{
-				// автоматизма нет у нормальной ветки (условия не требовали срочного его создания)
-				automatizmID := orientation(0)
-				// если автоматизм прошел проверку, то он уже был запущен
-				if automatizmID>0{
-					return automatizmID // блокировка рефлексов
-				}
-				return 0
-			}
-		}
 	}else{// вообще нет совпадений для данных условий
 // нарастить недостающее в ветке дерева - всегда для orientation_1()
 		detectedActiveLastNodID = formingBranch(detectedActiveLastNodID, currentStepCount+1, condArr)
 			
 		// автоматизма нет у недоделанной ветки
 		CurrentAutomatizTreeEnd=condArr // все - новизна
-		automatizmID := orientation(0)
-		return automatizmID // блокировка рефлексов
+		if afterTreeActivation(){
+			return 1// блокировка рефлексов
+		}
+		return 0
 
 	}
 notAllowScanInTreeThisTime=false
@@ -310,6 +285,69 @@ func conditionAutomatizmFound(level int,cond []int,node *AutomatizmNode){
 	return
 }
 ////////////////////////////////////////////////////////
+
+
+
+/////////////////////////////////////////////////////////
+/* реакция после активации ветки дерева
+
+если нет никаких действий, то возвращает false, инчае - true для блокировки более низкоуровневого
+ */
+func afterTreeActivation()(bool){
+
+// Был запущен моторный автоматизм (в том числе и ментальным автоматизмом) и идет период ожидания ответа
+	if LastRunAutomatizmPulsCount >0{
+		// 	Контроль за изменением состояния, возвращает:
+		//	lastCommonDiffValue - насколько изменилось общее состояние
+		//  	lastBetterOrWorse - стали лучше или хуже: величина измнения от -10 через 0 до 10
+		//  	gomeoParIdSuccesArr - стали лучше следующие г.параметры []int гоменостаза
+		if WasOperatorActiveted { // оператор отреагировал
+			lastCommonDiffValue,lastBetterOrWorse,gomeoParIdSuccesArr := wasChangingMoodCondition(2)
+			// обработать изменение состояния
+			calcAutomatizmResult(lastCommonDiffValue,lastBetterOrWorse, gomeoParIdSuccesArr)
+
+			if EvolushnStage > 3 {
+// Активировать Дерево Понимания: или запустить ментальный автоматизм или - ориентировочная реакция для осмысления
+				understandingSituation()
+			}
+
+			clinerAutomatizmRunning()
+		}
+// не нужно посылать всякие низкоуровневые реакции в период ожмдания, хотя итак установлен MotorTerminalBlocking
+		return true
+	}
+
+	// Была очередная активация дерева моторных автоматизмов
+
+	// всегда сначала активировать дерево понимания, результаты которого могут заблокировать все внизу
+	if EvolushnStage > 3 {
+// Активировать Дерево Понимания: или запустить ментальный автоматизм или - ориентировочная реакция для осмысления
+		understandingSituation()
+
+		//в результате ментальных процессов было совершено действие (моторное или ментальное)
+		if MentalReasonBlocing{
+			return true
+		}
+	}
+	////////////////////////
+
+	// ЕСТЬ ЛИ АВТОМАТИЗМ В ВЕТКЕ и болеее ранних? выбрать лучший автоматизм для сформированной ветки nodeID
+	automatizmID := getAutomatizmFromNodeID(detectedActiveLastNodID)
+	if automatizmID > 0 { //ориентировочный рефлекс 2
+		// проверить подходит ли автоматизм к текущим условиям, если нет, - режим нахождения альтернативы  - ориентировочный рефлекс 2
+		orientation(automatizmID)
+		// если автоматизм прошел проверку, то он уже был запущен
+		return true // блокировка рефлексов, если automatizmID > 0
+	}else {
+		// автоматизма нет у недоделанной ветки
+		orientation(0)
+
+		return true // блокировка рефлексов, если automatizmID > 0
+	}
+
+	return false
+}
+//////////////////////////////////////////////////////////
 
 
 

@@ -68,6 +68,7 @@ func SaveMentalAutomatizms(){
 
 }
 
+/////////////////////////////////////////////////
 func RunMentalAutomatizmsID(mentID int){
 	am:=MentalAutomatizmsFromID[mentID]
 
@@ -83,6 +84,8 @@ func RunMentalAutomatizmsID(mentID int){
 
 	//  выполнить дополнительные мозжечковые автоматизмы сразу после выполняющегося автоматизма
 	runCerebellumAdditionalAutomatizm(1,mentID)
+//нужно заблокировать обработку активации дерева моторных автоматизмов
+	MentalReasonBlocing=true
 }
 ////////////////////////////////////////////////////////////////
 

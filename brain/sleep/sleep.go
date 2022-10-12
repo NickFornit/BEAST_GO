@@ -12,6 +12,7 @@ package sleep
 
 import (
 	"BOT/brain/gomeostas"
+	"BOT/brain/psychic"
 )
 
 //////////////////////////////////////////
@@ -46,9 +47,9 @@ if !gomeostas.NotAllowSetGomeostazParams{
 /* Блокировать выполнение рефлексов на время сна sleep.AllowReflexesAction()
 вызывается из reflex_action.go рефлексов
  */
-var isReflexesActionBloking=false
+//var isReflexesActionBloking=false
 func NotAllowReflexesAction()(bool){
-	if isReflexesActionBloking{
+	if psychic.MotorTerminalBlocking{
 		return true
 	}
 	return false

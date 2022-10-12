@@ -145,13 +145,13 @@ if am.Usefulness<0{
 	//выполнить мозжечковый рефлекс сразу после выполняющегося автоматизма
 	runCerebellumAdditionalAutomatizm(0,am.ID)
 
-	MotorTerminalBlocking=true // через 2 пульса погаснет
+	MotorTerminalBlocking=true // блокировка рефлексов
 	LastRunAutomatizmPulsCount =PulsCount // активность мот.автоматизма в чисде пульсов
 	LastAutomatizmWeiting=am
 	/* Блокировать выполнение рефлексов на время ожидания результата автоматизма
 	вызывается из reflex_action.go рефлексов
 	*/
-	isReflexesActionBloking=true // отмена в automatizm_result.go или просто isReflexesActionBloking=false
+	//isReflexesActionBloking=true // отмена в automatizm_result.go или просто isReflexesActionBloking=false
 
 	return true
 }
