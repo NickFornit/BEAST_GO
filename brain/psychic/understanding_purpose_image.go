@@ -1,5 +1,6 @@
-/* образ цели для Дерева понимания (дерева ментальных автоматизмов)
-
+/* образ желаемойцели для Дерева понимания (дерева ментальных автоматизмов)
+Сначала - на основе жизненной цели PurposeGenetic и опасности, но потом может задаваться произвольно
+с переактивацией дерева понимания.
 */
 
 package psychic
@@ -20,14 +21,14 @@ type PurposeImage struct {
 	ID int
 	veryActual bool // true - цель очень актуальна
 	targetID []int //массив ID парамктров гомеостаза как цели для улучшения в данных условиях
-	actionID int //выбранный образ действия для данной цели (purpose_action_images.go)
+	actionID int //выбранный образ действия для достижения данной цели (purpose_action_images.go)
 	// для каждого actionID сила действий сначала принимается =5, а потом корректируется мозжечковыми рефлексами
 }
 var PurposeImageFromID=make(map[int]*PurposeImage)
 ///////////////////////////////////////////////////////////////////
 
 
-// создать новый образ сочетаний действий, если такого еще нет
+// создать новый образ желаемой цели, если такого еще нет
 var lastPurposeImagePurposeID=0
 func createPurposeImageID(id int,veryActual bool,targetID []int,actionID int)(int,*PurposeImage){
 	oldID,oldVal:=checkUnicumPurposeImage(veryActual,targetID,actionID)

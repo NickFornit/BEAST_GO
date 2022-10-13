@@ -12,7 +12,7 @@ import (
 func GetTreeAutomatizmTriggersInfo(treeNodeID int) string {
 	var out = ""
 	treeNode := psychic.AutomatizmTreeFromID[treeNodeID]
-	if treeNode.ActivityID > 0 {
+	if treeNode != nil && treeNode.ActivityID > 0 {
 		out += "Действия кнопок: <b>" + GetAcivButtInfo(treeNode.ActivityID) + "</b><br>"
 	}
 	if treeNode.VerbalID > 0 {
@@ -25,34 +25,20 @@ func GetTreeAutomatizmTriggersInfo(treeNodeID int) string {
 	return "<div style='font-weight:200;text-align:left'>" + out + "</div>"
 }
 
-// текстовое отображение сочетаний действия с пульта
+// текстовое отображение сочетаний действия с пульта образа psychic.Activity
 func GetAcivButtInfo(triggerID int) string {
 	var out = ""
-	act := TriggerStimulsArr[triggerID]
+	//act := TriggerStimulsArr[triggerID]
+	act := psychic.ActivityFromIdArr[triggerID]
 	if act == nil { return ""	}
 
-	if len(act.RSarr) > 0 {
-		for i := 0; i < len(act.RSarr); i++ {
+	if len(act.ActID) > 0 {
+		for i := 0; i < len(act.ActID); i++ {
 			if i > 0 { out += ", " }
-			out += action_sensor.GetActionNameFromID(act.RSarr[i])
+			out += action_sensor.GetActionNameFromID(act.ActID[i])
 		}
 	} else {
 		out += "нет"
 	}
-	/*
-	if len(act.PhraseID) > 0 {
-		if len(out) > 0 {
-			out += "<br>"
-		}
-		for i := 0; i < len(act.PhraseID); i++ {
-			if i > 0 {
-				out += "; "
-			}
-			w := wordSensor.GetPhraseStringsFromPhraseID(act.PhraseID[i])
-			//w=strings.Trim(w,"")
-			out += "\"" + w + "\""
-		}
-	}
-	 */
 	return out
 }

@@ -9,7 +9,7 @@ package psychic
 
 import "BOT/brain/gomeostas"
 
-/* Определение Цели в данной ситуации - ну уровне наследственных функций
+/* Определение Цели в данной ситуации - на уровне наследственных функций
 Здесь выбирается действие пробного автоматизма из выполнившегося рефлекса actualRelextActon.
 */
 func getPurposeGeneticAndRunAutomatizm()*Automatizm {
@@ -28,7 +28,7 @@ func getPurposeGeneticAndRunAutomatizm()*Automatizm {
 			он уже не вызовет orientation_1(), а будет orientation_2()
 			*/
 			atmzm :=createAndRunAutomatizmFromPurpose(purpose)
-			// в automatizm_result.go после оценки результата будет осмысление с активацией Дерева Понимания
+			SaveAutomatizm()
 			return atmzm
 		}
 		/* нет действий (практически невозможная ситуация потому, что если нет рефлексов,

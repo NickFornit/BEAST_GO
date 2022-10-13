@@ -97,7 +97,7 @@ func orientation_1()(*Automatizm){
 	curTargetArrID=CurrentInformationEnvironment.curTargetArrID
 
 
-	if EvolushnStage < 4 {
+	if EvolushnStage < 3 {// до формирования зеркальных !!!!!
 		/* Определение Цели в данной ситуации - ну уровне наследственных функций
 		Здесь выбирается действие пробного автоматизма из выполнившегося рефлекса actualRelextActon
 		и запускается автоматизм

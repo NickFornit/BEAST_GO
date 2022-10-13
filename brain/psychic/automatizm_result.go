@@ -51,6 +51,7 @@ func setAutomatizmRunning(am *Automatizm,ps *PurposeGenetic){
 	// при срабатывании автоматизма - блокируются все рефлексторные действия
 	MotorTerminalBlocking=true // уже есть, но на всякий случай :)
 	LastAutomatizmWeiting=am // уже есть, но для надежности :)
+	LastDetectedActiveLastNodID=detectedActiveLastNodID // уже есть, но для надежности :)
 
 	savePsyBaseMood=PsyBaseMood
 	savePsyMood=PsyMood
@@ -150,7 +151,13 @@ func calcAutomatizmResult(commonDiffValue int,diffPsyBaseMood int,wellIDarr []in
 	// задать тип автоматизма, 2 - проверенный
 	SetAutomatizmBelief(LastAutomatizmWeiting,2)// ТАК ПРОСТО НЕЛЬЗЯ ЗАДАВАТЬ Belief=2: LastAutomatizmWeiting.Belief=2
 
-	LastAutomatizmWeiting.Usefulness =commonDiffValue // diffPsyBaseMood
+	// изменять полезность по 1 шагу!
+	if commonDiffValue>0 && LastAutomatizmWeiting.Usefulness<10 {
+		LastAutomatizmWeiting.Usefulness++ // diffPsyBaseMood
+	}
+	if commonDiffValue<0 && LastAutomatizmWeiting.Usefulness>-10 {
+		LastAutomatizmWeiting.Usefulness-- // diffPsyBaseMood
+	}
 
 
 	if commonDiffValue>0{// стало лучше
@@ -168,6 +175,7 @@ func calcAutomatizmResult(commonDiffValue int,diffPsyBaseMood int,wellIDarr []in
    Создание автоматизма, повторяющего действия оператора в данных условиях
  */
 		createNewMirrorAutomatizm(LastAutomatizmWeiting)
+
 	}
 
 	if commonDiffValue<0{// стало хуже
@@ -180,21 +188,12 @@ func calcAutomatizmResult(commonDiffValue int,diffPsyBaseMood int,wellIDarr []in
 	// только если серьезно изменилась ситуация
 	if diffPsyBaseMood!=0{// изменилась ситуация
 		// обновить информационное окружение
-		GetCurrentInformationEnvironment()
+//		GetCurrentInformationEnvironment()
 		// переактивировать дерево рефлексов
-		automatizmTreeActivation()//и возникает новый цикл активации Дерева, уже по внутренним причинам
+// ЭТО ЗДОРОВО ЗАЦИКЛИВАЕТ, делаются все новые ветки дерева !!!
+// !!!!!!		automatizmTreeActivation()//и возникает новый цикл активации Дерева, уже по внутренним причинам
 	}
-
-
-// оценить значимость поизнесенной фразы в VerbalFromIdArr структурах Дерева Понимания??
-
-/* !!!!!! допонение cerebellumReflexFromID[LastAutomatizmWeiting.ID] другими корректирующими действиеями
-если это еще получается, но при отсуствии эффекта нужно создавать новый автоматизм.
-Это - только на уровне осмысления в Дереве Понимания:
-   cerebellumCoordination(LastAutomatizmWeiting.ID)
-Должна быть осознание цели и перебеора-недобора!!!!!!
-   В каждом автоматизме есть параметр силы: Automatizm.Energy вот он и корректируется.
- */
+// Все, достаточно функционала для обработки ответной реакции с пульта!
 return
 }
 ///////////////////////////////////////////////////////

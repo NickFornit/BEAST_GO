@@ -42,6 +42,8 @@ var MotorTerminalBlocking=false
 var LastRunAutomatizmPulsCount =0 //сбрасывать ожидание результата автоматизма если прошло 20 пульсов
 // ожидается результат запущенного MotAutomatizm
 var LastAutomatizmWeiting *Automatizm
+// активный узел дерева в момент запуска автоматизма
+var LastDetectedActiveLastNodID=0
 
 
 
@@ -148,6 +150,7 @@ if am.Usefulness<0{
 	MotorTerminalBlocking=true // блокировка рефлексов
 	LastRunAutomatizmPulsCount =PulsCount // активность мот.автоматизма в чисде пульсов
 	LastAutomatizmWeiting=am
+	LastDetectedActiveLastNodID=detectedActiveLastNodID
 	/* Блокировать выполнение рефлексов на время ожидания результата автоматизма
 	вызывается из reflex_action.go рефлексов
 	*/

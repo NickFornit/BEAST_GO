@@ -213,7 +213,7 @@ func SaveAutomatizm() {
 		out += strconv.Itoa(v.BranchID) + "|"
 		out += strconv.Itoa(v.Usefulness) + "||"
 		out += v.Sequence + "||"
-		out += strconv.Itoa(v.Usefulness) + "|"
+		out += strconv.Itoa(v.NextID) + "|"
 		out += strconv.Itoa(v.Energy) + "|"
 		out += strconv.Itoa(v.Belief) + "|"
 		out += strconv.Itoa(v.Count) + "|"

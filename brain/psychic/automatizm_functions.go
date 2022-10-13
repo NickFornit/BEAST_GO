@@ -220,11 +220,12 @@ if belief==2{
 		if len(aArr) > 1 {
 			for i := 0; i < len(aArr); i++ {
 				if aArr[i] != atmzm && aArr[i].Belief == 2 {
-					atmzm.Belief = 0
-					AutomatizmBelief2FromTreeNodeId[atmzm.BranchID] = nil
+					aArr[i].Belief = 0
+					AutomatizmBelief2FromTreeNodeId[aArr[i].BranchID] = nil
 				}
 			}
 		}
+	// внизу	atmzm.Belief=2
 		AutomatizmBelief2FromTreeNodeId[atmzm.BranchID] = atmzm
 	}
 	// привязанные к ID образа действий с пульта ActivityID

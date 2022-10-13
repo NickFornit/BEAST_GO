@@ -143,3 +143,5 @@ func createInactionImg(){
 	_,CurrentInformationEnvironment.PsyActionImg=createNewlastActivityID(1,[]int{0})
 }
 ///////////////////////////////////////////
+
+
