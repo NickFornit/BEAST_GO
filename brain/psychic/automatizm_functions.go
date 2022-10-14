@@ -94,7 +94,6 @@ func getAutomatizmFromNodeID(nodeID int)(int){
 1 Snn - перечень ID фраз через запятую
 2 Dnn - ID прогрмаммы действий, через запятую
 3 Ann - последовательный запуск автоматизмов с id1,id2..
-4 Mnn - внутренние произвольные действия с id1,id2...
 5 Tnn - образ тон-настроения одна цифра == образ тона-настроения (как в func GetToneMoodID(  и func GetToneMoodFromImg()
 */
 func ParceAutomatizmSequence(Sequence string)([]ActsAutomatizm){
@@ -109,10 +108,8 @@ func ParceAutomatizmSequence(Sequence string)([]ActsAutomatizm){
 		pArr:=strings.Split(sArr[i], ":")
 		switch pArr[0]{
 		case "Snn": act.Type=1
-		//case "nn": act.Type=2
 		case "Dnn": act.Type=2
 		case "Ann": act.Type=3
-		case "Mnn": act.Type=4
 		case "Tnn": act.Type=5
 		}
 
@@ -298,7 +295,7 @@ func createNodeUnattachedAutomatizm(nodeID int,aID int){
 		return }
 
 	if node.VerbalID>0 { // это узел фразы
-		_,autmzm:=CreateAutomatizm(2000000+node.VerbalID,autmzm0.Sequence)
+		_,autmzm:=CreateAutomatizm(2000000+node.VerbalID,autmzm0.Sequence,1)
 		if autmzm!=nil{
 			SetAutomatizmBelief(autmzm, 2)// сделать автоматизм штатным
 			autmzm.Usefulness=1 // полезность
@@ -306,7 +303,7 @@ func createNodeUnattachedAutomatizm(nodeID int,aID int){
 	}
 	/////////////
 	if node.ActivityID>0 && node.ToneMoodID==0 { // это узел действий - конечный в активной ветке
-		_,autmzm:=CreateAutomatizm(1000000+node.ActivityID,autmzm0.Sequence)
+		_,autmzm:=CreateAutomatizm(1000000+node.ActivityID,autmzm0.Sequence,1)
 		if autmzm!=nil{
 			SetAutomatizmBelief(autmzm, 2)// сделать автоматизм штатным
 			autmzm.Usefulness=1 // полезность

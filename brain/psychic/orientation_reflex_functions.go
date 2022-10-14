@@ -54,8 +54,8 @@ func createAutomatizm(pc *PurposeGenetic)(*Automatizm){
 	}
 
 
-	// создать автоматизм, даже если такой уже есть
-	_,atzm:=CreateNewAutomatizm(BranchID,Sequence)
+	// создать автоматизм
+	_,atzm:=CreateNewAutomatizm(BranchID,Sequence,1)
 	if atzm!=nil {
 		atzm.Energy = 5
 

@@ -113,7 +113,9 @@ if nodeA!=nil {
 		emotionTitle += gomeostas.GetBaseContextCondFromID(emo.BaseIDarr[i])
 	}
 	/////////////////////////////
-
+if nodeID=="12"{
+	nodeID="12"
+}
 	// пусковой стимул
 	trStr=strconv.Itoa(nodeA.ActivityID)+"-"+strconv.Itoa(nodeA.VerbalID)+"-"+strconv.Itoa(nodeA.ToneMoodID)
 

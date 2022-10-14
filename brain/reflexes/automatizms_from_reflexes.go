@@ -86,7 +86,7 @@ func RunMakeAutomatizmsFromReflexes() string {
 				sequence += strconv.Itoa(aArr[i])
 			}
 			psychic.NoWarningCreateShow = true
-			_, autmzm := psychic.CreateAutomatizm(nodeID, sequence)
+			_, autmzm := psychic.CreateAutomatizm(nodeID, sequence,0)
 			psychic.NoWarningCreateShow = false
 			if autmzm != nil {
 				psychic.SetAutomatizmBelief(autmzm, 2) // сделать автоматизм штатным
@@ -160,7 +160,7 @@ func RunMakeAutomatizmsFromGeneticReflexes() string {
 				sequence += strconv.Itoa(aArr[i])
 			}
 			psychic.NoWarningCreateShow = true
-			_, autmzm := psychic.CreateAutomatizm(nodeID, sequence)
+			_, autmzm := psychic.CreateAutomatizm(nodeID, sequence,0)
 			psychic.NoWarningCreateShow = false
 			if autmzm != nil {
 				psychic.SetAutomatizmBelief(autmzm, 2) // сделать автоматизм штатным

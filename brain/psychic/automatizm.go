@@ -39,7 +39,7 @@ func automatizmInit(){
 1 Snn - перечень ID фраз через запятую и к ней: Tnn:23 - образ тон-настроения
 2 Dnn - ID прогрмаммы действий, через запятую
 3 Ann - последовательный запуск автоматизмов с id1,id2..
-4 Mnn - внутренние произвольные действия с id1,id2...
+ НЕТ ТАКОГО 4 Mnn - внутренние произвольные действия с id1,id2...
 5 Tnn - образ тон-настроения одна цифра == образ тона-настроения (как в func GetToneMoodID(  и func GetToneMoodFromImg()
 */
 type ActsAutomatizm struct {
@@ -66,7 +66,7 @@ type Automatizm struct {
 	   Последовательность - строка, с разделителем | в которой виды действий обозначаются
 	   символом типа и последующим числом == ID данного вида реагирования:
 	   Snn- перечень ID фраз через запятую,
-НЕТ nn - ID программы ответа (фраза),
+		Tnn - образ тона и настроение
 	   Dnn - ID прогрмаммы действий, через запятую
 	   Ann - последовательный запуск автоматизмов с id1,id2...
 
@@ -147,10 +147,20 @@ func GetMotorsAutomatizmListFromTreeId(nodeID int) []*Automatizm {
 var lastAutomatizmID = 0 // ID последнего созданного автоматизма
 var NoWarningCreateShow = false // true - не выдавать сообщение о новом автоматизме
 
-// создать новый автоматизм
-func createNewAutomatizmID(id int,BranchID int,Sequence string)(int,*Automatizm) {
-// автоматизмы могут быть неуникальными, т.е. даже с тождественными Sequence, это не имеет значения.
-// к одной вентке могут быть прикреплены неограниченное число автоматизмов
+/* создать новый автоматизм
+checkLevel - глубина проверки на идентичность: 0 - нет проверки, 1 - поверхностная, 2 - полная
+ */
+func createNewAutomatizmID(id int,BranchID int,Sequence string, checkLevel int)(int,*Automatizm) {
+/* Автоматизмы уникальны по сочетанию BranchID и Sequence.
+	При попытке создать с таким же сочетанием возвращается уже созданный.
+ к одной вентке могут быть прикреплены неограниченное число автоматизмов
+ */
+	if checkLevel>0 {
+		oldID, oldVal := checkUnicumMotorsAutomatizm(BranchID, Sequence,checkLevel)
+		if oldVal != nil {
+			return oldID, oldVal
+		}
+	}
 	if id == 0 {
 		lastAutomatizmID++
 		id=lastAutomatizmID
@@ -181,24 +191,94 @@ func createNewAutomatizmID(id int,BranchID int,Sequence string)(int,*Automatizm)
 	}
 	return id, &node
 }
+//////////////////////////////////////////
+/* Автоматизмы уникальны по сочетанию BranchID и Sequence.
+Функцию можно использовать для выборки автоматизма с заданными BranchID и Sequence
+checkLevel - глубина проверки на идентичность: 0 - нет проверки, 1 - поверхностная, 2 - полная
+Полная проверка м.б. пригодиться для ментальных дел, в частности, нахождения автоматизма с заданными BranchID и Sequence
+*/
+func checkUnicumMotorsAutomatizm(BranchID int,Sequence string, checkLevel int)(int,*Automatizm){
+	for id, v := range AutomatizmFromIdArr {
+		if BranchID != v.BranchID || !compareAutomatizmSequence(Sequence,v.Sequence,checkLevel) {
+			continue
+		}
+		return id,v
+	}
+	return 0,nil
+}
+/* сравненеие на идентичности двух Sequence
+Sequence="Snn:24243,1234,0,24234,11234|Tnn:23|Dnn:24,78"
+тестирование - в func PsychicInit()
+ */
+func compareAutomatizmSequence(Sequence1 string,Sequence2 string, checkLevel int)(bool){
+	//a1Arr:=ParceAutomatizmSequence(Sequence1)
+	if Sequence1 == Sequence2{
+		return true
+	}
+	if checkLevel==1{// на этом проверка завершается
+		return false
+	}
+// полная проверка
+	sArr:=strings.Split(Sequence1, "|")
+	for i := 0; i < len(sArr); i++ {
+		if len(sArr[i]) == 0 {
+			continue
+		}
+		pArr := strings.Split(sArr[i], ":")
+		switch pArr[0] {
+		case "Snn": // есть ли такой у второго
+			if strings.Contains(Sequence2, "Snn"){
+				if !compareBlockContent(pArr[1],Sequence2,"Snn"){
+					return false}
+			}else{return false}
+		case "Dnn":
+			if strings.Contains(Sequence2, "Dnn"){
+				if !compareBlockContent(pArr[1],Sequence2,"Dnn"){
+					return false}
+			}else{return false}
+/* последовательный запуск автоматизмов НЕ ПРОВЕРЯЕМ ЭКЗОТИКУ...
+		case "Ann":
+*/
+		case "Tnn":
+			if strings.Contains(Sequence2, "Tnn"){
+				if !compareBlockContent(pArr[1],Sequence2,"Tnn"){
+					return false}
+			}else{return false}
+		}
+	}
+	return true // все блоки действий совпадают
+}
+// сравнить содержимое блоков данного типа
+func compareBlockContent(block1 string,Sequence2 string,kind string)(bool){
+	sArr:=strings.Split(Sequence2, "|")
+	for i := 0; i < len(sArr); i++ {
+		pArr := strings.Split(sArr[i], ":")
+// т.к. последовательности Dnn отсортированы по возрастанию, то можно проверять pArr[1]==block1
+		if pArr[0]==kind && pArr[1]==block1{
+			return true
+		}
+	}
+	return false
+}
+////////////////////////////////////////////
 
 // создать новый автоматизм с записю в файл
-func CreateNewAutomatizm(BranchID int, Sequence string)(int, *Automatizm) {
+func CreateNewAutomatizm(BranchID int, Sequence string, checkLevel int)(int, *Automatizm) {
 	// BranchID может быть ==0 для мозжечковых рефлексов
 	if len(Sequence) == 0 { return 0, nil }
 
-	id, verb := createNewAutomatizmID(0, BranchID, Sequence)
+	id, verb := createNewAutomatizmID(0, BranchID, Sequence,checkLevel)
 	SaveAutomatizm()
 
 	return id, verb
 }
 
 // создать новый автоматизм без записи в файл
-func CreateAutomatizm(BranchID int, Sequence string)(int, *Automatizm) {
+func CreateAutomatizm(BranchID int, Sequence string, checkLevel int)(int, *Automatizm) {
 	// BranchID может быть ==0 для мозжечковых рефлексов
 	if len(Sequence) == 0 {	return 0, nil }
 
-	id, verb := createNewAutomatizmID(0, BranchID, Sequence)
+	id, verb := createNewAutomatizmID(0, BranchID, Sequence,checkLevel)
 
 	return id,verb
 }
@@ -253,7 +333,7 @@ func loadAutomatizm() {
 			sp, _ := strconv.Atoi(s[i])
 			GomeoIdSuccesArr = append(GomeoIdSuccesArr, sp)
 		}
-		_, a := createNewAutomatizmID(id, BranchID, Sequence)
+		_, a := createNewAutomatizmID(id, BranchID, Sequence,0)// без проверки на уникальность
 		a.NextID = NextID
 		a.Usefulness = Usefulness
 		a.Energy = Energy
@@ -263,3 +343,4 @@ func loadAutomatizm() {
 	NoWarningCreateShow = false
 	return
 }
+/////////////////////////////////////////////////////////////

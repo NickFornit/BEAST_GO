@@ -76,6 +76,11 @@ func PsychicInit(){
 
 //	FormingMirrorAutomatizmFromTempList("/lib/mirror_basic_phrases_common.txt")
 
+/*
+	res:=compareAutomatizmSequence("Snn:24243,1234,0,24234,11234|Tnn:23|Dnn:17,30",
+		"Snn:24243,1234,0,24234,11234|Tnn:23|Dnn:17,30")
+	if res{}
+*/
 }
 /////////////////////////////////////////////////////////////
 

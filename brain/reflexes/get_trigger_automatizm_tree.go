@@ -6,7 +6,7 @@ package reflexes
 import (
 	"BOT/brain/action_sensor"
 	"BOT/brain/psychic"
-	wordSensor "BOT/brain/words_sensor"
+	word_sensor "BOT/brain/words_sensor"
 )
 
 func GetTreeAutomatizmTriggersInfo(treeNodeID int) string {
@@ -16,7 +16,7 @@ func GetTreeAutomatizmTriggersInfo(treeNodeID int) string {
 		out += "Действия кнопок: <b>" + GetAcivButtInfo(treeNode.ActivityID) + "</b><br>"
 	}
 	if treeNode.VerbalID > 0 {
-		out += "Фраза: \"<b>" + wordSensor.GetWordFromPraseNodeID(treeNode.VerbalID) + "\"</b><br>"
+		out += "Фраза: \"<b>" + word_sensor.GetPhraseStringsFromPhraseID(treeNode.VerbalID) + "\"</b><br>"
 	}
 	if treeNode.ToneMoodID > 0 {
 		out += "" + psychic.GetToneMoodStrFromID(treeNode.ToneMoodID) + ""

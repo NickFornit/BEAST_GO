@@ -70,7 +70,11 @@ func FormingMirrorAutomatizmFromList(file string) string {
 			// засунуть фразу в дерево слов и дерево фраз
 			wordSensor.VerbalDetection(p[3], 1, 0, 0)
 			answerID := wordSensor.CurrentPhrasesIDarr
-			sequence += strconv.Itoa(answerID[0])
+			//sequence += strconv.Itoa(answerID[0])
+			for i := 0; i < len(answerID); i++ {
+				if i > 0 { sequence += ","}
+				sequence += strconv.Itoa(answerID[i]) // ответная фраза
+			}
 
 			sequence += "|Тnn:" // тон и настроение
 			tnArr := strings.Split(p[4], ",")
@@ -86,7 +90,7 @@ func FormingMirrorAutomatizmFromList(file string) string {
 				sequence += aD[i]
 			}
 			NoWarningCreateShow = true
-			_, autmzm := CreateAutomatizm(nodeID, sequence)
+			_, autmzm := CreateAutomatizm(nodeID, sequence,0)
 			NoWarningCreateShow = false
 			if autmzm != nil {
 				SetAutomatizmBelief(autmzm, 2) // сделать автоматизм штатным
@@ -144,7 +148,11 @@ func FormingMirrorAutomatizmFromTempList(file string) string {
 		answerPraseID := wordSensor.CurrentPhrasesIDarr
 
 		// создать автоматизм и привязать его к объекту
-		var sequence = "Snn:" + strconv.Itoa(answerPraseID[0]) // ответная фраза
+		var sequence = "Snn:" // ответная фраза
+		for i := 0; i < len(answerPraseID); i++ {
+			if i > 0 { sequence += ","}
+			sequence += strconv.Itoa(answerPraseID[i]) // ответная фраза
+		}
 		sequence += "|Tnn:" + strconv.Itoa(tm) // тон и настроение
 		sequence += "|Dnn:" // перечень ответных действий
 		aD := strings.Split(p[3], ",")
@@ -155,7 +163,7 @@ func FormingMirrorAutomatizmFromTempList(file string) string {
 
 		NoWarningCreateShow=true
 		// для фразы triggerPraseID создаем привязанный к ней автоматизм
-		_, autmzm := CreateAutomatizm(2000000 + triggerPraseID[0], sequence)
+		_, autmzm := CreateAutomatizm(2000000 + triggerPraseID[0], sequence,0)
 		NoWarningCreateShow = false
 		if autmzm != nil {
 			SetAutomatizmBelief(autmzm, 2) // сделать автоматизм штатным
@@ -177,10 +185,24 @@ func FormingMirrorAutomatizmFromTempList(file string) string {
 func createNewMirrorAutomatizm(sourceAtmzm *Automatizm) {
 	if sourceAtmzm == nil { return }
 	var sequence = ""
+/* вытащить действия исходного автоматизма чтобы найти или сделать узел дерева с таким пускателем
+и существубшими BaseID и EmotionID
+ */
+	curNode:=AutomatizmTreeFromID[detectedActiveLastNodID]
+	targetNodeID:=findTreeNodrFromAutomatizmSequence(curNode.BaseID, curNode.EmotionID, sourceAtmzm.Sequence)
+	if targetNodeID==0{
+		return
+	}
+	SaveAutomatizmTree()
+// найти узел, который может реагировать на данные действия и если нет - создать его чтобы привязать зеркальный автоматизм
 
 	// создать автоматизм и привязать его к объекту
 	if len(curActiveActions.phraseID) > 0 {
-		sequence += "Snn:" + strconv.Itoa(curActiveActions.phraseID[0]) // ответная фраза
+		sequence += "Snn:"
+		for i := 0; i < len(curActiveActions.phraseID); i++ {
+			if i > 0 { sequence += ","}
+			sequence += strconv.Itoa(curActiveActions.phraseID[i]) // ответная фраза
+		}
 		// тон, настроение
 		tm := GetToneMoodID(curActiveActions.toneID, curActiveActions.moodID + 19)
 		sequence += "|Tnn:" + strconv.Itoa(tm) // тон и настроение
@@ -194,7 +216,9 @@ func createNewMirrorAutomatizm(sourceAtmzm *Automatizm) {
 
 	// NoWarningCreateShow=true
 	// для фразы triggerPraseID создаем привязанный к ней автоматизм
-	_, autmzm := CreateAutomatizm(LastDetectedActiveLastNodID, sequence)
+	//_, autmzm := CreateAutomatizm(LastDetectedActiveLastNodID, sequence,1)
+	//_, autmzm := CreateAutomatizm(detectedActiveLastNodID, sequence,1)
+	_, autmzm := CreateAutomatizm(targetNodeID, sequence,1)
 	//	NoWarningCreateShow=false
 	if autmzm != nil {
 		SetAutomatizmBelief(autmzm, 2) // сделать автоматизм штатным, т.к. действия авторитарно верные
@@ -203,6 +227,54 @@ func createNewMirrorAutomatizm(sourceAtmzm *Automatizm) {
 		SaveAutomatizm()
 	}
 }
+/* вытащить действия исходного автоматизма чтобы найти или сделать узел дерева с таким пускателем
+и существубшими BaseID и EmotionID
+*/
+func findTreeNodrFromAutomatizmSequence(baseID int, EmotionID int, AtmzmS string)(int){
+
+	lev2:=EmotionFromIdArr[EmotionID].BaseIDarr
+	var activityID []int
+	var toneMoodID=90
+	var simbolID=0
+	var verbalID []int
+	sArr:=strings.Split(AtmzmS, "|")
+	for i := 0; i < len(sArr); i++ {
+		if len(sArr[i]) == 0 {
+			continue
+		}
+		pArr := strings.Split(sArr[i], ":")
+		switch pArr[0] {
+		case "Snn": // есть ли такой у второго
+			v, _ := strconv.Atoi(pArr[1])
+			verbalID=append(verbalID,v)
+			// первый символ ответной фразы
+			simbolID = wordSensor.GetFirstSymbolFromPraseID(verbalID)
+		case "Dnn":
+			aArr := strings.Split(pArr[1], ",")
+			for n := 0; n < len(aArr); n++ {
+				a, _ := strconv.Atoi(aArr[n])
+				activityID=append(activityID,a)
+			}
+
+		/* последовательный запуск автоматизмов НЕ ПРОВЕРЯЕМ ЭКЗОТИКУ...
+		case "Ann":
+		*/
+		case "Tnn":
+			toneMoodID, _ = strconv.Atoi(pArr[1])
+		}
+	}
+
+	nodeID := FindConditionsNode(baseID, lev2, activityID, toneMoodID, simbolID, verbalID[0])
+	if nodeID > 0 {
+return nodeID
+	}
+
+	return 0
+}
+////////////////////////////////////////////////////////
+
+
+
 
 /* в случае отсуствия автоматизма в данных условиях - послать оператору те же стимулы, чтобы посмотреть его реакцию.
 Создание автоматизма, повторяющего действия оператора в данных условиях */
@@ -221,17 +293,20 @@ func provokatorMirrorAutomatizm(sourceAtmzm *Automatizm, purposeGenetic *Purpose
 	}
 
 	if len(curActiveActions.phraseID) > 0 {
-		verbID := curActiveActions.phraseID[0]
-		sequence += "Snn:" + strconv.Itoa(verbID) // ответная фраза
+		sequence += "Snn:"  // ответная фраза
+		for i := 0; i < len(curActiveActions.phraseID); i++ {
+			if i > 0 { sequence += ","}
+			sequence += strconv.Itoa(curActiveActions.phraseID[i]) // ответная фраза
+		}
 		// тон, настроение
 		tm := GetToneMoodID(curActiveActions.toneID, curActiveActions.moodID + 19)
 		sequence += "|Tnn:" + strconv.Itoa(tm) // тон и настроение
-		linkID = 2000000 + verbID
+		linkID = 2000000 + curActiveActions.phraseID[0] // только по первому слову?
 	}
 
 	// NoWarningCreateShow=true
 	// для фразы triggerPraseID создаем привязанный к ней автоматизм
-	_, autmzm := CreateAutomatizm(detectedActiveLastNodID, sequence)
+	_, autmzm := CreateAutomatizm(detectedActiveLastNodID, sequence,1)
 	// NoWarningCreateShow=false
 	if autmzm != nil {
 		autmzm.BranchID += linkID // не привязывать к узлу
@@ -241,3 +316,4 @@ func provokatorMirrorAutomatizm(sourceAtmzm *Automatizm, purposeGenetic *Purpose
 	// и тут же запустить реакцию с ожиданием ответа
 	setAutomatizmRunning(autmzm, purposeGenetic)
 }
+//////////////////////////////////
