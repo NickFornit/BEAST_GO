@@ -212,8 +212,8 @@ ActID:=action_sensor.CheckCurActionsContext();//CheckCurActions()
 
 
 	// результат активации Дерева:
-	if detectedActiveLastNodID>0{
 	notAllowScanInTreeThisTime=true
+	if detectedActiveLastNodID>0{
 // есть ли еще неучтенные, нулевые условия? т.е. просто показаь число ненулевых значений condArr
 		conditionsCount:=getConditionsCount(condArr)
 		CurrentAutomatizTreeEnd=condArr[currentStepCount:] // НОВИЗНА
@@ -223,24 +223,18 @@ ActID:=action_sensor.CheckCurActionsContext();//CheckCurActions()
 			detectedActiveLastNodID = formingBranch(detectedActiveLastNodID, currentStepCount+1, condArr)
 		}
 
-			if afterTreeActivation(){
-				return 1
-			}
-			return 0
-
 	}else{// вообще нет совпадений для данных условий
 // нарастить недостающее в ветке дерева - всегда для orientation_1()
 		detectedActiveLastNodID = formingBranch(detectedActiveLastNodID, currentStepCount+1, condArr)
 			
 		// автоматизма нет у недоделанной ветки
 		CurrentAutomatizTreeEnd=condArr // все - новизна
-		if afterTreeActivation(){
-			return 1// блокировка рефлексов
-		}
-		return 0
 
 	}
-notAllowScanInTreeThisTime=false
+	notAllowScanInTreeThisTime=false
+	if afterTreeActivation(){
+		return 1
+	}
 	return 0
 }
 //////////////////////////////////////////////////////////////////
