@@ -273,8 +273,7 @@ func conditionAutomatizmFound(level int,cond []int,node *AutomatizmNode){
 			detectedActiveLastNodID=cld.ID
 			ActiveBranchNodeArr=append(ActiveBranchNodeArr,cld.ID)
 		}else {
-			currentStepCount=level-1
-			//return
+			//currentStepCount=level-1
 			continue
 		}
 
@@ -283,7 +282,7 @@ func conditionAutomatizmFound(level int,cond []int,node *AutomatizmNode){
 		conditionAutomatizmFound(level,ost, &node.Children[n])
 		return // раз совпало, то другие ветки не смотреть
 	}
-
+	currentStepCount=level-1 // не нашло в ветке, откатываем шаг по уровню
 	return
 }
 ////////////////////////////////////////////////////////
