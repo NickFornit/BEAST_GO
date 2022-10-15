@@ -274,7 +274,8 @@ func conditionAutomatizmFound(level int,cond []int,node *AutomatizmNode){
 			ActiveBranchNodeArr=append(ActiveBranchNodeArr,cld.ID)
 		}else {
 			currentStepCount=level-1
-			return
+			//return
+			continue
 		}
 
 		level++
