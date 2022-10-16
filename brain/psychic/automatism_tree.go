@@ -192,6 +192,7 @@ ActID:=action_sensor.CheckCurActionsContext();//CheckCurActions()
 	}
 
 	condArr:=getActiveConditionsArr(lev1, lev2, lev3, lev4, lev5, lev6)
+	notAllowScanInTreeThisTime=true // защелка от повтора во время обработки
 	// основа дерева
 	cnt := len(AutomatizmTree.Children)
 	for n := 0; n < cnt; n++ {
@@ -212,7 +213,6 @@ ActID:=action_sensor.CheckCurActionsContext();//CheckCurActions()
 
 
 	// результат активации Дерева:
-	notAllowScanInTreeThisTime=true
 	if detectedActiveLastNodID>0{
 // есть ли еще неучтенные, нулевые условия? т.е. просто показаь число ненулевых значений condArr
 		conditionsCount:=getConditionsCount(condArr)
@@ -231,10 +231,12 @@ ActID:=action_sensor.CheckCurActionsContext();//CheckCurActions()
 		CurrentAutomatizTreeEnd=condArr // все - новизна
 
 	}
-	notAllowScanInTreeThisTime=false
+
 	if afterTreeActivation(){
+		notAllowScanInTreeThisTime=false // снять блокировку
 		return 1
 	}
+	notAllowScanInTreeThisTime=false // снять блокировку
 	return 0
 }
 //////////////////////////////////////////////////////////////////

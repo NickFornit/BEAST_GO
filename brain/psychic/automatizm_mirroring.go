@@ -224,7 +224,7 @@ func createNewMirrorAutomatizm(sourceAtmzm *Automatizm) {
 		SetAutomatizmBelief(autmzm, 2) // сделать автоматизм штатным, т.к. действия авторитарно верные
 		autmzm.Usefulness = 1 // авторитарная полезность
 
-		SaveAutomatizm()
+		// SaveAutomatizm()
 	}
 }
 /* вытащить действия исходного автоматизма чтобы найти или сделать узел дерева с таким пускателем
