@@ -98,6 +98,8 @@ func CreateNewConditionReflex(id int, lev1 int, lev2 []int, lev3 int, ActionIDar
 		// если условия те же, но действия уже другие - подставить в существующий рефлекс новые действия
 		if !lib.EqualArrs(rOld.ActionIDarr, ActionIDarr) {
 			rOld.ActionIDarr = ActionIDarr
+			rOld.lastActivation = int(LifeTime/(3600*24)) // последняя активация
+			rOld.birthTime = int(LifeTime/(3600*24)) // время рождения
 		}
 		return idOld, rOld
 	}
@@ -131,8 +133,9 @@ func compareCRUnicum(lev1 int, lev2 []int, lev3 int) (int, *ConditionReflex) {
 	for k, v := range ConditionReflexes {
 		if v.lev1 == lev1 && lib.EqualArrs(v.lev2, lev2) && v.lev3 == lev3 {
 			// если это просроченный рефлекс, то установить его lastActivation в актуальное состояние
-			v.lastActivation = int(LifeTime/(3600*24)) // последняя активация
-			v.birthTime = int(LifeTime/(3600*24)) // время рождения
+			//v.lastActivation = int(LifeTime/(3600*24)) // последняя активация
+			//v.birthTime = int(LifeTime/(3600*24)) // время рождения
+			// это просто функция поиска, тут не стоит делать изменений с объектом
 			return k, v
 		}
 	}
