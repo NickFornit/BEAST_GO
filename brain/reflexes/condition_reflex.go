@@ -101,8 +101,13 @@ func CreateNewConditionReflex(id int, lev1 int, lev2 []int, lev3 int, ActionIDar
 		if !lib.EqualArrs(rOld.ActionIDarr, ActionIDarr) {
 			rOld.ActionIDarr = ActionIDarr
 			// установить lastActivation в актуальное состояние
+<<<<<<< Updated upstream
 			rOld.lastActivation = int(LifeTime/(3600*24)) // последняя активация
 			rOld.birthTime = int(LifeTime/(3600*24)) // время рождения
+=======
+			v.lastActivation = int(LifeTime/(3600*24)) // последняя активация
+			v.birthTime = int(LifeTime/(3600*24)) // время рождения
+>>>>>>> Stashed changes
 		}
 		return idOld, rOld
 	}

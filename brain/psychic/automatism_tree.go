@@ -269,7 +269,11 @@ func conditionAutomatizmFound(level int,cond []int,node *AutomatizmNode){
 			detectedActiveLastNodID=cld.ID
 			ActiveBranchNodeArr=append(ActiveBranchNodeArr,cld.ID)
 		}else {
+<<<<<<< Updated upstream
 			//currentStepCount=level-1
+=======
+			currentStepCount=level-1
+>>>>>>> Stashed changes
 			continue
 		}
 
