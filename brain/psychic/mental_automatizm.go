@@ -80,6 +80,8 @@ func SaveMentalAutomatizms(){
 func RunMentalAutomatizmsID(mentID int){
 	am:=MentalAutomatizmsFromID[mentID]
 
+	//Функция вызова пронумерованной функции: runMenyalFunctionID(id int){ switch id{
+
 	// вернуть скорректированную силу действия
 	//addE:=0
 	//if am.Belief!=3 {// не рефлекс мозжечка

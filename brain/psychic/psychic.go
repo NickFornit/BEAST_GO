@@ -110,6 +110,10 @@ func PsychicCountPuls(evolushnStage int,lifeTime int,puls int,isSlipping bool){
 		sleepingProcess()
 	}
 
+	// осознание при бодрствовании
+	consciousness(0)
+
+
 
 	// просыпание - создание базового самоощущения CurrentInformationEnvironment
 	//	if psychicPulsCount>3 {

@@ -58,6 +58,9 @@ func orientationConsciousness(kind int)(bool){
 особенно не заморачиваясь (первое приближение).
  */
 	if kind ==1 {
+		if consciousness(1){
+			return true
+		}
 /* НОВИЗНА: CurrentUnderstandingTreeEnd=condArr[currentUnderstandingStepCount:] []int
 - нет еще таких веток, начиная с currentUnderstandingStepCount
 
@@ -84,7 +87,10 @@ func orientationConsciousness(kind int)(bool){
 	 штатный мент.автоматизм, привязанный к ветке: currentMentalAutomatizmID
    УСЛОВИЯ ДЛЯ ПРИМЕНЕНИЯ ПРОИЗВОЛЬНОСТИ: старый мент.автоматизм может быть заменен на новый.
  */
-	if kind==2 {
+	if kind==2 {// условия применения ПРОИЗВОЛЬНОСТИ
+		if consciousness(2){
+			return true
+		}
 /* нужна субъектиная (отвлеченная от гомеостаза) оценка ситуации -
   с учетом новизны ситуации, которая может не детектироваться активными ветками деревьев,
   особенно это касается понимания ФРАЗЫ сообщения.

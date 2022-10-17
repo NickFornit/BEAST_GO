@@ -219,7 +219,7 @@ func conditionUnderstandingFound(level int,cond []int,node *UnderstandingNode){
 			ActiveBranchNodeArr=append(ActiveBranchNodeArr,cld.ID)
 		}else {
 			currentUnderstandingStepCount=level-1
-			return
+			continue
 		}
 
 		level++
