@@ -165,7 +165,7 @@ func runCerebellumAdditionalAutomatizm(kind int, automatizmID int) {
 	} else {
 		aArr := cr.additionalMentalAutID
 		for i := 0; i < len(aArr); i++ {
-			RunMentalAutomatizmsID(aArr[i])
+			RunMentalMentalAutomatizmsID(aArr[i])
 		}
 	}
 }

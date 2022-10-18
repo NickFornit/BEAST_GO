@@ -4,6 +4,7 @@
 
 package psychic
 
+import "strings"
 
 //////////////////////////////////////////
 
@@ -44,6 +45,24 @@ func ExistsMentalAutomatizmForThisNodeID(nodeID int)(bool){
 ///////////////////////////////////////
 
 
+/* список удачных автоматизмов, относящихся к определенным условиям (привзяанных к определенной ветке Дерева)
+В этом списке поле Usefulness >0
+*/
+var MentalAutomatizmSuccessFromIdArr = make(map[int]*MentalAutomatizm)
+
+// список всех автоматизмов для ID узла Дерева
+func GetMentalAutomatizmListFromTreeId(nodeID int) []*MentalAutomatizm {
+	if nodeID == 0 { return nil	}
+	var mArr[] *MentalAutomatizm
+	for _, a := range MentalAutomatizmsFromID {
+		if a.BranchID == nodeID{
+			mArr = append(mArr, a)
+		}
+	}
+	return mArr
+}
+//////////////////////////////////////////////
+
 
 /* выбрать лучший автоматизм для узла nodeID то более ранних, если нет у поздних.
  */
@@ -68,3 +87,32 @@ func getMentalAutomatizmFromNodeID(nodeID int)(int){
 	return 0
 }
 /////////////////////////////////////
+
+
+
+/* разделить строку Sequence автоматизма на составляющие
+типы действий:
+1 Mnn - выполнить ментальную функцию с ID
+2 Ann - выполнить моторный автоматизм с ID
+*/
+func ParceMentalAutomatizmSequence(Sequence string)([]ActsMentalAutomatizm){
+	var acts[] ActsMentalAutomatizm
+
+	sArr:=strings.Split(Sequence, "|")
+	for i := 0; i < len(sArr); i++ {
+		if len(sArr[i])==0{
+			continue
+		}
+		var act ActsMentalAutomatizm
+		pArr:=strings.Split(sArr[i], ":")
+		switch pArr[0]{
+		case "Mnn": act.Type=1
+		case "Ann": act.Type=2
+		}
+
+		act.Acts = pArr[1] // строка действий (любого типа) через запятую
+		acts = append(acts, act)
+	}
+	return acts
+}
+////////////////////////////////////////////////

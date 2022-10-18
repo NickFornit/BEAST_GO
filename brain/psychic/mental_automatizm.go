@@ -6,6 +6,19 @@
 
 package psychic
 
+import (
+	"BOT/lib"
+	"strconv"
+	"strings"
+)
+////////////////////////////////////////
+
+func mentalAutomatizmInit(){
+	loadMentalAutomatizm()
+}
+///////////////////////////////////////
+
+
 ///////////////////////////////////////
 type MentalAutomatizm struct {
 	ID int
@@ -17,12 +30,6 @@ Mnn:ID - выполнить ментальную функцию с ID
 Ann:ID - выполнить моторный автоматизм с ID
 	*/
 	Sequence string
-
-	/* Цель, которая должна быть достигнута действиями Sequence
-
-	 */
-
-
 
 	/* Следующий автоматизм в цепочке исполнения. Цепь может быть пройдена ментально, без выполнения автоматизмов, для этого не вызывается моторное выполнение а просто - проход цепочки с просмотром ее звеньев.
 	или цепь может быть прервана осознанно
@@ -53,55 +60,175 @@ var MentalAutomatizmsFromID=make(map[int]*MentalAutomatizm)
 // ШТАТНЫЕ автоматизмы, прикрепленные к ID узла Дерева с Belief==2 т.е. ШТАТНЫЕ, выполняющиеся не раздумывая
 // у узла может быть только один штатный автоматизм с Belief==2
 var MentalAutomatizmBelief2FromTreeNodeId = make(map[int]*MentalAutomatizm)
+/////////////////////////////////////////////////////////////////////
 
-/* список удачных автоматизмов, относящихся к определенным условиям (привзяанных к определенной ветке Дерева)
-В этом списке поле Usefulness >0
+
+/* создать новый автоматизм
+checkLevel - глубина проверки на идентичность: 0 - нет проверки, 1 - поверхностная, 2 - полная
 */
-var MentalAutomatizmSuccessFromIdArr = make(map[int]*MentalAutomatizm)
-
-// список всех автоматизмов для ID узла Дерева
-func GetMentalAutomatizmListFromTreeId(nodeID int) []*MentalAutomatizm {
-	if nodeID == 0 { return nil	}
-	var mArr[] *MentalAutomatizm
-	for _, a := range MentalAutomatizmsFromID {
-		if a.BranchID < 1000000 && a.BranchID == nodeID{
-			mArr = append(mArr, a)
+var lastMentalAutomatizmID=0
+var NoWarningMentalCreateShow=false
+func createMentalAutomatizmID(id int,BranchID int,Sequence string, checkLevel int)(int,*MentalAutomatizm) {
+	/* Автоматизмы уникальны по сочетанию BranchID и Sequence.
+	   	При попытке создать с таким же сочетанием возвращается уже созданный.
+	    к одной вентке могут быть прикреплены неограниченное число автоматизмов
+	*/
+	if checkLevel>0 {
+		oldID, oldVal := checkUnicumMentalAutomatizm(BranchID, Sequence,checkLevel)
+		if oldVal != nil {
+			return oldID, oldVal
 		}
 	}
-	return mArr
-}
-
-
-func SaveMentalAutomatizms(){
-
-}
-
-/////////////////////////////////////////////////
-func RunMentalAutomatizmsID(mentID int){
-	am:=MentalAutomatizmsFromID[mentID]
-
-	//Функция вызова пронумерованной функции: runMenyalFunctionID(id int){ switch id{
-
-	// вернуть скорректированную силу действия
-	//addE:=0
-	//if am.Belief!=3 {// не рефлекс мозжечка
-		addE := getCerebellumReflexAddEnergy(1,am.ID)
-	//}
-	if addE>0{
-
+	if id == 0 {
+		lastMentalAutomatizmID++
+		id=lastMentalAutomatizmID
+	} else {
+		if lastMentalAutomatizmID < id {
+			lastMentalAutomatizmID = id
+		}
 	}
 
+	var node MentalAutomatizm
+	node.ID = id
+	node.BranchID = BranchID
+	node.Sequence = Sequence
 
-	//  выполнить дополнительные мозжечковые автоматизмы сразу после выполняющегося автоматизма
-	runCerebellumAdditionalAutomatizm(1,mentID)
-//нужно заблокировать обработку активации дерева моторных автоматизмов
-	MentalReasonBlocing=true
+	MentalAutomatizmsFromID[id] = &node
+
+	if !NoWarningMentalCreateShow {
+		lib.WritePultConsol("Создан новый автоматизм.")
+	}
+	return id, &node
 }
-////////////////////////////////////////////////////////////////
+//////////////////////////////////////////
+/* Автоматизмы уникальны по сочетанию BranchID и Sequence.
+Функцию можно использовать для выборки автоматизма с заданными BranchID и Sequence
+checkLevel - глубина проверки на идентичность: 0 - нет проверки, 1 - поверхностная, 2 - полная
+Полная проверка м.б. пригодиться для ментальных дел, в частности, нахождения автоматизма с заданными BranchID и Sequence
+*/
+func checkUnicumMentalAutomatizm(BranchID int,Sequence string, checkLevel int)(int,*MentalAutomatizm){
+	for id, v := range MentalAutomatizmsFromID {
+		if BranchID != v.BranchID || !compareAutomatizmSequence(Sequence,v.Sequence,checkLevel) {
+			continue
+		}
+		return id,v
+	}
+	return 0,nil
+}
+/* сравненеие на идентичности двух Sequence
+Sequence="Snn:24243,1234,0,24234,11234|Tnn:23|Dnn:24,78"
+тестирование - в func PsychicInit()
+*/
+func compareMentalAutomatizmSequence(Sequence1 string,Sequence2 string, checkLevel int)(bool){
+	//a1Arr:=ParceAutomatizmSequence(Sequence1)
+	if Sequence1 == Sequence2{
+		return true
+	}
+	if checkLevel==1{// на этом проверка завершается
+		return false
+	}
+	// полная проверка
+	sArr:=strings.Split(Sequence1, "|")
+	for i := 0; i < len(sArr); i++ {
+		if len(sArr[i]) == 0 {
+			continue
+		}
+		pArr := strings.Split(sArr[i], ":")
+		switch pArr[0] {
+		case "Snn": // есть ли такой у второго
+			if strings.Contains(Sequence2, "Snn"){
+				if !compareBlockContent(pArr[1],Sequence2,"Snn"){
+					return false}
+			}else{return false}
+		case "Dnn":
+			if strings.Contains(Sequence2, "Dnn"){
+				if !compareBlockContent(pArr[1],Sequence2,"Dnn"){
+					return false}
+			}else{return false}
+			/* последовательный запуск автоматизмов НЕ ПРОВЕРЯЕМ ЭКЗОТИКУ...
+			case "Ann":
+			*/
+		case "Tnn":
+			if strings.Contains(Sequence2, "Tnn"){
+				if !compareBlockContent(pArr[1],Sequence2,"Tnn"){
+					return false}
+			}else{return false}
+		}
+	}
+	return true // все блоки действий совпадают
+}
+// сравнить содержимое блоков данного типа
+func compareMentalBlockContent(block1 string,Sequence2 string,kind string)(bool){
+	sArr:=strings.Split(Sequence2, "|")
+	for i := 0; i < len(sArr); i++ {
+		pArr := strings.Split(sArr[i], ":")
+		// т.к. последовательности Dnn отсортированы по возрастанию, то можно проверять pArr[1]==block1
+		if pArr[0]==kind && pArr[1]==block1{
+			return true
+		}
+	}
+	return false
+}
+////////////////////////////////////////////
+
+
+// СОХРАНИТЬ структура записи: id|BranchID|Usefulness||Sequence||NextID|Energy|Belief
+// В случае отсуствия пусковых стимулов создается ID такого отсутсвия, пример такой записи: 2|||0|0|
+func SaveMentalAutomatizm() {
+	var out = ""
+
+	for k, v := range MentalAutomatizmsFromID {
+		out += strconv.Itoa(k) + "|"
+		out += strconv.Itoa(v.BranchID) + "|"
+		out += strconv.Itoa(v.Usefulness) + "||"
+		out += v.Sequence + "||"
+		out += strconv.Itoa(v.NextID) + "|"
+		out += strconv.Itoa(v.Belief) + "|"
+		out += strconv.Itoa(v.Count)
+		out += "\r\n"
+	}
+	lib.WriteFileContent(lib.GetMainPathExeFile() + "/memory_psy/automatizm_images.txt", out)
+}
+
+// ЗАГРУЗИТЬ структура записи: id|BranchID|Usefulness||Sequence||NextID|Energy|Belief
+func loadMentalAutomatizm() {
+	NoWarningMentalCreateShow = true
+	MentalAutomatizmsFromID = make(map[int]*MentalAutomatizm)
+
+	strArr, _ := lib.ReadLines(lib.GetMainPathExeFile() + "/memory_psy/automatizm_images.txt")
+	if strArr == nil { return	}
+	for n := 0; n < len(strArr); n++ {
+		if len(strArr[n]) == 0 { continue	}
+		main := strings.Split(strArr[n], "||")
+		p := strings.Split(main[0], "|")
+		id, _ := strconv.Atoi(p[0])
+		BranchID, _ := strconv.Atoi(p[1])
+		Usefulness, _ := strconv.Atoi(p[2])
+		Sequence := main[1]
+
+		p = strings.Split(main[2], "|")
+		NextID, _ := strconv.Atoi(p[0])
+		Belief, _ := strconv.Atoi(p[1])
+		Count, _ := strconv.Atoi(p[2])
+
+		_, a := createMentalAutomatizmID(id, BranchID, Sequence,0)// без проверки на уникальность
+		a.NextID = NextID
+		a.Usefulness = Usefulness
+		a.Count = Count
+		SetMentalAutomatizmBelief(a, Belief)
+	}
+	NoWarningMentalCreateShow = false
+	return
+}
+/////////////////////////////////////////////////////////////
 
 
 
-/////////////////////////////////////////////////
+
+
+
+
+
 
 
 

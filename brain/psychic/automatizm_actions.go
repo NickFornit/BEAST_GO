@@ -56,7 +56,7 @@ func RumAutomatizmID(id int)(bool){
 	if a==nil{
 		return false
 	}
-	return RumAutomatizm(AutomatizmFromIdArr[id])
+	return RumAutomatizm(a)
 }
 ////////////////////
 // todo = true - выполнить полюбому,

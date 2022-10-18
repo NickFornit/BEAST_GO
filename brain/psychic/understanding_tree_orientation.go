@@ -111,7 +111,7 @@ func orientationConsciousness(kind int)(bool){
 		то такая реакция запускается без осмысления (фактически это редуцированная ориентировочная реакция).
  */
 		if true{// TODO не нужно осмысление
-			RunMentalAutomatizmsID(currentMentalAutomatizmID)
+			RunMentalMentalAutomatizmsID(currentMentalAutomatizmID)
 			return true
 		}
 // нужно привлечение внимания, осмысление
@@ -127,7 +127,7 @@ func orientationConsciousness(kind int)(bool){
 
 		// запустить
 		if true {// TODO условие запуска
-			RunMentalAutomatizmsID(currentMentalAutomatizmID)
+			RunMentalMentalAutomatizmsID(currentMentalAutomatizmID)
 			return true
 		}
 	}

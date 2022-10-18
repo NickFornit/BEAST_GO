@@ -58,6 +58,7 @@ func PsychicInit(){
 	EpisodeMemoryInit()
 	initCurrentInformationEnvironment()
 	loadSituationImage()
+	mentalAutomatizmInit()
 	UnderstandingTreeInit()
 
 	saveActionImageArr()// сохранить образы сочетаний ответных действий
@@ -219,7 +220,7 @@ func SaveAllPsihicMemory(){
 	saveActionImageArr()
 	SaveCerebellumReflex()
 	saveEpisodicMenory()
-	SaveMentalAutomatizms()
+	SaveMentalAutomatizm()
 	SaveProblemDominenta()
 	notAllowScanInTreeThisTime = false
 }

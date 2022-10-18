@@ -21,9 +21,10 @@ func GetAutomatizmInfo(limitBasicID int)(string){
 	// сколько рефлексов есть
 	uAutomatizmCount:=len(AutomatizmFromIdArr)
 	// если больше 1000 то выдавать только по одному из 3-х базовыз состояний, иначе сильно тормозит
-	if uAutomatizmCount > 100{
+	if uAutomatizmCount > 1000{
 		if limitBasicID==0{
 		//  теперь 0 - непривязанные	limitBasicID=1// начинать с Плохо
+			limitBasicID=1// начинать с Плохо
 		}
 	// переключатель диапазона вывода
 		out+="<br>Показывать: "
