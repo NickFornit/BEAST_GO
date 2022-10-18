@@ -187,7 +187,7 @@ func SaveMentalAutomatizm() {
 		out += strconv.Itoa(v.Count)
 		out += "\r\n"
 	}
-	lib.WriteFileContent(lib.GetMainPathExeFile() + "/memory_psy/automatizm_images.txt", out)
+	lib.WriteFileContent(lib.GetMainPathExeFile() + "/memory_psy/mental_automatizm_images.txt", out)
 }
 
 // ЗАГРУЗИТЬ структура записи: id|BranchID|Usefulness||Sequence||NextID|Energy|Belief
@@ -195,7 +195,7 @@ func loadMentalAutomatizm() {
 	NoWarningMentalCreateShow = true
 	MentalAutomatizmsFromID = make(map[int]*MentalAutomatizm)
 
-	strArr, _ := lib.ReadLines(lib.GetMainPathExeFile() + "/memory_psy/automatizm_images.txt")
+	strArr, _ := lib.ReadLines(lib.GetMainPathExeFile() + "/memory_psy/mental_automatizm_images.txt")
 	if strArr == nil { return	}
 	for n := 0; n < len(strArr); n++ {
 		if len(strArr[n]) == 0 { continue	}
