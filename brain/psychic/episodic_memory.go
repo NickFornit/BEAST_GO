@@ -1,4 +1,5 @@
 /* Эпизодическая память последовательности привлечения осозаннного (understandingSituation) внимания
+Срабатывает по каждому действию оператора orientationConsciousness
 Линейная, не ветсящаяся цепочка.
 Запоминается в файле episod_memory.txt для каждого ор.рефлекса (до обработки с редуцированием operMemory)
 т.е. это - самая многочисленная часть памяти, поэтому редуцируется во сне (в psychic_sleep_process.go).
@@ -27,9 +28,13 @@ func EpisodeMemoryInit(){
 
 ///////////////////////////////////////
 type EpisodeMemory struct {
+	// последствия действий оператора
 	NodeAID int // конечный узел активной ветки дерева моторных автоматизмов
 	NodePID int // конечный узел активной ветки дерева ментальных автоматизмов
 	DiffMood int //изменение ощущаемого настроения после активации веток
+	// ответное действие (моторное) Beast
+	AutomatizmID int
+
 	Type int // 0 - объективный образ (внешний ор.рефлекс) или 1 - субъективный (произвольный ор.рефлекс)
 }
 ///////////////////////////////////////
@@ -38,7 +43,10 @@ type EpisodeMemory struct {
 var EpisodeMemoryObjects []*EpisodeMemory
 
 //последний созданный образ эпизодической памяти
-var EpisodeMemoryLastIDFrame int
+var EpisodeMemoryLastIDFrame=0
+
+// последний эпизод, который был осмыслен в лени или во сне
+var EpisodeMemoryLastCalcID=0
 ///////////////////////////////////////////////////////
 
 
@@ -55,17 +63,19 @@ var DiffMood=0
 	createEpisodeMemoryFrame(detectedActiveLastNodID,
 		detectedActiveLastUnderstandingNodID,
 		DiffMood,
+		LastAutomatizmWeiting.ID, // уже готов после ор.рефлекса дерева моторн.автоматизмов
 		0) // TODO пока не вижу как определять Type т.к. нет произвольной активации
 }
 
 
 // создать новый образ сочетаний действий, если такого еще нет
-func createEpisodeMemoryFrame(NodeAID int,NodePID int,DiffMood int,Type int)(*EpisodeMemory){
+func createEpisodeMemoryFrame(NodeAID int,NodePID int,DiffMood int,AutomatizmID int,Type int)(*EpisodeMemory){
 
 	var node EpisodeMemory
 	node.NodeAID=NodeAID
 	node.NodePID = NodePID
 	node.DiffMood=DiffMood
+	node.AutomatizmID=AutomatizmID
 	node.Type=Type
 
 	EpisodeMemoryObjects=append(EpisodeMemoryObjects,&node)
@@ -87,6 +97,7 @@ func saveEpisodicMenory(){
 		out+=strconv.Itoa(v.NodeAID)+"|"
 		out+=strconv.Itoa(v.NodePID)+"|"
 		out+=strconv.Itoa(v.DiffMood)+"|"
+		out+=strconv.Itoa(v.AutomatizmID)+"|"
 		out+=strconv.Itoa(v.Type)
 		out+="\r\n"
 	}
@@ -107,9 +118,10 @@ func loadEpisodicMenory(){
 		NodeAID, _ := strconv.Atoi(p[0])
 		NodePID, _ := strconv.Atoi(p[1])
 		DiffMood, _ := strconv.Atoi(p[2])
+		AutomatizmID, _ := strconv.Atoi(p[3])
 		Type, _ := strconv.Atoi(p[3])
 
-		createEpisodeMemoryFrame(NodeAID, NodePID, DiffMood, Type)
+		createEpisodeMemoryFrame(NodeAID, NodePID, DiffMood, AutomatizmID, Type)
 	}
 	return
 }

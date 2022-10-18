@@ -46,7 +46,6 @@ var LastAutomatizmWeiting *Automatizm
 var LastDetectedActiveLastNodID=0
 
 
-
 /////////////////////////////////////////
 /* запуск автоматизма на выполнение
 возвращает true при успехе
