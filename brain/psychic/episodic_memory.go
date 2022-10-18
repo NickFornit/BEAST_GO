@@ -27,15 +27,9 @@ func EpisodeMemoryInit(){
 
 ///////////////////////////////////////
 type EpisodeMemory struct {
-	ID int
-
-	LifeTime int // момент жизни
-
-	Mood int // сила ощущаемого настроения PsyMood (-10..0..10)
-	PsyBaseMood int // ощущаемое настроение: -1 Плохое настроение, 0 Нормальное, 1 - хорошее настроение
-// все ветки дерева понимания, включая текущую ситуацию:
-	NodeID[] int // узлы активных веток Дерева Понимания в последовательности их активации
-
+	NodeAID int // конечный узел активной ветки дерева моторных автоматизмов
+	NodePID int // конечный узел активной ветки дерева ментальных автоматизмов
+	DiffMood int //изменение ощущаемого настроения после активации веток
 	Type int // 0 - объективный образ (внешний ор.рефлекс) или 1 - субъективный (произвольный ор.рефлекс)
 }
 ///////////////////////////////////////
@@ -48,28 +42,34 @@ var EpisodeMemoryLastIDFrame int
 ///////////////////////////////////////////////////////
 
 
-/////////// НОВЫЙ ЭПИЗОД ПАМЯТИ в реализации
+// добавить НОВЫЙ ЭПИЗОД ПАМЯТИ в understanding_tree_orientation.go
 func newEpisodeMemory(){
-	// выдать массив ID узлов ветки по заданному ID узла
-	currentUnderstandingNodeID:=getBrangeUnderstandingNodeIdArr(detectedActiveLastUnderstandingNodID)
+var DiffMood=0
+	if WasOperatorActiveted { // оператор отреагировал
+		DiffMood=oldBetterOrWorse // текущее состояние на момент срабатывания автоматизма
+	}else{// активация по изменению текущего состояния без действия оператора
+		_,DiffMood,_ = wasChangingMoodCondition(1)
+	}
+
 	// новый эпизод памяти
-	createEpisodeMemoryFrame(LifeTime,PsyMood,PsyBaseMood,currentUnderstandingNodeID,0)
+	createEpisodeMemoryFrame(detectedActiveLastNodID,
+		detectedActiveLastUnderstandingNodID,
+		DiffMood,
+		0) // TODO пока не вижу как определять Type т.к. нет произвольной активации
 }
 
 
 // создать новый образ сочетаний действий, если такого еще нет
-func createEpisodeMemoryFrame(LifeTime int,Mood int,PsyBaseMood int,NodeID[] int,Type int)(*EpisodeMemory){
+func createEpisodeMemoryFrame(NodeAID int,NodePID int,DiffMood int,Type int)(*EpisodeMemory){
 
 	var node EpisodeMemory
-	//node.ID = id
-	node.LifeTime=LifeTime
-	node.Mood = Mood
-	node.PsyBaseMood=PsyBaseMood
-	node.NodeID=NodeID
+	node.NodeAID=NodeAID
+	node.NodePID = NodePID
+	node.DiffMood=DiffMood
 	node.Type=Type
 
 	EpisodeMemoryObjects=append(EpisodeMemoryObjects,&node)
-	EpisodeMemoryLastIDFrame=node.ID
+	EpisodeMemoryLastIDFrame=len(EpisodeMemoryObjects)-1
 
 	//saveEpisodicMenory() запись каждые 100 пульсов и при корректном выходе
 
@@ -83,19 +83,11 @@ func createEpisodeMemoryFrame(LifeTime int,Mood int,PsyBaseMood int,NodeID[] int
 // запись эпизодической памяти
 func saveEpisodicMenory(){
 	var out=""
-	for k, v := range EpisodeMemoryObjects {
-		out+=strconv.Itoa(k)+"|"
-		out+=strconv.Itoa(v.LifeTime)+"|"
-		out+=strconv.Itoa(v.Mood)+"|"
-		out+=strconv.Itoa(v.PsyBaseMood)+"|"
-
-		for i := 0; i < len(v.NodeID); i++ {
-			out+=strconv.Itoa(v.NodeID[i])+","
-		}
-		out+="|"
-		out+=strconv.Itoa(v.Type) //+"|"
-		//out+=strconv.Itoa(v.PrevID)+"|"
-		//out+=strconv.Itoa(v.NextID)
+	for _, v := range EpisodeMemoryObjects {
+		out+=strconv.Itoa(v.NodeAID)+"|"
+		out+=strconv.Itoa(v.NodePID)+"|"
+		out+=strconv.Itoa(v.DiffMood)+"|"
+		out+=strconv.Itoa(v.Type)
 		out+="\r\n"
 	}
 	lib.WriteFileContent(lib.GetMainPathExeFile()+"/memory_psy/episod_memory.txt",out)
@@ -107,35 +99,18 @@ func loadEpisodicMenory(){
 	EpisodeMemoryObjects=nil
 	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_psy/episod_memory.txt")
 	cunt:=len(strArr)
-	var lastEM int
 	for n := 0; n < cunt; n++ {
-		if len(strArr[n])==0{
+		if len(strArr[n]) == 0 {
 			continue
 		}
-		p:=strings.Split(strArr[n], "|")
-		//id,_:=strconv.Atoi(p[0])
-		LifeTime,_:=strconv.Atoi(p[1])
-		Mood,_:=strconv.Atoi(p[2])
-		PsyBaseMood,_:=strconv.Atoi(p[3])
-		s:=strings.Split(p[4], ",")
-		var NodeID[] int
-		for i := 0; i < len(s); i++ {
-			if len(s[i])==0{
-				continue
-			}
-			ni,_:=strconv.Atoi(s[i])
-			NodeID=append(NodeID,ni)
-		}
-		Type,_:=strconv.Atoi(p[5])
-	//	PrevID,_:=strconv.Atoi(p[6])
-	//	NextID,_:=strconv.Atoi(p[7])
+		p := strings.Split(strArr[n], "|")
+		NodeAID, _ := strconv.Atoi(p[0])
+		NodePID, _ := strconv.Atoi(p[1])
+		DiffMood, _ := strconv.Atoi(p[2])
+		Type, _ := strconv.Atoi(p[3])
 
-		em:=createEpisodeMemoryFrame(LifeTime,Mood,PsyBaseMood,NodeID,Type)
-	//	em.PrevID=PrevID
-	//	em.NextID=NextID
-		lastEM=em.ID
+		createEpisodeMemoryFrame(NodeAID, NodePID, DiffMood, Type)
 	}
-	EpisodeMemoryLastIDFrame=lastEM
 	return
 }
 ///////////////////////////////////////////

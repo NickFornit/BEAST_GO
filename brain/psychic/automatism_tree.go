@@ -158,7 +158,7 @@ func automatizmTreeActivation()(int){
 	lev1:=gomeostas.CommonBadNormalWell
 
 	bsIDarr:=gomeostas.GetCurContextActiveIDarr()
-	lev2,_:=createNewBaseStyle(0,PsyBaseMood,bsIDarr)
+	lev2,_:=createNewBaseStyle(0,bsIDarr)
 
 ActID:=action_sensor.CheckCurActionsContext();//CheckCurActions()
 

@@ -26,7 +26,7 @@ func getPurposeUndestandingAndRunAutomatizm()(bool) {
 	}
 /*
 	// переосмыслить ситуацию - Активировать Дерево Понимания
-	understandingSituation()
+	//understandingSituation()
 	и затем создать новую цель understanding_purpose_image.go
 */
 

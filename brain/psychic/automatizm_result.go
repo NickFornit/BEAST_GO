@@ -2,9 +2,9 @@
 
 В BAD_detector.go в самом низу есть func BetterOrWorseNow() с комментариями по делу. Я ее отрабатывал как раз для того, чтобы фиксировать любые улучшения или ухудшения для определения эффекта автоматизма.
 Она вызывается (через трансформатор против цицличности wasChangingMoodCondition()) 2 раза: в момент запуска автоматизма и как только совершится любое действие оператора на пульте. Таким образом в automatizm_result.go получается дифферент:
-oldCommonDiffValue,oldBetterOrWorse,oldParIdSuccesArr = wasChangingMoodCondition()
+oldlastBetterOrWorse,oldBetterOrWorse,oldParIdSuccesArr = wasChangingMoodCondition()
 Т.е. если ты поставишь точку прерывания на
-oldCommonDiffValue,oldBetterOrWorse,oldParIdSuccesArr = wasChangingMoodCondition()
+oldlastBetterOrWorse,oldBetterOrWorse,oldParIdSuccesArr = wasChangingMoodCondition()
 то и получишь эффект автоматизма.
 */
 
@@ -61,7 +61,7 @@ func setAutomatizmRunning(am *Automatizm,ps *PurposeGenetic){
 	}
 	WasOperatorActiveted=false // ждем ответа оператора
 	// зафиксировать текущее состояние на момент срабатывания автоматизма
-	oldCommonDiffValue,oldBetterOrWorse,oldParIdSuccesArr = wasChangingMoodCondition(1)
+	oldlastBetterOrWorse,oldBetterOrWorse,oldParIdSuccesArr = wasChangingMoodCondition(1)
 }
 ///////////////////////////////////
 func clinerAutomatizmRunning(){
@@ -77,7 +77,7 @@ func clinerAutomatizmRunning(){
 // ПУЛЬС срабатывания по каждому Пульсу здесь для удобства
 var oldBetterOrWorse=0 //- стали лучше или хуже: величина измнения от -10 через 0 до 10
 var oldParIdSuccesArr []int//стали лучше следующие г.параметры []int гоменостаза
-var oldCommonDiffValue=0 // насколько изменилось общее состояние, значение от  -10(максимально Плохо) через 0 до 10(максимально Хорошо)
+var oldlastBetterOrWorse=0 // насколько изменилось общее состояние, значение от  -10(максимально Плохо) через 0 до 10(максимально Хорошо)
 func automatizmActionsPuls(){
 
 	if LastRunAutomatizmPulsCount==0 {
@@ -134,16 +134,11 @@ func noAutovatizmResult()(bool){
 /* ПОСЛЕ ОРИЕНТИРОВОЧНОГО РЕФЛЕКСА оценивать действие запущенного автоматизма
 
  */
-func calcAutomatizmResult(commonDiffValue int,diffPsyBaseMood int,wellIDarr []int){
-	/*
-	if AutomatizmRunningPulsCount==0 || LastAutomatizmWeiting==nil{
-		clinerAutomatizmRunning()
-		return
-	}
-	 */
-	// commonDiffValue - точно изменился, иначе бы не было вызова calcAutomatizmResult
+func calcAutomatizmResult(lastCommonDiffValue int,lastBetterOrWorse int,wellIDarr []int){
+
+	// lastBetterOrWorse - точно изменился, иначе бы не было вызова calcAutomatizmResult
 	/// если числа имеют разные знаки (одно положительное, другое отрицательное)
-	if lib.IsDiffersOfSign(LastAutomatizmWeiting.Usefulness,commonDiffValue){
+	if lib.IsDiffersOfSign(LastAutomatizmWeiting.Usefulness,lastBetterOrWorse){
 		LastAutomatizmWeiting.Count=0 // сбрасываем  надежность
 	} else {
 		LastAutomatizmWeiting.Count++
@@ -152,20 +147,20 @@ func calcAutomatizmResult(commonDiffValue int,diffPsyBaseMood int,wellIDarr []in
 	SetAutomatizmBelief(LastAutomatizmWeiting,2)// ТАК ПРОСТО НЕЛЬЗЯ ЗАДАВАТЬ Belief=2: LastAutomatizmWeiting.Belief=2
 
 	// изменять полезность по 1 шагу!
-	if commonDiffValue>0 && LastAutomatizmWeiting.Usefulness<10 {
-		LastAutomatizmWeiting.Usefulness++ // diffPsyBaseMood
+	if lastBetterOrWorse>0 && LastAutomatizmWeiting.Usefulness<10 {
+		LastAutomatizmWeiting.Usefulness++ // lastBetterOrWorse
 	}
-	if commonDiffValue<0 && LastAutomatizmWeiting.Usefulness>-10 {
-		LastAutomatizmWeiting.Usefulness-- // diffPsyBaseMood
+	if lastBetterOrWorse<0 && LastAutomatizmWeiting.Usefulness>-10 {
+		LastAutomatizmWeiting.Usefulness-- // lastBetterOrWorse
 	}
 
 
-	if commonDiffValue>0{// стало лучше
+	if lastBetterOrWorse>0{// стало лучше
 		PsyBaseMood=1
 		// список гомео параметро, которые улучшило это действие
 		LastAutomatizmWeiting.GomeoIdSuccesArr=wellIDarr // м.б. nil !!!! если нет таких явных действий
 		// пополняется список полезных автоматизмов
-		if commonDiffValue>0 {
+		if lastBetterOrWorse>0 {
 			AutomatizmSuccessFromIdArr[LastAutomatizmWeiting.ID] = LastAutomatizmWeiting
 		}
 	}
@@ -178,126 +173,16 @@ func calcAutomatizmResult(commonDiffValue int,diffPsyBaseMood int,wellIDarr []in
 
 	}
 
-	if commonDiffValue<0{// стало хуже
+	if lastBetterOrWorse<0{// стало хуже
 		PsyBaseMood=-1
 		// очистить списки улучшения
 		LastAutomatizmWeiting.GomeoIdSuccesArr=nil
 		AutomatizmSuccessFromIdArr[LastAutomatizmWeiting.ID] =nil
 	}
 
-	// только если серьезно изменилась ситуация
-	if diffPsyBaseMood!=0{// изменилась ситуация
-		// обновить информационное окружение
-//		GetCurrentInformationEnvironment()
-		// переактивировать дерево рефлексов
-// ЭТО ЗДОРОВО ЗАЦИКЛИВАЕТ, делаются все новые ветки дерева !!!
-// !!!!!!		automatizmTreeActivation()//и возникает новый цикл активации Дерева, уже по внутренним причинам
-	}
-// Все, достаточно функционала для обработки ответной реакции с пульта!
 return
 }
 ///////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// начало неработающего кода
-//#############################################################################
-/*  ПОКА НИКАК НЕ ИСПОЛЬЗУЕТСЯ ?? TODO
-Отслеживание запущенных автоматизмов ВНЕ ОРИЕНТИРОВОЧНОГО РЕФЛЕКСА
-должно использовать всю ту же функцию
-func automatizmActionsPuls() !!!!!
-
-ПОКА ОСТАВЛЯЮ ЧТОБЫ СОХРАНИТЬ ИДЕИ....
-
-ЕСЛИ срабатывает автоматизм без ориентировочного рефлекса, значит есть технически невидимая новизна
-и нужно так же оценить последствия, и если они плохие, то задуматься.
-*/
-
-/*
-var savePsyBaseMoodAut=0 // -1 Плохое настроение, 0 Нормальное, 1 - хорошее настроение
-// для более точной оценки
-var savePsyMoodAut=0//сила Плохо -10 ... 0 ...+10 Хорошо
-
-var AutomatizmRunningAut *Automatizm // запущенный автоматизм
-var AutomatizmRunningPulsCountAut=0 // время запуска автоматизма
-func setAutomatizmRunningAut(am *Automatizm){
-	AutomatizmRunningAut=am
-	AutomatizmRunningPulsCountAut=PulsCount
-	savePsyBaseMoodAut=PsyBaseMood
-	savePsyMoodAut=PsyMood
-}
-///////////////////////////////////
-func clinerAutomatizmRunningAut(){
-	AutomatizmRunningAut=nil
-	AutomatizmRunningPulsCountAut=0
-}
-///////////////////////////////////////////////////////////////////
-// При любых изменениях wasChangingMoodCondition() оценивать действие запущенного автоматизма
-func calcAutomatizmResultAut(diffPsyBaseMood int,wellIDarr []int){
-	if AutomatizmRunningPulsCountAut==0 || AutomatizmRunningAut==nil{
-		clinerAutomatizmRunningAut()
-		return
-	}
-	// diffPsyBaseMood - точно изменился, иначе бы не было вызова calcAutomatizmResult
-	/// если числа имеют разные знаки (одно положительное, другое отрицательное)
-	if lib.IsDiffersOfSign(AutomatizmRunningAut.Usefulness,diffPsyBaseMood)		{
-		AutomatizmRunningAut.Count--
-	} else {
-		AutomatizmRunningAut.Count=0
-	}
-	SetAutomatizmBelief(AutomatizmRunning,2)
-	// ТАК НЕЛЬЗЯ ЗАДАВАТЬ Belief=2: AutomatizmRunning.Belief=2
-	AutomatizmRunningAut.Usefulness =diffPsyBaseMood
-
-	if diffPsyBaseMood<0{// СТАЛО ХУЖЕ В ПРИВЫЧНОМ АВТОМАТИЗМЕ !!!! криминал
-		PsyBaseMood=-1
-		// значит есть технически невидимая новизна и нужно ОСМЫСЛИТЬ ТАКУЮ СИТУАЦИЮ
-
-	}
-	if diffPsyBaseMood>0{// стало лучше
-		PsyBaseMood=1
-	}
-	if EvolushnStage > 3 {
-		// создать образ ситуации
-		autmzmTreeNodeID := AutomatizmRunning.BranchID
-		id, _ := createSituationImage(0, autmzmTreeNodeID, 2,true)
-		// осмыслить ситуацию - Активировать Дерево Понимания
-		understandingSituation(id, savePurposeGenetic)
-	}
-
-	// оценить значимость поизнесенной фразы в VerbalFromIdArr структурах Дерева Понимания??
-
-	// !!!!!! допонение cerebellumReflexFromID[LastAutomatizmWeiting.ID] другими корректирующими действиеями
-	 //  если это еще получается, но при отсуствии эффекта нужно создавать новый автоматизм.
-	 //  Это - только на уровне осмысления в Дереве Понимания:
-	 //     cerebellumCoordination(AutomatizmRunning.ID)
-	  // Должна быть осознание цели и перебеора-недобора!!!!!!
-	  //    В каждом автоматизме есть параметр силы: Automatizm.Energy вот он и корректируется.
-
-
-	clinerAutomatizmRunningAut()
-	return
-}
-*/
-//#############################################################################
-// конец неработающего кода
-
-
-
-
 
 
 
@@ -313,9 +198,7 @@ func WaitingPeriodForActions()(bool,int){
 
 	return false,0
 }
-
-
-
+//////////////////////////////////////////
 
 
 

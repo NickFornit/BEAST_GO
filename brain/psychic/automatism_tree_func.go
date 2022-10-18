@@ -276,7 +276,7 @@ func getBrangeNodeArr(lastNodeId int)([]*AutomatizmNode){
  */
 func FindConditionsNode(lev1 int,lev2 []int,actArr []int, tonMood int,fistSymb int,verbalID int)(int){
 	// образ эмоции
-	eID,_:=createNewBaseStyle(0,0,lev2)
+	eID,_:=createNewBaseStyle(0,lev2)
 	// образ действий дерева: из TriggerStimuls -> Activity
 	aID,_:=createNewlastActivityID(0,actArr)// конвертировать образ типа reflexes.TriggerStimuls в psychic.Activity
 

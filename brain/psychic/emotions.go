@@ -21,24 +21,12 @@ func emotionsInit(){
 }
 ////////////////////////////////
 
-/* Образ сочетания базовых контекстов и оценки успешности действий.
-ПО результатам действий в дерево рефлексов подставляется результирующий Emotion
-и возникает новый цикл активации Дерева, уже по внутренним причинам.
-Это - простейший механизм саморегуляции по результату действий,
-т.к. на уровне ор.рефлекса осмысливается ситуация и могут создаваться новые автоматизмы.
-Основы произвольности - корректировка Emotion по PsyBaseMood
+/* Образ сочетания базовых контекстов
+
  */
 type Emotion struct {
 	ID int  // идентификатор данного сочетания контекстов
 	BaseIDarr[] int // сочетание базовых контекстов
-	/* упешность действий. В automatizm_result.go по результатам действий
-	1) устанавливается настроение PsyBaseMood (-1,0,1),
-	2) в GetCurrentInformationEnvironment возникает Emotion, принимающий значение PsyBaseMood
-		а при совершенном дейсвии уже изменились Б.параметры и, значит и основа Emotion.
-	4) переактивируется Дерево автоматизмов, уже по внутренним причинам
-	5) при активации Дерева или тупо выполняется автоматизм или возникает новый ор.рефлекс.
-	 */
-	Success int // (-1,0,1)
 }
 ////////////////////////////////
 
@@ -47,8 +35,8 @@ var EmotionFromIdArr=make(map[int]*Emotion)
 /*  создать новую эмоцию, если такой еще нет
  */
 var lastEmotionID=0
-func createNewBaseStyle(id int,Success int,BaseIDarr []int)(int,*Emotion){
-	oldID,oldVal:=checkUnicumEmotion(Success,BaseIDarr)
+func createNewBaseStyle(id int,BaseIDarr []int)(int,*Emotion){
+	oldID,oldVal:=checkUnicumEmotion(BaseIDarr)
 	if oldVal!=nil{
 		return oldID,oldVal
 	}
@@ -72,9 +60,9 @@ func createNewBaseStyle(id int,Success int,BaseIDarr []int)(int,*Emotion){
 
 	return id,&node
 }
-func checkUnicumEmotion(Success int,bArr []int)(int,*Emotion){
+func checkUnicumEmotion(bArr []int)(int,*Emotion){
 	for id, v := range EmotionFromIdArr {
-		if Success==v.Success && lib.EqualArrs(bArr,v.BaseIDarr) {
+		if lib.EqualArrs(bArr,v.BaseIDarr) {
 			return id,v
 		}
 	}
@@ -92,8 +80,6 @@ func SaveEmotionArr(){
 		for i := 0; i < len(v.BaseIDarr); i++ {
 			out+=strconv.Itoa(v.BaseIDarr[i])+","
 		}
-		out+="|"
-		out+=strconv.Itoa(v.Success)+"|"
 		out+="\r\n"
 	}
 	lib.WriteFileContent(lib.GetMainPathExeFile()+"/memory_psy/emotion_images.txt",out)
@@ -118,8 +104,7 @@ func loadEmotionArr(){
 			bc,_:=strconv.Atoi(s[i])
 			BaseIDarr=append(BaseIDarr,bc)
 		}
-		Success,_:=strconv.Atoi(p[2])
-		createNewBaseStyle(id,Success,BaseIDarr)
+		createNewBaseStyle(id,BaseIDarr)
 	}
 	return
 }
@@ -137,10 +122,6 @@ if em==nil{
 	for i := 0; i < len(em.BaseIDarr); i++ {
 		if i>0{out+=", "}
 		out+=gomeostas.GetBaseContextCondFromID(em.BaseIDarr[i])
-	}
-	switch em.Success{
-	case -1: out+=" ( было НЕуспешное действие)"
-	case 1:	out+=" ( было успешное действие)"
 	}
 
 return out
