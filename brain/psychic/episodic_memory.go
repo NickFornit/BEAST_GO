@@ -31,10 +31,9 @@ type EpisodeMemory struct {
 	// последствия действий оператора
 	NodeAID int // конечный узел активной ветки дерева моторных автоматизмов
 	NodePID int // конечный узел активной ветки дерева ментальных автоматизмов
-	DiffMood int //изменение ощущаемого настроения после активации веток
-	// ответное действие (моторное) Beast
-	AutomatizmID int
+	RulesID int // действия оператора, ответное действие и эффект
 
+	LifeTime int
 	Type int // 0 - объективный образ (внешний ор.рефлекс) или 1 - субъективный (произвольный ор.рефлекс)
 }
 ///////////////////////////////////////
@@ -50,32 +49,26 @@ var EpisodeMemoryLastCalcID=0
 ///////////////////////////////////////////////////////
 
 
-// добавить НОВЫЙ ЭПИЗОД ПАМЯТИ в understanding_tree_orientation.go
-func newEpisodeMemory(){
-var DiffMood=0
-	if WasOperatorActiveted { // оператор отреагировал
-		DiffMood=oldBetterOrWorse // текущее состояние на момент срабатывания автоматизма
-	}else{// активация по изменению текущего состояния без действия оператора
-		_,DiffMood,_ = wasChangingMoodCondition(1)
-	}
-
+/* добавить НОВЫЙ ЭПИЗОД ПАМЯТИ в understanding_tree_orientation.go
+вызывается только в func calcAutomatizmResult:
+ */
+func newEpisodeMemory(rulesID int){
 	// новый эпизод памяти
 	createEpisodeMemoryFrame(detectedActiveLastNodID,
-		detectedActiveLastUnderstandingNodID,
-		DiffMood,
-		LastAutomatizmWeiting.ID, // уже готов после ор.рефлекса дерева моторн.автоматизмов
+		rulesID,
+		LifeTime,
 		0) // TODO пока не вижу как определять Type т.к. нет произвольной активации
 }
 
 
 // создать новый образ сочетаний действий, если такого еще нет
-func createEpisodeMemoryFrame(NodeAID int,NodePID int,DiffMood int,AutomatizmID int,Type int)(*EpisodeMemory){
+func createEpisodeMemoryFrame(NodePID int,rulesID int,lifeTime int,Type int)(*EpisodeMemory){
 
 	var node EpisodeMemory
-	node.NodeAID=NodeAID
+	node.NodeAID=NodePID
 	node.NodePID = NodePID
-	node.DiffMood=DiffMood
-	node.AutomatizmID=AutomatizmID
+	node.RulesID=rulesID
+	node.LifeTime=lifeTime
 	node.Type=Type
 
 	EpisodeMemoryObjects=append(EpisodeMemoryObjects,&node)
@@ -96,8 +89,8 @@ func saveEpisodicMenory(){
 	for _, v := range EpisodeMemoryObjects {
 		out+=strconv.Itoa(v.NodeAID)+"|"
 		out+=strconv.Itoa(v.NodePID)+"|"
-		out+=strconv.Itoa(v.DiffMood)+"|"
-		out+=strconv.Itoa(v.AutomatizmID)+"|"
+		out+=strconv.Itoa(v.RulesID)+"|"
+		out+=strconv.Itoa(v.LifeTime)+"|"
 		out+=strconv.Itoa(v.Type)
 		out+="\r\n"
 	}
@@ -115,13 +108,12 @@ func loadEpisodicMenory(){
 			continue
 		}
 		p := strings.Split(strArr[n], "|")
-		NodeAID, _ := strconv.Atoi(p[0])
-		NodePID, _ := strconv.Atoi(p[1])
-		DiffMood, _ := strconv.Atoi(p[2])
-		AutomatizmID, _ := strconv.Atoi(p[3])
+		NodePID, _ := strconv.Atoi(p[0])
+		RulesID, _ := strconv.Atoi(p[1])
+		lifeTime, _ := strconv.Atoi(p[2])
 		Type, _ := strconv.Atoi(p[3])
 
-		createEpisodeMemoryFrame(NodeAID, NodePID, DiffMood, AutomatizmID, Type)
+		createEpisodeMemoryFrame(NodePID, RulesID, lifeTime, Type)
 	}
 	return
 }

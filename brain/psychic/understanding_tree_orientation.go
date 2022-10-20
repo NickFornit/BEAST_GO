@@ -98,7 +98,7 @@ func orientationConsciousness(kind int)(bool){
 		}
 // нужно привлечение внимания, осмысление
 			// новый кадр эпизодической памяти, сохраняющий
-      	newEpisodeMemory()  // запись эпизодической памяти saveEpisodicMenory()
+// вызывается только в func calcAutomatizmResult:	newEpisodeMemory()  // запись эпизодической памяти saveEpisodicMenory()
 
       	// есть ли очень значимые новые признаки?
       //	newsRes:=getImportantSigns()

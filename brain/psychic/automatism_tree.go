@@ -111,15 +111,8 @@ func createBasicAutomatizmTree(){
 }
 /////////////////////////////////////////////////////
 
-// структура действий при активации дерева автоматизмов
-type activeActions struct {
-	actID []int // массив действийID с Пульта
-	triggID int // // текущий образ сочетания действий с Пульта Activity
-	phraseID []int
-	toneID int
-	moodID int
-}
-var curActiveActions activeActions
+// структура действий оператора при активации дерева автоматизмов
+var curActiveActions ActionsImage
 
 
 
@@ -163,11 +156,10 @@ func automatizmTreeActivation()(int){
 ActID:=action_sensor.CheckCurActionsContext();//CheckCurActions()
 
 	lev3,_:=createNewlastActivityID(0,ActID)// текущий образ сочетания действий с Пульта Activity
-	curActiveActions.actID=ActID// сохраняем для отзеркаливания действий оператора
-	curActiveActions.triggID=lev3
-	curActiveActions.phraseID=nil
-	curActiveActions.toneID=0
-	curActiveActions.moodID=0
+	curActiveActions.ActID=ActID// сохраняем для отзеркаливания действий оператора
+	curActiveActions.PhraseID=nil
+	curActiveActions.ToneID=0
+	curActiveActions.MoodID=0
 
 	var lev4=0
 	var lev5=0
@@ -186,9 +178,9 @@ ActID:=action_sensor.CheckCurActionsContext();//CheckCurActions()
 		*/
 		lev6=verb.PhraseID[0]
 		// сохраняем для отзеркаливания действий оператора
-		curActiveActions.phraseID=PhraseID
-		curActiveActions.toneID=ToneID
-		curActiveActions.moodID=MoodID
+		curActiveActions.PhraseID=PhraseID
+		curActiveActions.ToneID=ToneID
+		curActiveActions.MoodID=MoodID
 	}
 
 	condArr:=getActiveConditionsArr(lev1, lev2, lev3, lev4, lev5, lev6)
@@ -345,6 +337,11 @@ func afterTreeActivation()(bool){
 	return false
 }
 //////////////////////////////////////////////////////////
+
+
+
+
+
 
 
 

@@ -172,6 +172,19 @@ func calcAutomatizmResult(lastCommonDiffValue int,lastBetterOrWorse int,wellIDar
 		createNewMirrorAutomatizm(LastAutomatizmWeiting)
 
 	}
+	// >3 потому, что раньше не пишется эпизодическая память и формируются более примитивные механизмы.
+	if EvolushnStage > 3{
+
+/* ри каждом ответе на действия оператора - прописывать текущее правило rules.
+   А так же просматривать эпизод память взад макчимум на 6 шагов или до паузы в общении > 30 шагов,
+		фиксируя цепочку правил.
+ */
+	rulesID:=fixNewRules(lastBetterOrWorse)
+	if rulesID>0 {
+		// новый кадр эпизодической памяти, сохраняющий
+		newEpisodeMemory(rulesID) // запись эпизодической памяти saveEpisodicMenory()
+	}
+	}
 
 	if lastBetterOrWorse<0{// стало хуже
 		PsyBaseMood=-1
@@ -216,3 +229,29 @@ func wasChangingMoodCondition(kind int)(int,int,[]int){
 	return res0,res,wellIDarr
 }
 /////////////////////////////////////////////////////////////////////////
+
+
+
+////////////////////////////////////////////////////////////////////////
+/* на стадии >3 при каждом ответе на действия оператора - прописывать текущее правило rules.
+   А так же просматривать эпизод память взад макчимум на 6 шагов или до паузы в общении > 30 шагов,
+		фиксируя цепочку правил.
+*/
+func fixNewRules(lastBetterOrWorse int) int {
+	// образ действий оператора
+	ai1,_:=CreateNewActionsImageImage(curActiveActions.ActID,curActiveActions.PhraseID,curActiveActions.ToneID,curActiveActions.MoodID)
+	if ai1 == 0{return 0}
+	// ответный образ действий Beast
+	ai2:=LastAutomatizmWeiting.ActionsImageID
+	if ai2 == 0{return 0}
+	TriggerAndAction,_:=createNewlastTriggerAndActionID(0,ai1,ai2,lastBetterOrWorse)
+	if TriggerAndAction == 0{return 0}
+	rulesID, _ := createNewlastrulesID(0, detectedActiveLastNodID, []int{TriggerAndAction})
+	if rulesID == 0{return 0}
+
+
+	// теперь смотрим эпизодическую память
+
+	return rulesID
+}
+///////////////////////////////////////////////////////////////////////

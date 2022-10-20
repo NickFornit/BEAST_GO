@@ -176,15 +176,12 @@ func createNewMirrorAutomatizm(sourceAtmzm *Automatizm) {
 	if targetNodeID==0{
 		return
 	}
-	SaveAutomatizmTree()
+//	SaveAutomatizmTree()
 // найти узел, который может реагировать на данные действия и если нет - создать его чтобы привязать зеркальный автоматизм
 
 	// создать автоматизм и привязать его к объекту
 	// NoWarningCreateShow=true
-	// для фразы triggerPraseID создаем привязанный к ней автоматизм
-	//_, autmzm := CreateAutomatizm(LastDetectedActiveLastNodID, sequence,1)
-	//_, autmzm := CreateAutomatizm(detectedActiveLastNodID, sequence,1)
-	ActionsImageID,_:=CreateNewActionsImageImage(curActiveActions.actID,curActiveActions.phraseID,curActiveActions.toneID,curActiveActions.moodID)
+	ActionsImageID,_:=CreateNewActionsImageImage(curActiveActions.ActID,curActiveActions.PhraseID,curActiveActions.ToneID,curActiveActions.MoodID)
 	_, autmzm := CreateAutomatizm(targetNodeID, ActionsImageID)
 	//	NoWarningCreateShow=false
 	if autmzm != nil {
@@ -225,7 +222,7 @@ func findTreeNodeFromAutomatizmActionsImage(baseID int, EmotionID int, ActionsIm
 func provokatorMirrorAutomatizm(sourceAtmzm *Automatizm, purposeGenetic *PurposeGenetic) {
 	if sourceAtmzm == nil || purposeGenetic == nil { return	}
 
-	ActionsImageID,_:=CreateNewActionsImageImage(curActiveActions.actID,curActiveActions.phraseID,curActiveActions.toneID,curActiveActions.moodID)
+	ActionsImageID,_:=CreateNewActionsImageImage(curActiveActions.ActID,curActiveActions.PhraseID,curActiveActions.ToneID,curActiveActions.MoodID)
 	// NoWarningCreateShow=true
 	// для фразы triggerPraseID создаем привязанный к ней автоматизм
 	_, autmzm := CreateAutomatizm(detectedActiveLastNodID, ActionsImageID)

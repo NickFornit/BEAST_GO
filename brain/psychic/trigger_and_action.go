@@ -19,7 +19,7 @@ type TriggerAndAction struct {
 	ID int
 	Trigger int // образ пусковых стимулов
 	Action int // образ действий
-	Effect int // эффект от действий
+	Effect int // эффект от действий - lastBetterOrWorse
 }
 ////////////////////////
 
