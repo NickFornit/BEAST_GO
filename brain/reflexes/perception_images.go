@@ -96,6 +96,8 @@ func checkUnicumBaseStyle(bArr []int) (int, *BaseStyle) {
 Это - образ много-модеального воздействия или просто образ восприятия.
 
 Формат: ID|RSarr через ,|PhraseID через ,|ToneID|MoodID|
+
+Идентична ActionsImage психики.
 */
 type TriggerStimuls struct {
 	ID    int   // идентификатор данного сочетания пусковых стимулов
@@ -161,7 +163,7 @@ func CreateNewTriggerStimulsImage() {
 	setOldActiveCurTriggerStimulsVal(ActiveCurTriggerStimulsID)
 	ActiveCurTriggerStimulsID, _ = CreateNewlastTriggerStimulsID(0, RSarr, PhraseID, ToneID, MoodID)
 
-	SaveTriggerStimulsArr()
+	// SaveTriggerStimulsArr()
 }
 
 // сохранить образы сочетаний пусковых стимулов

@@ -50,6 +50,7 @@ func PsychicInit(){
 		return
 	}
 	automatizmTreeInit()
+	loadActionsImageArr()
 	automatizmInit()
 	emotionsInit()
 	loadActivityInit()
@@ -57,11 +58,12 @@ func PsychicInit(){
 	cerebellumReflexInit()
 	EpisodeMemoryInit()
 	initCurrentInformationEnvironment()
+	TriggerAndActionInit()
 	loadSituationImage()
 	mentalAutomatizmInit()
 	UnderstandingTreeInit()
 
-	saveActionImageArr()// сохранить образы сочетаний ответных действий
+	// saveActionImageArr()// сохранить образы сочетаний ответных действий
 
 	// просыпание - создание базового самоощущения CurrentInformationEnvironment
 		wakingUp()
@@ -77,11 +79,7 @@ func PsychicInit(){
 
 //	FormingMirrorAutomatizmFromTempList("/lib/mirror_basic_phrases_common.txt")
 
-/*
-	res:=compareAutomatizmSequence("Snn:24243,1234,0,24234,11234|Tnn:23|Dnn:17,30",
-		"Snn:24243,1234,0,24234,11234|Tnn:23|Dnn:17,30")
-	if res{}
-*/
+
 }
 /////////////////////////////////////////////////////////////
 
@@ -112,7 +110,9 @@ func PsychicCountPuls(evolushnStage int,lifeTime int,puls int,isSlipping bool){
 	}
 
 	// осознание при бодрствовании
-	consciousness(0)
+	if evolushnStage > 3 && PulsCount >4 {
+		consciousness(0)
+	}
 
 
 
@@ -216,10 +216,12 @@ func SaveAllPsihicMemory(){
 	SaveAutomatizmTree()
 	SaveAutomatizm()
 	SaveSituationImage()
-	SaveUnderstandingTree()
-	saveActionImageArr()
+	SaveActionsImageArr()
 	SaveCerebellumReflex()
+	SaveUnderstandingTree()
 	saveEpisodicMenory()
+	SaveTriggerAndActionArr()
+	SaveRulesArr()
 	SaveMentalAutomatizm()
 	SaveProblemDominenta()
 	notAllowScanInTreeThisTime = false

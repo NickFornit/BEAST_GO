@@ -78,15 +78,10 @@ func RunMakeAutomatizmsFromReflexes() string {
 				count++
 				continue
 			}
-			//  создать автоматизм и привязать его к nodeID
-			var sequence = "Dnn:"
-			aArr := v.ActionIDarr
-			for i := 0; i < len(aArr); i++ {
-				if i > 0 { sequence += "," }
-				sequence += strconv.Itoa(aArr[i])
-			}
+
 			psychic.NoWarningCreateShow = true
-			_, autmzm := psychic.CreateAutomatizm(nodeID, sequence,0)
+			ActionsImageID,_:=psychic.CreateNewActionsImageImage(v.ActionIDarr,nil,0,0)
+			_, autmzm := psychic.CreateAutomatizm(nodeID, ActionsImageID)
 			psychic.NoWarningCreateShow = false
 			if autmzm != nil {
 				psychic.SetAutomatizmBelief(autmzm, 2) // сделать автоматизм штатным
@@ -153,14 +148,9 @@ func RunMakeAutomatizmsFromGeneticReflexes() string {
 				continue
 			}
 			//  создать автоматизм и привязать его к nodeID
-			var sequence = "Dnn:"
-			aArr:=v.ActionIDarr
-			for i := 0; i < len(aArr); i++ {
-				if i > 0 { sequence += "," }
-				sequence += strconv.Itoa(aArr[i])
-			}
 			psychic.NoWarningCreateShow = true
-			_, autmzm := psychic.CreateAutomatizm(nodeID, sequence,0)
+			ActionsImageID,_:=psychic.CreateNewActionsImageImage(v.ActionIDarr,nil,0,0)
+			_, autmzm := psychic.CreateAutomatizm(nodeID, ActionsImageID)
 			psychic.NoWarningCreateShow = false
 			if autmzm != nil {
 				psychic.SetAutomatizmBelief(autmzm, 2) // сделать автоматизм штатным

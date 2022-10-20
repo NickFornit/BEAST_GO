@@ -148,7 +148,7 @@ out += "<td class='table_cell' "+onclickID+">"+nodeID+"</td>";
 out += "<td class='table_cell' ><nobr>"+baseID+"</nobr></td>";
 out += "<td class='table_cell' title='"+emotionTitle+"' "+emClick+" "+sStyle+"><nobr>"+emotionID+"</nobr></td>";
 out += "<td class='table_cell' title='Информация по клику' "+actClick+" "+sStyle+">"+trStr+"</td>";
-out += "<td class='table_cell' title='Информация по клику'  onClick='show_actions("+id+",`"+v.Sequence+"`)' style='cursor:pointer;color:blue'><nobr>"+v.Sequence+"</nobr></td>";
+out += "<td class='table_cell' title='Информация по клику'  onClick='show_actions("+id+")' style='cursor:pointer;color:blue'><nobr>"+strconv.Itoa(v.ActionsImageID)+"</nobr></td>";
 out += "<td class='table_cell' >"+strconv.Itoa(v.NextID)+"</td>";
 out += "<td class='table_cell' >"+strconv.Itoa(v.Energy)+"</td>";
 out += "<td class='table_cell' >"+strconv.Itoa(v.Usefulness)+"</td>";

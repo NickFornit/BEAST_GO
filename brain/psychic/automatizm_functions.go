@@ -4,11 +4,6 @@
 
 package psychic
 
-import (
-	"strconv"
-	"strings"
-)
-
 //////////////////////////////////////////
 
 
@@ -88,115 +83,6 @@ func getAutomatizmFromNodeID(nodeID int)(int){
 
 /////////////////////////////////////
 
-
-/* разделить строку Sequence автоматизма на составляющие
-типы действий:
-1 Snn - перечень ID фраз через запятую
-2 Dnn - ID прогрмаммы действий, через запятую
-3 Ann - последовательный запуск автоматизмов с id1,id2..
-5 Tnn - образ тон-настроения одна цифра == образ тона-настроения (как в func GetToneMoodID(  и func GetToneMoodFromImg()
-*/
-func ParceAutomatizmSequence(Sequence string)([]ActsAutomatizm){
-	var acts[] ActsAutomatizm
-
-	sArr:=strings.Split(Sequence, "|")
-	for i := 0; i < len(sArr); i++ {
-		if len(sArr[i])==0{
-			continue
-		}
-		var act ActsAutomatizm
-		pArr:=strings.Split(sArr[i], ":")
-		switch pArr[0]{
-		case "Snn": act.Type=1
-		case "Dnn": act.Type=2
-		case "Ann": act.Type=3
-		case "Tnn": act.Type=5
-		}
-
-		act.Acts = pArr[1] // строка действий (любого типа) через запятую
-		acts = append(acts, act)
-	}
-	return acts
-}
-////////////////////////////////////////////////
-
-
-/* получить массив wordID из Sequence автоматизма
- */
-func GetWordArrFromSequence(sequence string)([]int){
-	sArr:=strings.Split(sequence, "|")
-	for i := 0; i < len(sArr); i++ {
-		if len(sArr[i])==0{
-			continue
-		}
-		pArr:=strings.Split(sArr[i], ":")
-		if pArr[0]=="Snn"{
-			sA:=strings.Split(pArr[1], ",")
-			if len(sA)>0{
-				var out[]int
-				for a := 0; a < len(sA); a++ {
-					wID,_:=strconv.Atoi(sA[a])
-					out = append(out, wID)
-				}
-				return out
-			}
-		}
-	}
-	return nil
-}
-
-func GetAutomatizmSnn(ma *Automatizm)(string){
-	sequence:=ma.Sequence // Sequence="Snn:24243,1234,0,24234,11234|Dnn:24,4,56"
-	sArr:=strings.Split(sequence, "|")
-	for i := 0; i < len(sArr); i++ {
-		if len(sArr[i])==0{
-			continue
-		}
-		pArr:=strings.Split(sArr[i], ":")
-		if pArr[0]=="Snn"{
-			if len(pArr[1])>0{
-				return pArr[1]
-			}
-		}
-	}
-	return ""
-}
-
-func GetAutomatizmDnn(ma *Automatizm)(string){
-	sequence:=ma.Sequence
-	sArr:=strings.Split(sequence, "|")
-	for i := 0; i < len(sArr); i++ {
-		if len(sArr[i])==0{
-			continue
-		}
-		pArr:=strings.Split(sArr[i], ":")
-		if pArr[0]=="Dnn"{
-			if len(pArr[1])>0{
-				return pArr[1]
-			}
-		}
-	}
-	return ""
-}
-
-
-func GetAutomatizmTnn(ma *Automatizm)(string){
-	sequence:=ma.Sequence
-	sArr:=strings.Split(sequence, "|")
-	for i := 0; i < len(sArr); i++ {
-		if len(sArr[i])==0{
-			continue
-		}
-		pArr:=strings.Split(sArr[i], ":")
-		if pArr[0]=="Tnn"{
-			if len(pArr[1])>0{
-				return pArr[1]
-			}
-		}
-	}
-	return ""
-}
-//////////////////////////////////////////////////
 
 
 
@@ -295,7 +181,7 @@ func createNodeUnattachedAutomatizm(nodeID int,aID int){
 		return }
 
 	if node.VerbalID>0 { // это узел фразы
-		_,autmzm:=CreateAutomatizm(2000000+node.VerbalID,autmzm0.Sequence,1)
+		_,autmzm:=CreateAutomatizm(2000000+node.VerbalID,autmzm0.ActionsImageID)
 		if autmzm!=nil{
 			SetAutomatizmBelief(autmzm, 2)// сделать автоматизм штатным
 			autmzm.Usefulness=1 // полезность
@@ -303,7 +189,7 @@ func createNodeUnattachedAutomatizm(nodeID int,aID int){
 	}
 	/////////////
 	if node.ActivityID>0 && node.ToneMoodID==0 { // это узел действий - конечный в активной ветке
-		_,autmzm:=CreateAutomatizm(1000000+node.ActivityID,autmzm0.Sequence,1)
+		_,autmzm:=CreateAutomatizm(1000000+node.ActivityID,autmzm0.ActionsImageID)
 		if autmzm!=nil{
 			SetAutomatizmBelief(autmzm, 2)// сделать автоматизм штатным
 			autmzm.Usefulness=1 // полезность

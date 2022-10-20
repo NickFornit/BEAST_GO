@@ -6,7 +6,7 @@
 package psychic
 
 import (
-	"strconv"
+
 )
 
 /////////////////////////////////////////////////////////
@@ -23,39 +23,17 @@ func createAutomatizm(pc *PurposeGenetic)(*Automatizm){
 
 	BranchID:=detectedActiveLastNodID
 
-	// Sequence="Snn:24243,1234,0,24234,11234|Tnn:15|Dnn:24"
-	var Sequence=""
 	aArr:=pc.actionID.ActID
-	if len(aArr)>0 {
-		Sequence += "|Dnn:"
-		for i := 0; i < len(aArr); i++ {
-			if i > 0 {
-				Sequence += ","
-			}
-			Sequence += strconv.Itoa(aArr[i])
-		}
-	}
+
 	sArr:=pc.actionID.PhraseID
-	if len(sArr)>0 {
-		Sequence += "|Snn:"
-		for i := 0; i < len(sArr); i++ {
-			if i > 0 {
-				Sequence += ","
-			}
-			Sequence += strconv.Itoa(sArr[i])
-		}
-	}
+
 	// тон и настроение
-	t:=pc.actionID.PhraseToneID
-	m:=pc.actionID.PhraseMoodID-19
-	if t>0 || m>0{
-		tImg:=GetToneMoodID(t,m)
-		Sequence += "|Tnn:"+strconv.Itoa(tImg)
-	}
+	t:=pc.actionID.ToneID
+	m:=pc.actionID.MoodID-19
 
-
+	ActionsImageID,_:=CreateNewActionsImageImage(aArr,sArr,t,m)
 	// создать автоматизм
-	_,atzm:=CreateNewAutomatizm(BranchID,Sequence,1)
+	_,atzm:=CreateNewAutomatizm(BranchID,ActionsImageID)
 	if atzm!=nil {
 		atzm.Energy = 5
 

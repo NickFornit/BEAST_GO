@@ -28,8 +28,6 @@ import (
 	termineteAction "BOT/brain/terminete_action"
 	word_sensor "BOT/brain/words_sensor"
 	"BOT/lib"
-	"strconv"
-	"strings"
 )
 
 // при срабатывании автоматизма - блокируются все рефлексторные действия
@@ -71,7 +69,7 @@ func RumAutomatizm(am *Automatizm)(bool){
 	if  NotAllowAnyActions{
 		return false
 	}
-	if len(am.Sequence)==0{
+	if am.ActionsImageID==0{
 		return false
 	}
 
@@ -82,65 +80,9 @@ if am.Usefulness<0{
 }
 
 	var out="3|"
-	actArr:=ParceAutomatizmSequence(am.Sequence)
-	for i := 0; i < len(actArr); i++ {
 
-		if actArr[i].Type == 5{
-//тон-настроение в виде образа TN как в func GetToneMoodID(  и func GetToneMoodFromImg(
-			tInt,_:=strconv.Atoi(actArr[i].Acts)
-			out+="<br>"+GetToneMoodStrFromID(tInt)+"<br>"
-			continue
-		}
+	out+=GetAutomotizmActionsString(am)
 
-		// строка действий (любого типа) через запятую
-		aArr:=strings.Split(actArr[i].Acts, ",")
-		var idArr []int
-
-		switch actArr[i].Type{
-		case 1: // Snn- перечень ID сенсора слов через запятую,
-			for n := 0; n < len(aArr); n++ {
-				aID, _ := strconv.Atoi(aArr[n])
-				idArr=append(idArr, aID)
-			}
-			//addE:=0
-			//if am.Belief!=3 {// не рефлекс мозжечка
-			// учесть рефлекс мозжечка
-				addE := getCerebellumReflexAddEnergy(0,am.ID)
-			//}
-			out+=TerminatePraseAutomatizmActions(idArr,am.Energy+addE)
-		case 2: //Dnn - ID прогрмаммы действий, через запятую
-
-			for n := 0; n < len(aArr); n++ {
-				aID, _ := strconv.Atoi(aArr[n])
-				idArr=append(idArr, aID)
-			}
-			//addE:=0
-			//if am.Belief!=3 {// не рефлекс мозжечка
-			// учесть рефлекс мозжечка
-				addE := getCerebellumReflexAddEnergy(0,am.ID)
-			//}
-
-			sumEnergy:=am.Energy+addE
-			if sumEnergy>10{
-				sumEnergy=10
-			}
-			if sumEnergy<1{
-				sumEnergy=1
-			}
-			out+=TerminateMotorAutomatizmActions(idArr,sumEnergy)
-
-		case 3: //Ann - последовательный запуск автоматизмов с id1,id2..
-			// НО нужно как-то дожидаться выплнения предыдущего до запуска следующего !!!!!!
-			// последний просто перекроет все. Лучше выполнять следующий просто по следующему двойному тику пульса??
-			for n := 0; n < len(aArr); n++ {
-				aID,_:=strconv.Atoi(aArr[n])
-				RumAutomatizmID(aID)
-			}
-
-
-		///////////////////////////////////////
-		}
-	}
 	lib.SentActionsForPult(out)
 
 	//выполнить мозжечковый рефлекс сразу после выполняющегося автоматизма
@@ -158,6 +100,39 @@ if am.Usefulness<0{
 	return true
 }
 //////////////////////////////////////////
+
+
+func GetAutomotizmActionsString(am *Automatizm)(string){
+	var out=""
+	ai:=ActionsImageArr[am.ActionsImageID]
+	if ai.ActID != nil {
+		// учесть рефлекс мозжечка
+		addE := getCerebellumReflexAddEnergy(0,am.ID)
+		sumEnergy:=am.Energy+addE
+		if sumEnergy>10{
+			sumEnergy=10
+		}
+		if sumEnergy<1{
+			sumEnergy=1
+		}
+		out+=TerminateMotorAutomatizmActions(ai.ActID,sumEnergy)
+	}
+
+	if ai.PhraseID != nil {
+		addE := getCerebellumReflexAddEnergy(0,am.ID)
+		out+=TerminatePraseAutomatizmActions(ai.PhraseID,am.Energy+addE)
+	}
+
+	if ai.ToneID != 0 {
+		out+="<br>"+getToneStrFromID(ai.ToneID)+"<br>"
+	}
+
+	if ai.MoodID != 0 {
+		out+="<br>"+getMoodStrFromID(ai.MoodID)+"<br>"
+	}
+	return out
+}
+/////////////////////////////////////////
 
 
 

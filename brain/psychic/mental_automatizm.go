@@ -108,7 +108,7 @@ checkLevel - глубина проверки на идентичность: 0 - 
 */
 func checkUnicumMentalAutomatizm(BranchID int,Sequence string, checkLevel int)(int,*MentalAutomatizm){
 	for id, v := range MentalAutomatizmsFromID {
-		if BranchID != v.BranchID || !compareAutomatizmSequence(Sequence,v.Sequence,checkLevel) {
+		if BranchID != v.BranchID || !compareMentalAutomatizmSequence(Sequence,v.Sequence,checkLevel) {
 			continue
 		}
 		return id,v
@@ -120,7 +120,7 @@ Sequence="Snn:24243,1234,0,24234,11234|Tnn:23|Dnn:24,78"
 тестирование - в func PsychicInit()
 */
 func compareMentalAutomatizmSequence(Sequence1 string,Sequence2 string, checkLevel int)(bool){
-	//a1Arr:=ParceAutomatizmSequence(Sequence1)
+	//a1Arr:=ParceMentalAutomatizmSequence(Sequence1)
 	if Sequence1 == Sequence2{
 		return true
 	}
@@ -135,22 +135,14 @@ func compareMentalAutomatizmSequence(Sequence1 string,Sequence2 string, checkLev
 		}
 		pArr := strings.Split(sArr[i], ":")
 		switch pArr[0] {
-		case "Snn": // есть ли такой у второго
-			if strings.Contains(Sequence2, "Snn"){
-				if !compareBlockContent(pArr[1],Sequence2,"Snn"){
+		case "Mnn": // есть ли такой у второго
+			if strings.Contains(Sequence2, "Mnn"){
+				if !compareMentalBlockContent(pArr[1],Sequence2,"Mnn"){
 					return false}
 			}else{return false}
-		case "Dnn":
-			if strings.Contains(Sequence2, "Dnn"){
-				if !compareBlockContent(pArr[1],Sequence2,"Dnn"){
-					return false}
-			}else{return false}
-			/* последовательный запуск автоматизмов НЕ ПРОВЕРЯЕМ ЭКЗОТИКУ...
-			case "Ann":
-			*/
-		case "Tnn":
-			if strings.Contains(Sequence2, "Tnn"){
-				if !compareBlockContent(pArr[1],Sequence2,"Tnn"){
+		case "Ann":
+			if strings.Contains(Sequence2, "Ann"){
+				if !compareMentalBlockContent(pArr[1],Sequence2,"Ann"){
 					return false}
 			}else{return false}
 		}

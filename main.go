@@ -368,7 +368,7 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 			get_sequence_info := r.FormValue("get_sequence_info")
 			if len(get_sequence_info) > 0 {
 				autmzmID,_:=strconv.Atoi(r.FormValue("autmzmID"))
-				ref := psychic.GetAutomatizmSequenceInfo(autmzmID,r.FormValue("sequence"))
+				ref := psychic.GetAutomatizmSequenceInfo(autmzmID)
 				_, _ = fmt.Fprint(resp, ref)
 				return
 			}

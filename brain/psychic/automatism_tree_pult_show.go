@@ -8,11 +8,9 @@ package psychic
 import (
 	actionSensor "BOT/brain/action_sensor"
 	"BOT/brain/gomeostas"
-	termineteAction "BOT/brain/terminete_action"
 	word_sensor "BOT/brain/words_sensor"
 	"BOT/lib"
 	"strconv"
-	"strings"
 )
 
 ////////////////////////////////////////////
@@ -241,11 +239,11 @@ func TranslateAutomatizmSequence(am *Automatizm)(string){
 	if am==nil{
 		return ""
 	}
-	if len(am.Sequence)==0{
+	if am.ActionsImageID==0{
 		return ""
 	}
 
-	out:=GetAutomatizmSequenceInfo(am.ID,am.Sequence)
+	out:=GetAutomatizmSequenceInfo(am.ID)
 
 	return out
 }
@@ -253,69 +251,13 @@ func TranslateAutomatizmSequence(am *Automatizm)(string){
 
 
 // действия - в виде строки
-func GetAutomatizmSequenceInfo(idA int,sequence string)(string){
+func GetAutomatizmSequenceInfo(idA int)(string){
 
 	am:=AutomatizmFromIdArr[idA]
 	if am == nil{
 		return ""
 	}
-	var out=""
-	actArr:=ParceAutomatizmSequence(sequence)
-
-	for i := 0; i < len(actArr); i++ {
-		if actArr[i].Type == 5{
-//тон-настроение в виде образа TN как в func GetToneMoodID(  и func GetToneMoodFromImg(
-			tInt,_:=strconv.Atoi(actArr[i].Acts)
-			out+="<br>"+GetToneMoodStrFromID(tInt)+"<br>"
-			continue
-		}
-
-
-		// строка действий (любого типа) через запятую
-		aArr := strings.Split(actArr[i].Acts, ",")
-		var idArr []int
-
-		switch actArr[i].Type {
-		case 1: // Snn- перечень ID сенсора слов через запятую,
-			for n := 0; n < len(aArr); n++ {
-				aID, _ := strconv.Atoi(aArr[n])
-				idArr = append(idArr, aID)
-			}
-			//addE := 0
-			//if am.Belief != 3 { // не рефлекс мозжечка
-				addE := getCerebellumReflexAddEnergy(0,am.ID)
-			//}
-			for i := 0; i < len(idArr); i++ {
-				if i==0{out+="Фраза Beast c энергией "+strconv.Itoa(am.Energy+addE)+":</b>"}else{out+=", "}
-				out+= "<b>"+word_sensor.GetPhraseStringsFromPhraseID(idArr[i])+"</b>"
-			}
-			//TerminatePraseAutomatizmActions(idArr, am.Energy+addE)
-		case 2: //Dnn - ID прогрмаммы действий, через запятую
-
-			for n := 0; n < len(aArr); n++ {
-				aID, _ := strconv.Atoi(aArr[n])
-				idArr = append(idArr, aID)
-			}
-			//addE := 0
-			//if am.Belief != 3 { // не рефлекс мозжечка
-				addE := getCerebellumReflexAddEnergy(0,am.ID)
-			//}
-			for i := 0; i < len(idArr); i++ {
-				if i==0{out+="Действие Beast c энергией "+strconv.Itoa(am.Energy+addE)+": <br>"}
-				out+= "<b>"+termineteAction.TerminalActonsNameFromID[idArr[i]]+"</b>"
-			}
-
-		case 3: //Ann - последовательный запуск автоматизмов с id1,id2..
-			// НО нужно как-то дожидаться выплнения предыдущего до запуска следующего !!!!!!
-			// последний просто перекроет все. Лучше выполнять следующий просто по следующему двойному тику пульса??
-			out+="<b>Цепочка автоматизмов:</b>"
-			for n := 0; n < len(aArr); n++ {
-				if i>0{out+=", "}
-				out+=aArr[i]
-			}
-			///////////////////////////////////////
-		}
-	}
+	out:=GetAutomotizmActionsString(am)
 	return out
 }
 ///////////////////////////////////////////////////

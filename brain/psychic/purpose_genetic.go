@@ -12,9 +12,7 @@ package psychic
 
 import (
 	TerminalActions "BOT/brain/terminete_action"
-	word_sensor "BOT/brain/words_sensor"
 	"BOT/lib"
-	"strconv"
 )
 
 ///////////////////////////////////////////////
@@ -26,7 +24,7 @@ type PurposeGenetic struct {
 	puls int // PulsCount
 	veryActual bool // true - цель очень актуальна
 	targetID []int //массив ID парамктров гомеостаза как цели для улучшения в данных условиях
-	actionID *ActionImage //выбранный образ действия для данной цели
+	actionID *ActionsImage //выбранный образ действия для данной цели
 // для каждого actionID сила действий сначала принимается =5, а потом корректируется мозжечковыми рефлексами
 }
 var PurposeGeneticObject []*PurposeGenetic
@@ -52,8 +50,8 @@ func getPurposeGenetic()(*PurposeGenetic){
  */
 	//есть ли подходящий по условиям безусловный или условный рефлекс и сделать автоматизм по его действиям
 	if len(actualRelextActon)>0{
-		_,aImg:=CreateNewActionImageImage(actualRelextActon,nil,0,0)
-		pg.actionID = aImg
+		_,atmz:=CreateNewActionsImageImage(actualRelextActon,nil,0,0)
+		pg.actionID = atmz
 	}else {
 /* этого практивески не может быть, потому, что если нет рефлексов,
 		то дейсвтвия в GetActualReflexAction() берутся из эффектов действий
@@ -63,8 +61,8 @@ func getPurposeGenetic()(*PurposeGenetic){
 		// veryActualSituation: плохо для  1, 2, 7 и/или 8  параметров гомеостаза
 		if veryActualSituation { // нужно хоть что-то сделать, ПАНИКА
 			ActID:=[]int{21} // паника
-			_,aImg:=CreateNewActionImageImage(ActID,nil,0,0)
-			pg.actionID = aImg
+			_,atmz:=CreateNewActionsImageImage(ActID,nil,0,0)
+			pg.actionID = atmz
 		}
 	}
 
@@ -118,7 +116,7 @@ func chooseAutomatizmSuccessAndRun(purpose *PurposeGenetic)(*Automatizm) {
 				purpose.targetID = nil
 				purpose.targetID = append(purpose.targetID, targID[i])
 				// вытащить действия автоматизма
-				trigID := CreateNewActionImageFromAutomatizm(v.Sequence)
+				trigID := ActionsImageArr[v.ActionsImageID]
 				purpose.actionID = trigID
 				atmzm := createAndRunAutomatizmFromPurpose(purpose)
 				return atmzm
@@ -165,38 +163,29 @@ func findAnySympleRandActions()(*Automatizm){
 		for i := 0; i < len(actArrId); i++ {
 			usedActIdArr=append(usedActIdArr,actArrId[i])
 		}
-		var sequence = "Dnn:"
-		for i := 0; i < len(actArrId); i++ {
-			if i > 0 {
-				sequence += ","
-			}
-			sequence += strconv.Itoa(actArrId[i])
-		}
+
 		var purpose PurposeGenetic
 		purpose.targetID = targID
-		// вытащить действия автоматизма
-		trigID := CreateNewActionImageFromAutomatizm(sequence)
-		purpose.actionID= trigID
+		_,trig := CreateNewActionsImageImage(actArrId,nil,0,0)
+		purpose.actionID= trig
 		atmzm := createAndRunAutomatizmFromPurpose(&purpose)
 		return atmzm
 	}
 
 	// если кончились действия, начали порверять фразы  ДЛЯ ПОПОЛНЕНИЯ type Verbal struct (verbalFromIdArr[])
 // Выдавая это на стадии 3, тварь получает реакцию оператора, которую отзеркаливает
-	for k, _ := range word_sensor.PhraseTreeFromID {
+	for k, v := range VerbalFromIdArr {
 			if lib.ExistsValInArr(usedPraseIdArr, k){
 				continue
 			}
 		usedPraseIdArr=append(usedPraseIdArr,k)
-		sequence := "Snn:"+strconv.Itoa(k)
 
 		var purpose PurposeGenetic
 		purpose.targetID = targID
 //!? При создании нового автоматизма с фразой вписывать Tnn: тон настроение, которое брать из текущего гомеостаза ?
 
-		// вытащить действия автоматизма
-		trigID := CreateNewActionImageFromAutomatizm(sequence)
-		purpose.actionID = trigID
+		_,trig := CreateNewActionsImageImage(nil,v.PhraseID,v.ToneID,v.MoodID)
+		purpose.actionID = trig
 		atmzm := createAndRunAutomatizmFromPurpose(&purpose)
 		return atmzm
 	}
