@@ -73,7 +73,7 @@ func GetCurrentInformationEnvironment(){
 
 	ie.PsyActionImgPulsCount=PulsCount// момент обновления
 
-	 CurrentInformationEnvironment.IsSleep=IsSlipping
+	 CurrentInformationEnvironment.IsSleep= IsSleeping
 
 // определение текущего сочетания ID Базовых контекстов - оно есть всегда, даже если ничего не сделано на Пульте - нулевое сочетание.
 	bsIDarr:=gomeostas.GetCurContextActiveIDarr()

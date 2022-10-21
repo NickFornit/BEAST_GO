@@ -38,7 +38,7 @@ import (
  */
 type rules struct {
 	ID int
-	BranchID int// правило оптимизировано для ветки дерева понимания
+	BranchID int// правило создано для последнеего узла дерева в цепочке TAid
 	TAid []int // цепочка стимул-ответов ID TriggerAndAction - последовательность из эпизодов памяти подряд, сохраняющая последовательность общения ( дурак -> сам дурак!, маме скажу -> ябеда, щас в морду дам -> ну попробуй)
 }
 
@@ -54,23 +54,17 @@ func rulesInit(){
 
 
 ////////////////////////////////////////////////
-// создать новое сочетание ответных действий если такого еще нет с ЗАПОМИНАНИЕМ
-func CreateNewrulesImage(BranchID int,TAid []int)(int,*rules){
+// создать новое сочетание ответных действий если такого еще нет
+var lastrulesID=0
+func createNewlastrulesID(id int,BranchID int,TAid []int)(int,*rules){
+	if TAid == nil{
+		return 0,nil
+	}
+
 	oldID,oldVal:=checkUnicumrules(BranchID,TAid)
 	if oldVal!=nil{
 		return oldID,oldVal
 	}
-	aImgID,aImg:=createNewlastrulesID(0,BranchID,TAid)
-
-	SaveRulesArr()
-
-	return aImgID,aImg
-}
-/////////////////////////////////////////
-// создать образ сочетаний ответных действий
-var lastrulesID=0
-func createNewlastrulesID(id int,BranchID int,TAid []int)(int,*rules){
-
 	if id==0{
 		lastrulesID++
 		id=lastrulesID
@@ -87,6 +81,9 @@ func createNewlastrulesID(id int,BranchID int,TAid []int)(int,*rules){
 	node.TAid=TAid
 
 	rulesArr[id]=&node
+
+	if doWritingFile{SaveRulesArr() }
+
 	return id,&node
 }
 func checkUnicumrules(BranchID int,TAid []int)(int,*rules){
@@ -148,8 +145,9 @@ func loadrulesArr(){
 			si,_:=strconv.Atoi(s[i])
 			TAid=append(TAid,si)
 		}
-
+var saveDoWritingFile= doWritingFile; doWritingFile =false
 		createNewlastrulesID(id,BranchID,TAid)
+doWritingFile =saveDoWritingFile
 	}
 	return
 

@@ -67,7 +67,7 @@ func createNewCerebellumReflex(id int, typeAut int, sourceAutomatizmID int)(int,
 	} else {
 		cerebellumReflexFromMentalsID[sourceAutomatizmID] = &node
 	}
-	SaveCerebellumReflex()
+	if doWritingFile {SaveCerebellumReflex() }
 	return id, &node
 }
 
@@ -125,7 +125,9 @@ func loadCerebellumReflex() {
 			aid, _ := strconv.Atoi(a[i])
 			additionalMentalAutID = append(additionalMentalAutID,aid)
 		}
+var saveDoWritingFile= doWritingFile; doWritingFile =false
 		_, ca := createNewCerebellumReflex(id, typeAut, sourceAutomatizmID)
+doWritingFile =saveDoWritingFile
 		ca.addEnergy = addEnergy
 		ca.additionalAutomatizmID = additionalAutomatizmID
 		ca.additionalMentalAutID = additionalMentalAutID

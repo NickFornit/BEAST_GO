@@ -35,6 +35,9 @@ func loadImagesArrs() {
 // отслеживане времени с последнего изменения условий с Пульта в пульсах
 var lastActivnostFromPult = 0
 
+// было изменение активности с пульта в текущем пульсе. Только одна активность допускается в течение пульса.
+var activetedPulsCount = 0 // против многократных срабатываний
+
 // ПУЛЬС рефлексов
 var ReflexPulsCount = 0 // передача тика Пульса из brine.go
 var LifeTime = 0 				// время жизни
@@ -114,11 +117,11 @@ func setOldActiveCurTriggerStimulsVal(val int) {
 	oldActiveCurTriggerStimulsPulsCount = ReflexPulsCount
 }
 
-var activetedPulsCount = 0 // против многократных срабатываний
+
 
 /* Активация дерва рефлексов при любом изменении условий с проверкой по каждому пульсу. */
 func ActiveFromConditionChange() {
-	if activetedPulsCount > 0 { // ждет следующего пульса
+	if activetedPulsCount == ReflexPulsCount { // ждет следующего пульса
 		return
 	}
 	// очищать прежние акции с пульта при смене сочетания Базовых контекстов.
@@ -153,6 +156,10 @@ func ActiveFromConditionChange() {
 
 // активировать дерево действием reflexes.ActiveFromAction()
 func ActiveFromAction() {
+	if activetedPulsCount == ReflexPulsCount { // ждет следующего пульса
+		return
+	}
+	activetedPulsCount = ReflexPulsCount
 	ActivationTypeSensor = 2
 
 	ActiveCurBaseID = gomeostas.CommonBadNormalWell
@@ -189,6 +196,10 @@ func ActiveFromAction() {
 // активировать дерево фразой  reflexes.ActiveFromPhrase() - только для условных рефлексов
 // причем, с учетом недавного действия (или нескольких действий) т.к. контекст действий сохраняется 10 сек.
 func ActiveFromPhrase() {
+	if activetedPulsCount == ReflexPulsCount { // ждет следующего пульса
+		return
+	}
+	activetedPulsCount = ReflexPulsCount
 	ActivationTypeSensor = 3
 
 	ActiveCurBaseID = gomeostas.CommonBadNormalWell

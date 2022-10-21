@@ -41,7 +41,7 @@ var SituationImageFromIdArr=make(map[int]*SituationImage)
 
 
 var lastSituationImageID=0
-func createSituationImage(id int,autmzmTreeNodeID int,SituationType int,save bool)(int,*SituationImage){
+func createSituationImage(id int,autmzmTreeNodeID int,SituationType int)(int,*SituationImage){
 	oldID,oldVal:=checkUnicumSituationImage(autmzmTreeNodeID,SituationType)
 	if EvolushnStage < 4 { // только со стадии развития 4
 		return 0,nil
@@ -70,7 +70,7 @@ func createSituationImage(id int,autmzmTreeNodeID int,SituationType int,save boo
 
 	SituationImageFromIdArr[id]=&node
 
-	if save {
+	if doWritingFile {
 		SaveSituationImage()
 	}
 
@@ -116,7 +116,9 @@ func loadSituationImage(){
 		autmzmTreeNodeID,_:=strconv.Atoi(p[1])
 		SituationType,_:=strconv.Atoi(p[2])
 
-		createSituationImage(id,autmzmTreeNodeID,SituationType,false)
+var saveDoWritingFile= doWritingFile; doWritingFile =false
+		createSituationImage(id,autmzmTreeNodeID,SituationType)
+doWritingFile =saveDoWritingFile
 	}
 	return
 
@@ -201,13 +203,13 @@ if LastRunAutomatizmPulsCount > 0{// был и закончился ответо
 	// вышло время ожидания реакции
 	if (LastRunAutomatizmPulsCount+WaitingPeriodForActionsVal) < PulsCount {
 // оператор не прореагировал на действия в течение периода ожидания - игнорирует? нужно достучаться?
-		id, _ := createSituationImage(0, detectedActiveLastNodID, 5,true)
+		id, _ := createSituationImage(0, detectedActiveLastNodID, 5)
 		if id > 0 {
 			return id
 		}
 	}
 //было ответное действие (смотреть в автоматизме ветки Usefulness int - (БЕС)ПОЛЕЗНОСТЬ: вред: -10 0 +10 +n польза diffPsyBaseMood )
-	id, _ := createSituationImage(0, detectedActiveLastNodID, 1,true)
+	id, _ := createSituationImage(0, detectedActiveLastNodID, 1)
 	if id > 0 {
 		return id
 	}
@@ -216,7 +218,7 @@ if LastRunAutomatizmPulsCount > 0{// был и закончился ответо
 	// ЕСТЬ ЛИ АВТОМАТИЗМ В моторной ВЕТКЕ и болеее ранних?
 	if currentAutomatizmAfterTreeActivatedID > 0 {
 		//был запуск автоматизма ветки
-		id, _ := createSituationImage(0, detectedActiveLastNodID, 2,true)
+		id, _ := createSituationImage(0, detectedActiveLastNodID, 2)
 		if id > 0 {
 			return id
 		}
@@ -249,7 +251,7 @@ if max<prior{
 	}/////////////////////
 
 if sitID>0 {
-	id, _ := createSituationImage(0, detectedActiveLastNodID, sitID,true)
+	id, _ := createSituationImage(0, detectedActiveLastNodID, sitID)
 	if id > 0 {
 		return id
 	}
@@ -257,14 +259,14 @@ if sitID>0 {
 
 	if detectedActiveLastNodID == 0 {
 		// ничего не делали, но нужно осмысление
-		id, _ := createSituationImage(0, detectedActiveLastNodID, 3,true)
+		id, _ := createSituationImage(0, detectedActiveLastNodID, 3)
 		if id > 0 {
 			return id
 		}
 	}
 
 	// все спокойно, можно экспериментивароть
-	id, _ := createSituationImage(0, detectedActiveLastNodID, 4,true)
+	id, _ := createSituationImage(0, detectedActiveLastNodID, 4)
 	if id > 0 {
 		return id
 	}

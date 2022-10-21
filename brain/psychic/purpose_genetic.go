@@ -50,7 +50,7 @@ func getPurposeGenetic()(*PurposeGenetic){
  */
 	//есть ли подходящий по условиям безусловный или условный рефлекс и сделать автоматизм по его действиям
 	if len(actualRelextActon)>0{
-		_,atmz:=CreateNewActionsImageImage(actualRelextActon,nil,0,0)
+		_,atmz:=СreateNewlastActionsImageID(0,actualRelextActon,nil,0,0)
 		pg.actionID = atmz
 	}else {
 /* этого практивески не может быть, потому, что если нет рефлексов,
@@ -61,7 +61,7 @@ func getPurposeGenetic()(*PurposeGenetic){
 		// veryActualSituation: плохо для  1, 2, 7 и/или 8  параметров гомеостаза
 		if veryActualSituation { // нужно хоть что-то сделать, ПАНИКА
 			ActID:=[]int{21} // паника
-			_,atmz:=CreateNewActionsImageImage(ActID,nil,0,0)
+			_,atmz:=СreateNewlastActionsImageID(0,ActID,nil,0,0)
 			pg.actionID = atmz
 		}
 	}
@@ -166,7 +166,7 @@ func findAnySympleRandActions()(*Automatizm){
 
 		var purpose PurposeGenetic
 		purpose.targetID = targID
-		_,trig := CreateNewActionsImageImage(actArrId,nil,0,0)
+		_,trig := СreateNewlastActionsImageID(0,actArrId,nil,0,0)
 		purpose.actionID= trig
 		atmzm := createAndRunAutomatizmFromPurpose(&purpose)
 		return atmzm
@@ -184,7 +184,7 @@ func findAnySympleRandActions()(*Automatizm){
 		purpose.targetID = targID
 //!? При создании нового автоматизма с фразой вписывать Tnn: тон настроение, которое брать из текущего гомеостаза ?
 
-		_,trig := CreateNewActionsImageImage(nil,v.PhraseID,v.ToneID,v.MoodID)
+		_,trig := СreateNewlastActionsImageID(0,nil,v.PhraseID,v.ToneID,v.MoodID)
 		purpose.actionID = trig
 		atmzm := createAndRunAutomatizmFromPurpose(&purpose)
 		return atmzm

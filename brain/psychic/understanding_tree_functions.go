@@ -107,8 +107,10 @@ func loadUnderstandingTree(){
 		PurposeID,_:=strconv.Atoi(p[5])
 
 		// новый узел с каждой строкой из файла
+var saveDoWritingFile= doWritingFile; doWritingFile =false
 		createNewUnderstandingNode(UnderstandingNodeFromID[parentID],id,Mood,EmotionID,
 			SituationID,PurposeID)
+doWritingFile =saveDoWritingFile
 	}
 	return
 }
@@ -125,7 +127,7 @@ func createBasicUnderstandingTree(){
 	createNewUnderstandingNode(&UnderstandingTree,0,1,0,0,0)
 	createNewUnderstandingNode(&UnderstandingTree,0,2,0,0,0)
 	createNewUnderstandingNode(&UnderstandingTree,0,3,0,0,0)
-	SaveUnderstandingTree()
+	if doWritingFile {SaveUnderstandingTree() }
 	notAllowScanInTreeThisTime = false // запрет показа карты при обновлении
 }
 /////////////////////////////////////

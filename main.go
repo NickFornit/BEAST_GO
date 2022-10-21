@@ -29,6 +29,8 @@ import (
 	"strings"
 )
 
+var xxxxxxx=0 // в дебаге иногда начинается циклический вызов, это - защелка
+
 // true - остановка всей активности для совершения критических глобальных операций
 var isGlobalStopAllActivnost = false
 
@@ -317,8 +319,11 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				return
 			}
 
+//
+
 			set_action := r.FormValue("set_action")
-			if len(set_action) > 0 {
+			if len(set_action) > 0 && xxxxxxx==0 {
+				xxxxxxx=1
 				brain.IsPultActivnost = true
 				enegry, _ := strconv.Atoi(r.FormValue("food_portion"))
 				action_sensor.SetActionFromPult(set_action, enegry)
@@ -327,6 +332,7 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				reflexes.ActiveFromAction()
 				brain.IsPultActivnost = false
 				_, _ = fmt.Fprint(resp, "!")
+				xxxxxxx=0
 				return
 			}
 

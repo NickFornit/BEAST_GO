@@ -14,6 +14,7 @@ package psychic
 import (
 	"BOT/brain/gomeostas"
 	"BOT/lib"
+	"strconv"
 )
 
 /////////////////////////////////////////
@@ -68,6 +69,7 @@ func clinerAutomatizmRunning(){
 	MotorTerminalBlocking=false
 	LastAutomatizmWeiting=nil
 	LastRunAutomatizmPulsCount=0
+	WasOperatorActiveted=false
 // !!!! НЕ СБРАСЫВАТЬ savePurposeGenetic=nil - он может определяться независимо от запуска автоматизма
 }
 ///////////////////////////////////
@@ -101,6 +103,7 @@ func noAutovatizmResult()(bool){
 	if EvolushnStage > 3 {
 		// осмыслить ситуацию - Активировать Дерево Понимания
 		understandingSituation()
+		clinerAutomatizmRunning()
 		return true
 	}
 
@@ -110,6 +113,7 @@ func noAutovatizmResult()(bool){
 		   Создание автоматизма, повторяющего действия оператора в данных условиях
 	*/
 		provokatorMirrorAutomatizm(LastAutomatizmWeiting,&CurrentPurposeGenetic)
+		clinerAutomatizmRunning()
 		return true
 	}
 
@@ -117,9 +121,10 @@ func noAutovatizmResult()(bool){
 	if cerebellumCoordination(LastAutomatizmWeiting,1){
 		// и тут же снова запустить реакцию!
 		setAutomatizmRunning(LastAutomatizmWeiting, &CurrentPurposeGenetic)
+		clinerAutomatizmRunning()
 		return true
 	}
-
+	clinerAutomatizmRunning()
 	return false
 }
 /////////////////////////////////////////////////////////////////////
@@ -173,17 +178,14 @@ func calcAutomatizmResult(lastCommonDiffValue int,lastBetterOrWorse int,wellIDar
 
 	}
 	// >3 потому, что раньше не пишется эпизодическая память и формируются более примитивные механизмы.
-	if EvolushnStage > 3{
+	if EvolushnStage > 3 {
 
-/* ри каждом ответе на действия оператора - прописывать текущее правило rules.
-   А так же просматривать эпизод память взад макчимум на 6 шагов или до паузы в общении > 30 шагов,
-		фиксируя цепочку правил.
- */
-	rulesID:=fixNewRules(lastBetterOrWorse)
-	if rulesID>0 {
-		// новый кадр эпизодической памяти, сохраняющий
-		newEpisodeMemory(rulesID) // запись эпизодической памяти saveEpisodicMenory()
-	}
+		/* При каждом ответе на действия оператора - прописывать текущее правило rules
+		   		и делать новый кадр эпизодической памяти
+		      А так же просматривать эпизод память взад макчимум на EpisodeMemoryPause шагов или до паузы в общении > 30 шагов,
+		   		фиксируя цепочку правил.
+		*/
+		fixNewRules(lastBetterOrWorse)
 	}
 
 	if lastBetterOrWorse<0{// стало хуже
@@ -234,12 +236,12 @@ func wasChangingMoodCondition(kind int)(int,int,[]int){
 
 ////////////////////////////////////////////////////////////////////////
 /* на стадии >3 при каждом ответе на действия оператора - прописывать текущее правило rules.
-   А так же просматривать эпизод память взад макчимум на 6 шагов или до паузы в общении > 30 шагов,
+   А так же просматривать эпизод память взад макчимум на 6 шагов или до паузы в общении > EpisodeMemoryPause шагов,
 		фиксируя цепочку правил.
 */
 func fixNewRules(lastBetterOrWorse int) int {
 	// образ действий оператора
-	ai1,_:=CreateNewActionsImageImage(curActiveActions.ActID,curActiveActions.PhraseID,curActiveActions.ToneID,curActiveActions.MoodID)
+	ai1,_:=СreateNewlastActionsImageID(0,curActiveActions.ActID,curActiveActions.PhraseID,curActiveActions.ToneID,curActiveActions.MoodID)
 	if ai1 == 0{return 0}
 	// ответный образ действий Beast
 	ai2:=LastAutomatizmWeiting.ActionsImageID
@@ -249,8 +251,15 @@ func fixNewRules(lastBetterOrWorse int) int {
 	rulesID, _ := createNewlastrulesID(0, detectedActiveLastNodID, []int{TriggerAndAction})
 	if rulesID == 0{return 0}
 
+	lib.WritePultConsol("Записано правило № "+strconv.Itoa(rulesID))
 
-	// теперь смотрим эпизодическую память
+	// новый кадр эпизодической памяти, сохраняющий
+	newEpisodeMemory(rulesID,0) // запись эпизодической памяти saveEpisodicMenory()
+
+	// теперь обрабатываем прошлую эпизодическую память
+	GetRulesFromEpisodeMemory(0)
+
+
 
 	return rulesID
 }

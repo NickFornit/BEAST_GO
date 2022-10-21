@@ -85,7 +85,7 @@ func FormingMirrorAutomatizmFromList(file string) string {
 
 			NoWarningCreateShow = true
 
-			ActionsImageID,_:=CreateNewActionsImageImage(aArr,answerID,t,m)
+			ActionsImageID,_:=СreateNewlastActionsImageID(0,aArr,answerID,t,m)
 			_, autmzm := CreateAutomatizm(nodeID, ActionsImageID)
 			NoWarningCreateShow = false
 			if autmzm != nil {
@@ -146,7 +146,7 @@ func FormingMirrorAutomatizmFromTempList(file string) string {
 		// создать автоматизм и привязать его к объекту
 		NoWarningCreateShow=true
 		// для фразы triggerPraseID создаем привязанный к ней автоматизм
-		ActionsImageID,_:=CreateNewActionsImageImage(nil,answerPraseID,t,m)
+		ActionsImageID,_:=СreateNewlastActionsImageID(0,nil,answerPraseID,t,m)
 		_, autmzm := CreateAutomatizm(2000000 + triggerPraseID[0], ActionsImageID)
 		NoWarningCreateShow = false
 		if autmzm != nil {
@@ -181,14 +181,14 @@ func createNewMirrorAutomatizm(sourceAtmzm *Automatizm) {
 
 	// создать автоматизм и привязать его к объекту
 	// NoWarningCreateShow=true
-	ActionsImageID,_:=CreateNewActionsImageImage(curActiveActions.ActID,curActiveActions.PhraseID,curActiveActions.ToneID,curActiveActions.MoodID)
+	ActionsImageID,_:=СreateNewlastActionsImageID(0,curActiveActions.ActID,curActiveActions.PhraseID,curActiveActions.ToneID,curActiveActions.MoodID)
 	_, autmzm := CreateAutomatizm(targetNodeID, ActionsImageID)
 	//	NoWarningCreateShow=false
 	if autmzm != nil {
 		SetAutomatizmBelief(autmzm, 2) // сделать автоматизм штатным, т.к. действия авторитарно верные
 		autmzm.Usefulness = 1 // авторитарная полезность
 
-		// SaveAutomatizm()
+		if doWritingFile {SaveAutomatizm() }
 	}
 }
 /* вытащить действия исходного автоматизма чтобы найти или сделать узел дерева с таким пускателем
@@ -222,7 +222,7 @@ func findTreeNodeFromAutomatizmActionsImage(baseID int, EmotionID int, ActionsIm
 func provokatorMirrorAutomatizm(sourceAtmzm *Automatizm, purposeGenetic *PurposeGenetic) {
 	if sourceAtmzm == nil || purposeGenetic == nil { return	}
 
-	ActionsImageID,_:=CreateNewActionsImageImage(curActiveActions.ActID,curActiveActions.PhraseID,curActiveActions.ToneID,curActiveActions.MoodID)
+	ActionsImageID,_:=СreateNewlastActionsImageID(0,curActiveActions.ActID,curActiveActions.PhraseID,curActiveActions.ToneID,curActiveActions.MoodID)
 	// NoWarningCreateShow=true
 	// для фразы triggerPraseID создаем привязанный к ней автоматизм
 	_, autmzm := CreateAutomatizm(detectedActiveLastNodID, ActionsImageID)

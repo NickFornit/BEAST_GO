@@ -173,13 +173,14 @@ func checkUnicumMotorsAutomatizm(BranchID int,ActionsImageID int)(int,*Automatiz
 }
 ////////////////////////////////////////////
 
-// создать новый автоматизм с записю в файл
+// создать новый автоматизм 
 func CreateNewAutomatizm(BranchID int, ActionsImageID int)(int, *Automatizm) {
 	// BranchID может быть ==0 для мозжечковых рефлексов
 	if ActionsImageID == 0 { return 0, nil }
 
 	id, verb := createNewAutomatizmID(0, BranchID, ActionsImageID)
-	SaveAutomatizm()
+	
+	if doWritingFile {SaveAutomatizm() }
 
 	return id, verb
 }
@@ -241,12 +242,14 @@ func loadAutomatizm() {
 			sp, _ := strconv.Atoi(s[i])
 			GomeoIdSuccesArr = append(GomeoIdSuccesArr, sp)
 		}
+var saveDoWritingFile= doWritingFile; doWritingFile =false
 		_, a := createNewAutomatizmID(id, BranchID, ActionsImageID)// без проверки на уникальность
 		a.NextID = NextID
 		a.Usefulness = Usefulness
 		a.Energy = Energy
 		a.Count = Count
 		SetAutomatizmBelief(a, Belief)
+doWritingFile =saveDoWritingFile
 	}
 	NoWarningCreateShow = false
 	return

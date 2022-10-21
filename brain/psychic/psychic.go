@@ -35,13 +35,17 @@ TerminalActionsTargetsFromID - это – наследственно задан�
 */
 package psychic
 
-
 import (
 	"BOT/lib"
 	"strconv"
 )
 
 ///////////////////////////////
+
+// true - ПРИ ТЕСТИРОВАНИИ СОХРАНЯТЬ В ФАЙЛАХ ВСЕ ЭЛЕМЕНТЫ
+var doWritingFile =true
+
+///////////////////////////////////////////////////////////////////////
 // инициализирующий блок - в порядке последовательности инициализаций
 // после condition_reflex.go
 func PsychicInit(){
@@ -87,8 +91,8 @@ func PsychicInit(){
 var PulsCount=0 // передача тика Пульса из brine.go
 var LifeTime=0
 var EvolushnStage=0 // стадия развития
-var IsSlipping=false
-func PsychicCountPuls(evolushnStage int,lifeTime int,puls int,isSlipping bool){
+var IsSleeping =false
+func PsychicCountPuls(evolushnStage int,lifeTime int,puls int,isSleeping bool){
 
 	if evolushnStage<2 { // недостаточная стадия развития
 		return
@@ -97,7 +101,7 @@ func PsychicCountPuls(evolushnStage int,lifeTime int,puls int,isSlipping bool){
 	LifeTime=lifeTime
 	EvolushnStage=evolushnStage
 	PulsCount=puls // передача номера тика из более низкоуровневого пакета
-	IsSlipping=isSlipping
+	IsSleeping =isSleeping
 
 	// тики в automatizm_result.go для удобства
 	orientarionPuls()
@@ -105,12 +109,14 @@ func PsychicCountPuls(evolushnStage int,lifeTime int,puls int,isSlipping bool){
 	moodePulse()
 	EpisodeMemoryPuls()
 
-	if IsSlipping {
+	if IsSleeping {
 		sleepingProcess()
 	}
 
-	// осознание при бодрствовании
-	if evolushnStage > 3 && PulsCount >4 {
+	// осознание при включении и бодрствовании - один раз
+	if evolushnStage > 3 && PulsCount >4 && !IsSleeping && !allowConsciousnessProcess {
+// начать мышление
+		allowConsciousnessProcess=true
 		consciousness(0)
 	}
 

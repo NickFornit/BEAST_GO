@@ -123,7 +123,7 @@ func CreateVerbalImage(FirstSimbolID int,PhraseID []int,ToneID int,MoodID int)(i
 */
 	id,verb:=createNewlastVerbalID(0,FirstSimbolID,PhraseID,ToneID,MoodID)
 
-	SaveVerbalFromIdArr()
+	if doWritingFile {SaveVerbalFromIdArr() }
 
 	return id,verb
 }
@@ -171,8 +171,9 @@ func loadVerbalFromIdArr(){
 		}
 		ToneID,_:=strconv.Atoi(p[3])
 		MoodID,_:=strconv.Atoi(p[4])
-
+var saveDoWritingFile= doWritingFile; doWritingFile =false
 		createNewlastVerbalID(id,SimbolID,PhraseID,ToneID,MoodID)
+doWritingFile =saveDoWritingFile
 	}
 	return
 

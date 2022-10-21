@@ -13,7 +13,7 @@ var DominantaProblem=make(map[int]*Dominanta)
 var isCurrentProblemDominanta *Dominanta
 
 
-/////////////////////////////////
+/////////////////////////////////  if doWritingFile{SaveProblemDominenta() }
 func SaveProblemDominenta(){
 
 }

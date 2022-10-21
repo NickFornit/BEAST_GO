@@ -20,7 +20,7 @@ CurrentInformationEnvironment - текущего образа информаци
 package sleep
 
 // true - это СОН  sleep.IsSleeping
-var IsSleeping=false
+var IsSleeping=true
 
 func GetSleepCondition()(bool){
 	if IsSleeping{

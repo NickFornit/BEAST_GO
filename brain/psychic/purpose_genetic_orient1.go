@@ -28,7 +28,7 @@ func getPurposeGeneticAndRunAutomatizm()*Automatizm {
 			он уже не вызовет orientation_1(), а будет orientation_2()
 			*/
 			atmzm :=createAndRunAutomatizmFromPurpose(purpose)
-			// SaveAutomatizm()
+			if doWritingFile { SaveAutomatizm() }
 			return atmzm
 		}
 		/* нет действий (практически невозможная ситуация потому, что если нет рефлексов,

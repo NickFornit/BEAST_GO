@@ -34,23 +34,13 @@ func TriggerAndActionInit(){
 
 
 ////////////////////////////////////////////////
-// создать новое сочетание ответных действий если такого еще нет с ЗАПОМИНАНИЕМ
-func CreateNewTriggerAndActionImage(Trigger int,Action int,Effect int)(int,*TriggerAndAction){
+// создать новое сочетание ответных действий если такого еще нет
+var lastTriggerAndActionID=0
+func createNewlastTriggerAndActionID(id int,Trigger int,Action int,Effect int)(int,*TriggerAndAction){
 	oldID,oldVal:=checkUnicumTriggerAndAction(Trigger,Action,Effect)
 	if oldVal!=nil{
 		return oldID,oldVal
 	}
-	aImgID,aImg:=createNewlastTriggerAndActionID(0,Trigger,Action,Effect)
-
-	SaveTriggerAndActionArr()
-
-	return aImgID,aImg
-}
-/////////////////////////////////////////
-// создать образ сочетаний ответных действий
-var lastTriggerAndActionID=0
-func createNewlastTriggerAndActionID(id int,Trigger int,Action int,Effect int)(int,*TriggerAndAction){
-
 	if id==0{
 		lastTriggerAndActionID++
 		id=lastTriggerAndActionID
@@ -68,6 +58,9 @@ func createNewlastTriggerAndActionID(id int,Trigger int,Action int,Effect int)(i
 	node.Effect=Effect
 
 	TriggerAndActionArr[id]=&node
+
+	if doWritingFile{SaveTriggerAndActionArr() }
+
 	return id,&node
 }
 func checkUnicumTriggerAndAction(Trigger int,Action int,Effect int)(int,*TriggerAndAction){
@@ -112,7 +105,7 @@ func SaveTriggerAndActionArr(){
 // ID|ActID через ,|PhraseID через ,|ToneID|MoodID|
 func loadTriggerAndActionArr(){
 	TriggerAndActionArr=make(map[int]*TriggerAndAction)
-	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_psy/action_images.txt")
+	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_psy/trigger_and_actions.txt")
 	cunt:=len(strArr)
 	for n := 0; n < cunt; n++ {
 		if len(strArr[n])==0{
@@ -124,8 +117,9 @@ func loadTriggerAndActionArr(){
 		Trigger,_:=strconv.Atoi(p[1])
 		Action,_:=strconv.Atoi(p[2])
 		Effect,_:=strconv.Atoi(p[3])
-
+var saveDoWritingFile= doWritingFile; doWritingFile =false
 		createNewlastTriggerAndActionID(id,Trigger,Action,Effect)
+doWritingFile =saveDoWritingFile
 	}
 	return
 

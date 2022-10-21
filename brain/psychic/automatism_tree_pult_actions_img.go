@@ -88,7 +88,7 @@ func CreateNewActivityImage(ActID []int)(int,*Activity){
 
 	id,verb:=createNewlastActivityID(0,ActID)
 
-	SaveActivityFromIdArr()
+	if doWritingFile {SaveActivityFromIdArr() }
 
 	return id,verb
 }
@@ -132,8 +132,9 @@ func loadActivityFromIdArr(){
 			si,_:=strconv.Atoi(s[i])
 			ActID=append(ActID,si)
 		}
-
+var saveDoWritingFile= doWritingFile; doWritingFile =false
 		createNewlastActivityID(id,ActID)
+doWritingFile =saveDoWritingFile
 	}
 	return
 

@@ -53,7 +53,7 @@ func createPurposeImageID(id int,veryActual bool,targetID []int,actionID int)(in
 
 	PurposeImageFromID[id]=&node
 
-	SavePurposeImageFromIdArr()
+	if doWritingFile {SavePurposeImageFromIdArr() }
 
 	return id,&node
 }
@@ -109,8 +109,9 @@ func loadPurposeImageFromIdArr(){
 			targetID=append(targetID,si)
 		}
 		actionID,_:=strconv.Atoi(p[3])
-
+var saveDoWritingFile= doWritingFile; doWritingFile =false
 		createPurposeImageID(id,veryActual,targetID,actionID)
+doWritingFile =saveDoWritingFile
 	}
 	return
 

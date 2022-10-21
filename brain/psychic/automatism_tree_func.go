@@ -124,8 +124,10 @@ func loadAutomatizmTree(){
 		SimbolID,_:=strconv.Atoi(p[6])
 		VerbalID,_:=strconv.Atoi(p[7])
 		// новый узел с каждой строкой из файла
+var saveDoWritingFile= doWritingFile; doWritingFile =false
 		createNewAutomatizmNode(AutomatizmTreeFromID[parentID],id,baseID,EmotionID,
 			ActivityID,ToneMoodID,SimbolID,VerbalID)
+doWritingFile =saveDoWritingFile
 	}
 	return
 }
@@ -400,7 +402,7 @@ func formingBranch(fromID int,lastLevel int,condArr []int)(int){
 	lastNodeID:=addNewBranchFromNodes(lastLevel,condArr,lastNode)
 	if lastNodeID>0{
 		if !noRunThisOperation {
-			SaveAutomatizmTree()
+			if doWritingFile {SaveAutomatizmTree() }
 		}
 	}
 	return lastNodeID

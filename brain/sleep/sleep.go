@@ -1,7 +1,7 @@
 /* Cон, его стадии и циклы
 
 В каждом пакете есть флаг  и там для сна выполняется
-	if IsSlipping {
+	if IsSleeping {
 		sleepingProcess()
 	}
 в психике для этого есть psychic_sleep_process.go
@@ -25,10 +25,13 @@ func SleepPuls(evolushnStage int,lifeTime int,puls int){
 	EvolushnStage=evolushnStage
 	SlipPulsCount=puls // передача номера тика из более низкоуровневого пакета
 
-	// разбудить - сторожевая функция - в Пульсе рефлексов вызывает sleep.WakeUpping()
+	// разбудить при включении. Сторожевая функция - в Пульсе рефлексов вызывает sleep.WakeUpping()
+	if SlipPulsCount>3{
+		WakeUpping() // разбудить при включении
+	}
 
 if SlipPulsCount>5{
-	prepareWordArr()
+	prepareWordArr()// обработка накопившегося массива распознанных фраз
 
 
 }

@@ -46,8 +46,8 @@ func orientationConsciousness(kind int)(bool){
 /* НОВИЗНА: CurrentUnderstandingTreeEnd=condArr[currentUnderstandingStepCount:] []int
 - нет еще таких веток, начиная с currentUnderstandingStepCount
 
-	// новый кадр эпизодической памяти, сохраняющий
-   	newEpisodeMemory()  // запись эпизодической памяти saveEpisodicMenory()
+	// новый кадр эпизодической памяти, вызывается только в func calcAutomatizmResult !!!!!
+   	// newEpisodeMemory()  // тут нет возможности записать правило Стимул-Ответ-Эффективность !!!!
 
    	// есть ли очень значимые новые признаки?
    	newsRes:=getImportantSigns()

@@ -36,22 +36,9 @@ func ActionsImageInit(){
 
 
 ////////////////////////////////////////////////
-// создать новое сочетание ответных действий если такого еще нет с ЗАПОМИНАНИЕМ
-func CreateNewActionsImageImage(ActID []int,PhraseID []int,ToneID int,MoodID int)(int,*ActionsImage){
-	oldID,oldVal:=checkUnicumActionsImage(ActID,PhraseID,ToneID,MoodID)
-	if oldVal!=nil{
-		return oldID,oldVal
-	}
-	aImgID,aImg:=createNewlastActionsImageID(0,ActID,PhraseID,ToneID,MoodID)
-
-	SaveActionsImageArr()
-
-	return aImgID,aImg
-}
-/////////////////////////////////////////
-// создать образ сочетаний ответных действий
+// создать новое сочетание ответных действий если такого еще нет 
 var lastActionsImageID=0
-func createNewlastActionsImageID(id int,ActID []int,PhraseID []int,ToneID int,MoodID int)(int,*ActionsImage){
+func СreateNewlastActionsImageID(id int,ActID []int,PhraseID []int,ToneID int,MoodID int)(int,*ActionsImage){
 
 	if id==0{
 		lastActionsImageID++
@@ -71,6 +58,9 @@ func createNewlastActionsImageID(id int,ActID []int,PhraseID []int,ToneID int,Mo
 	node.MoodID=MoodID
 
 	ActionsImageArr[id]=&node
+
+	if doWritingFile { SaveActionsImageArr() }
+
 	return id,&node
 }
 func checkUnicumActionsImage(ActID []int,PhraseID []int,ToneID int,MoodID int)(int,*ActionsImage){
@@ -154,8 +144,9 @@ func loadActionsImageArr(){
 		ToneID:=x
 		x,_=strconv.Atoi(p[4])
 		MoodID:=x
-
-		createNewlastActionsImageID(id,ActID,PhraseID,ToneID,MoodID)
+var saveDoWritingFile= doWritingFile; doWritingFile =false
+		СreateNewlastActionsImageID(id,ActID,PhraseID,ToneID,MoodID)
+doWritingFile =saveDoWritingFile
 	}
 	return
 

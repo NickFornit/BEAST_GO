@@ -56,7 +56,7 @@ func createNewBaseStyle(id int,BaseIDarr []int)(int,*Emotion){
 
 	EmotionFromIdArr[id]=&node
 
-	SaveEmotionArr()
+	if doWritingFile {SaveEmotionArr() }
 
 	return id,&node
 }
@@ -104,7 +104,9 @@ func loadEmotionArr(){
 			bc,_:=strconv.Atoi(s[i])
 			BaseIDarr=append(BaseIDarr,bc)
 		}
+var saveDoWritingFile= doWritingFile; doWritingFile =false
 		createNewBaseStyle(id,BaseIDarr)
+doWritingFile =saveDoWritingFile
 	}
 	return
 }

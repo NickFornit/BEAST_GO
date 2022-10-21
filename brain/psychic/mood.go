@@ -43,7 +43,7 @@ var PsyBaseMood=0 // -1 Плохое настроение, 0 Нормально�
 var PulsCount=0 // передача тика Пульса из brine.go
 var LifeTime=0
 var EvolushnStage=0 // стадия развития
-var IsSlipping=false
+var IsSleeping=false
  */
 func moodePulse(){
 	updatePsyMood(false)

@@ -202,12 +202,13 @@ func loadMentalAutomatizm() {
 		NextID, _ := strconv.Atoi(p[0])
 		Belief, _ := strconv.Atoi(p[1])
 		Count, _ := strconv.Atoi(p[2])
-
+ var saveDoWritingFile= doWritingFile; doWritingFile =false
 		_, a := createMentalAutomatizmID(id, BranchID, Sequence,0)// без проверки на уникальность
 		a.NextID = NextID
 		a.Usefulness = Usefulness
 		a.Count = Count
 		SetMentalAutomatizmBelief(a, Belief)
+doWritingFile =saveDoWritingFile
 	}
 	NoWarningMentalCreateShow = false
 	return

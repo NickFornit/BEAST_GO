@@ -41,40 +41,50 @@ type EpisodeMemory struct {
 //во сне редуцируется с перезаписью подряд оставшихся
 var EpisodeMemoryObjects []*EpisodeMemory
 
-//последний созданный образ эпизодической памяти
-var EpisodeMemoryLastIDFrame=0
+//последний ID эпизода эпизодической памяти
+var EpisodeMemoryLastIDFrameID=0
 
 // последний эпизод, который был осмыслен в лени или во сне
 var EpisodeMemoryLastCalcID=0
 ///////////////////////////////////////////////////////
 
+// период времени прерывания цепочки связанных правил
+var EpisodeMemoryPause=30 // в числе пульсов
+
+/* кэш последних 7 эпизодов EpisodeMemory
+Заполняется как регистр сдвига: последий эпизод делается первым, а все сдвигаются далее.
+ */
+//const EpisodeMemoryChechCount = 7
+//var EpisodeMemoryChech=make([]*EpisodeMemory, EpisodeMemoryChechCount)
 
 /* добавить НОВЫЙ ЭПИЗОД ПАМЯТИ в understanding_tree_orientation.go
 вызывается только в func calcAutomatizmResult:
  */
-func newEpisodeMemory(rulesID int){
+func newEpisodeMemory(rulesID int,kind int)(*EpisodeMemory){
 	// новый эпизод памяти
-	createEpisodeMemoryFrame(detectedActiveLastNodID,
+	em:=createEpisodeMemoryFrame(detectedActiveLastNodID,
+		detectedActiveLastUnderstandingNodID,
 		rulesID,
 		LifeTime,
-		0) // TODO пока не вижу как определять Type т.к. нет произвольной активации
+		kind)
+	return em
 }
 
 
 // создать новый образ сочетаний действий, если такого еще нет
-func createEpisodeMemoryFrame(NodePID int,rulesID int,lifeTime int,Type int)(*EpisodeMemory){
+func createEpisodeMemoryFrame(NodeAID int,NodePID int,rulesID int,lifeTime int,Type int)(*EpisodeMemory){
 
 	var node EpisodeMemory
-	node.NodeAID=NodePID
+	node.NodeAID=NodeAID
 	node.NodePID = NodePID
 	node.RulesID=rulesID
 	node.LifeTime=lifeTime
 	node.Type=Type
 
 	EpisodeMemoryObjects=append(EpisodeMemoryObjects,&node)
-	EpisodeMemoryLastIDFrame=len(EpisodeMemoryObjects)-1
+	EpisodeMemoryLastIDFrameID=len(EpisodeMemoryObjects)-1
 
-	//saveEpisodicMenory() запись каждые 100 пульсов и при корректном выходе
+	if doWritingFile {saveEpisodicMenory() }
 
 	return &node
 }
@@ -108,13 +118,75 @@ func loadEpisodicMenory(){
 			continue
 		}
 		p := strings.Split(strArr[n], "|")
-		NodePID, _ := strconv.Atoi(p[0])
-		RulesID, _ := strconv.Atoi(p[1])
-		lifeTime, _ := strconv.Atoi(p[2])
-		Type, _ := strconv.Atoi(p[3])
-
-		createEpisodeMemoryFrame(NodePID, RulesID, lifeTime, Type)
+		NodeAID, _ := strconv.Atoi(p[0])
+		NodePID, _ := strconv.Atoi(p[1])
+		RulesID, _ := strconv.Atoi(p[2])
+		lifeTime, _ := strconv.Atoi(p[3])
+		Type, _ := strconv.Atoi(p[4])
+var saveDoWritingFile= doWritingFile; doWritingFile =false
+		createEpisodeMemoryFrame(NodeAID, NodePID, RulesID, lifeTime, Type)
+doWritingFile =saveDoWritingFile
 	}
 	return
 }
 ///////////////////////////////////////////
+
+
+/* Добавление нового эпизода в кэш EpisodeMemoryChech
+Заполняется как регистр сдвига: последий эпизод делается первым, а все сдвигаются далее.
+
+func AddEpisodeMemoryChech(episode *EpisodeMemory){
+	if episode == nil {return}
+	// сдвинуть все имеющиеся
+	for i := EpisodeMemoryChechCount-1; i >=0; i-- {
+		EpisodeMemoryChech[i]=EpisodeMemoryChech[i-1]
+	}
+	EpisodeMemoryChech[0]=episode
+}
+// выдает, сколько эпизодов с последнего (первый эпизод) и до времени EpisodeMemoryPause
+func GetEpisodeMemoryChechCount(kind int)(int){
+	var count=0
+	for i := 0; i < EpisodeMemoryChechCount; i++ {
+		em:=EpisodeMemoryChech[i]
+		if em == nil || em.Type != kind || (LifeTime - em.LifeTime) >EpisodeMemoryPause{
+			return count
+		}
+		count++
+	}
+return count
+}*/
+////////////////////////////////////////////
+
+
+/* Создать групповое правило (более одного в цепочке EpisodeMemory.TAid)
+из последнего участка эпизодической памяти объектиынх (EpisodeMemory.Type==0) элеметов.
+ */
+func GetRulesFromEpisodeMemory(kind int){
+	if EpisodeMemoryLastIDFrameID==0{
+		return
+	}
+	var beginID=0
+	for i := EpisodeMemoryLastIDFrameID; i >=0; i-- {
+		em:=EpisodeMemoryObjects[i]
+		if em == nil || em.Type != kind || (LifeTime - em.LifeTime) >EpisodeMemoryPause{
+			break // закончить выборку
+		}
+		beginID++
+	}
+	if beginID > 1 {
+		var taID []int
+		if (EpisodeMemoryLastIDFrameID - beginID) > 1 { // только групповые правила, более 1
+			for i := EpisodeMemoryLastIDFrameID - beginID; i < EpisodeMemoryLastIDFrameID; i++ {
+				em := EpisodeMemoryObjects[i]
+				taID = append(taID, em.RulesID)
+			}
+			// создать новое, групповое правило
+			branchID := EpisodeMemoryObjects[EpisodeMemoryLastIDFrameID].NodeAID
+			rulesID,_:=createNewlastrulesID(0, branchID, taID)
+if rulesID>0 {
+	lib.WritePultConsol("Записано групповое правило № " + strconv.Itoa(rulesID))
+}
+		}
+	}
+}
+//////////////////////////////////////////////////
