@@ -35,6 +35,9 @@ var savePsyMood=0//сила Плохо -10 ... 0 ...+10 Хорошо
 // НОВИЗНА СИТУАЦИИ сохраняется значение CurrentAutomatizTreeEnd[] для решений
 var savedNoveltySituation []int
 
+// отслеживать Правила из Пульта в http://go/pages/rulles.php
+var RullesOutputProcess=false // режим отслеживания
+var RullesOutputStr="" // текущее состояние последний 10 правил
 
 /////////////////////////////////////////////////////////////////////
 // отслеживание запущенных автоматизмов
@@ -49,8 +52,12 @@ var LastAutomatizmWeiting *Automatizm //сбрасывается указате�
 //////////////////////////////////////////////////////////////////////
 
 func setAutomatizmRunning(am *Automatizm,ps *PurposeGenetic){
+	lib.WritePultConsol("<span style='color:blue'>Ожидание ответа оператора.</span>")
+
 	// при срабатывании автоматизма - блокируются все рефлексторные действия
-	MotorTerminalBlocking=true // уже есть, но на всякий случай :)
+	//MotorTerminalBlocking=true
+	notAllowReflexRuning=false //уже есть, но на всякий случай :)
+
 	LastAutomatizmWeiting=am // уже есть, но для надежности :)
 	LastDetectedActiveLastNodID=detectedActiveLastNodID // уже есть, но для надежности :)
 
@@ -66,7 +73,9 @@ func setAutomatizmRunning(am *Automatizm,ps *PurposeGenetic){
 }
 ///////////////////////////////////
 func clinerAutomatizmRunning(){
-	MotorTerminalBlocking=false
+	//MotorTerminalBlocking=false
+	notAllowReflexRuning=false
+
 	LastAutomatizmWeiting=nil
 	LastRunAutomatizmPulsCount=0
 	WasOperatorActiveted=false
@@ -141,6 +150,8 @@ func noAutovatizmResult()(bool){
  */
 func calcAutomatizmResult(lastCommonDiffValue int,lastBetterOrWorse int,wellIDarr []int){
 
+lib.WritePultConsol("<span style='color:blue;background-color:#FFD0FF;'>Был ОТВЕТ ОПЕРАТОРА. До ответа оператора сосотояние: <b>"+strconv.Itoa(lastBetterOrWorse)+"</b>, изменение на: <b>"+strconv.Itoa(lastCommonDiffValue)+"</b></span>")
+
 	// lastBetterOrWorse - точно изменился, иначе бы не было вызова calcAutomatizmResult
 	/// если числа имеют разные знаки (одно положительное, другое отрицательное)
 	if lib.IsDiffersOfSign(LastAutomatizmWeiting.Usefulness,lastBetterOrWorse){
@@ -185,7 +196,7 @@ func calcAutomatizmResult(lastCommonDiffValue int,lastBetterOrWorse int,wellIDar
 		      А так же просматривать эпизод память взад макчимум на EpisodeMemoryPause шагов или до паузы в общении > 30 шагов,
 		   		фиксируя цепочку правил.
 		*/
-		fixNewRules(lastBetterOrWorse)
+		fixNewRules(lastCommonDiffValue)
 	}
 
 	if lastBetterOrWorse<0{// стало хуже
@@ -240,6 +251,9 @@ func wasChangingMoodCondition(kind int)(int,int,[]int){
 		фиксируя цепочку правил.
 */
 func fixNewRules(lastBetterOrWorse int) int {
+	if LastAutomatizmWeiting == nil || LastAutomatizmWeiting == nil{
+		return 0
+	}
 	// образ действий оператора
 	ai1,_:=СreateNewlastActionsImageID(0,curActiveActions.ActID,curActiveActions.PhraseID,curActiveActions.ToneID,curActiveActions.MoodID)
 	if ai1 == 0{return 0}
@@ -248,10 +262,10 @@ func fixNewRules(lastBetterOrWorse int) int {
 	if ai2 == 0{return 0}
 	TriggerAndAction,_:=createNewlastTriggerAndActionID(0,ai1,ai2,lastBetterOrWorse)
 	if TriggerAndAction == 0{return 0}
-	rulesID, _ := createNewlastrulesID(0, detectedActiveLastNodID, []int{TriggerAndAction})
+	rulesID, _ := createNewlastrulesID(0, []int{TriggerAndAction})
 	if rulesID == 0{return 0}
 
-	lib.WritePultConsol("Записано правило № "+strconv.Itoa(rulesID))
+	lib.WritePultConsol("<span style='color:green'>Записано <b>ПРАВИЛО № "+strconv.Itoa(rulesID)+"</b></span>")
 
 	// новый кадр эпизодической памяти, сохраняющий
 	newEpisodeMemory(rulesID,0) // запись эпизодической памяти saveEpisodicMenory()
@@ -259,7 +273,9 @@ func fixNewRules(lastBetterOrWorse int) int {
 	// теперь обрабатываем прошлую эпизодическую память
 	GetRulesFromEpisodeMemory(0)
 
-
+if RullesOutputProcess{// отслеживать Правила из Пульта в http://go/pages/rulles.php
+	RullesOutputStr=getCur10lastRules()
+}
 
 	return rulesID
 }

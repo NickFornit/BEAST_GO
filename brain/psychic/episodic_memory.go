@@ -181,10 +181,9 @@ func GetRulesFromEpisodeMemory(kind int){
 				taID = append(taID, em.RulesID)
 			}
 			// создать новое, групповое правило
-			branchID := EpisodeMemoryObjects[EpisodeMemoryLastIDFrameID].NodeAID
-			rulesID,_:=createNewlastrulesID(0, branchID, taID)
+			rulesID,_:=createNewlastrulesID(0, taID)
 if rulesID>0 {
-	lib.WritePultConsol("Записано групповое правило № " + strconv.Itoa(rulesID))
+	lib.WritePultConsol("<span style='color:green'>Записано групповое <b>ПРАВИЛО № " + strconv.Itoa(rulesID)+"</b></span>")
 }
 		}
 	}

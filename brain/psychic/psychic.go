@@ -63,6 +63,7 @@ func PsychicInit(){
 	EpisodeMemoryInit()
 	initCurrentInformationEnvironment()
 	TriggerAndActionInit()
+	rulesInit()
 	loadSituationImage()
 	mentalAutomatizmInit()
 	UnderstandingTreeInit()
@@ -112,6 +113,7 @@ func PsychicCountPuls(evolushnStage int,lifeTime int,puls int,isSleeping bool){
 	if IsSleeping {
 		sleepingProcess()
 	}
+
 
 	// осознание при включении и бодрствовании - один раз
 	if evolushnStage > 3 && PulsCount >4 && !IsSleeping && !allowConsciousnessProcess {

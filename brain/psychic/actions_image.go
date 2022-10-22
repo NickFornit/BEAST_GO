@@ -10,6 +10,8 @@
 package psychic
 
 import (
+	termineteAction "BOT/brain/terminete_action"
+	word_sensor "BOT/brain/words_sensor"
 	"BOT/lib"
 	"strconv"
 	"strings"
@@ -152,6 +154,45 @@ doWritingFile =saveDoWritingFile
 
 }
 ///////////////////////////////////////////
+
+func GetActionsString(act int)(string){
+	var out=""
+	ai:=ActionsImageArr[act]
+	if ai.ActID != nil {
+		out += "Действие: "
+		for i := 0; i < len(ai.ActID); i++ {
+			if i > 0 {
+				out += ", "
+			}
+			actName:= termineteAction.TerminalActonsNameFromID[ai.ActID[i]]
+			out += "<b>" + actName + "</b>"
+		}
+		out += " "
+	}
+
+	if ai.PhraseID != nil {
+		out += "Фраза: "
+		for i := 0; i < len(ai.PhraseID); i++ {
+			if i > 0 {
+				out += " "
+			}
+			prase := word_sensor.GetPhraseStringsFromPhraseID(ai.PhraseID[i])
+			out += "<b>\""+prase+"\"</b>"
+		}
+		out += " "
+	}
+
+	if ai.ToneID != 0 {
+		out+=" Тон: "+getToneStrFromID(ai.ToneID)+" "
+	}
+
+	if ai.MoodID != 0 {
+		out+=" Настрой: "+getMoodStrFromID(ai.MoodID)+"<br>"
+	}
+
+	return out
+}
+/////////////////////////////////////////
 
 
 

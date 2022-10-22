@@ -38,7 +38,6 @@ import (
  */
 type rules struct {
 	ID int
-	BranchID int// правило создано для последнеего узла дерева в цепочке TAid
 	TAid []int // цепочка стимул-ответов ID TriggerAndAction - последовательность из эпизодов памяти подряд, сохраняющая последовательность общения ( дурак -> сам дурак!, маме скажу -> ябеда, щас в морду дам -> ну попробуй)
 }
 
@@ -50,18 +49,21 @@ var rulesArr=make(map[int]*rules)
 // вызывается из psychic.go
 func rulesInit(){
 	loadrulesArr()
+
+//	getCur10lastRules()
+	RullesOutputStr=getCur10lastRules()// чтобы что-то было сразу
 }
 
 
 ////////////////////////////////////////////////
 // создать новое сочетание ответных действий если такого еще нет
 var lastrulesID=0
-func createNewlastrulesID(id int,BranchID int,TAid []int)(int,*rules){
+func createNewlastrulesID(id int,TAid []int)(int,*rules){
 	if TAid == nil{
 		return 0,nil
 	}
 
-	oldID,oldVal:=checkUnicumrules(BranchID,TAid)
+	oldID,oldVal:=checkUnicumrules(TAid)
 	if oldVal!=nil{
 		return oldID,oldVal
 	}
@@ -77,7 +79,6 @@ func createNewlastrulesID(id int,BranchID int,TAid []int)(int,*rules){
 
 	var node rules
 	node.ID = id
-	node.BranchID = BranchID
 	node.TAid=TAid
 
 	rulesArr[id]=&node
@@ -86,11 +87,8 @@ func createNewlastrulesID(id int,BranchID int,TAid []int)(int,*rules){
 
 	return id,&node
 }
-func checkUnicumrules(BranchID int,TAid []int)(int,*rules){
+func checkUnicumrules(TAid []int)(int,*rules){
 	for id, v := range rulesArr {
-		if BranchID != v.BranchID {
-			continue
-		}
 		if !lib.EqualArrs(TAid,v.TAid) {
 			continue
 		}
@@ -113,7 +111,6 @@ func SaveRulesArr(){
 	var out=""
 	for k, v := range rulesArr {
 		out+=strconv.Itoa(k)+"|"
-		out+=strconv.Itoa(v.BranchID)+"|"
 		for i := 0; i < len(v.TAid); i++ {
 			out+=strconv.Itoa(v.TAid[i])+","
 		}
@@ -135,8 +132,7 @@ func loadrulesArr(){
 		p:=strings.Split(strArr[n], "|")
 		id,_:=strconv.Atoi(p[0])
 
-		BranchID,_:=strconv.Atoi(p[1])
-		s:=strings.Split(p[2], ",")
+		s:=strings.Split(p[1], ",")
 		var TAid[] int
 		for i := 0; i < len(s); i++ {
 			if len(s[i])==0{
@@ -146,10 +142,33 @@ func loadrulesArr(){
 			TAid=append(TAid,si)
 		}
 var saveDoWritingFile= doWritingFile; doWritingFile =false
-		createNewlastrulesID(id,BranchID,TAid)
+		createNewlastrulesID(id,TAid)
 doWritingFile =saveDoWritingFile
 	}
 	return
 
+}
+///////////////////////////////////////////
+
+
+//отслеживать Правила из Пульта в http://go/pages/rulles.php
+func getCur10lastRules()string{
+rCount:=lastrulesID
+if rCount >10{
+	rCount=10
+}
+var out=""
+	for i := 0; i < rCount; i++ {
+		r:=rulesArr[lastrulesID-i]
+		for n := 0; n < len(r.TAid); n++ {
+			taa:=TriggerAndActionArr[r.TAid[n]]
+			out+="ID="+strconv.Itoa(r.ID)+". "
+			out+="Стимул: "+GetActionsString(taa.Trigger)+" "
+			out+="Ответ: "+GetActionsString(taa.Action)+" "
+			out+="Эффект: <b>"+strconv.Itoa(taa.Effect)+"</b>"
+		}
+		out+="<hr>"
+	}
+return out
 }
 ///////////////////////////////////////////

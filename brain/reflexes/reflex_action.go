@@ -19,6 +19,8 @@ import (
 	"strconv"
 )
 
+
+
 /* Образы сочетаний действий Beast - при выполнении ТОЛЬКО рефлексов НО НЕ автоматизмов */
 
 // последний образ сочетаний действий Beast
@@ -191,8 +193,12 @@ func ExpensesGomeostatParametersAfterAction(actID int) {
 
 // совершение действий и возможность их блокировки
 func todoAction(out string) {
+	if !psychic.GetAllowReflexRuning() {
+		return }
 	// блокировка во время сна
-	if IsBlockingMotorsAction() { return }
+	if IsBlockingMotorsAction() {
+		return }
+
 	lib.SentActionsForPult(out)
 }
 
@@ -206,6 +212,9 @@ return false
 
 // запустить готовые к выполнению рефлексы
 func toRunRefleses() {
+	if !psychic.GetAllowReflexRuning() {
+		lib.WritePultConsol("<span style='color:red'>Рефлекс <b>заблокирован</b></span>")
+		return }
 	// очистить буфер передачи действий на пульт
 	// lib.ActionsForPultStr = ""
 	lastActivnostFromPult=ReflexPulsCount // сбросить отчет времени бездействия

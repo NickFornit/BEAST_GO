@@ -28,10 +28,13 @@ import (
 	termineteAction "BOT/brain/terminete_action"
 	word_sensor "BOT/brain/words_sensor"
 	"BOT/lib"
+	"strconv"
 )
 
-// при срабатывании автоматизма - блокируются все рефлексторные действия
+// блокировка действий во сне и при совершаемых действиях
 var MotorTerminalBlocking=false
+
+
 
 ////////////////////////////////////////////////
 
@@ -56,12 +59,31 @@ func RumAutomatizmID(id int)(bool){
 	return RumAutomatizm(a)
 }
 ////////////////////
+
+/* запрос из рефлексов, можно ли выполнять рефлекс if !psychic.getAllowReflexRuning(){ return }
+РЕфлексы разблокируются через
+ */
+var notAllowReflexRuning=false
+func GetAllowReflexRuning()(bool){
+	if notAllowReflexRuning || MotorTerminalBlocking{
+		return false
+	}
+	return true
+}
+////////////////////////////////////////////////////
+
+
+
 // todo = true - выполнить полюбому,
 func RumAutomatizm(am *Automatizm)(bool){
 	if am==nil{
 		return false
 	}
 	if MotorTerminalBlocking { //блокировка моторных терминалов во сне или произвольно
+		return false
+	}
+	// не запускать новых автоматизмов в период ожидания ответа оператора
+	if LastRunAutomatizmPulsCount > 0{
 		return false
 	}
 
@@ -73,11 +95,12 @@ func RumAutomatizm(am *Automatizm)(bool){
 		return false
 	}
 
-// блокировка выполнения плохого автоматизма, если только не применена "ИЛА ВОЛИ"
+// блокировка выполнения плохого автоматизма, если только не применена "СИЛА ВОЛИ"
 if am.Usefulness<0{
-
 	return false
 }
+	notAllowReflexRuning=true // блокировка рефлексов
+	LastRunAutomatizmPulsCount =PulsCount // активность мот.автоматизма в чисде пульсов
 
 	var out="3|"
 
@@ -88,8 +111,7 @@ if am.Usefulness<0{
 	//выполнить мозжечковый рефлекс сразу после выполняющегося автоматизма
 	runCerebellumAdditionalAutomatizm(0,am.ID)
 
-	MotorTerminalBlocking=true // блокировка рефлексов
-	LastRunAutomatizmPulsCount =PulsCount // активность мот.автоматизма в чисде пульсов
+
 	LastAutomatizmWeiting=am
 	LastDetectedActiveLastNodID=detectedActiveLastNodID
 	/* Блокировать выполнение рефлексов на время ожидания результата автоматизма
@@ -130,6 +152,9 @@ func GetAutomotizmActionsString(am *Automatizm)(string){
 	if ai.MoodID != 0 {
 		out+="<br>"+getMoodStrFromID(ai.MoodID)+"<br>"
 	}
+
+	lib.WritePultConsol("<span style='color:blue;background-color:#FFFFA3;'>Запускается АВТОМАТИЗМ ID = "+strconv.Itoa(am.ActionsImageID)+" "+out+"</span>: ")
+
 	return out
 }
 /////////////////////////////////////////

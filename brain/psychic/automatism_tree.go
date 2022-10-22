@@ -140,6 +140,20 @@ func automatizmTreeActivation()(int){
 		return 0
 	}
  */
+
+// не активировать дерево по изменению гомеостатуса во время ожидания ответа оператора
+//  LastRunAutomatizmPulsCount устанавливается в RumAutomatizm(
+if LastRunAutomatizmPulsCount > 0{
+if !WasOperatorActiveted {
+	return 0
+}
+
+}else{
+	// гасить паразитные MotorTerminalBlocking вне периода ожидания
+//	MotorTerminalBlocking=false
+}
+
+
 	detectedActiveLastNodID=0
 	ActiveBranchNodeArr=nil
 	CurrentAutomatizTreeEnd=nil
@@ -327,10 +341,14 @@ func afterTreeActivation()(bool){
 		orientation(currentAutomatizmAfterTreeActivatedID)
 		// если автоматизм прошел проверку, то он уже был запущен
 		return true // блокировка рефлексов, если automatizmID > 0
-	}
+	}else {
 		// автоматизма нет у недоделанной ветки
 		orientation(0)
-		return false
+
+		return true // блокировка рефлексов, если automatizmID > 0
+	}
+
+	return false
 }
 //////////////////////////////////////////////////////////
 

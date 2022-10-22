@@ -84,7 +84,7 @@ if am.Usefulness<0{
 	//выполнить мозжечковый рефлекс сразу после выполняющегося автоматизма
 	//runCerebellumAdditionalMentalAutomatizm(0,am.ID)
 
-	MotorTerminalBlocking=true // блокировка рефлексов
+	notAllowReflexRuning=true // блокировка рефлексов
 	LastRunMentalMentalAutomatizmPulsCount =PulsCount // активность мот.автоматизма в чисде пульсов
 	LastMentalMentalAutomatizmWeiting=am
 	LastDetectedActiveLastMentalNodID=detectedActiveLastNodID

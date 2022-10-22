@@ -145,7 +145,7 @@ func activeReflexTree() {
 					}
 			}
 			// в консоль:
-			consol := "РЕФЛЕКС: "
+			consol := "Попытка запуска РЕФЛЕКС: "
 			for c := 0; c < len(oldReflexesIdArr); c++ {
 				consol += "ID=" + strconv.Itoa(oldReflexesIdArr[c]) + "; "
 			}
@@ -160,6 +160,8 @@ func activeReflexTree() {
 					NoUnconditionRefles = "NOREFLEX" + GetCurrentConditionsStr() // СТРОКА УСЛОВИЙ ДЛЯ РЕФЛЕКСА
 				}
 			}
+
+
 			// ДЛЯ ПСИХИКИ:
 			veryActual, targetArrID, acrArr := GetActualReflexAction()
 			// сортировка действий рефлексов по убыванию значимости

@@ -22,6 +22,7 @@ import (
 	"BOT/brain/gomeostas"
 	"BOT/brain/psychic"
 	"BOT/brain/sleep"
+	"BOT/lib"
 )
 
 // Создание образов сочетаний ID действий:
@@ -145,6 +146,9 @@ func ActiveFromConditionChange() {
 	res := psychic.SensorActivation(ActivationTypeSensor)
 
 	if res { // блокировать выполнение рефлексов
+		if len(oldReflexesIdArr)> 0 || len(geneticReflexesIdArr) > 0 {
+			lib.WritePultConsol("<span style='color:red'>Рефлекс <b>заблокирован</b></span>")
+		}
 		return
 	}
 	// запустить рефлексы
@@ -184,6 +188,9 @@ func ActiveFromAction() {
 	// активировать дерево автоматизмов
 	res := psychic.SensorActivation(ActivationTypeSensor)
 	if res { // блокировать выполнение рефлексов
+		if len(oldReflexesIdArr)> 0 || len(geneticReflexesIdArr) > 0 {
+			lib.WritePultConsol("<span style='color:red'>Рефлекс <b>заблокирован</b></span>")
+		}
 		return
 	}
 
@@ -223,6 +230,9 @@ func ActiveFromPhrase() {
 	// активировать дерево автоматизмов
 	res := psychic.SensorActivation(ActivationTypeSensor)
 	if res { // блокировать выполнение рефлексов
+		if len(oldReflexesIdArr)> 0 || len(geneticReflexesIdArr) > 0 {
+			lib.WritePultConsol("<span style='color:red'>Рефлекс <b>заблокирован</b></span>")
+		}
 		return
 	}
 

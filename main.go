@@ -418,6 +418,15 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				return
 			}
 
+			get_rulles_list_info := r.FormValue("get_rulles_list_info")
+			if get_rulles_list_info =="1" {
+				psychic.RullesOutputProcess=true
+				ref := psychic.RullesOutputStr
+				psychic.RullesOutputProcess=false
+				_, _ = fmt.Fprint(resp, ref)
+				return
+			}
+
 			make_automatizms_from_reflexes := r.FormValue("make_automatizms_from_reflexes")
 			if len(make_automatizms_from_reflexes) == 1 {
 				ref := reflexes.RunMakeAutomatizmsFromReflexes()
