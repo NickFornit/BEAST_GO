@@ -327,14 +327,10 @@ func afterTreeActivation()(bool){
 		orientation(currentAutomatizmAfterTreeActivatedID)
 		// если автоматизм прошел проверку, то он уже был запущен
 		return true // блокировка рефлексов, если automatizmID > 0
-	}else {
+	}
 		// автоматизма нет у недоделанной ветки
 		orientation(0)
-
-		return true // блокировка рефлексов, если automatizmID > 0
-	}
-
-	return false
+		return false
 }
 //////////////////////////////////////////////////////////
 
