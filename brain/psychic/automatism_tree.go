@@ -343,14 +343,12 @@ func afterTreeActivation()(bool){
 		if atzm>0{// блокировка рефлексов, если automatizmID > 0
 			return true
 		}
-		return false 
 	}else {
 		// автоматизма нет у недоделанной ветки
 		atzm:=orientation(0)
 		if atzm>0{// блокировка рефлексов, если automatizmID > 0
 			return true
 		}
-		return false  
 	}
 
 	return false
