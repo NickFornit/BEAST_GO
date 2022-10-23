@@ -57,7 +57,7 @@ func FormingMirrorAutomatizmFromList(file string) string {
 		// создать образ Брока
 		CreateVerbalImage(FirstSimbolID, PhraseID, 0, 0)
 
-		nodeID := FindConditionsNode(baseID, lev2, nil, tm, PhraseID[0], FirstSimbolID)
+		nodeID := FindConditionsNode(baseID, lev2, nil, FirstSimbolID, tm, PhraseID[0])
 		/* если есть привязанный к узлу автоматизм, то он просто перестанет быть штатным,
 		т.к. авторитерный (зеркальный) автоматизм важнее
 		exists:=ExistsAutomatizmForThisNodeID(nodeID)
@@ -205,7 +205,7 @@ func findTreeNodeFromAutomatizmActionsImage(baseID int, EmotionID int, ActionsIm
 
 	tm := GetToneMoodID(ai.ToneID, ai.MoodID + 19)
 
-	nodeID := FindConditionsNode(baseID, lev2, ai.ActID, ai.PhraseID[0], simbolID, tm)
+	nodeID := FindConditionsNode(baseID, lev2, ai.ActID, tm, simbolID, ai.PhraseID[0])
 	if nodeID > 0 {
 		return nodeID
 	}
