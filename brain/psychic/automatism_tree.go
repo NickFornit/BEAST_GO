@@ -338,14 +338,19 @@ func afterTreeActivation()(bool){
 	//более примитивное реагирование, EvolushnStage < 4
 	if currentAutomatizmAfterTreeActivatedID > 0 { //ориентировочный рефлекс 2
 		// проверить подходит ли автоматизм к текущим условиям, если нет, - режим нахождения альтернативы  - ориентировочный рефлекс 2
-		orientation(currentAutomatizmAfterTreeActivatedID)
+		atzm:=orientation(currentAutomatizmAfterTreeActivatedID)
 		// если автоматизм прошел проверку, то он уже был запущен
-		return true // блокировка рефлексов, если automatizmID > 0
+		if atzm>0{// блокировка рефлексов, если automatizmID > 0
+			return true
+		}
+		return false 
 	}else {
 		// автоматизма нет у недоделанной ветки
-		orientation(0)
-
-		return true // блокировка рефлексов, если automatizmID > 0
+		atzm:=orientation(0)
+		if atzm>0{// блокировка рефлексов, если automatizmID > 0
+			return true
+		}
+		return false  
 	}
 
 	return false
