@@ -160,12 +160,21 @@ if rCount >10{
 var out=""
 	for i := 0; i < rCount; i++ {
 		r:=rulesArr[lastrulesID-i]
+		out+="ID="+strconv.Itoa(r.ID)+":"
 		for n := 0; n < len(r.TAid); n++ {
 			taa:=TriggerAndActionArr[r.TAid[n]]
-			out+="ID="+strconv.Itoa(r.ID)+". "
+			if taa == nil{
+				continue
+			}
+			if n>0{
+				out+="<span style='padding:40px;'></span>"
+			}else{
+				out+="<span style='padding:10px;'></span>"
+			}
 			out+="Стимул: "+GetActionsString(taa.Trigger)+" "
 			out+="Ответ: "+GetActionsString(taa.Action)+" "
 			out+="Эффект: <b>"+strconv.Itoa(taa.Effect)+"</b>"
+			out+="<br>"
 		}
 		out+="<hr>"
 	}

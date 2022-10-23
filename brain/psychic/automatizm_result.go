@@ -251,12 +251,14 @@ func wasChangingMoodCondition(kind int)(int,int,[]int){
 		фиксируя цепочку правил.
 */
 func fixNewRules(lastBetterOrWorse int) int {
-	if LastAutomatizmWeiting == nil || LastAutomatizmWeiting == nil{
+	if LastAutomatizmWeiting == nil{
 		return 0
 	}
 	// образ действий оператора
 	ai1,_:=СreateNewlastActionsImageID(0,curActiveActions.ActID,curActiveActions.PhraseID,curActiveActions.ToneID,curActiveActions.MoodID)
-	if ai1 == 0{return 0}
+	if ai1 == 0  || LastAutomatizmWeiting == nil {
+		return 0
+	}
 	// ответный образ действий Beast
 	ai2:=LastAutomatizmWeiting.ActionsImageID
 	if ai2 == 0{return 0}
@@ -275,6 +277,7 @@ func fixNewRules(lastBetterOrWorse int) int {
 
 if RullesOutputProcess{// отслеживать Правила из Пульта в http://go/pages/rulles.php
 	RullesOutputStr=getCur10lastRules()
+	RullesOutputProcess=false
 }
 
 	return rulesID

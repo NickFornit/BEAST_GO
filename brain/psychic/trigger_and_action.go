@@ -19,7 +19,7 @@ type TriggerAndAction struct {
 	ID int
 	Trigger int // образ пусковых стимулов
 	Action int // образ действий
-	Effect int // эффект от действий - lastBetterOrWorse
+	Effect int // эффект от действий: -1 или 0 или 1
 }
 ////////////////////////
 
@@ -37,6 +37,9 @@ func TriggerAndActionInit(){
 // создать новое сочетание ответных действий если такого еще нет
 var lastTriggerAndActionID=0
 func createNewlastTriggerAndActionID(id int,Trigger int,Action int,Effect int)(int,*TriggerAndAction){
+	if Effect<0{Effect=-1}
+	if Effect>0{Effect=1}
+
 	oldID,oldVal:=checkUnicumTriggerAndAction(Trigger,Action,Effect)
 	if oldVal!=nil{
 		return oldID,oldVal

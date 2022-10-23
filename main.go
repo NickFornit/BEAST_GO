@@ -422,7 +422,6 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 			if get_rulles_list_info =="1" {
 				psychic.RullesOutputProcess=true
 				ref := psychic.RullesOutputStr
-				psychic.RullesOutputProcess=false
 				_, _ = fmt.Fprint(resp, ref)
 				return
 			}
