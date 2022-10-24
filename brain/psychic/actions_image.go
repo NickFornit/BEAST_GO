@@ -146,10 +146,9 @@ func loadActionsImageArr(){
 			si,_:=strconv.Atoi(s[i])
 			PhraseID=append(PhraseID,si)
 		}
-		x,_:=strconv.Atoi(p[3])
-		ToneID:=x
-		x,_=strconv.Atoi(p[4])
-		MoodID:=x
+		ToneID,_:=strconv.Atoi(p[3])
+		MoodID,_:=strconv.Atoi(p[4])
+
 var saveDoWritingFile= doWritingFile; doWritingFile =false
 		СreateNewlastActionsImageID(id,ActID,PhraseID,ToneID,MoodID)
 doWritingFile =saveDoWritingFile

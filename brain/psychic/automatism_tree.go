@@ -113,8 +113,8 @@ func createBasicAutomatizmTree(){
 
 // структура действий оператора при активации дерева автоматизмов
 var curActiveActions ActionsImage
-
-
+// структура образа текущего сосотояния
+var curBaseStateImage BaseStateImage
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /* попытка активации дерева автоматизмов, если неудачно - начать искать вариант действий
@@ -141,18 +141,15 @@ func automatizmTreeActivation()(int){
 	}
  */
 
+/* ТЕПЕПЕРЬ ВСЕГДА АКТИВИРОВАТЬ потому как и по изменению состояния формируются Правила.
+Но нужно блокировать ор.рефлексы!
 // не активировать дерево по изменению гомеостатуса во время ожидания ответа оператора
 //  LastRunAutomatizmPulsCount устанавливается в RumAutomatizm(
 if LastRunAutomatizmPulsCount > 0{
 if !WasOperatorActiveted {
 	return 0
 }
-
-}else{
-	// гасить паразитные MotorTerminalBlocking вне периода ожидания
-//	MotorTerminalBlocking=false
-}
-
+ */
 
 	detectedActiveLastNodID=0
 	ActiveBranchNodeArr=nil
@@ -166,6 +163,10 @@ if !WasOperatorActiveted {
 
 	bsIDarr:=gomeostas.GetCurContextActiveIDarr()
 	lev2,_:=createNewBaseStyle(0,bsIDarr)
+
+	curBaseStateImage.Mood=lev1
+	curBaseStateImage.EmotionID=lev2
+	curBaseStateImage.SituationID=0 // будет определн при активации дерева понимания, может и не быть выбранной ситуации
 
 ActID:=action_sensor.CheckCurActionsContext();//CheckCurActions()
 
@@ -296,10 +297,11 @@ func conditionAutomatizmFound(level int,cond []int,node *AutomatizmNode){
 
 если нет никаких действий, то возвращает false, инчае - true для блокировки более низкоуровневого
  */
+var onliOnceWasConditionsActiveted=false // т.к. опять может продолжиться изменение состояния в период ожидания
 func afterTreeActivation()(bool){
 
 // Был запущен моторный автоматизм (в том числе и ментальным автоматизмом)
-	if LastRunAutomatizmPulsCount >0{// обработка периода ожидания ответа оператора
+if LastRunAutomatizmPulsCount >0{// обработка периода ожидания ответа оператора
 		// 	Контроль за изменением состояния, возвращает:
 		//	lastCommonDiffValue - насколько изменилось общее состояние
 		//  	lastBetterOrWorse - стали лучше или хуже: величина измнения от -10 через 0 до 10
@@ -312,15 +314,35 @@ func afterTreeActivation()(bool){
 // по результатам обработки, но до очистки 	LastRunAutomatizmPulsCount и LastAutomatizmWeiting
 			if EvolushnStage > 3 {
 // Активировать Дерево Понимания: или запустить ментальный автоматизм или - ориентировочная реакция для осмысления
-				understandingSituation()
+				understandingSituation() // нельзя здесь делать прерывание! после обработки ожидаемой реакции Оператора - следует реакция Beast
+				// return true
 			}
-
+// закончить период ожидания после реакции оператора
 			clinerAutomatizmRunning()
+			WasConditionsActiveted = false // иначе сразу сработает fixRulesBaseStateImage после изменения состояния при действияъ
 		}
-//  после обработки ожидаемой реакции Оператора - следует реакция Beast
-//		return true
-	}// конец обработки ожидания ответа оператора
 
+	if !onliOnceWasConditionsActiveted {// только один раз во время периода ожидания
+		onliOnceWasConditionsActiveted = true
+		if WasConditionsActiveted { // изменились условия (не действия оператора)
+			WasConditionsActiveted = false
+			if EvolushnStage > 3 {
+				lastCommonDiffValue, _, _ := wasChangingMoodCondition(2)
+				// обработать изменение состояния - записать Правило типа BaseStateImage
+				fixRulesBaseStateImage(lastCommonDiffValue)
+				// Активировать Дерево Понимания: или запустить ментальный автоматизм или - ориентировочная реакция для осмысления
+				understandingSituation()
+
+				// НЕ заканчивать период ожидания после переактивации по изменившимся условиям, но не запускать ор.рефлекс:
+				return true
+			}
+		}
+	}
+//  после обработки ожидаемой реакции Оператора - следует реакция Beast
+//		return true  поэтому нельзя здесь делать прерывание!
+}// конец обработки ожидания ответа оператора
+
+// ОБРАБОТКА ВНЕ ПЕРИОДА ОЖИДАНИЯ ОТВЕТА
 	// ЕСТЬ ЛИ АВТОМАТИЗМ В ВЕТКЕ и болеее ранних? выбрать лучший автоматизм для сформированной ветки nodeID
 	currentAutomatizmAfterTreeActivatedID = getAutomatizmFromNodeID(detectedActiveLastNodID)
 

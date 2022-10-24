@@ -110,6 +110,7 @@ func understandingSituation()(bool){
 	if situationImageID<0{// нет выбранной ситуации
 			return false
 		}
+	curBaseStateImage.SituationID=situationImageID
 
 	saveSituationImageID=situationImageID
 	ps:=getPurposeGenetic() // - тут уже сохраняется savePurposeGenetic

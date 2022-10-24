@@ -25,6 +25,8 @@ import (
 */
 var WasOperatorActiveted=false
 
+var WasConditionsActiveted=false
+
 // период ожидания реакции оператора на действие автоматизма
 const WaitingPeriodForActionsVal=20
 
@@ -79,6 +81,7 @@ func clinerAutomatizmRunning(){
 	LastAutomatizmWeiting=nil
 	LastRunAutomatizmPulsCount=0
 	WasOperatorActiveted=false
+	onliOnceWasConditionsActiveted=false
 // !!!! НЕ СБРАСЫВАТЬ savePurposeGenetic=nil - он может определяться независимо от запуска автоматизма
 }
 ///////////////////////////////////
@@ -122,19 +125,21 @@ func noAutovatizmResult()(bool){
 		   Создание автоматизма, повторяющего действия оператора в данных условиях
 		НО если уже помылался provokatorMirrorAutomatizm то больше не делать этого (бесконечный цикл)
 	*/
-		if oldProvokatorAutomatizm != LastAutomatizmWeiting {
+		if oldProvokatorAutomatizm != LastAutomatizmWeiting {// не повторять, если только что был такой ответ
 			provokatorMirrorAutomatizm(LastAutomatizmWeiting, &CurrentPurposeGenetic)
 			clinerAutomatizmRunning()
 			return true
 		}
 	}
 
-	// реакция была, но но оператор не обратил на нее внимания, нужно усилить силу действия
+	// реакция была, но но оператор не обратил на нее внимания, нужно усилить силу действия мозжечковым рефлексом
 	if cerebellumCoordination(LastAutomatizmWeiting,1){
 		// и тут же снова запустить реакцию!
-		setAutomatizmRunning(LastAutomatizmWeiting, &CurrentPurposeGenetic)
-		clinerAutomatizmRunning()
-		return true
+		if oldProvokatorAutomatizm != LastAutomatizmWeiting {// не повторять, если только что был такой ответ
+			setAutomatizmRunning(LastAutomatizmWeiting, &CurrentPurposeGenetic)
+			clinerAutomatizmRunning()
+			return true
+		}
 	}
 	clinerAutomatizmRunning()
 	return false
@@ -199,7 +204,8 @@ lib.WritePultConsol("<span style='color:blue;background-color:#FFD0FF;'>Был �
 		      А так же просматривать эпизод память взад макчимум на EpisodeMemoryPause шагов или до паузы в общении > 30 шагов,
 		   		фиксируя цепочку правил.
 		*/
-		fixNewRules(lastCommonDiffValue)
+		ai1, _ := СreateNewlastActionsImageID(0, curActiveActions.ActID, curActiveActions.PhraseID, curActiveActions.ToneID, curActiveActions.MoodID)
+		fixNewRules(lastCommonDiffValue,ai1)
 	}
 
 	if lastBetterOrWorse<0{// стало хуже
@@ -253,19 +259,19 @@ func wasChangingMoodCondition(kind int)(int,int,[]int){
    А так же просматривать эпизод память взад макчимум на 6 шагов или до паузы в общении > EpisodeMemoryPause шагов,
 		фиксируя цепочку правил.
 */
-func fixNewRules(lastBetterOrWorse int) int {
+func fixNewRules(lastCommonDiffValue int,ai1 int) int {
 	if LastAutomatizmWeiting == nil{
 		return 0
 	}
+
 	// образ действий оператора
-	ai1,_:=СreateNewlastActionsImageID(0,curActiveActions.ActID,curActiveActions.PhraseID,curActiveActions.ToneID,curActiveActions.MoodID)
 	if ai1 == 0  || LastAutomatizmWeiting == nil {
 		return 0
 	}
 	// ответный образ действий Beast
 	ai2:=LastAutomatizmWeiting.ActionsImageID
 	if ai2 == 0{return 0}
-	TriggerAndAction,_:=createNewlastTriggerAndActionID(0,ai1,ai2,lastBetterOrWorse)
+	TriggerAndAction,_:=createNewlastTriggerAndActionID(0,ai1,ai2,lastCommonDiffValue)
 	if TriggerAndAction == 0{return 0}
 	rulesID, _ := createNewlastrulesID(0, []int{TriggerAndAction})
 	if rulesID == 0{return 0}
@@ -286,3 +292,12 @@ if RullesOutputProcess{// отслеживать Правила из Пульт�
 	return rulesID
 }
 ///////////////////////////////////////////////////////////////////////
+
+
+// обработать изменение состояния - записать Правило типа BaseStateImage
+func fixRulesBaseStateImage(lastCommonDiffValue int){
+	ai1, _ := СreateNewlastBaseStateImageID(0, curBaseStateImage.Mood, curBaseStateImage.EmotionID, curBaseStateImage.SituationID)
+	ai1*=-1 // отрицательное значение идентифицирует образ - как текущего сосотояния!!!
+	fixNewRules(lastCommonDiffValue,ai1)
+}
+/////////////////////////////////////////////////////////////////////

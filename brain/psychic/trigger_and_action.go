@@ -17,8 +17,12 @@ import (
 
 type TriggerAndAction struct {
 	ID int
-	Trigger int // образ пусковых стимулов
-	Action int // образ действий
+/*образ пусковых стимулов:
+  >0 - образы действий оператора с Пульта ActionsImage,
+  <0 - образ текущей ситуации
+ */
+	Trigger int
+	Action int // образ ответных действий - всегда ActionsImage
 	Effect int // эффект от действий: -1 или 0 или 1
 }
 ////////////////////////

@@ -104,7 +104,7 @@ func checkUnicumrules(TAid []int)(int,*rules){
 
 
 
-//////////////////// сохранить Образы стимула (действий оператора) - ответа Beast
+//////////////////// сохранить Образы rules
 //В случае отсуствия ответных действий создается ID такого отсутсвия, пример такой записи: 2|||0|0|
 // ID|ActID через ,|PhraseID через ,|ToneID|MoodID|
 func SaveRulesArr(){
@@ -119,7 +119,7 @@ func SaveRulesArr(){
 	lib.WriteFileContent(lib.GetMainPathExeFile()+"/memory_psy/rules.txt",out)
 
 }
-////////////////////  загрузить образы стимула (действий оператора) - ответа Beast
+////////////////////  загрузить образы rules
 // ID|ActID через ,|PhraseID через ,|ToneID|MoodID|
 func loadrulesArr(){
 	rulesArr=make(map[int]*rules)
@@ -171,7 +171,12 @@ var out=""
 			}else{
 				out+="<span style='padding:10px;'></span>"
 			}
-			out+="Стимул: "+GetActionsString(taa.Trigger)+" "
+			if taa.Trigger >0 {
+				out += "Стимул: " + GetActionsString(taa.Trigger) + " "
+			}
+			if taa.Trigger <0 {
+				out += "Стимул: " + GetBaseStateImageString(taa.Trigger) + " "
+			}
 			out+="Ответ: "+GetActionsString(taa.Action)+" "
 			out+="Эффект: <b>"+strconv.Itoa(taa.Effect)+"</b>"
 			out+="<br>"
@@ -181,3 +186,16 @@ var out=""
 return out
 }
 ///////////////////////////////////////////
+
+
+///////////////////////////////////////////
+/*  выбрать подходящее правило в текущей ситуации
+
+ */
+func getSuitableRules()(*rules){
+	// Текущая ситуация - массив самых последних кадров эпизодической памяти.
+
+
+	return nil
+}
+//////////////////////////////////////////////

@@ -100,10 +100,10 @@ if am.Usefulness<0{
 	return false
 }
 	notAllowReflexRuning=true // блокировка рефлексов
+	LastAutomatizmWeiting=am
 	LastRunAutomatizmPulsCount =PulsCount // активность мот.автоматизма в чисде пульсов
 
 	var out="3|"
-
 	out+=GetAutomotizmActionsString(am)
 
 	lib.SentActionsForPult(out)
@@ -111,8 +111,6 @@ if am.Usefulness<0{
 	//выполнить мозжечковый рефлекс сразу после выполняющегося автоматизма
 	runCerebellumAdditionalAutomatizm(0,am.ID)
 
-
-	LastAutomatizmWeiting=am
 	LastDetectedActiveLastNodID=detectedActiveLastNodID
 	/* Блокировать выполнение рефлексов на время ожидания результата автоматизма
 	вызывается из reflex_action.go рефлексов

@@ -43,7 +43,7 @@ import (
 ///////////////////////////////
 
 // true - ПРИ ТЕСТИРОВАНИИ СОХРАНЯТЬ В ФАЙЛАХ ВСЕ ЭЛЕМЕНТЫ
-var doWritingFile =true
+var doWritingFile =true // true  false
 
 ///////////////////////////////////////////////////////////////////////
 // инициализирующий блок - в порядке последовательности инициализаций
@@ -62,6 +62,7 @@ func PsychicInit(){
 	cerebellumReflexInit()
 	EpisodeMemoryInit()
 	initCurrentInformationEnvironment()
+	BaseStateImageInit()
 	TriggerAndActionInit()
 	rulesInit()
 	loadSituationImage()
@@ -228,6 +229,7 @@ func SaveAllPsihicMemory(){
 	SaveCerebellumReflex()
 	SaveUnderstandingTree()
 	saveEpisodicMenory()
+	SaveBaseStateImageArr()
 	SaveTriggerAndActionArr()
 	SaveRulesArr()
 	SaveMentalAutomatizm()

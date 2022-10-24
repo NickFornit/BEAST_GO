@@ -86,6 +86,7 @@ func ReflexCountPuls(evolushnStage int, lifeTime int, puls int, isSlipping bool)
 	if oldActiveCurTriggerStimulsID > 0 && oldActiveCurTriggerStimulsPulsCount > (ReflexPulsCount + 10) {
 		oldActiveCurTriggerStimulsID = 0
 	}
+
 }
 
 // АКТИВАЦИЯ ДЕРЕВА РЕФЛЕКСОВ ПО изменению условий, действиям с Пульта или фразе с Пульта
@@ -143,6 +144,7 @@ func ActiveFromConditionChange() {
 	activeReflexTree()
 
 	// активировать дерево автоматизмов
+	psychic.WasConditionsActiveted = true
 	res := psychic.SensorActivation(ActivationTypeSensor)
 
 	if res { // блокировать выполнение рефлексов
@@ -156,6 +158,8 @@ func ActiveFromConditionChange() {
 
 	// сбросить контекст акций по кнопкам Пульта
 	action_sensor.DeactivationTriggers()
+
+	psychic.WasConditionsActiveted =false
 }
 
 // активировать дерево действием reflexes.ActiveFromAction()
