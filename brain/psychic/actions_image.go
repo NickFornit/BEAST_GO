@@ -41,6 +41,10 @@ func ActionsImageInit(){
 // создать новое сочетание ответных действий если такого еще нет 
 var lastActionsImageID=0
 func СreateNewlastActionsImageID(id int,ActID []int,PhraseID []int,ToneID int,MoodID int)(int,*ActionsImage){
+	oldID,oldVal:=checkUnicumActionsImage(ActID,PhraseID,ToneID,MoodID)
+	if oldVal!=nil{
+		return oldID,oldVal
+	}
 
 	if id==0{
 		lastActionsImageID++
