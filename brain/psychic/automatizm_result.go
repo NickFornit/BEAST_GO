@@ -120,10 +120,13 @@ func noAutovatizmResult()(bool){
 	if EvolushnStage == 3 && !CurrentPurposeGenetic.veryActual{
 	/* в случае отсуствия автоматизма в данных условиях - послать оператору те же стимулы, чтобы посмотреть его реакцию.
 		   Создание автоматизма, повторяющего действия оператора в данных условиях
+		НО если уже помылался provokatorMirrorAutomatizm то больше не делать этого (бесконечный цикл)
 	*/
-		provokatorMirrorAutomatizm(LastAutomatizmWeiting,&CurrentPurposeGenetic)
-		clinerAutomatizmRunning()
-		return true
+		if oldProvokatorAutomatizm != LastAutomatizmWeiting {
+			provokatorMirrorAutomatizm(LastAutomatizmWeiting, &CurrentPurposeGenetic)
+			clinerAutomatizmRunning()
+			return true
+		}
 	}
 
 	// реакция была, но но оператор не обратил на нее внимания, нужно усилить силу действия

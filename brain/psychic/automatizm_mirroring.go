@@ -214,7 +214,8 @@ func findTreeNodeFromAutomatizmActionsImage(baseID int, EmotionID int, ActionsIm
 }
 ////////////////////////////////////////////////////////
 
-
+// чтобы не повторять ответ еще раз после каждого игнорирования
+var oldProvokatorAutomatizm *Automatizm
 
 
 /* в случае отсуствия автоматизма в данных условиях - послать оператору те же стимулы, чтобы посмотреть его реакцию.
@@ -228,6 +229,7 @@ func provokatorMirrorAutomatizm(sourceAtmzm *Automatizm, purposeGenetic *Purpose
 	_, autmzm := CreateAutomatizm(detectedActiveLastNodID, ActionsImageID)
 	// NoWarningCreateShow=false
 	if autmzm != nil {
+		oldProvokatorAutomatizm=autmzm
 		//autmzm.BranchID += linkID // не привязывать к узлу
 		SetAutomatizmBelief(autmzm, 2) // сделать автоматизм штатным, т.к. действия авторитарно верные (копируем действия оператора)
 		autmzm.Usefulness = 1 // авторитарная полезность
