@@ -158,34 +158,3 @@ return count
 ////////////////////////////////////////////
 
 
-/* Создать групповое правило (более одного в цепочке EpisodeMemory.TAid)
-из последнего участка эпизодической памяти объектиынх (EpisodeMemory.Type==0) элеметов.
- */
-func GetRulesFromEpisodeMemory(kind int){
-	if EpisodeMemoryLastIDFrameID==0{
-		return
-	}
-	var beginID=0
-	for i := EpisodeMemoryLastIDFrameID; i >=0; i-- {
-		em:=EpisodeMemoryObjects[i]
-		if em == nil || em.Type != kind || (LifeTime - em.LifeTime) >EpisodeMemoryPause{
-			break // закончить выборку
-		}
-		beginID++
-	}
-	if beginID > 1 {
-		var taID []int
-		if (EpisodeMemoryLastIDFrameID - beginID) > 1 { // только групповые правила, более 1
-			for i := EpisodeMemoryLastIDFrameID - beginID; i < EpisodeMemoryLastIDFrameID; i++ {
-				em := EpisodeMemoryObjects[i]
-				taID = append(taID, em.RulesID)
-			}
-			// создать новое, групповое правило
-			rulesID,_:=createNewlastrulesID(0, taID)
-if rulesID>0 {
-	lib.WritePultConsol("<span style='color:green'>Записано групповое <b>ПРАВИЛО № " + strconv.Itoa(rulesID)+"</b></span>")
-}
-		}
-	}
-}
-//////////////////////////////////////////////////

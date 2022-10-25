@@ -59,11 +59,11 @@ func getPurposeGenetic()(*PurposeGenetic){
 Так что лучше не заморачиваться с этим!
  */
 		// veryActualSituation: плохо для  1, 2, 7 и/или 8  параметров гомеостаза
-		if veryActualSituation { // нужно хоть что-то сделать, ПАНИКА
+		//if veryActualSituation { // нужно хоть что-то сделать, ПАНИКА
 			ActID:=[]int{21} // паника
 			_,atmz:=СreateNewlastActionsImageID(0,ActID,nil,0,0)
 			pg.actionID = atmz
-		}
+		//}
 	}
 
 	PurposeGeneticObject = append(PurposeGeneticObject, &pg)

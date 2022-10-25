@@ -13,24 +13,26 @@ package psychic
 func getAutomatizmFromNodeID(nodeID int)(int){
 	// список всех автоматизмов для ID узла Дерева
 	aArr:=GetMotorsAutomatizmListFromTreeId(nodeID)
-	var usefulness =-10 // полезность, выбрать наилучшую
-	var usefulnessID=0
-	for i := 0; i < len(aArr); i++ {
-		if aArr[i].Belief==2{// есть единственный проверенный автоматизм
-			return aArr[i].ID
+	var usefulness = -10 // полезность, выбрать наилучшую
+	var usefulnessID = 0
+	if aArr != nil {
+		for i := 0; i < len(aArr); i++ {
+			if aArr[i].Belief == 2 { // есть единственный проверенный автоматизм
+				return aArr[i].ID
+			}
+			if aArr[i].Usefulness > usefulness {
+				usefulness = aArr[i].Usefulness
+				usefulnessID = aArr[i].ID
+			}
 		}
-		if aArr[i].Usefulness > usefulness{
-			usefulness=aArr[i].Usefulness
-			usefulnessID=aArr[i].ID
+		if usefulnessID > 0 { // выбран самый полезный из всех
+			/*формирование не привязанных к узлу автоматизмов при активации дерева
+			- для всех фраз - и для всех действий на основе привязанного автоматизма,
+			чтобы другие ветки могли пользоваться при разных условиях.
+			*/
+			createNodeUnattachedAutomatizm(nodeID, usefulnessID)
+			return usefulnessID
 		}
-	}
-	if usefulnessID >0{// выбран самый полезный из всех
-		/*формирование не привязанных к узлу автоматизмов при активации дерева
-		- для всех фраз - и для всех действий на основе привязанного автоматизма,
-		чтобы другие ветки могли пользоваться при разных условиях.
-		*/
-		createNodeUnattachedAutomatizm(nodeID, usefulnessID)
-		return usefulnessID
 	}
 	// в данном узле нет привязанного к нему автоматизма
 	// если это - узел действий или узел фразы, смотрим, если привязанные к таким объектам автоматизм

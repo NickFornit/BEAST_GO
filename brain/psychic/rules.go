@@ -40,8 +40,6 @@ type rules struct {
 	ID int
 	TAid []int // цепочка стимул-ответов ID TriggerAndAction - последовательность из эпизодов памяти подряд, сохраняющая последовательность общения ( дурак -> сам дурак!, маме скажу -> ябеда, щас в морду дам -> ну попробуй)
 }
-
-
 var rulesArr=make(map[int]*rules)
 
 //////////////////////////////////////////
@@ -151,51 +149,3 @@ doWritingFile =saveDoWritingFile
 ///////////////////////////////////////////
 
 
-//отслеживать Правила из Пульта в http://go/pages/rulles.php
-func getCur10lastRules()string{
-rCount:=lastrulesID
-if rCount >10{
-	rCount=10
-}
-var out=""
-	for i := 0; i < rCount; i++ {
-		r:=rulesArr[lastrulesID-i]
-		out+="ID="+strconv.Itoa(r.ID)+":"
-		for n := 0; n < len(r.TAid); n++ {
-			taa:=TriggerAndActionArr[r.TAid[n]]
-			if taa == nil{
-				continue
-			}
-			if n>0{
-				out+="<span style='padding:40px;'></span>"
-			}else{
-				out+="<span style='padding:10px;'></span>"
-			}
-			if taa.Trigger >0 {
-				out += "Стимул: " + GetActionsString(taa.Trigger) + " "
-			}
-			if taa.Trigger <0 {
-				out += "Стимул: " + GetBaseStateImageString(taa.Trigger) + " "
-			}
-			out+="Ответ: "+GetActionsString(taa.Action)+" "
-			out+="Эффект: <b>"+strconv.Itoa(taa.Effect)+"</b>"
-			out+="<br>"
-		}
-		out+="<hr>"
-	}
-return out
-}
-///////////////////////////////////////////
-
-
-///////////////////////////////////////////
-/*  выбрать подходящее правило в текущей ситуации
-
- */
-func getSuitableRules()(*rules){
-	// Текущая ситуация - массив самых последних кадров эпизодической памяти.
-
-
-	return nil
-}
-//////////////////////////////////////////////

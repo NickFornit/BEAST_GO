@@ -253,6 +253,12 @@ func wasChangingMoodCondition(kind int)(int,int,[]int){
 /////////////////////////////////////////////////////////////////////////
 
 
+/* // текущий ID пускового стимула типов curActiveActions или curBaseStateImage
+при активации дерева автоматизмов. Если тип curBaseStateImage, то ID отрицательное (ID<0)!
+ */
+var currentTriggerID=0
+
+
 
 ////////////////////////////////////////////////////////////////////////
 /* на стадии >3 при каждом ответе на действия оператора - прописывать текущее правило rules.
@@ -260,6 +266,7 @@ func wasChangingMoodCondition(kind int)(int,int,[]int){
 		фиксируя цепочку правил.
 */
 func fixNewRules(lastCommonDiffValue int,ai1 int) int {
+	currentTriggerID=ai1
 	if LastAutomatizmWeiting == nil{
 		return 0
 	}
@@ -298,6 +305,7 @@ if RullesOutputProcess{// отслеживать Правила из Пульт�
 func fixRulesBaseStateImage(lastCommonDiffValue int){
 	ai1, _ := СreateNewlastBaseStateImageID(0, curBaseStateImage.Mood, curBaseStateImage.EmotionID, curBaseStateImage.SituationID)
 	ai1*=-1 // отрицательное значение идентифицирует образ - как текущего сосотояния!!!
+	currentTriggerID=ai1
 	fixNewRules(lastCommonDiffValue,ai1)
 }
 /////////////////////////////////////////////////////////////////////

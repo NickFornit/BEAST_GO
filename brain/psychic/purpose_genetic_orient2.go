@@ -19,6 +19,7 @@ import "BOT/brain/gomeostas"
 Из-за столь скудных возможностей и разросся функционал мыслительных автоматизмов
 с их произвольностью (- перекрытием имеющихся автоматизмов новыми).
  */
+var oldNodeAutomatizm=0 // прошлы раз запускался такой штатный автоматизм
 func getPurposeGenetic2AndRunAutomatizm(atmtzmID int)(*Automatizm){
 
 	atmzm:=AutomatizmFromIdArr[atmtzmID]
@@ -58,12 +59,26 @@ if newsRes{// повышенная опасность от оператора
 		}
 
 //if newsRes{// повышенная опасность от оператора
-}else{
+}else {
 	/* от оператора нет опасности, но высокий purpose.veryActual,
 	нужно выполнить штатный автоматизм, а не придуманный
-	 */
+	*/
+
+	// если в прошлый раз уже был такой автоматизм, то ничего не делать, иначе начинает повторять одно и то же
+if oldNodeAutomatizm != atmzm.ID{
 	runAutomatizmFromPurpose(atmzm, purpose)
+	oldNodeAutomatizm = atmzm.ID
 	return atmzm
+}
+
+	// список всех автоматизмов для ID узла Дерева
+	//aArr:=GetMotorsAutomatizmListFromTreeId(detectedActiveLastNodID)
+
+	/*aID := getAutomatizmFromNodeID(detectedActiveLastNodID)
+	atmzm=AutomatizmFromIdArr[aID]
+	purpose.actionID=ActionsImageArr[atmzm.ActionsImageID]
+	runAutomatizmFromPurpose(atmzm, purpose)*/
+	return nil
 }
 //if purpose.veryActual
 }else{// нет опасности и нет опасной новизны
