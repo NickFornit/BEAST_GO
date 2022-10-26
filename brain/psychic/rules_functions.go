@@ -67,13 +67,13 @@ func getCur10lastRules()string{
 				out+="<span style='padding:10px;'></span>"
 			}
 			if taa.Trigger >0 {
-				out += "Стимул: " + GetActionsString(taa.Trigger) + " "
+				out += "<b>Стимул:</b> <span style='background-color:#FFECEB;'>" + GetActionsString(taa.Trigger) + "</span> "
 			}
 			if taa.Trigger <0 {
-				out += "Стимул: " + GetBaseStateImageString(taa.Trigger) + " "
+				out += "<b>Стимул:</b> <span style='background-color:#FFECEB;'>" + GetBaseStateImageString(taa.Trigger) + "</span> "
 			}
-			out+="Ответ: "+GetActionsString(taa.Action)+" "
-			out+="Эффект: <b>"+strconv.Itoa(taa.Effect)+"</b>"
+			out+="=> <b>Ответ:</b> <span style='background-color:#E8E8FF;'>"+GetActionsString(taa.Action)+"</span> "
+			out+="<b>Эффект: "+strconv.Itoa(taa.Effect)+"</b>"
 			out+="<br>"
 		}
 		out+="<hr>"
@@ -110,14 +110,21 @@ if CurrentInformationEnvironment.veryActualSituation || CurrentInformationEnviro
 }
 
 	if rID==0 {
-	// попытка более обстоятельно найти в эпиз.памяти подходящий фрагмент
-	rID=getRulesFromEpisodicsSlice(activation_type)
+/* попытка более обстоятельно найти в эпиз.памяти подходящий фрагмент
+	Чем больше limit тем маловероятнее найти совпадения,
+   так что можно вызывать getRulesFromEpisodicsSlice постепенно уменьшая limit
+ */
+	rID=getRulesFromEpisodicsSlice(activation_type,5)
 	}
 
 	return rID
 }
 /////////////////////////////////////////////////
-func getRulesFromEpisodicsSlice(activation_type int)(int){
+/* нйти последнее Правило по цепочке последних limit кадров эпиз.памяти
+Чем больше limit тем маловероятнее найти совпадения,
+так что можно вызывать getRulesFromEpisodicsSlice постепенно уменьшая limit
+ */
+func getRulesFromEpisodicsSlice(activation_type int,limit int)(int){
 	if EpisodeMemoryLastIDFrameID==0{
 		return 0
 	}
@@ -127,23 +134,27 @@ func getRulesFromEpisodicsSlice(activation_type int)(int){
 	}
 
 	var beginID=0
+	var preLifeTime=0
 	for i := EpisodeMemoryLastIDFrameID; i >=0; i-- {
 		em:=EpisodeMemoryObjects[i]
 // если самый последний эпизод уже является em.Type == kind
 		if i==EpisodeMemoryLastIDFrameID && em.Type == kind{
 			continue
 		}
-		if em == nil || em.Type != kind || (LifeTime - em.LifeTime) >EpisodeMemoryPause{
+		if preLifeTime==0{
+			preLifeTime=em.LifeTime
+		}
+		if em == nil || em.Type != kind || (em.LifeTime - preLifeTime) >EpisodeMemoryPause{
 			break // закончить выборку
 		}
 		beginID++
 	}
-	if beginID == 0 {// это странно... м.б. не один последний em.Type == kind
+	if beginID == 0 {// скорее всего вышло время ожидания EpisodeMemoryPause
 		return 0
 	}
 	var rID []int
 	// перебор последнего фрагмента кадров эпиз.памяти
-	for i := EpisodeMemoryLastIDFrameID - beginID; i < EpisodeMemoryLastIDFrameID; i++ {
+	for i := EpisodeMemoryLastIDFrameID - beginID; i <= EpisodeMemoryLastIDFrameID; i++ {
 				em := EpisodeMemoryObjects[i]
 		ta:=TriggerAndActionArr[em.RulesID]
 		if ta !=nil {
@@ -157,13 +168,24 @@ func getRulesFromEpisodicsSlice(activation_type int)(int){
 				rID = append(rID, em.RulesID)
 	}
 // найти такую последовательность в предыдущей эпизод.памяти, но не далее 1000 фрагментов
+if len(rID)>limit{// limit последних
+	rID=rID[len(rID)-limit:]
+}
+
+//	rID=rID[len(rID)-2:] // для тестирования - оставить 2 последних
+
 	lenFrag:=len(rID)
-	if lenFrag > 10 { // длинные фрагменты не искать
+	if lenFrag > 7 { // длинные фрагменты не искать
 		return 0
 	}
 	steps:=0
+	lenEp:=len(EpisodeMemoryObjects)
+	var startF = lenEp - 2*lenFrag // отмотать на 2 длины, чтобы не проверять в rID саму себя
+	if startF > lenEp{//  а нет еще достаточной длины еп.памяти
+		return 0
+	}
 		// идем назад по кускам lenFrag
-		for i := beginID; i >= 0; i -=lenFrag {
+		for i := startF; i >= 0; i -- { // =lenFrag - пролетает мимо
 			if steps>1000{
 				return 0
 			}
@@ -178,14 +200,16 @@ func getRulesFromEpisodicsSlice(activation_type int)(int){
 			}
 			if isConc{// уж ты, нашли такой же фрагмент! но в нем нет пускового curActiveActions (раньше уже смотрели)
 				// выдать конечное праило, если оно с хорошим эффектом
-				ta:=TriggerAndActionArr[lastEM.RulesID]
+				rArr:=rulesArr[lastEM.RulesID]
+				lastTa:=rArr.TAid[len(rArr.TAid)-1:]
+				ta:=TriggerAndActionArr[lastTa[0]]
 				if ta !=nil {
 					//r.Trigger по знаку всегда совпадает с currentTriggerID
-					if ta.Trigger == currentTriggerID{// есть такой пусковой
+					//if ta.Trigger == currentTriggerID{// есть такой пусковой
 						if ta.Effect >0{// с хорошим эффектом
 							return lastEM.RulesID
 						}
-					}
+					//}
 				}
 			}
 			steps++

@@ -159,6 +159,9 @@ doWritingFile =saveDoWritingFile
 ///////////////////////////////////////////
 
 func GetActionsString(act int)(string){
+	if ActionsImageArr == nil || len(ActionsImageArr)==0 || ActionsImageArr[act]==nil{
+		return ""
+	}
 	var out=""
 	ai:=ActionsImageArr[act]
 	if ai.ActID != nil {
@@ -189,7 +192,13 @@ func GetActionsString(act int)(string){
 		out+=" Тон: "+getToneStrFromID(ai.ToneID)+" "
 	}
 
-	if ai.MoodID != 0 {
+	if ai.MoodID <0{
+		ai.MoodID*=-1
+	}
+	if ai.MoodID >=19{
+		ai.MoodID-=19
+	}
+	if ai.MoodID != 0  {
 		out+=" Настрой: "+getMoodStrFromID(ai.MoodID)+"<br>"
 	}
 

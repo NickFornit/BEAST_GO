@@ -160,42 +160,10 @@ func calcAutomatizmResult(lastCommonDiffValue int,lastBetterOrWorse int,wellIDar
 
 lib.WritePultConsol("<span style='color:blue;background-color:#FFD0FF;'>Был ОТВЕТ ОПЕРАТОРА. До ответа оператора сосотояние: <b>"+strconv.Itoa(lastBetterOrWorse)+"</b>, изменение на: <b>"+strconv.Itoa(lastCommonDiffValue)+"</b></span>")
 
-	// lastBetterOrWorse - точно изменился, иначе бы не было вызова calcAutomatizmResult
-	/// если числа имеют разные знаки (одно положительное, другое отрицательное)
-	if lib.IsDiffersOfSign(LastAutomatizmWeiting.Usefulness,lastBetterOrWorse){
-		LastAutomatizmWeiting.Count=0 // сбрасываем  надежность
-	} else {
-		LastAutomatizmWeiting.Count++
-	}
-	// задать тип автоматизма, 2 - проверенный
-	SetAutomatizmBelief(LastAutomatizmWeiting,2)// ТАК ПРОСТО НЕЛЬЗЯ ЗАДАВАТЬ Belief=2: LastAutomatizmWeiting.Belief=2
+	// lastBetterOrWorse больше не применяется т.к. lastCommonDiffValue более точен и информативен
 
-	// изменять полезность по 1 шагу!
-	if lastBetterOrWorse>0 && LastAutomatizmWeiting.Usefulness<10 {
-		LastAutomatizmWeiting.Usefulness++ // lastBetterOrWorse
-	}
-	if lastBetterOrWorse<0 && LastAutomatizmWeiting.Usefulness>-10 {
-		LastAutomatizmWeiting.Usefulness-- // lastBetterOrWorse
-	}
+	automatizmCorrection(lastCommonDiffValue,wellIDarr)
 
-
-	if lastBetterOrWorse>0{// стало лучше
-		PsyBaseMood=1
-		// список гомео параметро, которые улучшило это действие
-		LastAutomatizmWeiting.GomeoIdSuccesArr=wellIDarr // м.б. nil !!!! если нет таких явных действий
-		// пополняется список полезных автоматизмов
-		if lastBetterOrWorse>0 {
-			AutomatizmSuccessFromIdArr[LastAutomatizmWeiting.ID] = LastAutomatizmWeiting
-		}
-	}
-	if EvolushnStage == 3{
-/* отзеркаливание ответа оператора не зависимо от того, стало хуже или лучше
-потому, что это был ответ оператора на действия автоматизма, значит - авторитетный ответ
-   Создание автоматизма, повторяющего действия оператора в данных условиях
- */
-		createNewMirrorAutomatizm(LastAutomatizmWeiting)
-
-	}
 	// >3 потому, что раньше не пишется эпизодическая память и формируются более примитивные механизмы.
 	if EvolushnStage > 3 {
 
@@ -208,16 +176,52 @@ lib.WritePultConsol("<span style='color:blue;background-color:#FFD0FF;'>Был �
 		fixNewRules(lastCommonDiffValue,ai1)
 	}
 
-	if lastBetterOrWorse<0{// стало хуже
-		PsyBaseMood=-1
-		// очистить списки улучшения
-		LastAutomatizmWeiting.GomeoIdSuccesArr=nil
-		AutomatizmSuccessFromIdArr[LastAutomatizmWeiting.ID] =nil
-	}
-
 return
 }
 ///////////////////////////////////////////////////////
+
+//корректируется успешность автоматизма - реакция на результат lastCommonDiffValue
+func automatizmCorrection(lastCommonDiffValue int,wellIDarr []int){
+	/// если числа имеют разные знаки (одно положительное, другое отрицательное)
+	if lib.IsDiffersOfSign(LastAutomatizmWeiting.Usefulness,lastCommonDiffValue){
+		LastAutomatizmWeiting.Count=0 // сбрасываем  надежность
+	} else {
+		LastAutomatizmWeiting.Count++
+	}
+
+	// изменять полезность по 1 шагу!
+	if lastCommonDiffValue>0 && LastAutomatizmWeiting.Usefulness<10 {
+		LastAutomatizmWeiting.Usefulness++ // lastBetterOrWorse
+	}
+	if lastCommonDiffValue<0 && LastAutomatizmWeiting.Usefulness>-10 {
+		LastAutomatizmWeiting.Usefulness-- // lastBetterOrWorse
+	}
+
+	if LastAutomatizmWeiting.Usefulness>0 {
+		// задать тип автоматизма, 2 - проверенный
+		SetAutomatizmBelief(LastAutomatizmWeiting, 2) // ТАК ПРОСТО НЕЛЬЗЯ ЗАДАВАТЬ Belief=2: LastAutomatizmWeiting.Belief=2
+	}
+
+	if lastCommonDiffValue>0{// стало лучше
+		PsyBaseMood=1
+		// список гомео параметро, которые улучшило это действие
+		if wellIDarr != nil {
+			LastAutomatizmWeiting.GomeoIdSuccesArr = wellIDarr // м.б. nil !!!! если нет таких явных действий
+		}
+		// пополняется список полезных автоматизмов
+		AutomatizmSuccessFromIdArr[LastAutomatizmWeiting.ID] = LastAutomatizmWeiting
+	}
+
+	if lastCommonDiffValue<0{// стало хуже
+		PsyBaseMood=-1
+		// очистить списки улучшения
+		LastAutomatizmWeiting.GomeoIdSuccesArr=nil
+		if AutomatizmSuccessFromIdArr[LastAutomatizmWeiting.ID] !=nil {
+			AutomatizmSuccessFromIdArr[LastAutomatizmWeiting.ID] =nil
+		}
+	}
+}
+//////////////////////////////////////////////////////
 
 
 
@@ -303,6 +307,9 @@ if RullesOutputProcess{// отслеживать Правила из Пульт�
 
 // обработать изменение состояния - записать Правило типа BaseStateImage
 func fixRulesBaseStateImage(lastCommonDiffValue int){
+	//корректируется успешность автоматизма - как в calcAutomatizmResult
+	automatizmCorrection(lastCommonDiffValue,nil)
+	/////////////////////// ПРАВИЛО:
 	ai1, _ := СreateNewlastBaseStateImageID(0, curBaseStateImage.Mood, curBaseStateImage.EmotionID, curBaseStateImage.SituationID)
 	ai1*=-1 // отрицательное значение идентифицирует образ - как текущего сосотояния!!!
 	currentTriggerID=ai1

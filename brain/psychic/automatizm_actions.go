@@ -104,7 +104,7 @@ if am.Usefulness<0{
 	LastRunAutomatizmPulsCount =PulsCount // активность мот.автоматизма в чисде пульсов
 
 	var out="3|"
-	out+=GetAutomotizmActionsString(am)
+	out+=GetAutomotizmActionsString(am,true)
 
 	lib.SentActionsForPult(out)
 
@@ -121,8 +121,7 @@ if am.Usefulness<0{
 }
 //////////////////////////////////////////
 
-
-func GetAutomotizmActionsString(am *Automatizm)(string){
+func GetAutomotizmActionsString(am *Automatizm,writeLog bool)(string){
 	var out=""
 	ai:=ActionsImageArr[am.ActionsImageID]
 	if ai.ActID != nil {
@@ -150,9 +149,9 @@ func GetAutomotizmActionsString(am *Automatizm)(string){
 	if ai.MoodID != 0 {
 		out+="<br>"+getMoodStrFromID(ai.MoodID)+"<br>"
 	}
-
+if writeLog{
 	lib.WritePultConsol("<span style='color:blue;background-color:#FFFFA3;'>Запускается АВТОМАТИЗМ ID = "+strconv.Itoa(am.ActionsImageID)+" "+out+"</span>: ")
-
+}
 	return out
 }
 /////////////////////////////////////////

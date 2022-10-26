@@ -329,7 +329,7 @@ if LastRunAutomatizmPulsCount >0{// обработка периода ожида
 			if EvolushnStage > 3 {
 				lastCommonDiffValue, _, _ := wasChangingMoodCondition(2)
 				// обработать изменение состояния - записать Правило типа BaseStateImage
-				fixRulesBaseStateImage(lastCommonDiffValue)
+				fixRulesBaseStateImage(lastCommonDiffValue)// здесь корректируется успешность автоматизма - как в calcAutomatizmResult
 				// Активировать Дерево Понимания: или запустить ментальный автоматизм или - ориентировочная реакция для осмысления
 				understandingSituation()
 

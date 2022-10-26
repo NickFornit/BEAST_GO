@@ -41,8 +41,8 @@ func GetAutomatizmInfo(limitBasicID int)(string){
 		out+="' onClick='show_level(3)'>Хорошо</span> "
 
 		out+="<span style='cursor:pointer;"
-		if limitBasicID==0{out+="background-color:#FFFF9D;font-weight:bold;"}
-		out+="' onClick='show_level(0)' title='Автоматизмы, не привязанные к определнным условиям состояния Beast.'>Свободные</span> "
+		if limitBasicID==4{out+="background-color:#FFFF9D;font-weight:bold;"}
+		out+="' onClick='show_level(4)' title='Автоматизмы, не привязанные к определнным условиям состояния Beast.'>Свободные</span> "
 	}
 
 	header:="<tr><th width=70 class='table_header'>ID ав-ма</th>" +
@@ -86,13 +86,13 @@ sStyle:="style='cursor:pointer;color:blue'"
 emClick:=""
 actClick:=""
 
-// узел дерева, к которому прикреплен автоматизм
+// узел дерева, к которому прикреплен автоматизм   && limitBasicID<4
 if v.BranchID<1000000{
 nodeA:=AutomatizmTreeFromID[v.BranchID]
 if nodeA!=nil {
 	nodeID = strconv.Itoa(nodeA.ID)
 	if limitBasicID > 0 {
-		if nodeA.BaseID != limitBasicID || limitBasicID == 0 {
+		if nodeA.BaseID != limitBasicID{
 			continue
 		}
 	}
@@ -127,9 +127,7 @@ if nodeID=="12"{
 
 //if v.BranchID<1000000{
 }else{
-	if limitBasicID!=0{
-		continue
-	}
+
 	nodeID = strconv.Itoa(v.BranchID)
 	onclickID="onClick='show_object("+strconv.Itoa(v.BranchID)+")' style='cursor:pointer;color:blue'"
 	baseID="не"

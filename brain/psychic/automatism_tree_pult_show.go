@@ -243,7 +243,7 @@ func TranslateAutomatizmSequence(am *Automatizm)(string){
 		return ""
 	}
 
-	out:=GetAutomatizmSequenceInfo(am.ID)
+	out:=GetAutomatizmSequenceInfo(am.ID,true)
 
 	return out
 }
@@ -251,13 +251,13 @@ func TranslateAutomatizmSequence(am *Automatizm)(string){
 
 
 // действия - в виде строки
-func GetAutomatizmSequenceInfo(idA int)(string){
+func GetAutomatizmSequenceInfo(idA int,writeLog bool)(string){
 
 	am:=AutomatizmFromIdArr[idA]
 	if am == nil{
 		return ""
 	}
-	out:=GetAutomotizmActionsString(am)
+	out:=GetAutomotizmActionsString(am,writeLog)
 	return out
 }
 ///////////////////////////////////////////////////

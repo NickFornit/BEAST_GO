@@ -205,7 +205,11 @@ func findTreeNodeFromAutomatizmActionsImage(baseID int, EmotionID int, ActionsIm
 
 	tm := GetToneMoodID(ai.ToneID, ai.MoodID + 19)
 
-	nodeID := FindConditionsNode(baseID, lev2, ai.ActID, tm, simbolID, ai.PhraseID[0])
+prase:=0
+if ai.PhraseID != nil{
+	prase=ai.PhraseID[0]
+}
+	nodeID := FindConditionsNode(baseID, lev2, ai.ActID, tm, simbolID, prase)
 	if nodeID > 0 {
 		return nodeID
 	}
