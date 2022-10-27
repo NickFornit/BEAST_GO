@@ -38,9 +38,9 @@ func ActionsImageInit(){
 
 
 ////////////////////////////////////////////////
-// создать новое сочетание ответных действий если такого еще нет 
+// создать новое сочетание ответных действий если такого еще нет
 var lastActionsImageID=0
-func СreateNewlastActionsImageID(id int,ActID []int,PhraseID []int,ToneID int,MoodID int)(int,*ActionsImage){
+func CreateNewlastActionsImageID(id int,ActID []int,PhraseID []int,ToneID int,MoodID int)(int,*ActionsImage){
 	oldID,oldVal:=checkUnicumActionsImage(ActID,PhraseID,ToneID,MoodID)
 	if oldVal!=nil{
 		return oldID,oldVal
@@ -150,7 +150,7 @@ func loadActionsImageArr(){
 		MoodID,_:=strconv.Atoi(p[4])
 
 var saveDoWritingFile= doWritingFile; doWritingFile =false
-		СreateNewlastActionsImageID(id,ActID,PhraseID,ToneID,MoodID)
+		CreateNewlastActionsImageID(id,ActID,PhraseID,ToneID,MoodID)
 doWritingFile =saveDoWritingFile
 	}
 	return

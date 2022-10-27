@@ -31,7 +31,7 @@ func createAutomatizm(pc *PurposeGenetic)(*Automatizm){
 	t:=pc.actionID.ToneID
 	m:=pc.actionID.MoodID-19
 
-	ActionsImageID,_:=СreateNewlastActionsImageID(0,aArr,sArr,t,m)
+	ActionsImageID,_:=CreateNewlastActionsImageID(0,aArr,sArr,t,m)
 	// создать автоматизм
 	_,atzm:=CreateNewAutomatizm(BranchID,ActionsImageID)
 	if atzm!=nil {

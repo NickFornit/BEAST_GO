@@ -299,6 +299,8 @@ func conditionAutomatizmFound(level int,cond []int,node *AutomatizmNode){
  */
 var onliOnceWasConditionsActiveted=false // т.к. опять может продолжиться изменение состояния в период ожидания
 func afterTreeActivation()(bool){
+	// ЕСТЬ ЛИ АВТОМАТИЗМ В ВЕТКЕ и болеее ранних? выбрать лучший автоматизм для сформированной ветки nodeID
+	currentAutomatizmAfterTreeActivatedID = getAutomatizmFromNodeID(detectedActiveLastNodID)
 
 // Был запущен моторный автоматизм (в том числе и ментальным автоматизмом)
 if LastRunAutomatizmPulsCount >0{// обработка периода ожидания ответа оператора
@@ -343,9 +345,6 @@ if LastRunAutomatizmPulsCount >0{// обработка периода ожида
 }// конец обработки ожидания ответа оператора
 
 // ОБРАБОТКА ВНЕ ПЕРИОДА ОЖИДАНИЯ ОТВЕТА
-	// ЕСТЬ ЛИ АВТОМАТИЗМ В ВЕТКЕ и болеее ранних? выбрать лучший автоматизм для сформированной ветки nodeID
-	currentAutomatizmAfterTreeActivatedID = getAutomatizmFromNodeID(detectedActiveLastNodID)
-
 	// всегда сначала активировать дерево понимания, результаты которого могут заблокировать все внизу
 	if EvolushnStage > 3 {
 // Активировать Дерево Понимания: или запустить ментальный автоматизм или - ориентировочная реакция для осмысления

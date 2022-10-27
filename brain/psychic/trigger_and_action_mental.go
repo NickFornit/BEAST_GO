@@ -1,8 +1,6 @@
-/* Образ Правила: Cтимул (действий оператора) - ответа Beast - Эффекта
-
+/* Образ ментального Правила: Cтимул (действий оператора или мент.автом=ма) - ответа Beast - Эффекта
 
 */
-
 package psychic
 
 import (
@@ -11,65 +9,64 @@ import (
 	"strings"
 )
 
-//////////////////////////////////
-
-type TriggerAndAction struct {
+/////////////////////////
+type MentalTriggerAndAction struct {
 	ID int
 /*образ пусковых стимулов:
   >0 - образы действий оператора с Пульта ActionsImage,
-  <0 - образ текущей ситуации
+  <0 - образ действий ментального автоматизма, активировавшего consciousness
  */
 	Trigger int
-	Action int // образ ответных действий - всегда ActionsImage
+	Action int // образ ответных действий - всегда MentalActionsImages
 	Effect int // эффект от действий: -1 или 0 или 1
 }
 ////////////////////////
 
-var TriggerAndActionArr=make(map[int]*TriggerAndAction)
+var MentalTriggerAndActionArr=make(map[int]*MentalTriggerAndAction)
 
 //////////////////////////////////////////
 
 // вызывается из psychic.go
-func TriggerAndActionInit(){
-	loadTriggerAndActionArr()
+func MentalTriggerAndActionInit(){
+	loadMentalTriggerAndActionArr()
 }
 
 
 ////////////////////////////////////////////////
 // создать новое сочетание ответных действий если такого еще нет
-var lastTriggerAndActionID=0
-func createNewlastTriggerAndActionID(id int,Trigger int,Action int,Effect int)(int,*TriggerAndAction){
+var lastMentalTriggerAndActionID=0
+func createNewlastMentalTriggerAndActionID(id int,Trigger int,Action int,Effect int)(int,*MentalTriggerAndAction){
 	if Effect<0{Effect=-1}
 	if Effect>0{Effect=1}
 
-	oldID,oldVal:=checkUnicumTriggerAndAction(Trigger,Action,Effect)
+	oldID,oldVal:=checkUnicumMentalTriggerAndAction(Trigger,Action,Effect)
 	if oldVal!=nil{
 		return oldID,oldVal
 	}
 	if id==0{
-		lastTriggerAndActionID++
-		id=lastTriggerAndActionID
+		lastMentalTriggerAndActionID++
+		id=lastMentalTriggerAndActionID
 	}else{
 		//		newW.ID=id
-		if lastTriggerAndActionID<id{
-			lastTriggerAndActionID=id
+		if lastMentalTriggerAndActionID<id{
+			lastMentalTriggerAndActionID=id
 		}
 	}
 
-	var node TriggerAndAction
+	var node MentalTriggerAndAction
 	node.ID = id
 	node.Trigger = Trigger
 	node.Action=Action
 	node.Effect=Effect
 
-	TriggerAndActionArr[id]=&node
+	MentalTriggerAndActionArr[id]=&node
 
-	if doWritingFile{SaveTriggerAndActionArr() }
+	if doWritingFile{SaveMentalTriggerAndActionArr() }
 
 	return id,&node
 }
-func checkUnicumTriggerAndAction(Trigger int,Action int,Effect int)(int,*TriggerAndAction){
-	for id, v := range TriggerAndActionArr {
+func checkUnicumMentalTriggerAndAction(Trigger int,Action int,Effect int)(int,*MentalTriggerAndAction){
+	for id, v := range MentalTriggerAndActionArr {
 		if Trigger != v.Trigger {
 			continue
 		}
@@ -94,23 +91,23 @@ func checkUnicumTriggerAndAction(Trigger int,Action int,Effect int)(int,*Trigger
 //////////////////// сохранить Образы стимула (действий оператора) - ответа Beast
 //В случае отсуствия ответных действий создается ID такого отсутсвия, пример такой записи: 2|||0|0|
 // ID|ActID через ,|PhraseID через ,|ToneID|MoodID|
-func SaveTriggerAndActionArr(){
+func SaveMentalTriggerAndActionArr(){
 	var out=""
-	for k, v := range TriggerAndActionArr {
+	for k, v := range MentalTriggerAndActionArr {
 		out+=strconv.Itoa(k)+"|"
 		out+=strconv.Itoa(v.Trigger)+"|"
 		out+=strconv.Itoa(v.Action)+"|"
 		out+=strconv.Itoa(v.Effect)
 		out+="\r\n"
 	}
-	lib.WriteFileContent(lib.GetMainPathExeFile()+"/memory_psy/trigger_and_actions.txt",out)
+	lib.WriteFileContent(lib.GetMainPathExeFile()+"/memory_psy/trigger_and_actions_mental.txt",out)
 
 }
 ////////////////////  загрузить образы стимула (действий оператора) - ответа Beast
 // ID|ActID через ,|PhraseID через ,|ToneID|MoodID|
-func loadTriggerAndActionArr(){
-	TriggerAndActionArr=make(map[int]*TriggerAndAction)
-	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_psy/trigger_and_actions.txt")
+func loadMentalTriggerAndActionArr(){
+	MentalTriggerAndActionArr=make(map[int]*MentalTriggerAndAction)
+	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_psy/trigger_and_actions_mental.txt")
 	cunt:=len(strArr)
 	for n := 0; n < cunt; n++ {
 		if len(strArr[n])==0{
@@ -123,10 +120,11 @@ func loadTriggerAndActionArr(){
 		Action,_:=strconv.Atoi(p[2])
 		Effect,_:=strconv.Atoi(p[3])
 var saveDoWritingFile= doWritingFile; doWritingFile =false
-		createNewlastTriggerAndActionID(id,Trigger,Action,Effect)
+		createNewlastMentalTriggerAndActionID(id,Trigger,Action,Effect)
 doWritingFile =saveDoWritingFile
 	}
 	return
 
 }
 ///////////////////////////////////////////
+

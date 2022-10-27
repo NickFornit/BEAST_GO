@@ -40,13 +40,13 @@ var saveEvolushnStage=0 // сохранение значения уровня о
 (из ор.рефлекса - вызов функции активации самосознания и по результатам - продолжить), 
 а если в этот такт нет ор.рефлекса - то из PsychicCountPuls(.
 Вид активации - при вызове функции осознания.
-activation_type == 0 - не бывает
-activation_type == 1 - активация ориентировочным рефлексом новой ситуации
-activation_type == 2 - активация "внутренним" (произвольным) ориентировочным рефлексом
+activationType == 0 - не бывает
+activationType == 1 - активация ориентировочным рефлексом новой ситуации
+activationType == 2 - активация "внутренним" (произвольным) ориентировочным рефлексом
 
 В принципе здесь должны исправляться все лажи ответов предыдущих периодов...
 */
-func consciousness(activation_type int)(bool){
+func consciousness(activationType int)(bool){
 
 	if !allowConsciousnessProcess{
 		return false
@@ -56,7 +56,7 @@ func consciousness(activation_type int)(bool){
 
 // ПЕРВЫЙ УРОВЕНЬ, самый примитивный уровень:
 	// есть ли штатный мот.автоматизм и нужно ли его менять или задумываться
-	if currentAutomatizmAfterTreeActivatedID > 0 {// TODO пока нет currentAutomatizmAfterTreeActivatedID!!!
+	if currentAutomatizmAfterTreeActivatedID > 0 {
 		am:=AutomatizmSuccessFromIdArr[currentAutomatizmAfterTreeActivatedID]
 		if am != nil && am.Belief==2 && am.Usefulness>0{// нормальный, пусть выполняется
 			return false
@@ -68,7 +68,7 @@ func consciousness(activation_type int)(bool){
 // if CurrentInformationEnvironment.veryActualSituation || CurrentInformationEnvironment.danger{
 
 // ВТОРОЙ УРОВЕНЬ - попытка использования примитивных Правил
-	rules:=getSuitableRules(activation_type)
+	rules:=getSuitableRules(activationType)
 	if rules > 0 {// по правилу найти автоматизм и запустить его
 		ta:=TriggerAndActionArr[rules]
 		purpose := getPurposeGenetic()
@@ -106,12 +106,24 @@ func consciousness(activation_type int)(bool){
 	}
 
 //!!!! учитывать правила с отрицательным эффектом длz выбора решения
-// TODO использование ментальных автоматизмов
+// TODO использование ментальных автоматизмов:
+/*
+	mrules:=getSuitableMentalRules(activationType)
+	if mrules > 0 {// по правилу найти автоматизм и запустить его
+		mta:=MentalTriggerAndActionArr[mrules]
+		mai:=MentalActionsImagesArr[mta.Trigger]
+			_,matmzm := createAndRunMentalAutomatizm(mai.ID)
+			if matmzm != nil {
+				return true // заблокирвать более низкоуровневое? нужно ли блокировать объективные действия при мышлении?
+			}
+	}
+ */
 
 	/////////////////////////////////////////////////////////
 
 		if EvolushnStage > 4{
 // ЧЕТВЕРТЫЙ УРОВЕНЬ - доминанта нерешенной проблемы - только если нет срочности
+			// и тут - Стек отложенных дел.
 	if CurrentInformationEnvironment.veryActualSituation || CurrentInformationEnvironment.danger {
 		// TODO
 	}else{// нет решения, паника, откатиться на прежний уровень регирования

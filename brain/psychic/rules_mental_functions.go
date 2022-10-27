@@ -1,4 +1,4 @@
-/* функции Правил
+/* функции ментальных Правил
 
 */
 
@@ -15,10 +15,10 @@ import (
 из последнего участка эпизодической памяти объектиынх (EpisodeMemory.Type==0) элеметов.
 limit 5 ограничивает выборку из эпиз.памяти, но она может получться и меньше.
 */
-func GetRulesFromEpisodeMemory(kind int){
+func GetMentalRulesFromEpisodeMemory(kind int){
 	rImg:=getLastRulesSequenceFromEpisodeMemory(kind,5)
 	if rImg!=nil {
-		createNewlastrulesID(0, rImg)//записать (если еще нет такого) групповое правило
+		createNewlastrulesMentalID(0, rImg)//записать (если еще нет такого) групповое правило
 	}
 }
 //////////////////////////////////////////////////
@@ -27,7 +27,7 @@ func GetRulesFromEpisodeMemory(kind int){
 
 
 // вывести 10 последних Правил на Пульт в http://go/pages/rulles.php
-func getCur10lastRules()string{
+func getCur10lastMentalRules()string{
 	rCount:=lastrulesID
 	if rCount >10{
 		rCount=10
@@ -50,7 +50,7 @@ func getCur10lastRules()string{
 				out += "<b>Стимул:</b> <span style='background-color:#FFECEB;'>" + GetActionsString(taa.Trigger) + "</span> "
 			}
 			if taa.Trigger <0 {
-				out += "<b>Стимул:</b> <span style='background-color:#FFECEB;'>" + GetBaseStateImageString(taa.Trigger) + "</span> "
+				out += "<b>Стимул:</b> <span style='background-color:#FFECEB;'>" + GetMentalActionsString(taa.Trigger) + "</span> "
 			}
 			out+="=> <b>Ответ:</b> <span style='background-color:#E8E8FF;'>"+GetActionsString(taa.Action)+"</span> "
 			out+="<b>Эффект: "+strconv.Itoa(taa.Effect)+"</b>"
@@ -68,7 +68,7 @@ func getCur10lastRules()string{
 Текущая ситуация - массив самых последних кадров эпизодической памяти и
 активный пусковой стимул currentTriggerID типов curActiveActions или curBaseStateImage.
 */
-func getSuitableRules(activationType int)(int){
+func getSuitableMentalRules(activationType int)(int){
 	var rID=0
 
 // попытка срочно найти действие, в опасной ситуации
@@ -83,7 +83,7 @@ func getSuitableRules(activationType int)(int){
  */
 		maxSteps:=1000
 		for limit:=5; limit > 1; limit-- {
-			rID=getRulesFromEpisodicsSlice(activationType,limit,maxSteps)
+			rID=getMentalRulesFromEpisodicsSlice(activationType,limit,maxSteps)
 			if rID>0{
 				return rID
 			}
@@ -114,9 +114,9 @@ func getSuitableRules(activationType int)(int){
 Чем больше limit тем маловероятнее найти совпадения,
 так что можно вызывать getRulesFromEpisodicsSlice постепенно уменьшая limit
  */
-func getRulesFromEpisodicsSlice(activationType int,limit int,maxSteps int)(int){
+func getMentalRulesFromEpisodicsSlice(activationType int,limit int,maxSteps int)(int){
 
-	rImg:=getLastRulesSequenceFromEpisodeMemory(activationType,limit)
+	rImg:=getLastMentalRulesSequenceFromEpisodeMemory(activationType,limit)
 
 // найти такую последовательность в предыдущей эпизод.памяти, но не далее 1000 фрагментов
 /* уже обеспечено
@@ -169,7 +169,7 @@ if len(rImg)>limit{// limit последних
 /*
 
  */
-func getLastRulesSequenceFromEpisodeMemory(activationType int,limit int)([]int){
+func getLastMentalRulesSequenceFromEpisodeMemory(activationType int,limit int)([]int){
 	if EpisodeMemoryLastIDFrameID==0{
 		return nil
 	}
@@ -206,7 +206,7 @@ func getLastRulesSequenceFromEpisodeMemory(activationType int,limit int)([]int){
 		rImg = append(rImg, em.RulesID)
 	}
 	if len(rImg)>1{
-		createNewlastrulesID(0, rImg)// записать (если еще нет такого) групповое правило
+		createNewlastrulesMentalID(0, rImg)// записать (если еще нет такого) групповое правило
 
 		return rImg
 	}
@@ -221,7 +221,7 @@ func getLastRulesSequenceFromEpisodeMemory(activationType int,limit int)([]int){
 /*  быстро выбрать самое лучшее правило из rulesArr по пусковому стимулу
 используя шаблоном последнюю цепочку кадров эпизод. памяти.
  */
-func getRulesArrFromTrigger(trigID int)(int){
+func getMentalRulesArrFromTrigger(trigID int)(int){
 	// сначала попробовать найти Правило с учетом тематического контекста
 	for limit:=5; limit > 1; limit-- {
 		rImg := getLastRulesSequenceFromEpisodeMemory(1, limit)
@@ -251,7 +251,7 @@ func getRulesArrFromTrigger(trigID int)(int){
 	return 0
 }
 ///////////////////////////////////////////////
-func getRulesFromTemp(rImg []int,limit int)(int){
+func getMentalRulesFromTemp(rImg []int,limit int)(int){
 	for _, v := range rulesArr {
 		if len(v.TAid)!=limit{
 			continue

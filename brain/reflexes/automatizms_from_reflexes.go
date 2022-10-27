@@ -80,7 +80,7 @@ func RunMakeAutomatizmsFromReflexes() string {
 			}
 
 			psychic.NoWarningCreateShow = true
-			ActionsImageID,_:=psychic.СreateNewlastActionsImageID(0,v.ActionIDarr,nil,0,0)
+			ActionsImageID,_:=psychic.CreateNewlastActionsImageID(0,v.ActionIDarr,nil,0,0)
 			_, autmzm := psychic.CreateAutomatizm(nodeID, ActionsImageID)
 			psychic.NoWarningCreateShow = false
 			if autmzm != nil {
@@ -149,7 +149,7 @@ func RunMakeAutomatizmsFromGeneticReflexes() string {
 			}
 			//  создать автоматизм и привязать его к nodeID
 			psychic.NoWarningCreateShow = true
-			ActionsImageID,_:=psychic.СreateNewlastActionsImageID(0,v.ActionIDarr,nil,0,0)
+			ActionsImageID,_:=psychic.CreateNewlastActionsImageID(0,v.ActionIDarr,nil,0,0)
 			_, autmzm := psychic.CreateAutomatizm(nodeID, ActionsImageID)
 			psychic.NoWarningCreateShow = false
 			if autmzm != nil {

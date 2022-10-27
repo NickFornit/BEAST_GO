@@ -66,6 +66,7 @@ func PsychicInit(){
 	TriggerAndActionInit()
 	rulesInit()
 	loadSituationImage()
+	rulesMentalInit()
 	mentalAutomatizmInit()
 	UnderstandingTreeInit()
 

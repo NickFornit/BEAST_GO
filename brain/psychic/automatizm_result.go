@@ -172,7 +172,7 @@ lib.WritePultConsol("<span style='color:blue;background-color:#FFD0FF;'>Был �
 		      А так же просматривать эпизод память взад макчимум на EpisodeMemoryPause шагов или до паузы в общении > 30 шагов,
 		   		фиксируя цепочку правил.
 		*/
-		ai1, _ := СreateNewlastActionsImageID(0, curActiveActions.ActID, curActiveActions.PhraseID, curActiveActions.ToneID, curActiveActions.MoodID)
+		ai1, _ := CreateNewlastActionsImageID(0, curActiveActions.ActID, curActiveActions.PhraseID, curActiveActions.ToneID, curActiveActions.MoodID)
 		fixNewRules(lastCommonDiffValue,ai1)
 	}
 

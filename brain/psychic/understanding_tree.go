@@ -168,7 +168,7 @@ func understandingSituation()(bool){
 			return res
 		}else{// все условия пойдены,. ветка существует,
 			//МЕНТ.АВТОМАТИЗМ может и не БЫТЬ
-			currentMentalAutomatizmID=getMentalAutomatizmFromNodeID(detectedActiveLastUnderstandingNodID)
+			//!!! НЕ ПРИВЯЗЫВАЕТСЯ К ВЕТКЕ currentMentalAutomatizmID=MentalAutomatizmsFromID(detectedActiveLastUnderstandingNodID)
 			// Ориентировочный рефлекс осознания ситуации - только новизна ситуации
 			if currentMentalAutomatizmID>0 {
 				res := orientationConsciousness(2)
