@@ -111,10 +111,28 @@ if CurrentInformationEnvironment.veryActualSituation || CurrentInformationEnviro
 
 	if rID==0 {
 /* попытка более обстоятельно найти в эпиз.памяти подходящий фрагмент
-	Чем больше limit тем маловероятнее найти совпадения,
+	Чем больше limit тем маловероятнее найти совпадения сочетания Правил в ранней эпизодюпамяти,
    так что можно вызывать getRulesFromEpisodicsSlice постепенно уменьшая limit
+Чем больше 	limit тем точнее результат обобщения, но меньше вероятность нахождения данного сочетания Правил
  */
-	rID=getRulesFromEpisodicsSlice(activation_type,5)
+	maxSteps:=1000
+	limit:=5
+	rID=getRulesFromEpisodicsSlice(activation_type,limit,maxSteps)
+	if rID==0{
+		limit=4
+		maxSteps=500
+		rID=getRulesFromEpisodicsSlice(activation_type,limit,maxSteps)
+	}
+	if rID==0{
+		limit=3
+		maxSteps=400
+		rID=getRulesFromEpisodicsSlice(activation_type,limit,maxSteps)
+	}
+	if rID==0{
+		limit=2
+		maxSteps=300
+		rID=getRulesFromEpisodicsSlice(activation_type,limit,maxSteps)
+	}
 	}
 
 	return rID
@@ -124,7 +142,7 @@ if CurrentInformationEnvironment.veryActualSituation || CurrentInformationEnviro
 Чем больше limit тем маловероятнее найти совпадения,
 так что можно вызывать getRulesFromEpisodicsSlice постепенно уменьшая limit
  */
-func getRulesFromEpisodicsSlice(activation_type int,limit int)(int){
+func getRulesFromEpisodicsSlice(activation_type int,limit int,maxSteps int)(int){
 	if EpisodeMemoryLastIDFrameID==0{
 		return 0
 	}
@@ -168,16 +186,12 @@ func getRulesFromEpisodicsSlice(activation_type int,limit int)(int){
 				rID = append(rID, em.RulesID)
 	}
 // найти такую последовательность в предыдущей эпизод.памяти, но не далее 1000 фрагментов
+	// limit=2// для тестирования - оставить 2 последних
 if len(rID)>limit{// limit последних
 	rID=rID[len(rID)-limit:]
 }
 
-//	rID=rID[len(rID)-2:] // для тестирования - оставить 2 последних
-
 	lenFrag:=len(rID)
-	if lenFrag > 7 { // длинные фрагменты не искать
-		return 0
-	}
 	steps:=0
 	lenEp:=len(EpisodeMemoryObjects)
 	var startF = lenEp - 2*lenFrag // отмотать на 2 длины, чтобы не проверять в rID саму себя
@@ -186,7 +200,7 @@ if len(rID)>limit{// limit последних
 	}
 		// идем назад по кускам lenFrag
 		for i := startF; i >= 0; i -- { // =lenFrag - пролетает мимо
-			if steps>1000{
+			if steps>maxSteps{
 				return 0
 			}
 			var isConc=true
@@ -208,7 +222,7 @@ if len(rID)>limit{// limit последних
 					//if ta.Trigger == currentTriggerID{// есть такой пусковой
 						if ta.Effect >0{// с хорошим эффектом
 							return lastEM.RulesID
-						}
+						}//else - продолжает искать хороший конец далее назад
 					//}
 				}
 			}

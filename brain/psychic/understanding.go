@@ -34,7 +34,9 @@ var saveEvolushnStage=0 // сохранение значения уровня о
 происходит с формированием опыта прозвольности выполнения Правил и их выбора для данных условий (psy_Experience.go),
 в частности, Правил относительно самого себя (самосознание).
 
-По каждому пульсу система осознания активируется по ор.рефлексу 
+Начинает работать с if EvolushnStage > 3
+
+По каждому пульсу система осознания активируется по ор.рефлексу
 (из ор.рефлекса - вызов функции активации самосознания и по результатам - продолжить), 
 а если в этот такт нет ор.рефлекса - то из PsychicCountPuls(.
 Вид активации - при вызове функции осознания.
@@ -54,7 +56,7 @@ func consciousness(activation_type int)(bool){
 
 // ПЕРВЫЙ УРОВЕНЬ, самый примитивный уровень:
 	// есть ли штатный мот.автоматизм и нужно ли его менять или задумываться
-	if currentAutomatizmAfterTreeActivatedID > 0 {
+	if currentAutomatizmAfterTreeActivatedID > 0 {// TODO пока нет currentAutomatizmAfterTreeActivatedID!!!
 		am:=AutomatizmSuccessFromIdArr[currentAutomatizmAfterTreeActivatedID]
 		if am != nil && am.Belief==2 && am.Usefulness>0{// нормальный, пусть выполняется
 			return false
@@ -81,7 +83,7 @@ func consciousness(activation_type int)(bool){
 	}
 	/////////////////////////////////////////////////////////
 
-
+	//if EvolushnStage > 3 { - уже обеспечено
 /* ТРЕТИЙ УРОВЕНЬ - попытка найти решение, используя всю текущую инфрмацию с учетом срочности.
    Ментальные автоматизмы нужны только если нет мот.автоматизма или его нужно переделать.
 Т.е. привязанный к ветке дерева понимания мент автоматизм должен срабатывать ЗДЕСЬ.
@@ -108,20 +110,24 @@ func consciousness(activation_type int)(bool){
 
 	/////////////////////////////////////////////////////////
 
-
+		if EvolushnStage > 4{
 // ЧЕТВЕРТЫЙ УРОВЕНЬ - доминанта нерешенной проблемы - только если нет срочности
-	if CurrentInformationEnvironment.veryActualSituation || CurrentInformationEnvironment.danger{
+	if CurrentInformationEnvironment.veryActualSituation || CurrentInformationEnvironment.danger {
 		// TODO
-
-
-
-
-
-
 	}else{// нет решения, паника, откатиться на прежний уровень регирования
-// TODO аварийное решение проблемы
-		return false // пусть выполняется все менее высокоуровневое
-	}
+			// TODO аварийное решение проблемы
+			return false // пусть выполняется все менее высокоуровневое
+		}
+
+	} //if EvolushnStage > 4
+		/////////////////////////////////////////////////////////
+
+
+
+
+
+
+
 	/////////////////////////////////////////////////////////
 
 	// вернуть стадию развития
