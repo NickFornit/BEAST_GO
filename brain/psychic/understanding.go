@@ -56,11 +56,14 @@ func consciousness(activationType int)(bool){
 
 // ПЕРВЫЙ УРОВЕНЬ, самый примитивный уровень:
 	// есть ли штатный мот.автоматизм и нужно ли его менять или задумываться
-	if currentAutomatizmAfterTreeActivatedID > 0 {
-		am:=AutomatizmSuccessFromIdArr[currentAutomatizmAfterTreeActivatedID]
-		if am != nil && am.Belief==2 && am.Usefulness>0{// нормальный, пусть выполняется
+	nArr:=GetMotorsAutomatizmListFromTreeId(detectedActiveLastNodID)
+	if nArr != nil {
+	for i := 0; i < len(nArr); i++ {
+		if nArr[i].Belief==2 && nArr[i].Usefulness>0{// есть нормальный, пусть выполняется
+			//currentAutomatizmAfterTreeActivatedID=nArr[i].ID
 			return false
 		}
+	}
 	}
 	/////////////////////////////////////////////////////////
 
