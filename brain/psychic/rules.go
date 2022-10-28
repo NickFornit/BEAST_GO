@@ -84,11 +84,9 @@ func createNewlastrulesID(id int,TAid []int)(int,*rules){
 
 	rulesArr[id]=&node
 
-	if doWritingFile{
-		if sNew==1{
-			lib.WritePultConsol("<span style='color:green'>Записано групповое <b>ПРАВИЛО № " + strconv.Itoa(id) + "</b></span>")
-		}
-		SaveRulesArr()
+	if doWritingFile{SaveRulesArr() }
+	if sNew==1{
+		lib.WritePultConsol("<span style='color:green'>Записано групповое <b>ПРАВИЛО № " + strconv.Itoa(id) + "</b></span>")
 	}
 
 	return id,&node

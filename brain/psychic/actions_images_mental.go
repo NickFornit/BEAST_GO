@@ -16,11 +16,12 @@ type MentalActionsImages struct {
 	activateBaseID int // активация настроения
 	activateEmotion int // активация эмоции
 	/* Разнообразие заготовленных инфо-функций дает больший потенциал
-	   разных ментальных действий, по-началу случайных, но оптимизирующихся по эффекту Правила.
+	   разных ментальных действий, поначалу случайных, но оптимизирующихся по эффекту Правила.
 	*/
 	activateInfoFunc int // вызов инфо функции
-	activateConsciousness bool // ментальная активация func consciousness
+	activateMotorID int // запуск моторного автоматизма по результатам инфо-функции создания автоматизма
 }
+
 
 var MentalActionsImagesArr=make(map[int]*MentalActionsImages)
 
@@ -35,8 +36,9 @@ func MentalActionsImagesInit(){
 ////////////////////////////////////////////////
 // создать новое сочетание ответных действий если такого еще нет 
 var lastMentalActionsImagesID=0
-func CreateNewlastMentalActionsImagesID(id int,activateBaseID int,activateEmotion int,activateInfoFunc int,activateConsciousness bool)(int,*MentalActionsImages){
-	oldID,oldVal:=checkUnicumMentalActionsImages(activateBaseID,activateEmotion,activateInfoFunc,activateConsciousness)
+func CreateNewlastMentalActionsImagesID(id int,activateBaseID int,activateEmotion int,
+	activateInfoFunc int,activateMotorID int)(int,*MentalActionsImages){
+	oldID,oldVal:=checkUnicumMentalActionsImages(activateBaseID,activateEmotion,activateInfoFunc,activateMotorID)
 	if oldVal!=nil{
 		return oldID,oldVal
 	}
@@ -56,7 +58,7 @@ func CreateNewlastMentalActionsImagesID(id int,activateBaseID int,activateEmotio
 	node.activateBaseID = activateBaseID
 	node.activateEmotion=activateEmotion
 	node.activateInfoFunc=activateInfoFunc
-	node.activateConsciousness=activateConsciousness
+	node.activateMotorID=activateMotorID
 
 	MentalActionsImagesArr[id]=&node
 
@@ -64,12 +66,12 @@ func CreateNewlastMentalActionsImagesID(id int,activateBaseID int,activateEmotio
 
 	return id,&node
 }
-func checkUnicumMentalActionsImages(activateBaseID int,activateEmotion int,activateInfoFunc int,activateConsciousness bool)(int,*MentalActionsImages){
+func checkUnicumMentalActionsImages(activateBaseID int,activateEmotion int,activateInfoFunc int,activateMotorID int)(int,*MentalActionsImages){
 	for id, v := range MentalActionsImagesArr {
 		if activateBaseID!=v.activateBaseID || 
 			activateEmotion!=v.activateEmotion ||
 			activateInfoFunc!=v.activateInfoFunc ||
-			activateConsciousness!=v.activateConsciousness{
+			activateMotorID!=v.activateMotorID {
 			continue
 		}
 		return id,v
@@ -94,7 +96,7 @@ func SaveMentalActionsImagesArr(){
 		out+=strconv.Itoa(v.activateBaseID)+"|"
 		out+=strconv.Itoa(v.activateEmotion)+"|"
 		out+=strconv.Itoa(v.activateInfoFunc)+"|"
-		out+=strconv.FormatBool(v.activateConsciousness)+"|"
+		out+=strconv.Itoa(v.activateMotorID)
 		out+="\r\n"
 	}
 	lib.WriteFileContent(lib.GetMainPathExeFile()+"/memory_psy/action_images_mental.txt",out)
@@ -115,10 +117,10 @@ func loadMentalActionsImagesArr(){
 		activateBaseID,_:=strconv.Atoi(p[3])
 		activateEmotion,_:=strconv.Atoi(p[3])
 		activateInfoFunc,_:=strconv.Atoi(p[3])
-		activateConsciousness,_:=strconv.ParseBool(p[4])
+		activateMotorID,_:=strconv.Atoi(p[4])
 
 var saveDoWritingFile= doWritingFile; doWritingFile =false
-		CreateNewlastMentalActionsImagesID(id,activateBaseID,activateEmotion,activateInfoFunc,activateConsciousness)
+		CreateNewlastMentalActionsImagesID(id,activateBaseID,activateEmotion,activateInfoFunc,activateMotorID)
 doWritingFile =saveDoWritingFile
 	}
 	return
@@ -144,8 +146,8 @@ func GetMentalActionsString(act int)(string){
 		out+=" вызов инфо функции: "+getToneStrFromID(ai.activateInfoFunc)+" "
 	}
 
-	if ai.activateConsciousness {
-		out+=" ментальная активация consciousness: "+strconv.FormatBool(ai.activateConsciousness)+"<br>"
+	if ai.activateMotorID != 0 {
+		out+=" запуск автоматизма: "+getToneStrFromID(ai.activateInfoFunc)+" "
 	}
 
 	return out

@@ -1,11 +1,14 @@
 /* Информационные функции, вызываемые как действия ментального автоматизма по их ID функции.
 
-
+Для каждой инфо-функции создается ее дежурная структура и общая переменная currentInfoStructId == ID инфо-функции
 */
 
 package psychic
 
-
+/* Общая переменная currentInfoStructId == ID инфо-функции),
+которые могут использоваться при запуске consciousness()
+ */
+var currentInfoStructId=0
 
 ///////////////////////////////////
 /* Функция вызова пронумерованной функции
@@ -19,9 +22,46 @@ func runMenyalFunctionID(id int){
 
 
 //////////////////////////////////////////////////////////
-// далее идут ПРОНУМЕРОВАННЫЕ ИНФОРМАЦИОННЫЕ ФУНКЦИИ
+/* далее идут ПРОНУМЕРОВАННЫЕ ИНФОРМАЦИОННЫЕ ФУНКЦИИ,
+для которых в mental_automatizm_INFO_structs.go определяются ИНФОРМАЦИОННЫЕ ГЛОБАЛЬНЫЕ СТРУКТУРЫ - для
+передачи в них полученной информации.
+
+Прототипы:
+type infoStruct4 struct {
+	par int
+}
+var info4 infoStruct4
+func infoFunc4(){
+	res:=0
+
+	info4.par = res // передача инфы в структуру
+	currentInfoStructId=4 // определение актуальной инфо-структуры
+}
+ */
 //////////////////////////////////////////////////////////
 
+
+
+
+/* Подобрать MentalActionsImages
+случайно или по заготовке редактора с Пульта
+*/
+func infoFunc0(){
+	iID:=0// ID MentalActionsImages
+
+	activateBaseID:=0
+	activateEmotion:=0
+	activateInfoFunc:=0
+	activateMotorID:=0
+
+	// TODO подобрать
+
+	// создать
+	iID,_=CreateNewlastMentalActionsImagesID(0,activateBaseID,activateEmotion,	activateInfoFunc,activateMotorID)
+
+	info0.mImgID = iID // передача инфы в структуру
+	currentInfoStructId=0 // определение актуальной инфо-структуры
+}
 
 //////////////////////////////////////////////////////////
 

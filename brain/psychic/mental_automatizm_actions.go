@@ -5,7 +5,7 @@
 package psychic
 
 import (
-
+	"BOT/brain/gomeostas"
 )
 ////////////////////////////////////////////////
 
@@ -31,11 +31,11 @@ func RunMentalMentalAutomatizmsID(id int)(bool){
 	if a==nil{
 		return false
 	}
-	return RumMentalMentalAutomatizm(a)
+	return RunMentalMentalAutomatizm(a)
 }
 ////////////////////
 // todo = true - выполнить полюбому,
-func RumMentalMentalAutomatizm(am *MentalAutomatizm)(bool){
+func RunMentalMentalAutomatizm(am *MentalAutomatizm)(bool){
 	if am==nil{
 		return false
 	}
@@ -49,26 +49,47 @@ func RumMentalMentalAutomatizm(am *MentalAutomatizm)(bool){
 	}
 
 // блокировка выполнения плохого автоматизма, если только не применена "СИЛА ВОЛИ"
-if am.Usefulness<0{
+if am.ActionsImageID>0{
 
 	return false
 }
+	ai:=MentalActionsImagesArr[am.ActionsImageID]
 
-	GetMentalAutomotizmActionsString(am,true)
+	if ai.activateMotorID >0 {
+		// здесь начинается период ожидания: LastRunAutomatizmPulsCount =PulsCount
+		RumAutomatizmID(ai.activateMotorID)
+	}
+
+	if ai.activateInfoFunc >0 {
+		runMenyalFunctionID(ai.activateInfoFunc)
+		// обязательная переактивация
+		consciousness(2,3)
+	}
+
+	if ai.activateBaseID >0 {// на один текущий пульс, во время которого происходит обдумывание
+		gomeostas.CommonBadNormalWell=ai.activateBaseID
+		automatizmTreeActivation()
+		// и сама последует consciousness(1,0)
+	}
+	if ai.activateEmotion >0 {// на один текущий пульс, во время которого происходит обдумывание
+
+		// найти эмоцию по ее ID
+		lev2:=EmotionFromIdArr[ai.activateEmotion].BaseIDarr
+		gomeostas.SetCurContextActiveIDarr(lev2)
+		automatizmTreeActivation()
+		// и сама последует consciousness(1,0)
+	}
 
 	currentMentalAutomatizmID=am.ID
-
 	//выполнить мозжечковый рефлекс сразу после выполняющегося автоматизма
 	//runCerebellumAdditionalMentalAutomatizm(0,am.ID)
-
 //	notAllowReflexRuning=true // блокировка рефлексов
-
 	return true
 }
 //////////////////////////////////////////
 
 
-
+// только для показа на Пульте т.к. мент.автоматизм не имеет видимых действий 
 func GetMentalAutomotizmActionsString(am *MentalAutomatizm,writeLog bool){
 
 

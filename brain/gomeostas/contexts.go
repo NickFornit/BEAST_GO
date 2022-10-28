@@ -316,3 +316,13 @@ func IsContextActive()bool {
  }
  return false
 }
+
+
+// для произвольного задания текущего сочетания ID Безовых контекстов gomeostas.SetCurContextActiveIDarr()
+func SetCurContextActiveIDarr(c []int) {
+	// concurrent map iteration and map write
+	for i := 0; i < len(c); i++ {
+		BaseContextActive[c[i]]=true
+	}
+}
+////////////////////////////////////////////////////////

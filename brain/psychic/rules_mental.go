@@ -64,11 +64,9 @@ func createNewlastrulesMentalID(id int,TAid []int)(int,*rulesMental){
 
 	rulesMentalArr[id]=&node
 
-	if doWritingFile{
-		if sNew==1{
-			lib.WritePultConsol("<span style='color:green'>Записано групповое <b>ПРАВИЛО № " + strconv.Itoa(id) + "</b></span>")
-		}
-		SaverulesMentalArr()
+	if doWritingFile{SaverulesMentalArr() }
+	if sNew==1{
+		lib.WritePultConsol("<span style='color:green'>Записано групповое <b>ПРАВИЛО № " + strconv.Itoa(id) + "</b></span>")
 	}
 
 	return id,&node

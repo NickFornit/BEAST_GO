@@ -162,30 +162,17 @@ func understandingSituation()(bool){
 			// нарастить недостающее в ветке дерева
 			detectedActiveLastUnderstandingNodID = formingUnderstandingBranch(detectedActiveLastUnderstandingNodID, currentUnderstandingStepCount+1, condArr)
 	//мент.автоматизм может прикрепляться ТОЛЬКО к последнему узлу ветки - при полном понимании ситуации
-			// Ориентировочный рефлекс осознания ситуации - частичная новизна условий
-			res:=orientationConsciousness(1)
-			// если res==true - были совершены действия, заблокировать все более низкоуровневые действия
+
+			res:=consciousness(1,0)
 			return res
-		}else{// все условия пойдены,. ветка существует,
-			//МЕНТ.АВТОМАТИЗМ может и не БЫТЬ
-			//!!! НЕ ПРИВЯЗЫВАЕТСЯ К ВЕТКЕ currentMentalAutomatizmID=MentalAutomatizmsFromID(detectedActiveLastUnderstandingNodID)
-			// Ориентировочный рефлекс осознания ситуации - только новизна ситуации
-			if currentMentalAutomatizmID>0 {
-				res := orientationConsciousness(2)
-				return res
-			}else{
-				res:=orientationConsciousness(1)
-				return res
-			}
-			return false
 		}
 	}else{// вообще нет совпадений для данных условий
 		// нарастить недостающее в ветке дерева
 		detectedActiveLastUnderstandingNodID = formingUnderstandingBranch(detectedActiveLastUnderstandingNodID, currentUnderstandingStepCount, condArr)
 
 		CurrentUnderstandingTreeEnd=condArr // все - новизна
-		// Ориентировочный рефлекс осознания ситуации полная новизна условий
-		res:=orientationConsciousness(1)
+
+		res:=consciousness(1,0)
 		return res
 	}
 
