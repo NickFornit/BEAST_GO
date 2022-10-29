@@ -17,8 +17,8 @@ type TriggerAndAction struct {
 	ID int
 /*образ пусковых стимулов:
   >0 - образы действий оператора с Пульта ActionsImage,
-  <0 - образ текущей ситуации
- */
+  <0 - образ текущего состояния BaseStateImage
+*/
 	Trigger int
 	Action int // образ ответных действий - всегда ActionsImage
 	Effect int // эффект от действий: -1 или 0 или 1

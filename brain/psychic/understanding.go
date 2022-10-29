@@ -66,6 +66,10 @@ func consciousness(activationType int,fromNextID int)(bool) {
 		// нужно прервать выполнение циклов субъективныъ активаций
 		stopMentalWork=true
 	}
+	if activationType == 1 {
+		isActivationType2 = false
+		// посмотреть, есть ли прерванные цепочки осмысления, и если есть, выбрать, с какой продолжить осмысление.
+	}
 	if activationType == 2 {
 		isActivationType2 = true
 	}
