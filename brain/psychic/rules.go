@@ -20,6 +20,10 @@
 
 Заполняется при активации дерева (один эпизод)
 и при обобщении эпизодической памяти (последовательность эпизодов).
+
+Цепочки Правил в Эпиз.памяти создабт карту решений в контексте одной темы:
+карты местности - куда идти после очередного шага,
+карту игры в шахматы: как ходить в данной позиции и на сколько шагов вперед обдумывать решения.
 */
 
 
@@ -109,8 +113,7 @@ func checkUnicumrules(TAid []int)(int,*rules){
 
 
 //////////////////// сохранить Образы rules
-//В случае отсуствия ответных действий создается ID такого отсутсвия, пример такой записи: 2|||0|0|
-// ID|ActID через ,|PhraseID через ,|ToneID|MoodID|
+// ID|TAid через ,
 func SaveRulesArr(){
 	var out=""
 	for k, v := range rulesArr {
@@ -124,7 +127,7 @@ func SaveRulesArr(){
 
 }
 ////////////////////  загрузить образы rules
-// ID|ActID через ,|PhraseID через ,|ToneID|MoodID|
+// ID|TAid через ,
 func loadrulesArr(){
 	rulesArr=make(map[int]*rules)
 	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_psy/rules.txt")

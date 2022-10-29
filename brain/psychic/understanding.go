@@ -30,9 +30,11 @@ package psychic
 //////////////////////////////
 var allowConsciousnessProcess=false // при включении и просыпании - 1 раз
 
+// сохранение значения уровня осмысления == стадии развития при произвольном изменении уровня
+var saveEvolushnStage=0
 
-var saveEvolushnStage=0 // сохранение значения уровня осмысления == стадии развития при произвольном изменении уровня
-
+// true - текущий режим активации consciousness - субъектиынй (activationType=2)
+var isActivationType2=false
 
 ////////////////////////////////////////////////////////////
 /* Главная, постоянно активная с каждым пульсом функция поддержвания информационной среды и произвольности.
@@ -51,11 +53,21 @@ activationType == 1 - активация ориентировочным рефл
 activationType == 2 - активация "внутренним" (произвольным) ориентировочным рефлексом
 
 В принципе здесь должны исправляться все лажи ответов предыдущих периодов...
-*/
-func consciousness(activationType int,fromLev int)(bool){
 
-	if !allowConsciousnessProcess{
+fromNextID - ID MentalNext на котором была запущена переактивация consciousness при обдумывании
+*/
+func consciousness(activationType int,fromNextID int)(bool) {
+
+	if !allowConsciousnessProcess {
 		return false
+	}
+	var stopMentalWork=false
+	if activationType == 1 && isActivationType2{// объективная активация
+		// нужно прервать выполнение циклов субъективныъ активаций
+		stopMentalWork=true
+	}
+	if activationType == 2 {
+		isActivationType2 = true
 	}
 
 	// вернуть стадию развития
@@ -69,7 +81,7 @@ func consciousness(activationType int,fromLev int)(bool){
 
 // ПЕРВЫЙ УРОВЕНЬ, самый примитивный уровень:
 	// есть ли штатный мот.автоматизм и нужно ли его менять или задумываться
-	if fromLev==0 || fromLev==1 {
+	if fromNextID==0 {
 		nArr := GetMotorsAutomatizmListFromTreeId(detectedActiveLastNodID)
 		/* - только привязанные к ветке, а не мягкий алгоритм
 		      currentAutomatizmAfterTreeActivatedID = getAutomatizmFromNodeID(detectedActiveLastNodID)
@@ -91,7 +103,7 @@ func consciousness(activationType int,fromLev int)(bool){
 // if CurrentInformationEnvironment.veryActualSituation || CurrentInformationEnvironment.danger{
 
 // ВТОРОЙ УРОВЕНЬ - попытка использования примитивных Правил
-	if fromLev==0 || fromLev==2 {
+	if fromNextID==0 {
 		rules := getSuitableRules(activationType)
 		if rules > 0 { // по правилу найти автоматизм и запустить его
 			ta := TriggerAndActionArr[rules]
@@ -127,7 +139,13 @@ func consciousness(activationType int,fromLev int)(bool){
 
    После срабатывания инфо-функции (.activateInfoFunc) информация добавляется к текущему информационному окружения в виде одной из соответствующих глобальных структур (для каждой инфо-функции в mental_automatizm_INFO_structs.go создается ее дежурная структура и задается значение общей переменной currentInfoStructId == ID инфо-функции), которые могут использоваться при запуске consciousness().
  */
-	if fromLev==0 || fromLev==3 {
+	if fromNextID==0 {
+		if stopMentalWork{
+			// запомнить текущую работу в момент ее прерывания, чтобы можно было вернуться к обдумыванию
+			// TODO стек 7 прерванных дел
+
+			// TODO превать нахождение решения методом циклической активации
+		}
 		// детекция ленивого состояния
 		if isIdleness() {
 			// пофиг все, можно лениво обрабатывать накопившиеся структуры, реагирование - на уровне - до EvolushnStage < 4
@@ -144,12 +162,21 @@ func consciousness(activationType int,fromLev int)(bool){
 		   Если есть с .activateMotorID>0 - запустить моторный автоматизм activateMotorID,
 		   если нет .activateMotorID==0 - создать следующий цепоцечный мент.автоматизм и прописать его ID в .NextID
 		*/
-		mentA := MentalAutomatizmsFromBranchID[detectedActiveLastUnderstandingNodID]
-		if mentA == nil {
+		firstArr:=goNextFromUnderstandingNodeIDArr[detectedActiveLastUnderstandingNodID]
+		if firstArr != nil {
 			// подбираем подходящий MentalActionsImages и создаем базовый автоматизм
 			infoFunc0()
-			createMentalAutomatizmID(0, detectedActiveLastUnderstandingNodID, info0.mImgID, 1)
-			consciousness(activationType,3)
+			// создание или использование ментального автоматизма
+			aID,_:=createMentalAutomatizmID(0, info0.mImgID, 1)
+			// создание первого элемента цепочки
+			fromNextID,_=createNewNextFromUnderstandingNodeID(
+				detectedActiveLastUnderstandingNodID,
+				detectedActiveLastNodID,
+				0,
+				0,
+				aID)
+			// перезапуск осмысления
+			consciousness(2,fromNextID)
 			return true // ничего не делать при перезапуске
 		}
 
@@ -164,11 +191,14 @@ func consciousness(activationType int,fromLev int)(bool){
 					}
 			}
 		*/
+	//}if isIdleness()
+	}else{// продолжить осмысление с goNext.ID == fromNextID
+
 	}
 
 	/////////////////////////////////////////////////////////
 
-	if fromLev==0 || fromLev==4 {
+	if fromNextID==0 {
 		if EvolushnStage > 4 {
 			// ЧЕТВЕРТЫЙ УРОВЕНЬ - доминанта нерешенной проблемы - только если нет срочности
 			// и тут - Стек отложенных дел.

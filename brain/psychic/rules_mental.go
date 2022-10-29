@@ -1,5 +1,8 @@
 /* обобщение ментальных правил на основе ментальных кадров эпизодической памяти
 
+Цепочки Правил в Эпиз.памяти создабт карту решений в контексте одной темы:
+карты местности - куда идти после очередного шага,
+карту игры в шахматы: как ходить в данной позиции и на сколько шагов вперед обдумывать решения.
 */
 
 
@@ -89,8 +92,7 @@ func checkUnicumrulesMental(TAid []int)(int,*rulesMental){
 
 
 //////////////////// сохранить Образы rulesMental
-//В случае отсуствия ответных действий создается ID такого отсутсвия, пример такой записи: 2|||0|0|
-// ID|ActID через ,|PhraseID через ,|ToneID|MoodID|
+// ID|TAid через ,
 func SaverulesMentalArr(){
 	var out=""
 	for k, v := range rulesMentalArr {
@@ -104,7 +106,7 @@ func SaverulesMentalArr(){
 
 }
 ////////////////////  загрузить образы rulesMental
-// ID|ActID через ,|PhraseID через ,|ToneID|MoodID|
+// ID|TAid через ,
 func loadrulesMentalArr(){
 	rulesMentalArr=make(map[int]*rulesMental)
 	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_psy/rulesMental.txt")
