@@ -11,17 +11,6 @@ import (
 
 
 
-/* для разделения строки Sequence автоматизма на составляющие
-типы действий:
-1 Mnn - выполнить ментальную функцию с ID
-2 Ann - выполнить моторный автоматизм с ID
-*/
-type ActsMentalAutomatizm struct {
-	Type int  	// тип совершаемого действия
-	Acts string // само действие
-}
-
-
 /////////////////////////////////////////
 /* запуск автоматизма на выполнение
 возвращает true при успехе
@@ -48,7 +37,7 @@ func RunMentalMentalAutomatizm(am *MentalAutomatizm)(bool){
 		return false
 	}
 
-// блокировка выполнения плохого автоматизма, если только не применена "СИЛА ВОЛИ"
+// блокировка выполнения плохого мент.автоматизма, если только не применена "СИЛА ВОЛИ"
 if am.ActionsImageID>0{
 
 	return false
@@ -62,14 +51,11 @@ if am.ActionsImageID>0{
 
 	if ai.activateInfoFunc >0 {
 		runMenyalFunctionID(ai.activateInfoFunc)
-		// обязательная переактивация
-		consciousness(2,3)
 	}
 
 	if ai.activateBaseID >0 {// на один текущий пульс, во время которого происходит обдумывание
 		gomeostas.CommonBadNormalWell=ai.activateBaseID
 		automatizmTreeActivation()
-		// и сама последует consciousness(1,0)
 	}
 	if ai.activateEmotion >0 {// на один текущий пульс, во время которого происходит обдумывание
 
@@ -77,7 +63,6 @@ if am.ActionsImageID>0{
 		lev2:=EmotionFromIdArr[ai.activateEmotion].BaseIDarr
 		gomeostas.SetCurContextActiveIDarr(lev2)
 		automatizmTreeActivation()
-		// и сама последует consciousness(1,0)
 	}
 
 	currentMentalAutomatizmID=am.ID

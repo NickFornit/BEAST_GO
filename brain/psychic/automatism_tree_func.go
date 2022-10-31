@@ -23,8 +23,13 @@ var lastAutomatizmNodeID=0
 var noRunThisOperation=false // не проверять на дубли
 func createNewAutomatizmNode(parent *AutomatizmNode,id int,baseID int,EmotionID int,
 	ActivityID int,ToneMoodID int,SimbolID int,VerbalID int)(int,*AutomatizmNode){
+	/* !!!!
 	if parent == nil{
 		return 0,nil
+	}
+	 */
+	if parent == nil{
+		parent=&AutomatizmTree
 	}
 	//if !noRunThisOperation { НЕЛЬЗЯ ИГНОРИРОВАТЬ ИНАЧЕ СОЗДАЕТ ЛИШНЕЕ
 		// если есть такой узел, то не создавать
@@ -96,7 +101,7 @@ func updatingPhraseTreeFromID(rt *AutomatizmNode){
 ID|ParentNode|BaseID|EmotionID|ActivityID|ToneMoodID|SimbolID|VerbalID
  */
 func loadAutomatizmTree(){
-	createNulLevelAutomatizmTree(&AutomatizmTree)
+//	createNulLevelAutomatizmTree(&AutomatizmTree)
 	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_psy/automatizm_tree.txt")
 	cunt:=len(strArr)
 	//просто проход по всем строкам файла подряд так что сначала идут дочки, потом - их родители
@@ -131,18 +136,20 @@ doWritingFile =saveDoWritingFile
 	}
 	return
 }
+/*
 // создать первый, нулевой уровень дерева
 func createNulLevelAutomatizmTree(rt *AutomatizmNode){
 	rt.ID=0
 	AutomatizmTreeFromID[rt.ID]=rt
 	return
 }
+ */
 /////////////////////////////////////
 func SaveAutomatizmTree(){
 	notAllowScanInTreeThisTime = true
 	var out=""
 	cnt:=len(AutomatizmTree.Children)
-	for n := 0; n < cnt; n++ {
+	for n := 0; n < cnt; n++ { // чтобы записывалось по порядку родителей
 		out+=getAutomatizmNode(&AutomatizmTree.Children[n])
 	}
 	lib.WriteFileContent(lib.GetMainPathExeFile()+"/memory_psy/automatizm_tree.txt",out)

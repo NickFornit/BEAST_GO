@@ -40,11 +40,8 @@ func rulesMentalInit(){
 // создать новое сочетание ответных действий если такого еще нет
 var lastrulesMentalID=0
 func createNewlastrulesMentalID(id int,TAid []int)(int,*rulesMental){
-	sNew:=0
 	if TAid == nil{
 		return 0,nil
-	}else{
-		sNew=1
 	}
 
 	oldID,oldVal:=checkUnicumrulesMental(TAid)
@@ -67,9 +64,13 @@ func createNewlastrulesMentalID(id int,TAid []int)(int,*rulesMental){
 
 	rulesMentalArr[id]=&node
 
-	if doWritingFile{SaverulesMentalArr() }
-	if sNew==1{
+	if doWritingFile{
+		SaverulesMentalArr()
+	if len(TAid)>1{
 		lib.WritePultConsol("<span style='color:green'>Записано групповое <b>ПРАВИЛО № " + strconv.Itoa(id) + "</b></span>")
+	}else{
+		lib.WritePultConsol("<span style='color:green'>Записано <b>ПРАВИЛО № " + strconv.Itoa(id) + "</b></span>")
+	}
 	}
 
 	return id,&node

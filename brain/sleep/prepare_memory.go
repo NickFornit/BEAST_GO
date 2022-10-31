@@ -9,6 +9,7 @@ package sleep
 
 import (
 	word_sensor "BOT/brain/words_sensor"
+	"BOT/brain/psychic"
 )
 
 
@@ -20,6 +21,9 @@ func prepareWordArr(){
 
 		}
 
+
+	// обработка кратковременной памяти во сне или бездействии
+	psychic.ShortTermMemoryProcessing()
 }
 
 

@@ -106,6 +106,7 @@ func createBasicAutomatizmTree(){
 	createNewAutomatizmNode(&AutomatizmTree,0,3,0,0,0,0,0)
 
 	if doWritingFile {SaveAutomatizmTree() }
+	SaveAutomatizmTree()
 	notAllowScanInTreeThisTime=false // запрет показа карты при обновлении
 	return
 }

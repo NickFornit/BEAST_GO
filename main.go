@@ -101,9 +101,12 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 					waitingPeriod = strconv.Itoa(time)
 				}
 
-				var psichicReady = ""
+				var psichicReady = "0"
 				if psychic.StartPsichicNow{
 					psichicReady = "1"
+				}
+				if psychic.AllowConsciousnessProcess{
+					psichicReady = "2"
 				}
 
 				outStr += "#|#" + gomeostas.GetCurGomeoStatus() + "#|#" + gomeostas.GetCurContextActive() +

@@ -1,7 +1,7 @@
 /* Дерево понимания или дерево ментальных автоматизмов
 
 В конечных узлах Дерева накапливаются ментальные автоматизмы.
-
+формат записи: ID|ParentNode|Mood|EmotionID|SituationID|PurposeID
 */
 
 package psychic
@@ -11,7 +11,9 @@ package psychic
 // инициализирующий блок - в порядке последовательности инициализаций
 // из psychic.go
 func UnderstandingTreeInit(){
-
+	if EvolushnStage < 4 { // только со стадии развития 4
+		return
+	}
 	loadPurposeImageFromIdArr()
 	loadUnderstandingTree()
 	if len(UnderstandingTree.Children)==0{// еще нет никаких веток
@@ -23,7 +25,7 @@ func UnderstandingTreeInit(){
 
 /* ДЕРЕВО понимания или Дерево ментальных автоматизмов.
 Имеет фиксированных 4 уровней (кроме базового нулевого)
-формат записи: ID|Mood|EmotionID|SituationID|PurposeI
+формат записи: ID|ParentNode|Mood|EmotionID|SituationID|PurposeID
 Узлы всех уровней могут произвольно меняться на другие для переактивации Дерева.
  */
 type UnderstandingNode struct { // узел дерева автоматизмов
@@ -124,7 +126,7 @@ func understandingSituation()(bool){
 	currentUnderstandingNodeID=nil
 
 	// вытащить 3 уровня условий в виде ID их образов
-	var lev1=PsyBaseMood
+	var lev1=PsyBaseMood // PsyBaseMood: -1 Плохое настроение, 0 Нормальное, 1 - хорошее настроение
 	var lev2=0
 	if CurrentInformationEnvironment.PsyActionImg!=nil{
 		lev2=CurrentInformationEnvironment.PsyEmotionImg.ID
@@ -164,6 +166,9 @@ func understandingSituation()(bool){
 	//мент.автоматизм может прикрепляться ТОЛЬКО к последнему узлу ветки - при полном понимании ситуации
 
 			res:=consciousness(1,0)
+			if isActivationType2{// был ментальный перезапус
+				return true// заблокировать все низкоуровневое
+			}
 			return res
 		}
 	}else{// вообще нет совпадений для данных условий
@@ -173,6 +178,9 @@ func understandingSituation()(bool){
 		CurrentUnderstandingTreeEnd=condArr // все - новизна
 
 		res:=consciousness(1,0)
+		if isActivationType2{// был ментальный перезапус
+			return true// заблокировать все низкоуровневое
+		}
 		return res
 	}
 

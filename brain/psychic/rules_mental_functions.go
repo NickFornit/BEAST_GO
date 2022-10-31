@@ -68,9 +68,9 @@ func getCur10lastMentalRules()string{
 Текущая ситуация - массив самых последних кадров эпизодической памяти и
 активный пусковой стимул currentTriggerID типов curActiveActions или curBaseStateImage.
 */
-func getSuitableMentalRules(activationType int)(int){
+func getSuitableMentalRules()(int){
 	var rID=0
-
+	var activationType=2
 // попытка срочно найти действие, в опасной ситуации
 	if CurrentInformationEnvironment.veryActualSituation || CurrentInformationEnvironment.danger{
 		rID = getRulesArrFromTrigger(currentTriggerID)

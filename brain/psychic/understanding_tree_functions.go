@@ -1,5 +1,5 @@
 /* Функции для Дерева понимания (дерева ментальных автоматизмов)
-
+запись ID|ParentNode|Mood|EmotionID|SituationID|PurposeID
 */
 
 package psychic
@@ -24,6 +24,14 @@ ID|ParentNode|Mood|EmotionID|SituationID|PurposeID
 var lastUnderstandingNodeID=0
 func createNewUnderstandingNode(parent *UnderstandingNode,id int,Mood int,EmotionID int,
 	SituationID int,PurposeID int)(int,*UnderstandingNode){
+	/*!!!!
+	if parent == nil{
+		return 0,nil
+	}
+	 */
+	if parent == nil{
+		parent=&UnderstandingTree
+	}
 	// если есть такой узел, то не создавать
 	idOld,nodeOld:=FindUnderstandingTreeNodeFromCondition(Mood,EmotionID,SituationID,PurposeID)
 	if idOld>0{
@@ -43,7 +51,8 @@ func createNewUnderstandingNode(parent *UnderstandingNode,id int,Mood int,Emotio
 	var node UnderstandingNode
 	node.ID = id
 	node.ParentNode=parent
-	node.ParentID=parent.ID
+	node.ParentID = parent.ID
+
 	node.Mood=Mood
 	node.EmotionID=EmotionID
 	node.SituationID=SituationID
@@ -57,10 +66,23 @@ func createNewUnderstandingNode(parent *UnderstandingNode,id int,Mood int,Emotio
 			newN = &parent.Children[i]
 		}
 	}
+
+	UnderstandingNodeFromID[id]=&node
 	// т.к. append меняет длину массива, перетусовывая адреса, то нужно обновить адреса в UnderstandingNodeFromID:
 	updateUnderstandingNodeFromID(parent)// здесь потому, что при загрузке из файла нужно на лету получать адреса
 
 	return id,newN
+}
+// создать первые три ветки базовых состояний
+func createBasicUnderstandingTree(){
+	notAllowScanInTreeThisTime=true // запрет показа карты при обновлении
+	//PsyBaseMood: -1 Плохое настроение, 0 Нормальное, 1 - хорошее настроение
+	createNewUnderstandingNode(&UnderstandingTree,0,-1,0,0,0)
+	createNewUnderstandingNode(&UnderstandingTree,0,0,0,0,0)
+	createNewUnderstandingNode(&UnderstandingTree,0,1,0,0,0)
+	if doWritingFile {SaveUnderstandingTree() }
+	// SaveUnderstandingTree()
+	notAllowScanInTreeThisTime = false // запрет показа карты при обновлении
 }
 // корректируем адреса всех узлов
 func updateUnderstandingNodeFromID(parent *UnderstandingNode){
@@ -83,10 +105,10 @@ func updatingUnderstandingNodeFromID(rt *UnderstandingNode){
 ///////////////////////////////////////////////////////////
 /* загрузить записанное дерево
 Формат записи:
-ID|ParentNode|Mood|EmotionID|ActivityID|ToneMoodID|SimbolID|VerbalID
+ID|ParentNode|Mood|EmotionID|SituationID|PurposeID
 */
 func loadUnderstandingTree(){
-	createNulLevelUnderstandingTree(&UnderstandingTree)
+	//UnderstandingNodeFromID[0]=rt
 	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_psy/understanding_tree.txt")
 	cunt:=len(strArr)
 	//просто проход по всем строкам файла подряд так что сначала идут дочки, потом - их родители
@@ -101,7 +123,7 @@ func loadUnderstandingTree(){
 		p:=strings.Split(strArr[n], "|")
 		id,_:=strconv.Atoi(p[0])
 		parentID,_:=strconv.Atoi(p[1])
-		Mood,_:=strconv.Atoi(p[2])
+		Mood,_:=strconv.Atoi(p[2]) // PsyBaseMood: -1 Плохое настроение, 0 Нормальное, 1 - хорошее настроение
 		EmotionID,_:=strconv.Atoi(p[3])
 		SituationID,_:=strconv.Atoi(p[4])
 		PurposeID,_:=strconv.Atoi(p[5])
@@ -114,23 +136,9 @@ doWritingFile =saveDoWritingFile
 	}
 	return
 }
-// создать первый, нулевой уровень дерева
-func createNulLevelUnderstandingTree(rt *UnderstandingNode){
-	rt.ID=0
-	UnderstandingNodeFromID[rt.ID]=rt
-	return
-}
+
 ///////////////////////////////////////////
-// создать первые три ветки базовых состояний
-func createBasicUnderstandingTree(){
-	notAllowScanInTreeThisTime=true // запрет показа карты при обновлении
-	createNewUnderstandingNode(&UnderstandingTree,0,1,0,0,0)
-	createNewUnderstandingNode(&UnderstandingTree,0,2,0,0,0)
-	createNewUnderstandingNode(&UnderstandingTree,0,3,0,0,0)
-	if doWritingFile {SaveUnderstandingTree() }
-	notAllowScanInTreeThisTime = false // запрет показа карты при обновлении
-}
-/////////////////////////////////////
+// ID|ParentNode|Mood|EmotionID|SituationID|PurposeID
 func SaveUnderstandingTree(){
 	if EvolushnStage < 4 { // только со стадии развития 4
 		return
@@ -138,15 +146,17 @@ func SaveUnderstandingTree(){
 	notAllowScanInTreeThisTime=true
 	var out=""
 	cnt:=len(UnderstandingTree.Children)
-	for n := 0; n < cnt; n++ {
+	for n := 0; n < cnt; n++ {// чтобы записывалось по порядку родителей
 		out+=getUnderstandingNode(&UnderstandingTree.Children[n])
 	}
+
 	lib.WriteFileContent(lib.GetMainPathExeFile()+"/memory_psy/understanding_tree.txt",out)
 	notAllowScanInTreeThisTime = false
 	return
 }
+// такой проход чтодбы дочерние узлы шли по порядку и всегда были бы родители
 func getUnderstandingNode(wt *UnderstandingNode)(string){
-	var out=""
+	var out="" //ID|ParentNode|Mood|EmotionID|SituationID|PurposeID
 	//	if wt.ParentID>0 {
 	out += strconv.Itoa(wt.ID) + "|"
 	out += strconv.Itoa(wt.ParentID) + "|"
@@ -164,6 +174,7 @@ func getUnderstandingNode(wt *UnderstandingNode)(string){
 	}
 	return out
 }
+
 /////////////////////////////////////
 // найти КОНЕЧНЫЙ узел по условиям
 func FindUnderstandingTreeNodeFromCondition(Mood int,EmotionID int,

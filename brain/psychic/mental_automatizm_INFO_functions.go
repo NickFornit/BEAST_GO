@@ -1,21 +1,54 @@
 /* Информационные функции, вызываемые как действия ментального автоматизма по их ID функции.
 
-Для каждой инфо-функции создается ее дежурная структура и общая переменная currentInfoStructId == ID инфо-функции
+Инфо-функции - разные методы получения инфы, систематизации, поиска и т.п.
+с целью найти верное действие для моторного автоматизма, а если нет,
+то создания нового ментального автоматизма для продолжения итеации поиска.
+
+Если нужно, то входные данные могут сначала помещаться в структуру входных данных типа
+type inputStruct4 struct {
+	par int
+}
+var input4 inputStruct4
+
+Результат работы инфо-функции записывается в mentalInfoStruct
+и определяется общая переменная currentInfoStructId == ID инфо-функции
 */
 
 package psychic
 
+/* Общая для всех информационных функций структура (типа информацонного окружения)
+для сохранения найденной информации.
+*/
+type mentalInfo struct {
+	mImgID int // ID MentalActionsImages найденного целевого действия
+
+}
+var mentalInfoStruct mentalInfo
+
+func clinerMentalInfo(){ // НУЖНА ЛИ?..
+	mentalInfoStruct.mImgID=0
+	// ВСТАВЛЯТЬ ДРУГИЕ ЧЛЕНЫ ПО МЕРЕ ПОЯВЛЕНИЯ !!!!
+}
+/////////////////////////////////////
+
+
 /* Общая переменная currentInfoStructId == ID инфо-функции),
 которые могут использоваться при запуске consciousness()
+
+Можно использовать switch currentInfoStructId{ для выявления поля структуры mentalInfoStruct
  */
 var currentInfoStructId=0
 
 ///////////////////////////////////
 /* Функция вызова пронумерованной функции
+
  */
 func runMenyalFunctionID(id int){
 	switch id {
-
+	case 1: infoFunc1()//Подобрать MentalActionsImages для базового звена цепочки
+	case 2: infoFunc2()//Подобрать MentalActionsImages для последующего звена цепочки
+	case 3: infoFunc3()
+	case 4: infoFunc4()
 	}
 }
 //////////////////////////////////////////////////////////
@@ -25,28 +58,18 @@ func runMenyalFunctionID(id int){
 /* далее идут ПРОНУМЕРОВАННЫЕ ИНФОРМАЦИОННЫЕ ФУНКЦИИ,
 для которых в mental_automatizm_INFO_structs.go определяются ИНФОРМАЦИОННЫЕ ГЛОБАЛЬНЫЕ СТРУКТУРЫ - для
 передачи в них полученной информации.
-
-Прототипы:
-type infoStruct4 struct {
-	par int
-}
-var info4 infoStruct4
-func infoFunc4(){
-	res:=0
-
-	info4.par = res // передача инфы в структуру
-	currentInfoStructId=4 // определение актуальной инфо-структуры
-}
+Так же для передачи информации в инфо-функции (если это нужно, например, что найти) применяюися входне структуры.
  */
 //////////////////////////////////////////////////////////
 
 
 
 
-/* Подобрать MentalActionsImages
+/* №0 Подобрать MentalActionsImages для базового звена цепочки
+c вызовом activateInfoFunc для начальной информированности,
 случайно или по заготовке редактора с Пульта
 */
-func infoFunc0(){
+func infoFunc1(){
 	iID:=0// ID MentalActionsImages
 
 	activateBaseID:=0
@@ -55,13 +78,129 @@ func infoFunc0(){
 	activateMotorID:=0
 
 	// TODO подобрать
+	/*
+	1. Поиск MentalActionsImages для следующего .NextID начинается по ментальным Правилам.
+	2. Если нет правил, посмотреть, есть ли дургие ветки у данного узла и использовать их начальную инфу.
+	3. Если нет дргих веток, выбрать какой-то провоцирующий.
+	 */
+	// поиск в Правилах
+	infoFindRightMentalRukes()
 
 	// создать
 	iID,_=CreateNewlastMentalActionsImagesID(0,activateBaseID,activateEmotion,	activateInfoFunc,activateMotorID)
 
-	info0.mImgID = iID // передача инфы в структуру
-	currentInfoStructId=0 // определение актуальной инфо-структуры
+	mentalInfoStruct.mImgID = iID // передача инфы в структуру
+	currentInfoStructId=1 // определение актуальной инфо-структуры
 }
+/////////////////////////////////////////////////////////
+
+
+/* №2 Подобрать MentalActionsImages для последующего звена цепочки, если не найдено в опыте
+с вызовом различных activateInfoFunc или
+ c вызовом activateMotorID моторнорнного автоматизма (а значит, с запуском моторного с периодом ожидания),
+т.е. раз нет решения, пробовать подобрать моторные действия, просмотрев цеаочку с начала.
+Если в базовом звене есть другие MotorBranchID то - подсмотреть как они продолжаются с насовпажающего звена цепи!
+*/
+func infoFunc2(){
+	iID:=0// ID MentalActionsImages
+
+	activateBaseID:=0
+	activateEmotion:=0
+	activateInfoFunc:=0
+	activateMotorID:=0
+
+	// TODO подобрать
+	/*
+		1. Поиск MentalActionsImages для следующего .NextID начинается по ментальным Правилам.
+		2. Если нет правил, посмотреть, есть ли дургие ветки у данного узла и использовать их начальную инфу.
+		3. Если нет дргих веток, выбрать какой-то провоцирующий.
+	*/
+	// поиск в Правилах
+	infoFindRightMentalRukes()
+
+	// создать
+	iID,_=CreateNewlastMentalActionsImagesID(0,activateBaseID,activateEmotion,	activateInfoFunc,activateMotorID)
+
+	mentalInfoStruct.mImgID = iID // передача инфы в структуру
+	currentInfoStructId=2 // определение актуальной инфо-структуры
+}
+//////////////////////////////////////////////////////////
+
+
+
+
+
+/* №3 найти подходящий мент.автоматизм по опыту ментальных Правил
+*/
+func infoFunc3() {
+	infoFindRightMentalRukes()
+	// получили mentalInfoStruct.mImgID
+	currentInfoStructId=3 // определение актуальной инфо-структуры
+}
+func infoFindRightMentalRukes(){
+	mrules:=getSuitableMentalRules()
+	if mrules > 0 { // по правилу найти автоматизм и запустить его
+		mta := MentalTriggerAndActionArr[mrules]
+		mai := MentalActionsImagesArr[mta.Trigger]
+		id, _ := createMentalAutomatizmID(0, mai.ID, 1)
+		if id >0 {
+			// запустить мент.автоматизм
+			//RunMentalMentalAutomatizm(matmzm)
+			mentalInfoStruct.mImgID=id
+		}
+	}
+	mentalInfoStruct.mImgID=0
+}
+//////////////////////////////////////////////////////////
+
+
+
+/* нализ инфо стркутуры и др. информации по currentInfoStructId и выдача решения
+Нужна таблица, какие инфо-функции вызывать при данной ситуации
+
+ */
+func infoFunc4(){
+	if currrentFromNextID>0 {
+		analisAndSintez(currrentFromNextID) // возвращает mentalInfoStruct.mImgID
+	}else{
+		mentalInfoStruct.mImgID=0
+	}
+	// получили mentalInfoStruct.mImgID
+	currentInfoStructId=4 // определение актуальной инфо-структуры
+}
+/* анализ инфо стркутуры и др. информации по currentInfoStructId и выдача решения
+Нужна таблица, какие инфо-функции вызывать при данной ситуации
+Возвращает fromNextID следующего звена, даже если найден моторный автоматизм или задана объективная переактивация.
+*/
+func analisAndSintez(fromNextID int)(int){
+	clinerMentalInfo()
+	// сначала стандартно:
+	/*
+		1. Поиск MentalActionsImages для следующего .NextID начинается по ментальным Правилам.
+		2. Если нет правил, посмотреть, есть ли дургие ветки у данного узла и использовать их начальную инфу.
+		3. Если нет дргих веток, выбрать какой-то провоцирующий.
+	*/
+	// поиск в Правилах
+	infoFindRightMentalRukes()
+
+	// сложные типы данных, полученные в инфо-функциях
+	switch currentInfoStructId{
+
+	}
+
+
+
+
+	return mentalInfoStruct.mImgID // очищенный или заполненный
+}
+//////////////////////////////////////////////////////////
+
+
+
+
+
+
+
 
 //////////////////////////////////////////////////////////
 

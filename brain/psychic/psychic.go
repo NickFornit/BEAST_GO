@@ -119,9 +119,9 @@ func PsychicCountPuls(evolushnStage int,lifeTime int,puls int,isSleeping bool){
 
 
 	// осознание при включении и бодрствовании - один раз
-	if evolushnStage > 3 && PulsCount >4 && !IsSleeping && !allowConsciousnessProcess {
+	if evolushnStage > 3 && PulsCount >4 && !IsSleeping && !AllowConsciousnessProcess {
 // начать мышление
-		allowConsciousnessProcess=true
+		AllowConsciousnessProcess=true
 		consciousness(0,0)
 	}
 

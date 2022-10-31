@@ -61,13 +61,10 @@ func rulesInit(){
 // создать новое сочетание ответных действий если такого еще нет
 var lastrulesID=0
 func createNewlastrulesID(id int,TAid []int)(int,*rules){
-	sNew:=0
+
 	if TAid == nil{
 		return 0,nil
-	}else{
-		sNew=1
 	}
-
 	oldID,oldVal:=checkUnicumrules(TAid)
 	if oldVal!=nil{
 		return oldID,oldVal
@@ -88,9 +85,14 @@ func createNewlastrulesID(id int,TAid []int)(int,*rules){
 
 	rulesArr[id]=&node
 
-	if doWritingFile{SaveRulesArr() }
-	if sNew==1{
+	if doWritingFile{
+		SaveRulesArr()
+
+		if len(TAid)>1{
 		lib.WritePultConsol("<span style='color:green'>Записано групповое <b>ПРАВИЛО № " + strconv.Itoa(id) + "</b></span>")
+		}else{
+			lib.WritePultConsol("<span style='color:green'>Записано <b>ПРАВИЛО № " + strconv.Itoa(id) + "</b></span>")
+		}
 	}
 
 	return id,&node
