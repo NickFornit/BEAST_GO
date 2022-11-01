@@ -78,8 +78,7 @@ var goNextFromUnderstandingNodeIDArr=make(map[int][]*goNext)
  */
 func createNewNextFromUnderstandingNodeID(UnderstandingNodeID int,
 	MotorBranchID int,
-	FromID int,
-	NextID int,
+	FromID int, // записывается текущее currrentFromNextID
 	AutomatizmID int)(int,*goNext){
 
 	// если ли уже такое начало цепочки?
@@ -91,12 +90,12 @@ func createNewNextFromUnderstandingNodeID(UnderstandingNodeID int,
 			}
 		}
 	}
-	id,gn:=createNewlastgoNextID(0,MotorBranchID,FromID,NextID,AutomatizmID)
-	goNextFromUnderstandingNodeIDArr[UnderstandingNodeID]=append(goNextFromUnderstandingNodeIDArr[UnderstandingNodeID],gn)
+	id,newID:=createNewlastgoNextID(0,MotorBranchID,FromID,0,AutomatizmID)
+	goNextFromUnderstandingNodeIDArr[UnderstandingNodeID]=append(goNextFromUnderstandingNodeIDArr[UnderstandingNodeID],newID)
 // прицепить мент.автоматизм
 createMentalAutomatizmID(0, mentalInfoStruct.mImgID, 1)
 
-	return id,gn
+	return id,newID
 }
 ///////////////////////////////////////////////
 

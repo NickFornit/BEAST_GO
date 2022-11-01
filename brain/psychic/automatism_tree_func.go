@@ -23,14 +23,11 @@ var lastAutomatizmNodeID=0
 var noRunThisOperation=false // не проверять на дубли
 func createNewAutomatizmNode(parent *AutomatizmNode,id int,baseID int,EmotionID int,
 	ActivityID int,ToneMoodID int,SimbolID int,VerbalID int)(int,*AutomatizmNode){
-	/* !!!!
+
 	if parent == nil{
 		return 0,nil
 	}
-	 */
-	if parent == nil{
-		parent=&AutomatizmTree
-	}
+
 	//if !noRunThisOperation { НЕЛЬЗЯ ИГНОРИРОВАТЬ ИНАЧЕ СОЗДАЕТ ЛИШНЕЕ
 		// если есть такой узел, то не создавать
 		idOld, nodeOld := FindAutomatizmTreeNodeFromCondition(baseID, EmotionID, ActivityID, ToneMoodID, SimbolID, VerbalID)
@@ -101,6 +98,9 @@ func updatingPhraseTreeFromID(rt *AutomatizmNode){
 ID|ParentNode|BaseID|EmotionID|ActivityID|ToneMoodID|SimbolID|VerbalID
  */
 func loadAutomatizmTree(){
+	//нулевой узел
+	AutomatizmTreeFromID[0]=&AutomatizmTree // все по нулям по умолчанию
+
 //	createNulLevelAutomatizmTree(&AutomatizmTree)
 	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_psy/automatizm_tree.txt")
 	cunt:=len(strArr)

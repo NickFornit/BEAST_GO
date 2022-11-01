@@ -47,8 +47,9 @@ func runMenyalFunctionID(id int){
 	switch id {
 	case 1: infoFunc1()//Подобрать MentalActionsImages для базового звена цепочки
 	case 2: infoFunc2()//Подобрать MentalActionsImages для последующего звена цепочки
-	case 3: infoFunc3()
-	case 4: infoFunc4()
+	case 3: infoFunc3()//айти подходящий мент.автоматизм по опыту ментальных Правил
+	case 4: infoFunc4()//нализ инфо стркутуры и др. информации по currentInfoStructId и выдача решения
+	case 5: infoFunc5()//создать и запустить ментальный автоматизм по акции
 	}
 }
 //////////////////////////////////////////////////////////
@@ -84,7 +85,7 @@ func infoFunc1(){
 	3. Если нет дргих веток, выбрать какой-то провоцирующий.
 	 */
 	// поиск в Правилах
-	infoFindRightMentalRukes()
+	//action:=infoFindRightMentalRukes()
 
 	// создать
 	iID,_=CreateNewlastMentalActionsImagesID(0,activateBaseID,activateEmotion,	activateInfoFunc,activateMotorID)
@@ -116,7 +117,8 @@ func infoFunc2(){
 		3. Если нет дргих веток, выбрать какой-то провоцирующий.
 	*/
 	// поиск в Правилах
-	infoFindRightMentalRukes()
+	//action:=infoFindRightMentalRukes()
+
 
 	// создать
 	iID,_=CreateNewlastMentalActionsImagesID(0,activateBaseID,activateEmotion,	activateInfoFunc,activateMotorID)
@@ -137,19 +139,18 @@ func infoFunc3() {
 	// получили mentalInfoStruct.mImgID
 	currentInfoStructId=3 // определение актуальной инфо-структуры
 }
-func infoFindRightMentalRukes(){
+func infoFindRightMentalRukes()(int){
 	mrules:=getSuitableMentalRules()
 	if mrules > 0 { // по правилу найти автоматизм и запустить его
 		mta := MentalTriggerAndActionArr[mrules]
-		mai := MentalActionsImagesArr[mta.Trigger]
-		id, _ := createMentalAutomatizmID(0, mai.ID, 1)
-		if id >0 {
-			// запустить мент.автоматизм
-			//RunMentalMentalAutomatizm(matmzm)
-			mentalInfoStruct.mImgID=id
+		// выбираем Ответное действие из Правила
+		if mta != nil {
+			mentalInfoStruct.mImgID=mta.Action
+			return mentalInfoStruct.mImgID
 		}
 	}
 	mentalInfoStruct.mImgID=0
+	return 0
 }
 //////////////////////////////////////////////////////////
 
@@ -181,7 +182,7 @@ func analisAndSintez(fromNextID int)(int){
 		3. Если нет дргих веток, выбрать какой-то провоцирующий.
 	*/
 	// поиск в Правилах
-	infoFindRightMentalRukes()
+	//action:=infoFindRightMentalRukes()
 
 	// сложные типы данных, полученные в инфо-функциях
 	switch currentInfoStructId{
@@ -196,7 +197,27 @@ func analisAndSintez(fromNextID int)(int){
 //////////////////////////////////////////////////////////
 
 
-
+/* №5 создать и запустить ментальный автоматизм по акции -
+ВСЕГДА ПОСЛЕ ПОЛУЧЕНИЯ ОБРАЗА ДЕЙСТВИЯ mentalInfoStruct.mImgID
+ */
+func infoFunc5() {
+	if mentalInfoStruct.mImgID >0 {
+		infoCreateAndRunMentAtmzmFromAction(mentalInfoStruct.mImgID)
+	}
+	// получили mentalInfoStruct.mImgID
+	currentInfoStructId=5 // определение актуальной инфо-структуры
+}
+func infoCreateAndRunMentAtmzmFromAction(actImgID int){
+	if mentalInfoStruct.mImgID ==0 {
+		return
+	}
+	id, matmzm := createMentalAutomatizmID(0, actImgID, 1)
+	if id >0 {
+		// запустить мент.автоматизм
+		RunMentalMentalAutomatizm(matmzm)
+	}
+}
+//////////////////////////////////////////////////////////
 
 
 

@@ -101,12 +101,13 @@ var ActiveBranchNodeArr []int
 // создать первые три ветки базовых состояний
 func createBasicAutomatizmTree(){
 	notAllowScanInTreeThisTime=true // запрет показа карты при обновлении
+
 	createNewAutomatizmNode(&AutomatizmTree,0,1,0,0,0,0,0)
 	createNewAutomatizmNode(&AutomatizmTree,0,2,0,0,0,0,0)
 	createNewAutomatizmNode(&AutomatizmTree,0,3,0,0,0,0,0)
 
 	if doWritingFile {SaveAutomatizmTree() }
-	SaveAutomatizmTree()
+	//SaveAutomatizmTree()
 	notAllowScanInTreeThisTime=false // запрет показа карты при обновлении
 	return
 }
@@ -343,6 +344,12 @@ if LastRunAutomatizmPulsCount >0{// обработка периода ожида
 			}
 		}
 	}
+	/* после периода ожидания
+	   Учесть последствия запуска мот.автоматизма
+	   и если нужно обдумать их в новом ментальном consciousness(2,currrentFromNextID)
+	*/
+	afterWaitingPeriod()
+
 //  после обработки ожидаемой реакции Оператора - следует реакция Beast
 //		return true  поэтому нельзя здесь делать прерывание!
 }// конец обработки ожидания ответа оператора

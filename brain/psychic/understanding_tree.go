@@ -109,7 +109,7 @@ func understandingSituation()(bool){
 	}
 	// определить ID ситуации: настроение при посылке сообщения, нажатые кнопки и т.п.
 	situationImageID:=getCurSituationImageID()
-	if situationImageID<0{// нет выбранной ситуации
+	if situationImageID == 0{// нет выбранной ситуации
 			return false
 		}
 	curBaseStateImage.SituationID=situationImageID
@@ -163,28 +163,24 @@ func understandingSituation()(bool){
 		if currentUnderstandingStepCount<conditionsCount { // не пройдено до конца имеющихся условий
 			// нарастить недостающее в ветке дерева
 			detectedActiveLastUnderstandingNodID = formingUnderstandingBranch(detectedActiveLastUnderstandingNodID, currentUnderstandingStepCount+1, condArr)
-	//мент.автоматизм может прикрепляться ТОЛЬКО к последнему узлу ветки - при полном понимании ситуации
-
-			res:=consciousness(1,0)
-			if isActivationType2{// был ментальный перезапус
-				return true// заблокировать все низкоуровневое
-			}
-			return res
 		}
 	}else{// вообще нет совпадений для данных условий
 		// нарастить недостающее в ветке дерева
 		detectedActiveLastUnderstandingNodID = formingUnderstandingBranch(detectedActiveLastUnderstandingNodID, currentUnderstandingStepCount, condArr)
-
 		CurrentUnderstandingTreeEnd=condArr // все - новизна
-
-		res:=consciousness(1,0)
-		if isActivationType2{// был ментальный перезапус
-			return true// заблокировать все низкоуровневое
-		}
-		return res
 	}
 
-	return false
+	/* объективный запуск consciousness
+	мент.автоматизм может прикрепляться ТОЛЬКО к последнему узлу ветки - при полном понимании ситуации
+	 */
+	res:=consciousness(1,0)
+	if isActivationType2{// был ментальный перезапус
+		return true// заблокировать все низкоуровневое
+	}
+/* вернуть res consciousness после конца рекурсивного цикла ментального осмысления:
+	если был запущен моторный автоматизм, то true
+ */
+	return res
 }
 
 //////////////////////////////////////////////////////////////////

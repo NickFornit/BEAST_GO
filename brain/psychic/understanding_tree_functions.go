@@ -24,14 +24,11 @@ ID|ParentNode|Mood|EmotionID|SituationID|PurposeID
 var lastUnderstandingNodeID=0
 func createNewUnderstandingNode(parent *UnderstandingNode,id int,Mood int,EmotionID int,
 	SituationID int,PurposeID int)(int,*UnderstandingNode){
-	/*!!!!
+
 	if parent == nil{
 		return 0,nil
 	}
-	 */
-	if parent == nil{
-		parent=&UnderstandingTree
-	}
+
 	// если есть такой узел, то не создавать
 	idOld,nodeOld:=FindUnderstandingTreeNodeFromCondition(Mood,EmotionID,SituationID,PurposeID)
 	if idOld>0{
@@ -76,6 +73,7 @@ func createNewUnderstandingNode(parent *UnderstandingNode,id int,Mood int,Emotio
 // создать первые три ветки базовых состояний
 func createBasicUnderstandingTree(){
 	notAllowScanInTreeThisTime=true // запрет показа карты при обновлении
+
 	//PsyBaseMood: -1 Плохое настроение, 0 Нормальное, 1 - хорошее настроение
 	createNewUnderstandingNode(&UnderstandingTree,0,-1,0,0,0)
 	createNewUnderstandingNode(&UnderstandingTree,0,0,0,0,0)
@@ -108,6 +106,10 @@ func updatingUnderstandingNodeFromID(rt *UnderstandingNode){
 ID|ParentNode|Mood|EmotionID|SituationID|PurposeID
 */
 func loadUnderstandingTree(){
+
+	//нулевой узел
+	UnderstandingNodeFromID[0]=&UnderstandingTree// все по нулям по умолчанию
+	
 	//UnderstandingNodeFromID[0]=rt
 	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_psy/understanding_tree.txt")
 	cunt:=len(strArr)
