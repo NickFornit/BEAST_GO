@@ -21,10 +21,16 @@ func prepareWordArr(){
 
 		}
 
+if EvolushnStage>3 {
+	// обработка эпизодической памяти
+
 
 	// обработка кратковременной памяти во сне или бездействии
 	psychic.ShortTermMemoryProcessing()
 }
+
+}
+/////////////////////////////////
 
 
 

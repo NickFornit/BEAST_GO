@@ -359,9 +359,18 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 
 			get_automatizm_list_info := r.FormValue("get_automatizm_list_info")
 			if len(get_automatizm_list_info) > 0 {
-				base := r.FormValue("limitBasicID")
-				limitBasicID,_:=strconv.Atoi(base)
-				ref := psychic.GetAutomatizmInfo(limitBasicID)
+				lpage := r.FormValue("limitPage")
+				limitPage,_:=strconv.Atoi(lpage)
+				ref := psychic.GetAutomatizmInfo(limitPage)
+				_, _ = fmt.Fprint(resp, ref)
+				return
+			}
+
+			get_mental_automatizm_list_info := r.FormValue("get_mental_automatizm_list_info")
+			if len(get_mental_automatizm_list_info) > 0 {
+				base := r.FormValue("limitPage")
+				limitPage,_:=strconv.Atoi(base)
+				ref := psychic.GetMentalAutomatizmInfo(limitPage)
 				_, _ = fmt.Fprint(resp, ref)
 				return
 			}
@@ -378,6 +387,14 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 			if len(get_sequence_info) > 0 {
 				autmzmID,_:=strconv.Atoi(r.FormValue("autmzmID"))
 				ref := psychic.GetAutomatizmSequenceInfo(autmzmID, false)
+				_, _ = fmt.Fprint(resp, ref)
+				return
+			}
+
+			get_mental_actiom_img_info := r.FormValue("get_mental_actiom_img_info")
+			if len(get_mental_actiom_img_info) > 0 {
+				mautmzmID,_:=strconv.Atoi(r.FormValue("mautmzmID"))
+				ref := psychic.GetMentalAutomotizmActionsString(mautmzmID, false)
 				_, _ = fmt.Fprint(resp, ref)
 				return
 			}
@@ -420,6 +437,31 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				_, _ = fmt.Fprint(resp, ref)
 				return
 			}
+
+
+			get_mental_automatizm_tree := r.FormValue("get_mental_automatizm_tree")
+			if len(get_mental_automatizm_tree) > 0 {
+				base := r.FormValue("limit")
+				limit,_:=strconv.Atoi(base)
+				ref := psychic.GetMentalAutomatizmTreeForPult(limit)
+				_, _ = fmt.Fprint(resp, ref)
+				return
+			}
+			get_node_mental_situations := r.FormValue("get_node_mental_situations")
+			if len(get_node_mental_situations) > 0 {
+				nodeID,_:=strconv.Atoi(r.FormValue("autNodeID"))
+				ref := psychic.GetMentalSituationsForNodeInfo(nodeID)
+				_, _ = fmt.Fprint(resp, ref)
+				return
+			}
+			get_node_mental_purpose := r.FormValue("get_node_mental_purpose")
+			if len(get_node_mental_purpose) > 0 {
+				nodeID,_:=strconv.Atoi(r.FormValue("autNodeID"))
+				ref := psychic.GetMentalPurposeForNodeInfo(nodeID)
+				_, _ = fmt.Fprint(resp, ref)
+				return
+			}
+
 
 			get_rulles_list_info := r.FormValue("get_rulles_list_info")
 			if get_rulles_list_info =="1" {

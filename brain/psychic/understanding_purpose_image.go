@@ -21,7 +21,7 @@ type PurposeImage struct {
 	ID int
 	veryActual bool // true - цель очень актуальна
 	targetID []int //массив ID парамктров гомеостаза как цели для улучшения в данных условиях
-	actionID int //выбранный образ действия для достижения данной цели (purpose_action_images.go)
+	actionID int //выбранный образ действия для достижения данной цели (ActionsImage)
 	// для каждого actionID сила действий сначала принимается =5, а потом корректируется мозжечковыми рефлексами
 }
 var PurposeImageFromID=make(map[int]*PurposeImage)
@@ -71,7 +71,7 @@ func checkUnicumPurposeImage(veryActual bool,targetID []int,actionID int)(int,*P
 
 
 /////////////////////////////////////////
-// сохранить образы сочетаний пусковых стимулов
+// сохранить образы
 func SavePurposeImageFromIdArr(){
 	var out=""
 	for k, v := range PurposeImageFromID {
@@ -87,7 +87,7 @@ func SavePurposeImageFromIdArr(){
 	lib.WriteFileContent(lib.GetMainPathExeFile()+"/memory_psy/purpose_images.txt",out)
 
 }
-////////////////////  загрузить образы сочетаний пусковых стимулов
+////////////////////  загрузить образы 
 func loadPurposeImageFromIdArr(){
 	PurposeImageFromID=make(map[int]*PurposeImage)
 	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_psy/purpose_images.txt")
@@ -109,6 +109,7 @@ func loadPurposeImageFromIdArr(){
 			targetID=append(targetID,si)
 		}
 		actionID,_:=strconv.Atoi(p[3])
+
 var saveDoWritingFile= doWritingFile; doWritingFile =false
 		createPurposeImageID(id,veryActual,targetID,actionID)
 doWritingFile =saveDoWritingFile

@@ -1,5 +1,5 @@
 /* Образ ментального действия
-
+ID|activateBaseID|activateEmotion|activateInfoFunc|activateMotorID|
 */
 
 package psychic
@@ -13,8 +13,8 @@ import (
 ///////////////////////////////////
 type MentalActionsImages struct {
 	ID    int   // идентификатор данного сочетания пусковых стимулов
-	activateBaseID int // активация настроения
-	activateEmotion int // активация эмоции
+	activateBaseID int // активация настроения Mood в дереве понимания 1 2 3 (отражает -1 0 1 UnderstandingNode.Mood)
+	activateEmotion int // активация эмоции EmotionID в дереве понимания (UnderstandingNode.EmotionID)
 	/* Разнообразие заготовленных инфо-функций дает больший потенциал
 	   разных ментальных действий, поначалу случайных, но оптимизирующихся по эффекту Правила.
 	*/
@@ -34,10 +34,14 @@ func MentalActionsImagesInit(){
 
 
 ////////////////////////////////////////////////
-// создать новое сочетание ответных действий если такого еще нет 
+/* создать новое сочетание ответных действий если такого еще нет
+!!! activateBaseID в виде 1,2,3, а не -1,0,1 !!!!
+при activateBaseID==0 не задается переадресация
+ */
 var lastMentalActionsImagesID=0
 func CreateNewlastMentalActionsImagesID(id int,activateBaseID int,activateEmotion int,
 	activateInfoFunc int,activateMotorID int)(int,*MentalActionsImages){
+
 	oldID,oldVal:=checkUnicumMentalActionsImages(activateBaseID,activateEmotion,activateInfoFunc,activateMotorID)
 	if oldVal!=nil{
 		return oldID,oldVal
@@ -87,8 +91,7 @@ func checkUnicumMentalActionsImages(activateBaseID int,activateEmotion int,activ
 
 
 //////////////////// сохранить образы сочетаний ответных действий
-//В случае отсуствия ответных действий создается ID такого отсутсвия, пример такой записи: 2|||0|0|
-// ID|ActID через ,|PhraseID через ,|ToneID|MoodID|
+// ID|activateBaseID|activateEmotion|activateInfoFunc|activateMotorID|
 func SaveMentalActionsImagesArr(){
 	var out=""
 	for k, v := range MentalActionsImagesArr {
@@ -114,8 +117,8 @@ func loadMentalActionsImagesArr(){
 		}
 		p:=strings.Split(strArr[n], "|")
 		id,_:=strconv.Atoi(p[0])
-		activateBaseID,_:=strconv.Atoi(p[3])
-		activateEmotion,_:=strconv.Atoi(p[3])
+		activateBaseID,_:=strconv.Atoi(p[1])
+		activateEmotion,_:=strconv.Atoi(p[2])
 		activateInfoFunc,_:=strconv.Atoi(p[3])
 		activateMotorID,_:=strconv.Atoi(p[4])
 

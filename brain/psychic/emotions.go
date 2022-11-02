@@ -119,7 +119,7 @@ doWritingFile =saveDoWritingFile
 func getEmotonsComponentStr(em *Emotion)(string){
 var out=""
 if em==nil{
-	return "Еще не определились эмоции."
+	return "НЕТ"
 }
 	for i := 0; i < len(em.BaseIDarr); i++ {
 		if i>0{out+=", "}

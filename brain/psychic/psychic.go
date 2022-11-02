@@ -67,6 +67,7 @@ func PsychicInit(){
 	rulesInit()
 	loadSituationImage()
 	goNextInit()
+	loadMentalActionsImagesArr()
 	rulesMentalInit()
 	mentalAutomatizmInit()
 	UnderstandingTreeInit()
@@ -233,8 +234,10 @@ func SaveAllPsihicMemory(){
 	saveEpisodicMenory()
 	SaveBaseStateImageArr()
 	SaveTriggerAndActionArr()
+	SavePurposeImageFromIdArr()
 	SaveRulesArr()
 	SavegoNext()
+	SaveMentalActionsImagesArr()
 	SaveMentalAutomatizm()
 	SaveProblemDominenta()
 	notAllowScanInTreeThisTime = false

@@ -1,7 +1,7 @@
 /* Ментальные (умственные) автоматизмы мышления.
 Базовый мент.автоматизм может прикрепляться ТОЛЬКО к последнему узлу ветки - при полном понимании ситуации
 
-id|BranchID|Usefulness|ActionsImageID|Count
+id|Usefulness|ActionsImageID|Count
 */
 
 package psychic
@@ -95,8 +95,7 @@ func checkUnicumMentalAutomatizm(ActionsImageID int, checkLevel int)(int,*Mental
 ////////////////////////////////////////////
 
 
-// СОХРАНИТЬ структура записи: id|BranchID|Usefulness|ActionsImageID|Count
-// В случае отсуствия пусковых стимулов создается ID такого отсутсвия, пример такой записи: 2|||0|0|
+// СОХРАНИТЬ структура записи: id|Usefulness|ActionsImageID|Count
 func SaveMentalAutomatizm() {
 	var out = ""
 
@@ -110,7 +109,7 @@ func SaveMentalAutomatizm() {
 	lib.WriteFileContent(lib.GetMainPathExeFile() + "/memory_psy/mental_automatizm_images.txt", out)
 }
 
-// ЗАГРУЗИТЬ структура записи: id|BranchID|Usefulness|ActionsImageID|Count
+// ЗАГРУЗИТЬ структура записи: id|Usefulness|ActionsImageID|Count
 func loadMentalAutomatizm() {
 	NoWarningMentalCreateShow = true
 	MentalAutomatizmsFromID = make(map[int]*MentalAutomatizm)

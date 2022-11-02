@@ -27,11 +27,16 @@ func UnderstandingTreeInit(){
 Имеет фиксированных 4 уровней (кроме базового нулевого)
 формат записи: ID|ParentNode|Mood|EmotionID|SituationID|PurposeID
 Узлы всех уровней могут произвольно меняться на другие для переактивации Дерева.
+
+Дерево может переактивароваться при срабатывании мент.автоматизмов с действиями
+MentalActionsImages.activateBaseID и MentalActionsImages.activateEmotion
+в mental_automatizm_actions.go RunMentalMentalAutomatizm(
  */
-type UnderstandingNode struct { // узел дерева автоматизмов
+type UnderstandingNode struct { // узел дерева понимания
 	ID int
-	Mood int // ощущаемое настроение PsyBaseMood: -1 Плохое настроение, 0 Нормальное, 1 - хорошее настроение
-	EmotionID int // эмоция, может произвольно меняться
+	//Mood = PsyBaseMood: -1 Плохое настроение, 0 Нормальное, 1 - хорошее настроение
+	Mood int // ощущаемое настроение МОЖЕТ ПРОИЗВОЛЬНО МЕНЯТЬСЯ
+	EmotionID int // эмоция, МОЖЕТ ПРОИЗВОЛЬНО МЕНЯТЬСЯ
 /* SituationID определяет основной контекст ситуации, определяемый при вызове активации дерева понимания.
 Если этот контекст не задан в understandingSituation(situationImageID
 то в getCurSituationImageID() по-началу выбирается наугад (для первого приближения) более важные из существующих,

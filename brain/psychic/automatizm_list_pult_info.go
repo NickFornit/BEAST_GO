@@ -1,4 +1,4 @@
-/* список автоматизмов для Пульта
+/* список моторных автоматизмов для Пульта
 для http://go/pages/automatizm_table.php
 */
 
@@ -50,7 +50,7 @@ func GetAutomatizmInfo(limitBasicID int)(string){
 		"<th width=70 class='table_header' style='background-color:#CCC5FF;'  title='ID базового состояния'>BaseID Дерева</th>" +
 		"<th width='70' class='table_header' style='background-color:#CCC5FF;'  title='ID образа сочетания эмоций'>Эмоции Дерева</th>" +
 		"<th width='10%' class='table_header' style='background-color:#CCC5FF;'  title='ID образа пускового стимула'>ДействияID-ФразаID-НастроениеID</th>" +
-		"<th class='table_header'  title='Действия автоматизма, их может быть много видов.'>Строка действий</th>" +
+		"<th class='table_header'  title='Действия автоматизма, их может быть много видов.'>Образ действия</th>" +
 		"<th width='30' class='table_header' title='ID следующего автоматизма в цепочке'>NextID</th>" +
 		"<th width='30' class='table_header' title='Энергичность'>Energy</th>" +
 		"<th width='30' class='table_header' title='(БЕС)ПОЛЕЗНОСТЬ: -10 вред 0 +10 +n польза'>Полезность</th>" +
