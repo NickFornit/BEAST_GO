@@ -16,7 +16,7 @@ type MentalTriggerAndAction struct {
   >0 - образы действий оператора с Пульта ActionsImage,
   <0 - образ действий ментального автоматизма, активировавшего consciousness
  */
-	Trigger int
+	Trigger int// м.б. два вида (см. сверху)
 	Action int // образ ответных действий - всегда MentalActionsImages
 	Effect int // эффект от действий: -1 или 0 или 1
 }

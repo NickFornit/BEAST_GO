@@ -24,6 +24,11 @@
 Цепочки Правил в Эпиз.памяти создабт карту решений в контексте одной темы:
 карты местности - куда идти после очередного шага,
 карту игры в шахматы: как ходить в данной позиции и на сколько шагов вперед обдумывать решения.
+
+Поиск по Павилам ведется не по отдельным действиям (а это - не только слова, но и тон и/или кнопки действий),
+а тупо по ID образов действий. Но, если крепко заматься и вспоминать детально,
+то можно делать поиск по всем компонентам действий и делать его мягким.
+Заготовлен прототип getSuitableMentalRulesСarefully() для использования в ментальных инфо-функциях.
 */
 
 
@@ -48,6 +53,11 @@ var rulesArr=make(map[int]*rules)
 
 //////////////////////////////////////////
 
+// отслеживать Правила из Пульта в http://go/pages/rulles.php
+var RullesOutputProcess=false // режим отслеживания
+var RullesOutputStr="" // текущее состояние последний 10 правил
+
+///////////////////////////////////////////
 // вызывается из psychic.go
 func rulesInit(){
 	loadrulesArr()
@@ -60,6 +70,7 @@ func rulesInit(){
 ////////////////////////////////////////////////
 // создать новое сочетание ответных действий если такого еще нет
 var lastrulesID=0
+var isNotLoading=true
 func createNewlastrulesID(id int,TAid []int)(int,*rules){
 
 	if TAid == nil{
@@ -87,10 +98,11 @@ func createNewlastrulesID(id int,TAid []int)(int,*rules){
 
 	if doWritingFile{
 		SaveRulesArr()
-
-		if len(TAid)>1{
-		lib.WritePultConsol("<span style='color:green'>Записано групповое <b>ПРАВИЛО № " + strconv.Itoa(id) + "</b></span>")
-		}else{
+	}
+	if isNotLoading {
+		if len(TAid) > 1 {
+			lib.WritePultConsol("<span style='color:green'>Записано групповое <b>ПРАВИЛО № " + strconv.Itoa(id) + "</b></span>")
+		} else {
 			lib.WritePultConsol("<span style='color:green'>Записано <b>ПРАВИЛО № " + strconv.Itoa(id) + "</b></span>")
 		}
 	}
@@ -151,7 +163,9 @@ func loadrulesArr(){
 			TAid=append(TAid,si)
 		}
 var saveDoWritingFile= doWritingFile; doWritingFile =false
+		isNotLoading=false
 		createNewlastrulesID(id,TAid)
+		isNotLoading=true
 doWritingFile =saveDoWritingFile
 	}
 	return

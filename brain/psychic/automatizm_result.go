@@ -37,9 +37,7 @@ var savePsyMood=0//сила Плохо -10 ... 0 ...+10 Хорошо
 // НОВИЗНА СИТУАЦИИ сохраняется значение CurrentAutomatizTreeEnd[] для решений
 var savedNoveltySituation []int
 
-// отслеживать Правила из Пульта в http://go/pages/rulles.php
-var RullesOutputProcess=false // режим отслеживания
-var RullesOutputStr="" // текущее состояние последний 10 правил
+
 
 /////////////////////////////////////////////////////////////////////
 // отслеживание запущенных автоматизмов
@@ -302,7 +300,7 @@ func fixNewRules(lastCommonDiffValue int,ai1 int) int {
 	// новый кадр эпизодической памяти, сохраняющий
 	newEpisodeMemory(rulesID,0) // запись эпизодической памяти saveEpisodicMenory()
 
-	// теперь обрабатываем прошлую эпизодическую память
+	// теперь обрабатываем прошлую эпизодическую память (необязательно, т.к. при каждом поиске в эп.памяти это происходит)
 	GetRulesFromEpisodeMemory(0)
 
 if RullesOutputProcess{// отслеживать Правила из Пульта в http://go/pages/rulles.php

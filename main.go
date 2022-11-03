@@ -471,6 +471,43 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				return
 			}
 
+			get_mental_rulles_list_info := r.FormValue("get_mental_rulles_list_info")
+			if get_mental_rulles_list_info =="1" {
+				psychic.RullesMentalOutputProcess=true
+				//psychic.GetRRRRRRRRR() // тестирование
+				ref := psychic.RullesMentalOutputStr
+				_, _ = fmt.Fprint(resp, ref)
+				return
+			}
+
+			get_mental_cickles_list_info := r.FormValue("get_mental_cickles_list_info")
+			if get_mental_cickles_list_info =="1" {
+				ref := psychic.GetCicklesToPult()
+				_, _ = fmt.Fprint(resp, ref)
+				return
+			}
+			get_atmzm_tree_info := r.FormValue("get_atmzm_tree_info")
+			if get_atmzm_tree_info =="1" {
+				objID,_:=strconv.Atoi(r.FormValue("objID"))
+				ref := psychic.GetAtmzmTreeInfo(objID)
+				_, _ = fmt.Fprint(resp, ref)
+				return
+			}
+			get_undstg_tree_info := r.FormValue("get_undstg_tree_info")
+			if get_undstg_tree_info =="1" {
+				objID,_:=strconv.Atoi(r.FormValue("objID"))
+				ref := psychic.GetUndstgTreeInfo(objID)
+				_, _ = fmt.Fprint(resp, ref)
+				return
+			}
+			get_ment_atmzm_info := r.FormValue("get_ment_atmzm_info")
+			if get_ment_atmzm_info =="1" {
+				objID,_:=strconv.Atoi(r.FormValue("objID"))
+				ref := psychic.GetMentAtmzmInfo(objID)
+				_, _ = fmt.Fprint(resp, ref)
+				return
+			}
+
 			make_automatizms_from_reflexes := r.FormValue("make_automatizms_from_reflexes")
 			if len(make_automatizms_from_reflexes) == 1 {
 				ref := reflexes.RunMakeAutomatizmsFromReflexes()

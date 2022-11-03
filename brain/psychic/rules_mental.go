@@ -15,6 +15,9 @@ import (
 )
 
 ///////////////////////////////////
+// отслеживать Правила из Пульта в http://go/pages/rulles.php
+var RullesMentalOutputProcess=false // режим отслеживания
+var RullesMentalOutputStr="" // текущее состояние последний 10 правил
 
 /* Правила примитивного опыта, обобщающие стимулы->ответы->эффект для таких цепочек в диалогах
 На основе этих правил становятся возможны более системные обобщения.
@@ -32,13 +35,14 @@ func rulesMentalInit(){
 	loadrulesMentalArr()
 
 //	getCur10lastrulesMental()
-	RullesOutputStr=getCur10lastMentalRules()// чтобы что-то было сразу
+	RullesMentalOutputStr=getCur10lastMentalRules()// чтобы что-то было сразу
 }
 
 
 ////////////////////////////////////////////////
 // создать новое сочетание ответных действий если такого еще нет
 var lastrulesMentalID=0
+var isNotMentLoading=true
 func createNewlastrulesMentalID(id int,TAid []int)(int,*rulesMental){
 	if TAid == nil{
 		return 0,nil
@@ -66,11 +70,15 @@ func createNewlastrulesMentalID(id int,TAid []int)(int,*rulesMental){
 
 	if doWritingFile{
 		SaverulesMentalArr()
-	if len(TAid)>1{
-		lib.WritePultConsol("<span style='color:green'>Записано групповое <b>ПРАВИЛО № " + strconv.Itoa(id) + "</b></span>")
-	}else{
-		lib.WritePultConsol("<span style='color:green'>Записано <b>ПРАВИЛО № " + strconv.Itoa(id) + "</b></span>")
+
 	}
+	if isNotMentLoading {
+		RullesMentalOutputStr=getCur10lastMentalRules()
+		if len(TAid)>1{
+			lib.WritePultConsol("<span style='color:green'>Записано групповое <b>ПРАВИЛО № " + strconv.Itoa(id) + "</b></span>")
+		}else{
+			lib.WritePultConsol("<span style='color:green'>Записано <b>ПРАВИЛО № " + strconv.Itoa(id) + "</b></span>")
+		}
 	}
 
 	return id,&node
@@ -129,7 +137,9 @@ func loadrulesMentalArr(){
 			TAid=append(TAid,si)
 		}
 var saveDoWritingFile= doWritingFile; doWritingFile =false
+		isNotMentLoading=false
 		createNewlastrulesMentalID(id,TAid)
+		isNotMentLoading=true
 doWritingFile =saveDoWritingFile
 	}
 	return

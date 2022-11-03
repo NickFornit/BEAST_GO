@@ -43,7 +43,7 @@ var isActivationType2=false
 var currrentFromNextID=0 // текущий fromNextID в текущем запуске consciousness
 
 // временное сохранеиние цикла осмысления между двумя объективными вызовами consciousness
-var saveFromNextIDcurretCicle []int
+var saveFromNextIDcurretCicle []int // последовательность fromNextID
 
 ////////////////////////////////////////////////////////////
 /* Главная, постоянно активная с каждым пульсом функция поддержвания информационной среды и произвольности.

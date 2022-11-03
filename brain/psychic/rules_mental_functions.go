@@ -1,5 +1,8 @@
 /* функции ментальных Правил
 
+
+Функция мягкого поиска по деталям образов действий getSuitableMentalRulesСarefully()
+который можно использовать в инфо-функциях.
 */
 
 
@@ -23,21 +26,23 @@ func GetMentalRulesFromEpisodeMemory(kind int){
 }
 //////////////////////////////////////////////////
 
-
-
+// тестовый вызов из main.go
+func GetRRRRRRRRR(){
+	RullesMentalOutputStr=getCur10lastMentalRules()
+}
 
 // вывести 10 последних Правил на Пульт в http://go/pages/rulles.php
 func getCur10lastMentalRules()string{
-	rCount:=lastrulesID
+	rCount:=lastrulesMentalID
 	if rCount >10{
 		rCount=10
 	}
 	var out=""
 	for i := 0; i < rCount; i++ {
-		r:=rulesArr[lastrulesID-i]
+		r:=rulesMentalArr[lastrulesMentalID-i]
 		out+="ID="+strconv.Itoa(r.ID)+":"
 		for n := 0; n < len(r.TAid); n++ {
-			taa:=TriggerAndActionArr[r.TAid[n]]
+			taa:=MentalTriggerAndActionArr[r.TAid[n]]
 			if taa == nil{
 				continue
 			}
@@ -47,12 +52,12 @@ func getCur10lastMentalRules()string{
 				out+="<span style='padding:10px;'></span>"
 			}
 			if taa.Trigger >0 {
-				out += "<b>Стимул:</b> <span style='background-color:#FFECEB;'>" + GetActionsString(taa.Trigger) + "</span> "
+				out += "<b>Стимул (оператора):</b> <span style='background-color:#FFECEB;'>" + GetActionsString(taa.Trigger) + "</span> "
 			}
 			if taa.Trigger <0 {
-				out += "<b>Стимул:</b> <span style='background-color:#FFECEB;'>" + GetMentalActionsString(taa.Trigger) + "</span> "
+				out += "<b>Стимул (ментальный):</b> <span style='background-color:#FFECEB;'>" + GetMentalActionsString(-taa.Trigger) + "</span> "
 			}
-			out+="=> <b>Ответ:</b> <span style='background-color:#E8E8FF;'>"+GetActionsString(taa.Action)+"</span> "
+			out+="=> <b>Ответ:</b> <span style='background-color:#E8E8FF;'>"+GetMentalActionsString(taa.Action)+"</span> "
 			out+="<b>Эффект: "+strconv.Itoa(taa.Effect)+"</b>"
 			out+="<br>"
 		}
@@ -73,7 +78,7 @@ func getSuitableMentalRules()(int){
 	var activationType=2
 // попытка срочно найти действие, в опасной ситуации
 	if CurrentInformationEnvironment.veryActualSituation || CurrentInformationEnvironment.danger{
-		rID = getRulesArrFromTrigger(currentTriggerID)
+		rID = getMentalRulesArrFromTrigger(currentTriggerID)
 
 	}else{
 /* попытка более обстоятельно найти в эпиз.памяти подходящий фрагмент
@@ -92,6 +97,18 @@ func getSuitableMentalRules()(int){
 	}
 
 	return rID
+}
+/////////////////////////////////////////////////////////////
+/* Внимательно выбрать наилучшее Правило rulesID по действию с Пульта или измееннию состояния.
+Мягкий поиск (с игнорирование второстепенного) - не по ID образов действий, а по детализованных действиям:
+по словам фразы, тон игнорируется, и по действиям.
+Это - очень ресурсоемко, так что пока не реализовано
+ */
+func getSuitableMentalRulesСarefully()(int){
+
+	// TODO
+
+	return 0
 }
 /////////////////////////////////////////////////
 /* Найти последнее известное Правило по цепочке последних limit кадров эпиз.памяти (шаблон решений)
@@ -150,7 +167,7 @@ if len(rImg)>limit{// limit последних
 			}
 			if isConc{// уж ты, нашли такой же фрагмент! но в нем нет пускового curActiveActions (раньше уже смотрели)
 				// выдать конечное праило, если оно с хорошим эффектом
-				rArr:=rulesArr[lastEM.RulesID]
+				rArr:=rulesMentalArr[lastEM.RulesID]
 				lastTa:=rArr.TAid[len(rArr.TAid)-1:]
 				ta:=TriggerAndActionArr[lastTa[0]]
 				if ta !=nil {
@@ -231,7 +248,7 @@ func getMentalRulesArrFromTrigger(trigID int)(int){
 		}
 	}
 // раз не нашли, то смотрим одиночные правила
-	for k, v := range rulesArr {
+	for k, v := range rulesMentalArr {
 		for i := 0; i < len(v.TAid); i++ {
 			if trigID!=v.TAid[i] || len(v.TAid)>1{
 				continue
@@ -252,7 +269,7 @@ func getMentalRulesArrFromTrigger(trigID int)(int){
 }
 ///////////////////////////////////////////////
 func getMentalRulesFromTemp(rImg []int,limit int)(int){
-	for _, v := range rulesArr {
+	for _, v := range rulesMentalArr {
 		if len(v.TAid)!=limit{
 			continue
 		}

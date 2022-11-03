@@ -162,10 +162,10 @@ func loadgoNext(){
 		}
 		p:=strings.Split(strArr[n], "|")
 		id,_:=strconv.Atoi(p[0])
-		MotorBranchID,_:=strconv.Atoi(p[0])
-		FromID,_:=strconv.Atoi(p[1])
-		NextID,_:=strconv.Atoi(p[2])
-		AutomatizmID,_:=strconv.Atoi(p[3])
+		MotorBranchID,_:=strconv.Atoi(p[1])
+		FromID,_:=strconv.Atoi(p[2])
+		NextID,_:=strconv.Atoi(p[3])
+		AutomatizmID,_:=strconv.Atoi(p[4])
 
 		var saveDoWritingFile= doWritingFile; doWritingFile =false
 		createNewlastgoNextID(id,MotorBranchID,FromID,NextID,AutomatizmID)

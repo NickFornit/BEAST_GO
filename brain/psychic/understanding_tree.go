@@ -65,7 +65,7 @@ type UnderstandingNode struct { // узел дерева понимания
 var UnderstandingTree UnderstandingNode
 var UnderstandingNodeFromID=make(map[int]*UnderstandingNode)
 // последовательность узлов активной ветки
-var ActiveBranchUnderstandingArr []int
+//var ActiveBranchUnderstandingArr []int
 ////////////////////////////////////////////////
 
 // если в результате ментальных процессов было действие, то нужно заблокировать обработку активации дерева моторных автоматизмов
