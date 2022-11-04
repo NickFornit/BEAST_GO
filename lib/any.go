@@ -233,6 +233,28 @@ func UniqueArr(intSlice []int) []int {
 	return list
 }
 
+// убрать дублеры в массиве 2D
+func UniqueArr2D(intSlice [][]int)([][]int){
+	var list[][]int
+	listBuf := [][]int{{0}}
+
+	for _, arr := range intSlice {
+		isFind:=true
+		for _, arr1 := range listBuf {
+			if EqualArrs(arr, arr1)==true {
+				isFind=false
+				break
+			}
+		}
+		if isFind {
+			list = append(list, arr)
+			listBuf = append(listBuf, arr)
+		}
+	}
+	return list
+}
+
+
 /* найти какие значения m1 есть в m2
 т.е. m2 должен быть частью m1 или полностью совпадать с ним
 */

@@ -157,9 +157,9 @@ if len(rImg)>limit{// limit последних
 				return 0
 			}
 			var isConc=true
-			var lastEM *EpisodeMemory
+			var lastEM EpisodeMemory
 			for j := 0; j < lenFrag; j++ {
-				lastEM=EpisodeMemoryObjects[i+j]
+				lastEM =*EpisodeMemoryObjects[i+j]
 				if lastEM.RulesID != rImg[j] {
 					isConc=false
 					break
