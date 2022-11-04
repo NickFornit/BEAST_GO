@@ -30,6 +30,9 @@ type Emotion struct {
 }
 ////////////////////////////////
 
+// последнее определенная эмоциz
+var CurrentEmotionReception *Emotion
+
 var EmotionFromIdArr=make(map[int]*Emotion)
 
 /*  создать новую эмоцию, если такой еще нет
@@ -57,6 +60,8 @@ func createNewBaseStyle(id int,BaseIDarr []int)(int,*Emotion){
 	EmotionFromIdArr[id]=&node
 
 	if doWritingFile {SaveEmotionArr() }
+
+	CurrentEmotionReception=&node
 
 	return id,&node
 }
@@ -129,5 +134,14 @@ if em==nil{
 return out
 }
 //////////////////////////////////////////
+
+// последняя испытанная эмоция в виде строки
+func GetCurrentEmotionReception()(string){
+	if CurrentEmotionReception == nil{
+		return "Эмоция еще не определена."
+	}
+	return getEmotonsComponentStr(CurrentEmotionReception)
+}
+///////////////////////////////////////////
 
 

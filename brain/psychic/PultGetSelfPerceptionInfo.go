@@ -14,12 +14,19 @@ import (
 
 
 func GetSelfPerceptionInfo()(string){
+
+	refreshCurrentInformationEnvironment()
+	// опасность
+	danger:=GetAttentionDanger()
+	// актуальность ситуации
+	veryActualSituation,_:=gomeostas.FindTargetGomeostazID()
+
 	// против паники типа "одновременная запись и считывание карты"
 	if notAllowScanInTreeThisTime{
 		return "!!!"
 	}
 	ie:=CurrentInformationEnvironment
-var out="Общее базовое состояние: <b>"
+var out="Общее состояние жизненных параметров: <b>"
 if gomeostas.CommonBadNormalWell==1{
 	out+="ПЛОХО"
 }
@@ -43,30 +50,39 @@ if gomeostas.CommonBadNormalWell==1{
 	}
 	out+="</b>"
 	////////////////////////////////
-	out+="<br>Текущая эмоция: "+getEmotonsComponentStr(ie.PsyEmotionImg)
+	out+="<br>Текущая эмоция: "+GetCurrentEmotionReception() //getEmotonsComponentStr(ie.PsyEmotionImg)
 	///////////////////////////////
 	out+="<br>Опасность состояния: <b>"
-	if ie.danger{out+="Опасное"}else{out+="Неопасное"}
+	if danger {out+="Опасное"}else{out+="Неопасное"}
+	out+="</b>"
+	out+="<br>Важность состояния: <b>"
+	if veryActualSituation {out+="Очень важное состояние"}else{out+="Спокойное состояние."}
 	out+="</b>"
 	////////////////////////////////
-	if ie.PsyActionImg !=nil{
-		out+="<br>Текущий образ сочетания действий с Пульта: <b>"
-		aID:=ie.PsyActionImg.ActID
+	if ie.PsyActionImg !=nil {
+		str := ""
+		aID := ie.PsyActionImg.ActID
 		for i := 0; i < len(aID); i++ {
-			if i>0{out+=", "}
-			out+=action_sensor.GetActionNameFromID(aID[i])
+			if i > 0 {
+				out += ", "
+			}
+			str += action_sensor.GetActionNameFromID(aID[i])
 		}
-		out+="</b>"
+		if len(str) > 0 {
+			out += "<br>Текущий образ сочетания действий с Пульта: <b>" + str + "</b>"
+		}
 	}
 	////////////////////////////////
 	if ie.PsyVerbImg !=nil{
-		out+="<br>Текущий образ фразы с Пульта: <b>"
+		str:=""
 		pID:=ie.PsyVerbImg.PhraseID
 		for i := 0; i < len(pID); i++ {
 			if i>0{out+=", "}
-			out+=word_sensor.GetPhraseStringsFromPhraseID(pID[i])
+			str+=word_sensor.GetPhraseStringsFromPhraseID(pID[i])
 		}
-		out+="</b>"
+if len(str) >0 {
+	out += "<br>Текущий образ фразы с Пульта: <b>"+str+"</b>"
+}
 	}
 	///////////////////////////////
 
