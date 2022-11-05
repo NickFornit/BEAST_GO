@@ -51,11 +51,14 @@ func getCur10lastMentalRules()string{
 			}else{
 				out+="<span style='padding:10px;'></span>"
 			}
-			if taa.Trigger >0 {
-				out += "<b>Стимул (оператора):</b> <span style='background-color:#FFECEB;'>" + GetActionsString(taa.Trigger) + "</span> "
-			}
-			if taa.Trigger <0 {
-				out += "<b>Стимул (ментальный):</b> <span style='background-color:#FFECEB;'>" + GetMentalActionsString(-taa.Trigger) + "</span> "
+			if taa.ShortTermMemoryID!=nil  {
+				out += "<b>Цепочка осмысления:</b>"
+				CickleStr :=""
+				for c := 0; c < len(taa.ShortTermMemoryID); c++ {
+					if c>0{CickleStr+=", "}
+					CickleStr+=strconv.Itoa(taa.ShortTermMemoryID[c])
+				}
+				out += "<span style='background-color:#FFECEB;'>" + CickleStr + "</span> "
 			}
 			out+="=> <b>Ответ:</b> <span style='background-color:#E8E8FF;'>"+GetMentalActionsString(taa.Action)+"</span> "
 			out+="<b>Эффект: "+strconv.Itoa(taa.Effect)+"</b>"

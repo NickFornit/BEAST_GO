@@ -102,8 +102,11 @@ func noAutovatizmResult()
 При вызове может быть определен situationImageID или проставлен 0 и тогда образ ситуации определяется в самой функции.
 
 Если были совершены действия, то нужно выставлять MotorTerminalBlocking=true !!!
+
+activationType =1 - объективная активация
+activationType =2 - произвольная переактивация
  */
-func understandingSituation()(bool){
+func understandingSituation(activationType int)(bool){
 	MentalReasonBlocing=false // освободить обработку дерева моторных автоматизмов
 
 	if EvolushnStage < 4 { // только со стадии развития 4
@@ -175,10 +178,10 @@ func understandingSituation()(bool){
 		CurrentUnderstandingTreeEnd=condArr // все - новизна
 	}
 
-	/* объективный запуск consciousness
-	мент.автоматизм может прикрепляться ТОЛЬКО к последнему узлу ветки - при полном понимании ситуации
+	/* объективный запуск consciousness - по кативации дерева автоматизмов
+	ментальный запуск в случае произвольной переактивации дерева понимания или цикле осмысления (5-я ступень)
 	 */
-	res:=consciousness(1,0)
+	res:=consciousness(activationType,0)
 	if isActivationType2{// был ментальный перезапус
 		return true// заблокировать все низкоуровневое
 	}

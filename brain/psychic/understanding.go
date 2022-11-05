@@ -42,8 +42,10 @@ var isActivationType2=false
 
 var currrentFromNextID=0 // текущий fromNextID в текущем запуске consciousness
 
-// временное сохранеиние цикла осмысления между двумя объективными вызовами consciousness
-var saveFromNextIDcurretCicle []int // последовательность fromNextID
+/* временное сохранеиние цикла осмысления между двумя объективными вызовами consciousness
+Всегда повторяет фагмент Кратковременной памяти ShortTermMemory
+ */
+var saveFromNextIDcurretCicle []int // последовательность fromNextID, может быть с разными
 
 ////////////////////////////////////////////////////////////
 /* Главная, постоянно активная с каждым пульсом функция поддержвания информационной среды и произвольности.
@@ -64,7 +66,7 @@ activationType == 2 - активация "внутренним" (произво�
 
 fromNextID - ID MentalNext на котором была запущена переактивация consciousness при обдумывании
 */
-func consciousness(activationType int,fromNextID int)(bool) {    return false
+func consciousness(activationType int,fromNextID int)(bool) {  //  return false
 	if currrentFromNextID != fromNextID{//сохранеиние цикла осмысления между двумя объективными вызовами consciousness
 		saveFromNextIDcurretCicle=append(saveFromNextIDcurretCicle,fromNextID)
 	}

@@ -134,6 +134,7 @@ func GetAutomotizmActionsString(am *Automatizm,writeLog bool)(string){
 		if sumEnergy<1{
 			sumEnergy=1
 		}
+		am.Count++
 		out+=TerminateMotorAutomatizmActions(ai.ActID,sumEnergy)
 	}
 

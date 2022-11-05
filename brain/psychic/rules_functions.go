@@ -7,7 +7,6 @@ package psychic
 
 import (
 	"BOT/lib"
-	"sort"
 	"strconv"
 )
 
@@ -118,28 +117,34 @@ func getSuitableRules(activationType int)(int){
 
  */
 func getRulesFromEpisodicsSlice(activationType int,limit int,maxSteps int)(int){
+
 	rImg:=getLastRulesSequenceFromEpisodeMemory(activationType,limit)
-	lenFrag0:=len(rImg)
-	// получаем комбинации фрагментов rImg
-	rImgArr:=combiRidArr(rImg, limit)
-	for n:=0; n<len(rImgArr); n++{
-		rImg = rImgArr[n].arrImg
-		lenFrag:=len(rImg)
-		steps:=0
-		lenEp:=len(EpisodeMemoryObjects)
-		var startF = lenEp - lenFrag0 - lenFrag // отмотать, чтобы не проверять в rID саму себя
-		if startF <= 0{//  а нет еще достаточной длины еп.памяти
-			continue
-		}
+
+// найти такую последовательность в предыдущей эпизод.памяти, но не далее 1000 фрагментов
+/* уже обеспечено
+if len(rImg)>limit{// limit последних
+	rImg=rImg[len(rImg)-limit:]
+}
+*/
+	lenFrag:=len(rImg)
+	steps:=0
+	lenEp:=len(EpisodeMemoryObjects)
+	var startF = lenEp - 2*lenFrag // отмотать на 2 длины, чтобы не проверять в rID саму себя
+	if startF <0{//  а нет еще достаточной длины еп.памяти
+		return 0
+	}
 		// идем назад по кускам lenFrag
+/*TODO хорошо бы оптимизировать функцию так, чтобы можно было листать назад по -=lenFrag
+если только это принципиально возможно
+ */
 		for i := startF; i >= 0; i -- { // =lenFrag - пролетает мимо
 			if steps>maxSteps{
 				return 0
 			}
 			var isConc=true
-			var lastEM EpisodeMemory
+			var lastEM *EpisodeMemory
 			for j := 0; j < lenFrag; j++ {
-				lastEM =*EpisodeMemoryObjects[i+j]
+				lastEM=EpisodeMemoryObjects[i+j]
 				if lastEM.RulesID != rImg[j] {
 					isConc=false
 					break
@@ -148,75 +153,27 @@ func getRulesFromEpisodicsSlice(activationType int,limit int,maxSteps int)(int){
 			if isConc{// уж ты, нашли такой же фрагмент! но в нем нет пускового curActiveActions (раньше уже смотрели)
 				// выдать конечное праило, если оно с хорошим эффектом
 				rArr:=rulesArr[lastEM.RulesID]
-				if rArr !=nil {
-					lastTa:=rArr.TAid[len(rArr.TAid)-1:]
-					ta:=TriggerAndActionArr[lastTa[0]]
-					if ta !=nil {
+				lastTa:=rArr.TAid[len(rArr.TAid)-1:]
+				ta:=TriggerAndActionArr[lastTa[0]]
+				if ta !=nil {
 						if ta.Effect >0{// с хорошим эффектом
-							/* TODO тут можно посмотреть далее на сколько-то шагов вперед чтобы прикинуть, чем закончится комбинацияя Стимул-Ответ
-							это - как думать на сколько-то шагов врепед в шахматах. Можно запустить цикл обдумывания.
-							Найденный ta.Effect >0 - это и есть примитивная ЦЕЛЬ, в отличие от Доминанты нерешенной проблемы.
-							*/
+/* TODO тут можно посмотреть далее на сколько-то шагов вперед чтобы прикинуть, чем закончится комбинацияя Стимул-Ответ
+это - как думать на сколько-то шагов врепед в шахматах. Можно запустить цикл обдумывания.
+Найденный ta.Effect >0 - это и есть примитивная ЦЕЛЬ, в отличие от Доминанты нерешенной проблемы.
+ */
+
+
 							return lastEM.RulesID
 						}
-						//else - продолжает искать хороший конец далее назад, хотя это уже менее вероятно, но в прощлом при меньшей  длине шаблона можно найти.
-					}
+//else - продолжает искать хороший конец далее назад, хотя это уже менее вероятно, но в прощлом при меньшей  длине шаблона можно найти.
 				}
 			}
 			steps++
 		}
-	}
+
 	return 0
 }
-
-type rImgS struct {
-	arrImg []int
-	count int
-}
-
-/* Комбинации ID фрагментов эпизодической памяти >2 звеньев:
-1,2,3,4,5: 1,2,3,4,5 - 1,2,3,4 - 1,2,3 - 1,2 - 4,5 - 3,4,5 - 2,3,4,5
-*/
-func combiRidArr(rImg[]int, limit int) []*rImgS{
-	var arrOut[][]int
-
-	for i:=limit; i > 1; i--{
-		rImg = rImg[:i]
-		lenFrag:=len(rImg)
-		for j:=1; j<lenFrag; j++{
-			arrOut = append(arrOut, rImg[lenFrag-j-1:])
-			if j>1 {
-				arrOut = append(arrOut, rImg[:j])
-			}
-		}
-	}
-	// убираем дублеры
-	var list[]*rImgS
-	listBuf:=[][]int{{0}}
-
-	for _, arr := range arrOut {
-		isFind:=true
-		for _, arr1 := range listBuf {
-			if lib.EqualArrs(arr, arr1)==true {
-				isFind=false
-				break
-			}
-		}
-		if isFind {
-			var node rImgS
-			node.arrImg = arr
-			node.count = len(arr)
-			list = append(list, &node)
-			listBuf = append(listBuf, arr)
-		}
-	}
-	// сортируем по кол-во элементов, сохраняя повторы
-	sort.SliceStable(list, func(i, j int) bool {
-		return list[i].count > list[j].count
-	})
-
-	return list
-}
+///////////////////////////////////////////////////
 
 /*
 
@@ -235,7 +192,7 @@ func getLastRulesSequenceFromEpisodeMemory(activationType int,limit int)([]int){
 	for i := EpisodeMemoryLastIDFrameID; i >=0; i-- {
 		em:=EpisodeMemoryObjects[i]
 		// если самый последний эпизод уже является em.Type == kind
-		if i==EpisodeMemoryLastIDFrameID && em.Type == kind{
+		if i==EpisodeMemoryLastIDFrameID && em.Type == kind || beginID > 5{
 			continue
 		}
 		if preLifeTime==0{
@@ -253,8 +210,8 @@ func getLastRulesSequenceFromEpisodeMemory(activationType int,limit int)([]int){
 	}
 	var rImg []int
 	// перебор последнего фрагмента кадров эпиз.памяти
-	// beginID + 1: иначе выборка будет Limit +1
-	for i := EpisodeMemoryLastIDFrameID - beginID + 1; i <= EpisodeMemoryLastIDFrameID; i++ {
+	//beginID+1 чтобы число проходов цикла было равно beginID и окончился на i <= EpisodeMemoryLastIDFrameID
+	for i := EpisodeMemoryLastIDFrameID - beginID+1; i <= EpisodeMemoryLastIDFrameID; i++ {
 		em := EpisodeMemoryObjects[i]
 		rImg = append(rImg, em.RulesID)
 	}

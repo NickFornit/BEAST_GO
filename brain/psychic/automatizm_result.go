@@ -112,7 +112,7 @@ func noAutovatizmResult()(bool){
 
 	if EvolushnStage > 3 {
 		// осмыслить ситуацию - Активировать Дерево Понимания
-		understandingSituation()
+		understandingSituation(1)
 		clinerAutomatizmRunning()
 		return true
 	}

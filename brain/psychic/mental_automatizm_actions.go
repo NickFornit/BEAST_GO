@@ -45,6 +45,8 @@ if am.ActionsImageID>0{
 }
 	ai:=MentalActionsImagesArr[am.ActionsImageID]
 
+	am.Count++
+
 	if ai.activateMotorID >0 {
 		// здесь начинается период ожидания: LastRunAutomatizmPulsCount =PulsCount
 		RumAutomatizmID(ai.activateMotorID)
@@ -56,14 +58,14 @@ if am.ActionsImageID>0{
 
 	if ai.activateBaseID >0 {// на один текущий пульс, во время которого происходит обдумывание
 		gomeostas.CommonBadNormalWell=ai.activateBaseID
-		understandingSituation()
+		understandingSituation(2)
 	}
 	if ai.activateEmotion >0 {// на один текущий пульс, во время которого происходит обдумывание
 
 		// найти эмоцию по ее ID
 		lev2:=EmotionFromIdArr[ai.activateEmotion].BaseIDarr
 		gomeostas.SetCurContextActiveIDarr(lev2)
-		understandingSituation()
+		understandingSituation(2)
 	}
 
 	currentMentalAutomatizmID=am.ID
