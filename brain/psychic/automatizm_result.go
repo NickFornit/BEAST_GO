@@ -303,11 +303,6 @@ func fixNewRules(lastCommonDiffValue int,ai1 int) int {
 	// теперь обрабатываем прошлую эпизодическую память (необязательно, т.к. при каждом поиске в эп.памяти это происходит)
 	GetRulesFromEpisodeMemory(0)
 
-if RullesOutputProcess{// отслеживать Правила из Пульта в http://go/pages/rulles.php
-	RullesOutputStr=getCur10lastRules()
-	RullesOutputProcess=false
-}
-
 	return rulesID
 }
 ///////////////////////////////////////////////////////////////////////

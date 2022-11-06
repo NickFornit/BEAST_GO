@@ -27,7 +27,7 @@ func GetRulesFromEpisodeMemory(kind int){
 
 
 // вывести 10 последних Правил на Пульт в http://go/pages/rulles.php
-func getCur10lastRules()string{
+func GetCur10lastRules()string{
 	rCount:=lastrulesID
 	if rCount >10{
 		rCount=10
@@ -39,6 +39,7 @@ func getCur10lastRules()string{
 		for n := 0; n < len(r.TAid); n++ {
 			taa:=TriggerAndActionArr[r.TAid[n]]
 			if taa == nil{
+				out+="<span style='padding:40px;'></span><span style='color:red;' title='Нет образа TriggerAndActionArr "+strconv.Itoa(r.TAid[n])+"'>нет "+strconv.Itoa(r.TAid[n])+"&nbsp;&nbsp;&nbsp;&nbsp;</span>"
 				continue
 			}
 			if n>0{

@@ -66,7 +66,7 @@ activationType == 2 - активация "внутренним" (произво�
 
 fromNextID - ID MentalNext на котором была запущена переактивация consciousness при обдумывании
 */
-func consciousness(activationType int,fromNextID int)(bool) {  //  return false
+func consciousness(activationType int,fromNextID int)(bool) {     return false
 	if currrentFromNextID != fromNextID{//сохранеиние цикла осмысления между двумя объективными вызовами consciousness
 		saveFromNextIDcurretCicle=append(saveFromNextIDcurretCicle,fromNextID)
 	}

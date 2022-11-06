@@ -465,9 +465,8 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 
 			get_rulles_list_info := r.FormValue("get_rulles_list_info")
 			if get_rulles_list_info =="1" {
-				psychic.RullesOutputProcess=true
-				ref := psychic.RullesOutputStr
-				_, _ = fmt.Fprint(resp, ref)
+				rulles:=psychic.GetCur10lastRules()
+				_, _ = fmt.Fprint(resp, rulles)
 				return
 			}
 

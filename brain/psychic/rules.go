@@ -53,9 +53,6 @@ var rulesArr=make(map[int]*rules)
 
 //////////////////////////////////////////
 
-// отслеживать Правила из Пульта в http://go/pages/rulles.php
-var RullesOutputProcess=false // режим отслеживания
-var RullesOutputStr="" // текущее состояние последний 10 правил
 
 ///////////////////////////////////////////
 // вызывается из psychic.go
@@ -63,7 +60,6 @@ func rulesInit(){
 	loadrulesArr()
 
 //	getCur10lastRules()
-	RullesOutputStr=getCur10lastRules()// чтобы что-то было сразу
 }
 
 
