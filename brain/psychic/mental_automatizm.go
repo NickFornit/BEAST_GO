@@ -25,7 +25,7 @@ type MentalAutomatizm struct {
 
 	Usefulness int // (БЕС)ПОЛЕЗНОСТЬ: -10 вред 0 +10 +n польза
 
-	// образ действий
+	// образ действий типа MentalActionsImages
 	ActionsImageID int
 
 /* из-за универсальности мент.автоматизмов (могут использоваться в любых цепочках goNext)

@@ -14,8 +14,12 @@ func RunInitialisation() {
 	if len(str) > 0 {
 		LifeTime, _ = strconv.Atoi(strings.TrimSpace(str[0]))
 	} else {
-		panic("ОБНУЛИЛОСЬ ВРЕМЯ ЖИЗНИ LifeTime")
+		lib.TodoPanic("ОБНУЛИЛОСЬ ВРЕМЯ ЖИЗНИ LifeTime!")
+		//panic("ОБНУЛИЛОСЬ ВРЕМЯ ЖИЗНИ LifeTime")
 	}
 	str,_ = lib.ReadLines(lib.GetMainPathExeFile() + "/memory_reflex/stages.txt")
 	EvolushnStage,_ = strconv.Atoi(strings.TrimSpace(str[0]))
 }
+///////////////////////////////////////
+
+

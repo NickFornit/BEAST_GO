@@ -130,7 +130,7 @@ var detectedActiveLastNodID=0
 // нераспознанный остаток - НОВИЗНА
 var CurrentAutomatizTreeEnd []int
 var currentStepCount=0
-var currentAutomatizmAfterTreeActivatedID=0
+var currentAutomatizmAfterTreeActivatedID=0 //! это  не обязательно штатный автоматизм ветки, а выбранный мягким алгоритмом
 
 
 func automatizmTreeActivation()(int){
@@ -308,12 +308,14 @@ func afterTreeActivation()(bool){
 
 // Был запущен моторный автоматизм (в том числе и ментальным автоматизмом)
 if LastRunAutomatizmPulsCount >0{// обработка периода ожидания ответа оператора
+	effect:=0
 		// 	Контроль за изменением состояния, возвращает:
 		//	lastCommonDiffValue - насколько изменилось общее состояние
 		//  	lastBetterOrWorse - стали лучше или хуже: величина измнения от -10 через 0 до 10
 		//  	gomeoParIdSuccesArr - стали лучше следующие г.параметры []int гоменостаза
 		if WasOperatorActiveted { // оператор отреагировал
 			lastCommonDiffValue,lastBetterOrWorse,gomeoParIdSuccesArr := wasChangingMoodCondition(2)
+			effect=lastCommonDiffValue
 			// обработать изменение состояния
 			calcAutomatizmResult(lastCommonDiffValue,lastBetterOrWorse, gomeoParIdSuccesArr)
 
@@ -348,7 +350,7 @@ if LastRunAutomatizmPulsCount >0{// обработка периода ожида
 	   Учесть последствия запуска мот.автоматизма
 	   и если нужно обдумать их в новом ментальном consciousness(2,currrentFromNextID)
 	*/
-	afterWaitingPeriod()
+	afterWaitingPeriod(effect)
 
 //  после обработки ожидаемой реакции Оператора - следует реакция Beast
 //		return true  поэтому нельзя здесь делать прерывание!

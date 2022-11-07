@@ -34,9 +34,9 @@ func EpisodeMemoryInit(){
 ///////////////////////////////////////
 type EpisodeMemory struct {
 	// последствия действий оператора
-	NodeAID int // конечный узел активной ветки дерева моторных автоматизмов
-	NodePID int // конечный узел активной ветки дерева ментальных автоматизмов
-	RulesID int // действия оператора, ответное действие и эффект
+	NodeAID            int // конечный узел активной ветки дерева моторных автоматизмов
+	NodePID            int // конечный узел активной ветки дерева ментальных автоматизмов
+	TriggerAndActionID int // действия оператора, ответное действие и эффект
 
 	LifeTime int
 	Type int // 0 - объективный образ (внешний ор.рефлекс) или 1 - субъективный (произвольный ор.рефлекс)
@@ -82,7 +82,7 @@ func createEpisodeMemoryFrame(NodeAID int,NodePID int,rulesID int,lifeTime int,T
 	var node EpisodeMemory
 	node.NodeAID=NodeAID
 	node.NodePID = NodePID
-	node.RulesID=rulesID
+	node.TriggerAndActionID =rulesID
 	node.LifeTime=lifeTime
 	node.Type=Type
 
@@ -104,7 +104,7 @@ func saveEpisodicMenory(){
 	for _, v := range EpisodeMemoryObjects {
 		out+=strconv.Itoa(v.NodeAID)+"|"
 		out+=strconv.Itoa(v.NodePID)+"|"
-		out+=strconv.Itoa(v.RulesID)+"|"
+		out+=strconv.Itoa(v.TriggerAndActionID)+"|"
 		out+=strconv.Itoa(v.LifeTime)+"|"
 		out+=strconv.Itoa(v.Type)
 		out+="\r\n"

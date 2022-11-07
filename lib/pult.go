@@ -16,6 +16,13 @@ func WritePultConsol(print string) {
 	WritePultConsolStr =	print + "<br>" + WritePultConsolStr
 }
 
+// функция вызова паники с информированием в логе Пульта
+func TodoPanic(panicWarning string){
+	WritePultConsol("<span style='color:red;font-size:19px;font-weight:bold;'>ПАНИКА: </span> "+panicWarning)
+	panic(panicWarning)
+}
+//////////////////////////////////////////////////
+
 var ActionsForPultStr = ""
 /* вывести на Пульт действия Бота строкой lib.SentActionsForPult("xcvxvxcv")
 Каждая акция - в формате: вид действия (1 - действие рефлекса, 2 - фраза) затем строка акции,

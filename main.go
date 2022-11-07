@@ -132,6 +132,8 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				return
 			}
 
+
+
 			//  передача информации от Beast в Пульт различается идентификатором назначения информации перед самой информацией
 			// информация для консоли ничинается с идентификатора назначения: "CONSOL:"
 			if len(lib.WritePultConsolStr) > 0 {
@@ -519,6 +521,17 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				_, _ = fmt.Fprint(resp, ref)
 				return
 			}
+
+			// обнулить параметры гомеостаза Beast
+			cliner_gomeo_pars := r.FormValue("cliner_gomeo_pars")
+			if len(cliner_gomeo_pars) > 0 {
+				brain.IsPultActivnost = true
+				gomeostas.ClinerAllGomeoParams()
+				brain.IsPultActivnost = false
+				_, _ = fmt.Fprint(resp, "1")
+				return
+			}
+
 			_, _ = fmt.Fprint(resp, "GET")
 		}
 	}

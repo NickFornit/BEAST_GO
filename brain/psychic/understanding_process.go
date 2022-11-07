@@ -5,7 +5,9 @@
 
 package psychic
 
-import "strconv"
+import (
+	"BOT/lib"
+)
 
 ///////////////////////////////
 
@@ -40,115 +42,165 @@ func getPurposeUndestandingAndRunAutomatizm()(bool) {
 
 
 
+//////////////////////////////////////////////////////////////////
+// перезапустить осмысление или остановить цикл
+func reloadConsciousness(stop bool,fromNextID int)(bool){
+	if fromNextID == currrentFromNextID{//тихо (без стека прерываний) предотвратить зацикливание
+		return false
+	}
+	if stop{// было прервано объективной активацией, запомнить остановленное и прекратить ментальный цикл
+		// не запускать consciousness(2,fromNextID)
+		saveInterruptMemory()
+
+		return false
+	}else {
+		// перезапуск осмысления
+		consciousness(2, fromNextID)
+	}
+	return true
+}
 ///////////////////////////////////////////////////
 
-// выдать текущую инфу для http://go/pages/mental_cicles.php
-func GetCicklesToPult()(string){
 
-//	saveFromNextIDcurretCicle=[]int{1,2,3} // тестирвоание
-	out:=""
-	cickl:=saveFromNextIDcurretCicle
-	if cickl==nil || len(cickl)==0{
-		out+="Нет текущего цикла осмысления.<hr><br><br>"
-	}else{
-		out+="<table cellpadding=0 cellspacing=0 border=1 class='main_table'>"
-		out+="<tr><th class='table_header'>goNext ID</th>"
-		out+="<th class='table_header'>ID дерева понимания</th>"
-		out+="<th class='table_header'>ID дерева автоматизмов</th>"
-		out+="<th class='table_header'>ID ментального автоматизма</th></tr>"
-		for i := 0; i < len(cickl); i++ {
-			gn:=goNextFromIDArr[cickl[i]]
-			if gn!=nil{
-				warn:=""
-				if detectedActiveLastNodID != gn.MotorBranchID{
-					warn="style='color:red' title='ID дерева автоматизмов не соотвествует goNext.MotorBranchID'"
-				}
-				style:="style='font-size:19px;font-weight:bold;cursor:pointer'"
-				out+="<tr><td class='table_cell'><span style='color:#666666'>"+strconv.Itoa(gn.ID)+"</span>"
-				out+="</td><td class='table_cell'><span "+style+" onClick='show_unde_tree("+strconv.Itoa(detectedActiveLastUnderstandingNodID)+")'>"+strconv.Itoa(detectedActiveLastUnderstandingNodID)+
-					"</span></td><td class='table_cell'><span "+style+" onClick='show_atmzm_tree("+strconv.Itoa(detectedActiveLastNodID)+")'>"+strconv.Itoa(detectedActiveLastNodID)+" <span "+warn+">("+strconv.Itoa(gn.MotorBranchID)+")</span> "+
-					"</span></td><td class='table_cell'><span "+style+" onClick='show_ment_atmzm("+strconv.Itoa(gn.AutomatizmID)+")'>"+strconv.Itoa(gn.AutomatizmID)+
-					"</span></td></tr>"
-			}
+///////////////////////////////
+// обновление состояния информационной среды
+func refreshCurrentInformationEnvironment(){
+	///////// Информационная среда осознания ситуации
+	// Нужно собрать всю информацию, которая может повлиять на решение.
+	//  получение текущего состояния информационной среды: отражение Базового состояния и Активных Базовых контекстов
+	GetCurrentInformationEnvironment()
+
+	// оценка опасности ситуации, необходиомсть срочных действий
+	veryActualSituation=CurrentInformationEnvironment.veryActualSituation
+	// выявить ID парамктров гомеостаза как цели для улучшения в данных условиях
+	curTargetArrID=CurrentInformationEnvironment.curTargetArrID
+
+	/* Еще информация:
+	жизненный опыт  psy_Experience.go
+	доминанта psy_problem_dominanta.go
+	субъектиная оценка ситуации для применения произвольности
+	*/
+
+	// актуальной инфой являются узлы активной ветки дерева понимания, особенно контекст SituationID
+}
+///////////////////////////////////////////////
+
+
+// детекция ленивого состояния
+func isIdleness()(bool){
+	if CurrentInformationEnvironment.veryActualSituation || CurrentInformationEnvironment.danger {
+		return false
+	}
+
+	if isCurrentProblemDominanta != nil{
+		return false
+	}
+
+	return true
+}
+///////////////////////////////////////////////////////
+// обработка структур в свободном состоянии, в первую очередь - эпизодической памяти
+func processingFreeState(){
+	// TODO переработка происходившего, в первую очередь - эпизодической памяти
+	//EpisodeMemoryLastCalcID - последний эпизод, который был осмыслен в лени или во сне
+}
+//////////////////////////////////////////////////////
+
+
+
+
+///////////////////////////////////////////////////////
+// создание или использование ментального автоматизма инфо-функции c ID= infoID
+func createNexusFromNextID(fromNextID int,infoID int)(int){
+
+	imgID,_:=CreateNewlastMentalActionsImagesID(0,0,0,infoID,0)
+	if imgID>0 {
+		aID, _ := createMentalAutomatizmID(0, imgID, 1)
+		if aID > 0 {
+			// создание звена цепочки (всегда уникальное звено)
+			fromNextID0 := fromNextID
+			// создание нового элемента цепочки
+			fromNextID, _ = createNewNextFromUnderstandingNodeID(
+				detectedActiveLastUnderstandingNodID,
+				detectedActiveLastNodID,
+				fromNextID0,
+				aID)
+
+			//addShortTermMemory(fromNextID)
+
+			return fromNextID
 		}
-		out+="</table>"
 	}
-	// последнгие 20 кадров кратковременной памяти
-//	termMemory=[]shortTermMemory{{4800,5,1},{7188,4,2},{4800,3,3}} // тестирование
-	if termMemory == nil{
-		return "Еще нет кратковременной памяти."
-	}
-	var termMemoryFrag []shortTermMemory
-	if len(termMemory)>20{
-		termMemoryFrag = termMemory[:20]
-	}else{
-		termMemoryFrag=termMemory
-	}
-	out+="<br><b>Кратковременная память (последнгие 20 кадров):</b><br>"
-	out+="<table cellpadding=0 cellspacing=0 border=1 class='main_table'>"
-	out+="<tr><th class='table_header'>goNext ID</th>"
-	out+="<th class='table_header'>ID дерева понимания</th>"
-	out+="<th class='table_header'>ID дерева автоматизмов</th>"
-	out+="<th class='table_header'>ID ментального автоматизма</th></tr>"
-	for i := len(termMemoryFrag)-1; i >=0; i-- {
-		sm:=termMemory[i]
-		gn:=goNextFromIDArr[sm.GoNextID]
 
-		style:="style='font-size:19px;font-weight:bold;cursor:pointer'"
-		out+="<tr><td class='table_cell'><span style='color:#666666'>"+strconv.Itoa(gn.ID)+
-			"</span></td><td class='table_cell'><span "+style+" onClick='show_unde_tree("+strconv.Itoa(sm.uTreeNodID)+")'>"+strconv.Itoa(sm.uTreeNodID)+
-			"</span></td><td class='table_cell'><span "+style+" onClick='show_atmzm_tree("+strconv.Itoa(gn.MotorBranchID)+")'>"+strconv.Itoa(gn.MotorBranchID)+"</span> "+
-			"</span></td><td class='table_cell'><span "+style+" onClick='show_ment_atmzm("+strconv.Itoa(gn.AutomatizmID)+")'>"+strconv.Itoa(gn.AutomatizmID)+
-			"</span></td></tr>"
-	}
-	out+="</table>"
+	return 0
+}
+//////////////////////////////////////////////////
 
-	return out
-}
-//////////////////////////////////////////////////////////////////
-// для GetCicklesToPult() инфа о ветке дерева автоматизмов
-func GetAtmzmTreeInfo(id int)(string){
-	out:=""
-	node:=AutomatizmTreeFromID[id]
-	if node==nil{
-		return "Нет такого узла дерева автоматизмов."
-	}
-	out+=getStrFromCond(0,node.BaseID)+"<br>"
-	out+=getStrFromCond(1,node.EmotionID)+"<br>"
-	out+=getStrFromCond(2,node.ActivityID)+"<br>"
-	out+=getStrFromCond(3,node.ToneMoodID)+"<br>"
-	out+=getStrFromCond(4,node.SimbolID)+"<br>"
-	out+=getStrFromCond(5,node.VerbalID)+"<br>"
-	return out
-}
-// для GetCicklesToPult() инфа о ветке дерева понимания
-func GetUndstgTreeInfo(id int)(string){
-	out:=""
-	node:=UnderstandingNodeFromID[id]
-	if node==nil{
-		return "Нет такого узла дерева понимания."
-	}
-	out += "Состояние: <b> " + getMoodStr(node) + "</b><br>"
-	out += "Эмоция: <b> " + getEmotionStr(node) + "</b><br>"
-	out += "Ситуация: <b> " + getSituationStr(node) + "</b><br>"
-	out += "Цель: <b> " + getPurposeStr(node) + "</b><br>"
-	return out
-}
-// для GetCicklesToPult() инфа о ментальном автоматизме
-func GetMentAtmzmInfo(id int)(string){
-	out:=""
-	atmz:=MentalAutomatizmsFromID[id]
-	if atmz==nil{
-		return "Нет такого узла дерева понимания."
-	}
-	out += "Действия: "+GetMentalAutomotizmActionsString(atmz.ID,false)+"<br>"
-	out += "(Бес)Полезность: "+strconv.Itoa(atmz.Usefulness)+"<br>"
-	out += "Число использований: "+strconv.Itoa(atmz.Count)+"<br>"
 
-	return out
-}
-//////////////////////////////////////////////////////////////////
+/* обработать результат инфо-фукнции и прикинуть, что дальше с fromNextID
+ */
+func calcNexusFromNextID(fromNextID int)(int){
+	switch currentInfoStructId{
+	// если это - самая первая ф-ция, то вызвать 2-ю ф-цию поиска продолжения
+	case 1: return createNexusFromNextID(fromNextID,2)
+	// анализ инфо стркутуры по currentInfoStructId и выдача решения
+	case 2: return analisAndSintez(fromNextID)
+	}
 
+	return 0
+}
+//////////////////////////////////////////////////////
+
+
+
+//////////////////////////////////////////////////////
+/* после периода ожидания
+Учесть последствия запуска мот.автоматизма,
+из saveFromNextIDcurretCicle выявить Правила и записать в эпизод.пямять.
+Если нужно - обдумать результат в новом ментальном consciousness(2,currrentFromNextID)
+Сразу после обработки периода ожидания запускается дерево понимания и объявный запуск consciousness(1,0)
+так что никаких действий совершать в afterWaitingPeriod() или в самой afterWaitingPeriod() не следует.
+
+effect =lastCommonDiffValue
+*/
+func afterWaitingPeriod(effect int){
+	if saveFromNextIDcurretCicle==nil || len(saveFromNextIDcurretCicle)==0{
+		return
+	}
+	//вытащить последний член, который ДОЛЖЕН БЫТЬ с ментальным автоматизмом запуска моторного автоматизма - ответного действия
+	last:=saveFromNextIDcurretCicle[len(saveFromNextIDcurretCicle)-1]// всегда есть
+	lastNextFrom:=goNextFromIDArr[last]
+	if lastNextFrom==nil{// не должно быть такого
+		return
+	}
+	mentAtmzm:=MentalAutomatizmsFromID[lastNextFrom.AutomatizmID]
+	if mentAtmzm==nil{// не должно быть такого, поэтому выдадим панику
+		lib.TodoPanic("Нет автоматизма для func afterWaitingPeriod()")
+		return
+	}
+	mact:= MentalActionsImagesArr[mentAtmzm.ActionsImageID]
+	if mact==nil{// не должно быть такого, поэтому выдадим панику
+		lib.TodoPanic("Нет действия автоматизма для func afterWaitingPeriod()")
+		return
+	}
+	if mact.activateMotorID ==0{// конечный член saveFromNextIDcurretCicle не содержит мент.автоматизм моторного запуска
+		// м.б. только при ошибке логики кода, поэтому выдадим панику
+		lib.TodoPanic("конечный член saveFromNextIDcurretCicle не содержит мент.автоматизм моторного запуска в func afterWaitingPeriod()")
+		return
+	}
+
+	mRules,_:=createNewlastMentalTriggerAndActionID(0,saveFromNextIDcurretCicle,mact.activateMotorID,effect)
+
+	rID,_:=createNewlastrulesMentalID(0,[]int{mRules})
+	if rID>0 {
+		// записать в эпизод.пямять ментальный кадр - всегда если дошло до этой строки
+		newEpisodeMemory(rID,1)
+	}
+
+	// нужно ли осмыслить это?
+	//??  consciousness(2,currrentFromNextID)
+}
+///////////////////////////////////////////////////////
 
 
 

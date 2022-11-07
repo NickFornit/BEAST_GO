@@ -24,7 +24,7 @@ func RunMentalMentalAutomatizmsID(id int)(bool){
 	return RunMentalMentalAutomatizm(a)
 }
 ////////////////////
-// todo = true - выполнить полюбому,
+// Запуск
 func RunMentalMentalAutomatizm(am *MentalAutomatizm)(bool){
 	if am==nil{
 		return false
@@ -38,11 +38,12 @@ func RunMentalMentalAutomatizm(am *MentalAutomatizm)(bool){
 		return false
 	}
 
-// блокировка выполнения плохого мент.автоматизма, если только не применена "СИЛА ВОЛИ"
-if am.ActionsImageID>0{
-
-	return false
+/* Блокировка выполнения плохого мент.автоматизма, если только не применена "СИЛА ВОЛИ"
+	выполняется на уровне ментальных Правил, в функции consciousness
+if am.Usefulness<0{
+	return false Здесь не должно быть блокировки!
 }
+*/
 	ai:=MentalActionsImagesArr[am.ActionsImageID]
 
 	am.Count++

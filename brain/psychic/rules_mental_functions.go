@@ -18,8 +18,8 @@ import (
 из последнего участка эпизодической памяти объектиынх (EpisodeMemory.Type==0) элеметов.
 limit 5 ограничивает выборку из эпиз.памяти, но она может получться и меньше.
 */
-func GetMentalRulesFromEpisodeMemory(kind int){
-	rImg:=getLastRulesSequenceFromEpisodeMemory(kind,5)
+func GetMentalRulesFromEpisodeMemory(){
+	rImg:=getLastRulesSequenceFromEpisodeMemory(5)
 	if rImg!=nil {
 		createNewlastrulesMentalID(0, rImg)//записать (если еще нет такого) групповое правило
 	}
@@ -163,19 +163,19 @@ if len(rImg)>limit{// limit последних
 			var lastEM EpisodeMemory
 			for j := 0; j < lenFrag; j++ {
 				lastEM =*EpisodeMemoryObjects[i+j]
-				if lastEM.RulesID != rImg[j] {
+				if lastEM.TriggerAndActionID != rImg[j] {
 					isConc=false
 					break
 				}
 			}
 			if isConc{// уж ты, нашли такой же фрагмент! но в нем нет пускового curActiveActions (раньше уже смотрели)
 				// выдать конечное праило, если оно с хорошим эффектом
-				rArr:=rulesMentalArr[lastEM.RulesID]
+				rArr:=rulesMentalArr[lastEM.TriggerAndActionID]
 				lastTa:=rArr.TAid[len(rArr.TAid)-1:]
 				ta:=TriggerAndActionArr[lastTa[0]]
 				if ta !=nil {
 						if ta.Effect >0{// с хорошим эффектом
-							return lastEM.RulesID
+							return lastEM.TriggerAndActionID
 						}//else - продолжает искать хороший конец далее назад
 				}
 			}
@@ -223,7 +223,7 @@ func getLastMentalRulesSequenceFromEpisodeMemory(activationType int,limit int)([
 	// перебор последнего фрагмента кадров эпиз.памяти
 	for i := EpisodeMemoryLastIDFrameID - beginID; i <= EpisodeMemoryLastIDFrameID; i++ {
 		em := EpisodeMemoryObjects[i]
-		rImg = append(rImg, em.RulesID)
+		rImg = append(rImg, em.TriggerAndActionID)
 	}
 	if len(rImg)>1{
 		createNewlastrulesMentalID(0, rImg)// записать (если еще нет такого) групповое правило
@@ -244,7 +244,7 @@ func getLastMentalRulesSequenceFromEpisodeMemory(activationType int,limit int)([
 func getMentalRulesArrFromTrigger(trigID int)(int){
 	// сначала попробовать найти Правило с учетом тематического контекста
 	for limit:=5; limit > 1; limit-- {
-		rImg := getLastRulesSequenceFromEpisodeMemory(1, limit)
+		rImg := getLastRulesSequenceFromEpisodeMemory(limit)
 		rules := getRulesFromTemp(rImg, limit)
 		if rules>0{
 			return rules

@@ -195,6 +195,18 @@ func SetCurGomeoParams(parID int,parVal string) {
 	return
 }
 
+func ClinerAllGomeoParams(){
+	GomeostazParams[1]=0.0
+	GomeostazParams[2]=0.0
+	GomeostazParams[3]=0.0
+	GomeostazParams[4]=0.0
+	GomeostazParams[5]=0.0
+	GomeostazParams[6]=0.0
+	GomeostazParams[7]=0.0
+	GomeostazParams[8]=0.0
+}
+///////////////////////////////
+
 // до определенной стадии развития Гон и Потребности в обучении не влияют ни на что (нет у детей гона)
 var IsLevelBeginParam3 = false // true - уровень развития для Гона достигнут
 var IsLevelBeginParam5 = false  // true - уровень развития для Потребность в обучении достигнут

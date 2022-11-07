@@ -4,11 +4,9 @@
 с целью найти верное действие для моторного автоматизма, а если нет,
 то создания нового ментального автоматизма для продолжения итеации поиска.
 
-Если нужно, то входные данные могут сначала помещаться в структуру входных данных типа
-type inputStruct4 struct {
-	par int
-}
-var input4 inputStruct4
+У инфо-функций не должно быть вхлжного аргумента, иначе невозможно будет их вызывать из runMenyalFunctionID(id int)
+Поэтому в инфо-функции могут вызываться вспомогательные функции с аргументами, полученными в инфофункци
+которые вызываются только если есть нужная инфа, например, сохраненная в mentalInfoStruct
 
 Результат работы инфо-функции записывается в mentalInfoStruct
 и определяется общая переменная currentInfoStructId == ID инфо-функции
@@ -16,11 +14,13 @@ var input4 inputStruct4
 
 package psychic
 
-/* Общая для всех информационных функций структура (типа информацонного окружения)
+/* Дополнительное инфо-окружение.
+Общая для всех информационных функций структура (типа информацонного окружения)
 для сохранения найденной информации.
 */
 type mentalInfo struct {
 	mImgID int // ID MentalActionsImages найденного целевого действия
+	motorAtmzmID int // ID моторного атвоматизма, рвущегося на выполнение
 
 }
 var mentalInfoStruct mentalInfo
@@ -34,6 +34,7 @@ func clinerMentalInfo(){ // НУЖНА ЛИ?..
 
 /* Общая переменная currentInfoStructId == ID инфо-функции),
 которые могут использоваться при запуске consciousness()
+для определения какой параметр из mentalInfoStruct использовать как выходная инфа функции.
 
 Можно использовать switch currentInfoStructId{ для выявления поля структуры mentalInfoStruct
  */
@@ -50,6 +51,7 @@ func runMenyalFunctionID(id int){
 	case 3: infoFunc3()//айти подходящий мент.автоматизм по опыту ментальных Правил
 	case 4: infoFunc4()//нализ инфо стркутуры и др. информации по currentInfoStructId и выдача решения
 	case 5: infoFunc5()//создать и запустить ментальный автоматизм по акции
+	case 6: infoFunc6()//ПОДВЕРГНУТЬ СОМНЕНИЮ автоматизм, если нет опасности (не нужно реагировать аффектно) и ситуация важна
 	}
 }
 //////////////////////////////////////////////////////////
@@ -91,7 +93,7 @@ func infoFunc1(){
 	iID,_=CreateNewlastMentalActionsImagesID(0,activateBaseID,activateEmotion,	activateInfoFunc,activateMotorID)
 
 	mentalInfoStruct.mImgID = iID // передача инфы в структуру
-	currentInfoStructId=1 // определение актуальной инфо-структуры
+	currentInfoStructId=1 // определение актуального поля mentalInfo
 }
 /////////////////////////////////////////////////////////
 
@@ -124,7 +126,7 @@ func infoFunc2(){
 	iID,_=CreateNewlastMentalActionsImagesID(0,activateBaseID,activateEmotion,	activateInfoFunc,activateMotorID)
 
 	mentalInfoStruct.mImgID = iID // передача инфы в структуру
-	currentInfoStructId=2 // определение актуальной инфо-структуры
+	currentInfoStructId=2 // определение актуального поля mentalInfo
 }
 //////////////////////////////////////////////////////////
 
@@ -137,7 +139,7 @@ func infoFunc2(){
 func infoFunc3() {
 	infoFindRightMentalRukes()
 	// получили mentalInfoStruct.mImgID
-	currentInfoStructId=3 // определение актуальной инфо-структуры
+	currentInfoStructId=3 // определение актуального поля mentalInfo
 }
 func infoFindRightMentalRukes()(int){
 	mrules:=getSuitableMentalRules()
@@ -167,7 +169,7 @@ func infoFunc4(){
 		mentalInfoStruct.mImgID=0
 	}
 	// получили mentalInfoStruct.mImgID
-	currentInfoStructId=4 // определение актуальной инфо-структуры
+	currentInfoStructId=4 // определение актуального поля mentalInfo
 }
 /* анализ инфо стркутуры и др. информации по currentInfoStructId и выдача решения
 Нужна таблица, какие инфо-функции вызывать при данной ситуации
@@ -197,7 +199,7 @@ func analisAndSintez(fromNextID int)(int){
 //////////////////////////////////////////////////////////
 
 
-/* №5 создать и запустить ментальный автоматизм по акции -
+/* №5 создать и запустить ментальный автоматизм по действию -
 ВСЕГДА ПОСЛЕ ПОЛУЧЕНИЯ ОБРАЗА ДЕЙСТВИЯ mentalInfoStruct.mImgID
  */
 func infoFunc5() {
@@ -205,10 +207,10 @@ func infoFunc5() {
 		infoCreateAndRunMentAtmzmFromAction(mentalInfoStruct.mImgID)
 	}
 	// получили mentalInfoStruct.mImgID
-	currentInfoStructId=5 // определение актуальной инфо-структуры
+	currentInfoStructId=5 // определение актуального поля mentalInfo
 }
 func infoCreateAndRunMentAtmzmFromAction(actImgID int){
-	if mentalInfoStruct.mImgID ==0 {
+	if actImgID ==0 {
 		return
 	}
 	id, matmzm := createMentalAutomatizmID(0, actImgID, 1)
@@ -219,6 +221,53 @@ func infoCreateAndRunMentAtmzmFromAction(actImgID int){
 }
 //////////////////////////////////////////////////////////
 
+
+/* №6 нужно ПОДВЕРГНУТЬ СОМНЕНИЮ автоматизм, если нет опасности (не нужно реагировать аффектно) и ситуация важна.
+Создать новый образ действий, если он лучше текущего в моторном автоматизме, рвущесмя на выполнение
+и запустить ментальный автоматизм по акции -
+ВСЕГДА ПОСЛЕ ПОЛУЧЕНИЯ ОБРАЗА ДЕЙСТВИЯ mentalInfoStruct.mImgID
+*/
+func infoFunc6() {
+	if mentalInfoStruct.motorAtmzmID >0 {
+		infoCreateAndRunNewActionMentAtmzmFromAction(mentalInfoStruct.motorAtmzmID)
+	}
+	// получили mentalInfoStruct.mImgID
+	currentInfoStructId=6 // определение актуального поля mentalInfo
+}
+func infoCreateAndRunNewActionMentAtmzmFromAction(actImgID int){
+	if actImgID ==0 {// ID действия мот.автоматизма, рвущегося на выполнение
+		return
+	}
+
+// сопоставление
+newActionID:=todoComparison(actImgID)
+if newActionID==0{// не получилось
+	return
+}
+
+	id, matmzm := createMentalAutomatizmID(0, actImgID, 1)
+	if id >0 {
+		// запустить мент.автоматизм
+		RunMentalMentalAutomatizm(matmzm)
+	}
+}
+/* сопоставить действия actImgID с другими из Правил и т.п. инфы и если компоненты найденных действий
+дают более желательный результат, то Создать новый образ действий из таких компонентов.
+Или же, если действия actImgID в данных условиях прогнозируют плохой эффект, то
+попытаться сгенерировать новое действие по имеющейся информации.
+
+Нужно иметь в виду, что в Vernike_detector.go есть массив памяти фраз, накапливается в течении дня
+var MemoryDetectedArr []MemoryDetected - структур фразы с контекстным окружением
+и Verbal.PhraseID[] - можно найти в этом массиве для ориентировки что бы ло раньше и позже.
+MemoryDetectedArr - как бы оперативная память фраз для сопоставлений.
+При активности дерева автоматизмов возникает Правило: Verbal оператора -> Verbal бота -> эффект
+*/
+func todoComparison(actImgID int)(int){
+
+	// TODO сопоставление
+	return 0
+}
+//////////////////////////////////////////////////////////
 
 
 

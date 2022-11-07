@@ -269,7 +269,7 @@ func wasChangingMoodCondition(kind int)(int,int,[]int){
 при активации дерева автоматизмов. Если тип curBaseStateImage, то ID отрицательное (ID<0)!
  */
 var currentTriggerID=0
-
+var currentRulesID=0
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -292,18 +292,19 @@ func fixNewRules(lastCommonDiffValue int,ai1 int) int {
 	if ai2 == 0{return 0}
 	TriggerAndAction,_:=createNewlastTriggerAndActionID(0,ai1,ai2,lastCommonDiffValue)
 	if TriggerAndAction == 0{return 0}
-	rulesID, _ := createNewlastrulesID(0, []int{TriggerAndAction})
-	if rulesID == 0{return 0}
+	currentRulesID, _ = createNewlastrulesID(0, []int{TriggerAndAction})
+	if currentRulesID == 0{return 0}
 
-	lib.WritePultConsol("<span style='color:green'>Записано <b>ПРАВИЛО № "+strconv.Itoa(rulesID)+"</b></span>")
-
+	lib.WritePultConsol("<span style='color:green'>Записано <b>ПРАВИЛО № "+strconv.Itoa(currentRulesID)+"</b></span>")
+/* В эпиз.память пишется только если не вызвало автоматических (неосознанных) действий,
+а было привлечено осознанное внимание consciousness(2
 	// новый кадр эпизодической памяти, сохраняющий
-	newEpisodeMemory(rulesID,0) // запись эпизодической памяти saveEpisodicMenory()
-
+	newEpisodeMemory(currentRulesID,0) // запись эпизодической памяти saveEpisodicMenory()
+*/
 	// теперь обрабатываем прошлую эпизодическую память (необязательно, т.к. при каждом поиске в эп.памяти это происходит)
-	GetRulesFromEpisodeMemory(0)
+	GetRulesFromEpisodeMemory()
 
-	return rulesID
+	return currentRulesID
 }
 ///////////////////////////////////////////////////////////////////////
 
