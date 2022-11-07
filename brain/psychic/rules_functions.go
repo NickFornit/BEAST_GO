@@ -151,6 +151,9 @@ if len(rImg)>limit{// limit последних
 					break
 				}
 			}
+			if lastEM == nil{
+				return 0
+			}
 			if isConc{// уж ты, нашли такой же фрагмент! но в нем нет пускового curActiveActions (раньше уже смотрели)
 				// выдать конечное праило, если оно с хорошим эффектом
 				rArr:=rulesArr[lastEM.TriggerAndActionID]

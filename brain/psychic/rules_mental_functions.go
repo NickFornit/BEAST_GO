@@ -148,7 +148,7 @@ if len(rImg)>limit{// limit последних
 	steps:=0
 	lenEp:=len(EpisodeMemoryObjects)
 	var startF = lenEp - 2*lenFrag // отмотать на 2 длины, чтобы не проверять в rID саму себя
-	if startF > lenEp{//  а нет еще достаточной длины еп.памяти
+	if startF <0{//  а нет еще достаточной длины еп.памяти
 		return 0
 	}
 		// идем назад по кускам lenFrag
@@ -160,13 +160,16 @@ if len(rImg)>limit{// limit последних
 				return 0
 			}
 			var isConc=true
-			var lastEM EpisodeMemory
+			var lastEM *EpisodeMemory
 			for j := 0; j < lenFrag; j++ {
-				lastEM =*EpisodeMemoryObjects[i+j]
+				lastEM =EpisodeMemoryObjects[i+j]
 				if lastEM.TriggerAndActionID != rImg[j] {
 					isConc=false
 					break
 				}
+			}
+			if lastEM == nil{
+				return 0
 			}
 			if isConc{// уж ты, нашли такой же фрагмент! но в нем нет пускового curActiveActions (раньше уже смотрели)
 				// выдать конечное праило, если оно с хорошим эффектом
