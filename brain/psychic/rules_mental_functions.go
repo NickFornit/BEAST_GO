@@ -224,7 +224,7 @@ func getLastMentalRulesSequenceFromEpisodeMemory(activationType int,limit int)([
 	}
 	var rImg []int
 	// перебор последнего фрагмента кадров эпиз.памяти
-	for i := EpisodeMemoryLastIDFrameID - beginID; i <= EpisodeMemoryLastIDFrameID; i++ {
+	for i := EpisodeMemoryLastIDFrameID - beginID+1; i <= EpisodeMemoryLastIDFrameID; i++ {
 		em := EpisodeMemoryObjects[i]
 		rImg = append(rImg, em.TriggerAndActionID)
 	}

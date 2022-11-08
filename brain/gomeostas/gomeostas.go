@@ -195,8 +195,8 @@ func SetCurGomeoParams(parID int,parVal string) {
 	return
 }
 
-func ClinerAllGomeoParams(){
-	GomeostazParams[1]=0.0
+func ClinerAllGomeoParams(value float64){
+	GomeostazParams[1]=value
 	GomeostazParams[2]=0.0
 	GomeostazParams[3]=0.0
 	GomeostazParams[4]=0.0

@@ -526,7 +526,8 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 			cliner_gomeo_pars := r.FormValue("cliner_gomeo_pars")
 			if len(cliner_gomeo_pars) > 0 {
 				brain.IsPultActivnost = true
-				gomeostas.ClinerAllGomeoParams()
+				value,_:=strconv.ParseFloat(cliner_gomeo_pars, 64)
+				gomeostas.ClinerAllGomeoParams(value)
 				brain.IsPultActivnost = false
 				_, _ = fmt.Fprint(resp, "1")
 				return

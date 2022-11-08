@@ -25,7 +25,9 @@ func init() {
 
 // сохранить время жизни в файл
 func saveLifeTime() {
-	lib.WriteFileContent(lib.GetMainPathExeFile() + "/memory_reflex/life_time.txt", strconv.Itoa(LifeTime))
+	if LifeTime>10 {// иногда life_time.txt обнулялся...
+		lib.WriteFileContent(lib.GetMainPathExeFile()+"/memory_reflex/life_time.txt", strconv.Itoa(LifeTime))
+	}
 }
 
 var IsPultActivnost = false	// начало активности с Пульта  brain.IsPultActivnost=true brain.IsPultActivnost=false

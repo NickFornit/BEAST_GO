@@ -17,7 +17,7 @@ func init(){
 }
 
 var pulsCount = 0
-var LifeTime = 0
+var LifeTime = 0 
 var EvolushnStage = 0  // стадия развития
 var IsStressing = false
 
