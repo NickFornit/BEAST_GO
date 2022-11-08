@@ -154,9 +154,10 @@ func calcNexusFromNextID(fromNextID int)(int){
 
 
 //////////////////////////////////////////////////////
-/* после периода ожидания
-Учесть последствия запуска мот.автоматизма,
-из saveFromNextIDcurretCicle выявить Правила и записать в эпизод.пямять.
+/* после периода ожидания, если мот.автоматизма был запущен ментально:
+в конце saveFromNextIDAnswerCicle есть звено с таким запуском.
+Учесть последствия ментального запуска мот.автоматизма,
+из saveFromNextIDAnswerCicle выявить Правила и записать в эпизод.пямять.
 Если нужно - обдумать результат в новом ментальном consciousness(2,currrentFromNextID)
 Сразу после обработки периода ожидания запускается дерево понимания и объявный запуск consciousness(1,0)
 так что никаких действий совершать в afterWaitingPeriod() или в самой afterWaitingPeriod() не следует.
@@ -164,11 +165,11 @@ func calcNexusFromNextID(fromNextID int)(int){
 effect =lastCommonDiffValue
 */
 func afterWaitingPeriod(effect int){
-	if saveFromNextIDcurretCicle==nil || len(saveFromNextIDcurretCicle)==0{
+	if saveFromNextIDAnswerCicle==nil || len(saveFromNextIDAnswerCicle)==0{
 		return
 	}
 	//вытащить последний член, который ДОЛЖЕН БЫТЬ с ментальным автоматизмом запуска моторного автоматизма - ответного действия
-	last:=saveFromNextIDcurretCicle[len(saveFromNextIDcurretCicle)-1]// всегда есть
+	last:=saveFromNextIDAnswerCicle[len(saveFromNextIDAnswerCicle)-1]// всегда есть
 	lastNextFrom:=goNextFromIDArr[last]
 	if lastNextFrom==nil{// не должно быть такого
 		return
@@ -183,13 +184,15 @@ func afterWaitingPeriod(effect int){
 		lib.TodoPanic("Нет действия автоматизма для func afterWaitingPeriod()")
 		return
 	}
-	if mact.activateMotorID ==0{// конечный член saveFromNextIDcurretCicle не содержит мент.автоматизм моторного запуска
-		// м.б. только при ошибке логики кода, поэтому выдадим панику
-		lib.TodoPanic("конечный член saveFromNextIDcurretCicle не содержит мент.автоматизм моторного запуска в func afterWaitingPeriod()")
+	if mact.activateMotorID ==0{// конечный член saveFromNextIDAnswerCicle не содержит мент.автоматизм моторного запуска
+/* в конце saveFromNextIDAnswerCicle должен быть мент.автоматизм моторного запуска,
+   если только Стимул не возникнет, не дожидаясь ответа на предыдущий.
+   В таком случае ментальное Правило не формируется.
+ */
 		return
 	}
 
-	mRules,_:=createNewlastMentalTriggerAndActionID(0,saveFromNextIDcurretCicle,mact.activateMotorID,effect)
+	mRules,_:=createNewlastMentalTriggerAndActionID(0,saveFromNextIDAnswerCicle,mact.activateMotorID,effect)
 
 	rID,_:=createNewlastrulesMentalID(0,[]int{mRules})
 	if rID>0 {

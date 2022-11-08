@@ -20,7 +20,9 @@ package psychic
 */
 type mentalInfo struct {
 	mImgID int // ID MentalActionsImages найденного целевого действия
-	motorAtmzmID int // ID моторного атвоматизма, рвущегося на выполнение
+	ActionsImageID int//ID ActionsImage действия (стимула или ответа)
+	motorAtmzmID int // ID моторного автоматизма
+	mentalAtmzmID int // ID моторного автоматизма
 
 }
 var mentalInfoStruct mentalInfo
@@ -52,6 +54,7 @@ func runMenyalFunctionID(id int){
 	case 4: infoFunc4()//нализ инфо стркутуры и др. информации по currentInfoStructId и выдача решения
 	case 5: infoFunc5()//создать и запустить ментальный автоматизм по акции
 	case 6: infoFunc6()//ПОДВЕРГНУТЬ СОМНЕНИЮ автоматизм, если нет опасности (не нужно реагировать аффектно) и ситуация важна
+	case 7: infoFunc7()//создать и запустить ментальный автоматизм запуска моторного автоматизма по действию ActionsImageID
 	}
 }
 //////////////////////////////////////////////////////////
@@ -199,7 +202,7 @@ func analisAndSintez(fromNextID int)(int){
 //////////////////////////////////////////////////////////
 
 
-/* №5 создать и запустить ментальный автоматизм по действию -
+/* №5 создать и запустить ментальный автоматизм по действию mImgID -
 ВСЕГДА ПОСЛЕ ПОЛУЧЕНИЯ ОБРАЗА ДЕЙСТВИЯ mentalInfoStruct.mImgID
  */
 func infoFunc5() {
@@ -266,6 +269,42 @@ func todoComparison(actImgID int)(int){
 
 	// TODO сопоставление
 	return 0
+}
+//////////////////////////////////////////////////////////
+
+
+
+/* №7 создать и запустить ментальный автоматизм запуска моторного автоматизма по действию ActionsImageID -
+ВСЕГДА ПОСЛЕ ПОЛУЧЕНИЯ ОБРАЗА ДЕЙСТВИЯ mentalInfoStruct.ActionsImageID
+Создается моторный автоматизм (если такого еще нет), привязанный к ветке текущей активности дерева автоматизмов.
+*/
+func infoFunc7() {
+	if mentalInfoStruct.ActionsImageID >0 {
+		infoCreateAndRunMentMotorAtmzmFromAction(mentalInfoStruct.ActionsImageID)
+	}
+	// получили mentalInfoStruct.mImgID
+	currentInfoStructId=7 // определение актуального поля mentalInfo
+}
+func infoCreateAndRunMentMotorAtmzmFromAction(ActionsImageID int){
+	if ActionsImageID ==0 {
+		return
+	}
+	motorID,_:=createNewAutomatizmID(0,detectedActiveLastNodID,mentalInfoStruct.ActionsImageID)
+	clinerMentalInfo()
+	mentalInfoStruct.motorAtmzmID=motorID
+if motorID==0{
+	return
+}
+	actImgID,_:=CreateNewlastMentalActionsImagesID(0,0,0,0,motorID)
+if actImgID==0{
+	return
+}
+	id, matmzm := createMentalAutomatizmID(0, actImgID, 1)
+	if id >0 {
+		mentalInfoStruct.mentalAtmzmID=id
+		// запустить мент.автоматизм
+		RunMentalMentalAutomatizm(matmzm)
+	}
 }
 //////////////////////////////////////////////////////////
 
