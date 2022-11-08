@@ -146,8 +146,8 @@ func loadMentalTriggerAndActionArr(){
 			si,_:=strconv.Atoi(s[i])
 			ShortTermMemoryID=append(ShortTermMemoryID,si)
 		}
-		Action,_:=strconv.Atoi(p[2])
-		Effect,_:=strconv.Atoi(p[3])
+		Action,_:=strconv.Atoi(p[1])
+		Effect,_:=strconv.Atoi(p[2])
 var saveDoWritingFile= doWritingFile; doWritingFile =false
 		createNewlastMentalTriggerAndActionID(id,ShortTermMemoryID,Action,Effect)
 doWritingFile =saveDoWritingFile
