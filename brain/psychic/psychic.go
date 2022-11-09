@@ -239,6 +239,7 @@ func SaveAllPsihicMemory(){
 	SavePurposeImageFromIdArr()
 	SaveRulesArr()
 	SavegoNext()
+	saveInterruptMemory()
 	SaveMentalActionsImagesArr()
 	SaveMentalAutomatizm()
 	SaveProblemDominenta()

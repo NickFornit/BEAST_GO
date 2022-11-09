@@ -1,5 +1,5 @@
 /* Образ ментального действия
-ID|activateBaseID|activateEmotion|activateInfoFunc|activateMotorID|
+ID|activateBaseID|activateEmotion|activatePurpose|activateInfoFunc|activateMotorID|
 */
 
 package psychic
@@ -15,6 +15,7 @@ type MentalActionsImages struct {
 	ID    int   // идентификатор данного сочетания пусковых стимулов
 	activateBaseID int // активация настроения Mood в дереве понимания 1 2 3 (отражает -1 0 1 UnderstandingNode.Mood)
 	activateEmotion int // активация эмоции EmotionID в дереве понимания (UnderstandingNode.EmotionID)
+	activatePurpose int // активация PurposeImage в дереве понимания (UnderstandingNode.PurposeID)
 	/* Разнообразие заготовленных инфо-функций дает больший потенциал
 	   разных ментальных действий, поначалу случайных, но оптимизирующихся по эффекту Правила.
 	*/
@@ -39,10 +40,10 @@ func MentalActionsImagesInit(){
 при activateBaseID==0 не задается переадресация
  */
 var lastMentalActionsImagesID=0
-func CreateNewlastMentalActionsImagesID(id int,activateBaseID int,activateEmotion int,
+func CreateNewlastMentalActionsImagesID(id int,activateBaseID int,activateEmotion int,activatePurpose int,
 	activateInfoFunc int,activateMotorID int)(int,*MentalActionsImages){
 
-	oldID,oldVal:=checkUnicumMentalActionsImages(activateBaseID,activateEmotion,activateInfoFunc,activateMotorID)
+	oldID,oldVal:=checkUnicumMentalActionsImages(activateBaseID,activateEmotion,activatePurpose,activateInfoFunc,activateMotorID)
 	if oldVal!=nil{
 		return oldID,oldVal
 	}
@@ -70,10 +71,11 @@ func CreateNewlastMentalActionsImagesID(id int,activateBaseID int,activateEmotio
 
 	return id,&node
 }
-func checkUnicumMentalActionsImages(activateBaseID int,activateEmotion int,activateInfoFunc int,activateMotorID int)(int,*MentalActionsImages){
+func checkUnicumMentalActionsImages(activateBaseID int,activateEmotion int,activatePurpose int,activateInfoFunc int,activateMotorID int)(int,*MentalActionsImages){
 	for id, v := range MentalActionsImagesArr {
 		if activateBaseID!=v.activateBaseID || 
 			activateEmotion!=v.activateEmotion ||
+			activatePurpose!=v.activatePurpose ||
 			activateInfoFunc!=v.activateInfoFunc ||
 			activateMotorID!=v.activateMotorID {
 			continue
@@ -91,13 +93,14 @@ func checkUnicumMentalActionsImages(activateBaseID int,activateEmotion int,activ
 
 
 //////////////////// сохранить образы сочетаний ответных действий
-// ID|activateBaseID|activateEmotion|activateInfoFunc|activateMotorID|
+// ID|activateBaseID|activateEmotion|activatePurpose|activateInfoFunc|activateMotorID|
 func SaveMentalActionsImagesArr(){
 	var out=""
 	for k, v := range MentalActionsImagesArr {
 		out+=strconv.Itoa(k)+"|"
 		out+=strconv.Itoa(v.activateBaseID)+"|"
 		out+=strconv.Itoa(v.activateEmotion)+"|"
+		out+=strconv.Itoa(v.activatePurpose)+"|"
 		out+=strconv.Itoa(v.activateInfoFunc)+"|"
 		out+=strconv.Itoa(v.activateMotorID)
 		out+="\r\n"
@@ -106,7 +109,6 @@ func SaveMentalActionsImagesArr(){
 
 }
 ////////////////////  загрузить образы сочетаний ответных действий
-// ID|ActID через ,|PhraseID через ,|ToneID|MoodID|
 func loadMentalActionsImagesArr(){
 	MentalActionsImagesArr=make(map[int]*MentalActionsImages)
 	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_psy/action_images_mental.txt")
@@ -119,11 +121,12 @@ func loadMentalActionsImagesArr(){
 		id,_:=strconv.Atoi(p[0])
 		activateBaseID,_:=strconv.Atoi(p[1])
 		activateEmotion,_:=strconv.Atoi(p[2])
-		activateInfoFunc,_:=strconv.Atoi(p[3])
-		activateMotorID,_:=strconv.Atoi(p[4])
+		activatePurpose,_:=strconv.Atoi(p[3])
+		activateInfoFunc,_:=strconv.Atoi(p[4])
+		activateMotorID,_:=strconv.Atoi(p[5])
 
 var saveDoWritingFile= doWritingFile; doWritingFile =false
-		CreateNewlastMentalActionsImagesID(id,activateBaseID,activateEmotion,activateInfoFunc,activateMotorID)
+		CreateNewlastMentalActionsImagesID(id,activateBaseID,activateEmotion,activatePurpose,activateInfoFunc,activateMotorID)
 doWritingFile =saveDoWritingFile
 	}
 	return
@@ -143,6 +146,10 @@ func GetMentalActionsString(act int)(string){
 
 	if ai.activateEmotion != 0 {
 		out+=" активация эмоции: "+getToneStrFromID(ai.activateEmotion)+" "
+	}
+
+	if ai.activateEmotion != 0 {
+		out+=" активация цели: "+GetMentalPurposeForNodeInfo(ai.activatePurpose)+" "
 	}
 
 	if ai.activateInfoFunc != 0 {

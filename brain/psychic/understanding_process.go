@@ -13,12 +13,21 @@ import (
 
 
 //////////////////////////////////////////////////
-/* Определение Цели в данной ситуации - на уровне дерева понимания
-	Здесь выбирается действие пробного автоматизма из выполнившегося рефлекса actualRelextActon
-	и запускается МЕНТАЛЬНЫЙ автоматизм.
-	На стадии 4 - провоцировать оператора на ответы (почему, зачем, что такое?)
+/* Определение ближайшей Цели в данной ситуации
+!!!!это - не PurposeImage (understanding_purpose_image.go)!!!
+Это - постановка цели для текущего цикла размышления, чтобы оценить эффект для Правила.
+Дополнение стека savePorposeIDcurrentCicle[]  addMewPorposeMemory(porposeID)
 */
 func getPurposeUndestandingAndRunAutomatizm()(bool) {
+
+	/* TODO ДОДЕЛАТЬ:
+	func getPurposeUndestandingAndRunAutomatizm()(bool)
+	func valuationPorposeIDcurrentCicle()
+	СДЕЛАТЬ:
+	ментальную функцию поставновки целей !!!! альтернативную getPurposeUndestandingAndRunAutomatizm()
+	ментальную функцию оценки эффекта альтернативную getMentalEffect
+	Проставить lib.WritePultConsol() для главных событий цикла
+	 */
 
 
 	// мозжечковые рефлексы - самый первый уровень осознания - подгонка действий под заданную Цель.
@@ -28,13 +37,9 @@ func getPurposeUndestandingAndRunAutomatizm()(bool) {
 
 		 */
 	}
-/*
-	// переосмыслить ситуацию - Активировать Дерево Понимания
-	//understandingSituation()
-	и затем создать новую цель understanding_purpose_image.go
-*/
 
 
+	//lib.WritePultConsol()
 	return false
 }
 ////////////////////////////////////////////////
@@ -50,7 +55,7 @@ func reloadConsciousness(stop bool,fromNextID int)(bool){
 	}
 	if stop{// было прервано объективной активацией, запомнить остановленное и прекратить ментальный цикл
 		// не запускать consciousness(2,fromNextID)
-		saveInterruptMemory()
+		addInterruptMemory()
 
 		return false
 	}else {
@@ -108,12 +113,54 @@ func processingFreeState(){
 
 
 
+/* получить конечный goNext цепочки
+*/
+func getLastAutomatizmFrom(fromNextID int)(int){
+	nextID:=goNextFromIDArr[fromNextID].ID // если нет продолжения, то остается данный fromNextID
+	for goNextFromIDArr[nextID].NextID>0 {
+		nextID=goNextFromIDArr[nextID].NextID
+	}
+	return nextID
+}
+///////////////////////////////////////
+
+
+
+///////////////////////////////////////////////////////
+/* НАЙТИ или создать Базовое звено цепи fromNextID для данной активности деревьев
+и пройти цепочку до конца, чтобы продолжить цикл от него.
+ */
+func createBasicLink()(int){
+	fromNextID:=0
+	// если такое Базовое звено?
+	firstArr:=goNextFromUnderstandingNodeIDArr[detectedActiveLastUnderstandingNodID]
+	if firstArr == nil { // нет веток у данного узла дерева - создать базовое звено цепочки
+		// создание нового элемента цепочки
+		fromNextID, _ = createNewNextFromUnderstandingNodeID(
+			detectedActiveLastUnderstandingNodID,
+			detectedActiveLastNodID,
+			0,
+			0)
+	}else{// уже есть базовое звено
+		fromNextID=firstArr[0].ID
+	}
+	//стек для обобщений: 7 Базовых fromNextID
+	addMewBaseLinksMemory(fromNextID)
+
+	// найти конец цепочки чтобы продолжить цикл от него
+	fromNextID = getLastAutomatizmFrom(fromNextID)
+
+	return fromNextID
+}
+//////////////////////////////////////////////////
+
+
 
 ///////////////////////////////////////////////////////
 // создание или использование ментального автоматизма инфо-функции c ID= infoID
 func createNexusFromNextID(fromNextID int,infoID int)(int){
 
-	imgID,_:=CreateNewlastMentalActionsImagesID(0,0,0,infoID,0)
+	imgID,_:=CreateNewlastMentalActionsImagesID(0,0,0,0,infoID,0)
 	if imgID>0 {
 		aID, _ := createMentalAutomatizmID(0, imgID, 1)
 		if aID > 0 {
@@ -192,7 +239,10 @@ func afterWaitingPeriod(effect int){
 		return
 	}
 
-	mRules,_:=createNewlastMentalTriggerAndActionID(0,saveFromNextIDAnswerCicle,mact.activateMotorID,effect)
+	// оценить совокупный эффект
+	effectValuation:=getMentalEffect(effect)
+
+	mRules,_:=createNewlastMentalTriggerAndActionID(0,saveFromNextIDAnswerCicle,mact.activateMotorID,effectValuation)
 
 	rID,_:=createNewlastrulesMentalID(0,[]int{mRules})
 	if rID>0 {
@@ -205,6 +255,71 @@ func afterWaitingPeriod(effect int){
 }
 ///////////////////////////////////////////////////////
 
+func getMentalEffect(effect0 int)int{
+	/* улучшилось ли положение с учетом текущего PurposeImage 4-го узла ветки понимания?
+	currentUnderstandingActivedNodes[]*UnderstandingNode // начиная с конечного к первому
+	*/
+	effect4:=valuationPurpose()
+
+	/* оценить эффект с учетом текущих целей savePorposeIDcurrentCicle []
+	И эта цель имеет значимое преимущество для EvolushnStage > 4, где произвольная цель - главное,
+	особенно в случае Доминанты.
+	 */
+	maneEffect:=valuationPorposeIDcurrentCicle()
+
+	// Коэффициенты эффектов разного вида должны сильно влиять не ментальность твари, что для нее важнее.
+	effectValuation:=effect0*3 + effect4*1 + maneEffect*4
+	if effectValuation>1{effectValuation=1}
+	if effectValuation<1{effectValuation=-1}
+
+	return effectValuation
+}
+///// оценить эффект по цели 4-го узла
+func valuationPurpose()(int){
+	effect:=0
+	node4:=currentUnderstandingActivedNodes[1:]
+	purpose4id:=node4[0].PurposeID
+	purpose4:=PurposeImageFromID[purpose4id]
+	if purpose4!=nil && prePurpose4 !=nil {
+		/* использовать для сравнения с предыдущим образом var prePurpose4 *PurposeImage*/
+		if !purpose4.veryActual && prePurpose4.veryActual{
+			effect+=2
+		}
+		if purpose4.veryActual && !prePurpose4.veryActual{
+			effect-=2
+		}
+		//purpose4.targetID Уменьшилось ли число критических параметров с прошлого раза
+		if len(purpose4.targetID) < len(prePurpose4.targetID){
+			effect++
+		}
+		if len(purpose4.targetID) > len(prePurpose4.targetID){
+			effect--
+		}
+		//purpose4.actionID - непонятно как использовать, разве что по Правилам или эпиз.памяти
+
+		prePurpose4 = purpose4// сохранить для следующего
+	}
+	if effect>0 {
+		return 1
+	}
+	if effect<0 {
+		return -1
+	}
+	return 0
+}
+////////////////////////////////////
+
+/*оценить эффект с учетом текущих целей savePorposeIDcurrentCicle []
+И эта цель имеет значимое преимущество для EvolushnStage > 4, где произвольная цель - главное,
+особенно в случае Доминанты.
+ */
+func valuationPorposeIDcurrentCicle()int{
+
+
+
+	return 0
+}
+/////////////////////////////////////////////////////////
 
 
 

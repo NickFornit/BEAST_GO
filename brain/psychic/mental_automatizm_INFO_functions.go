@@ -80,6 +80,7 @@ func infoFunc1(){
 
 	activateBaseID:=0
 	activateEmotion:=0
+	activatePurpose:=0
 	activateInfoFunc:=0
 	activateMotorID:=0
 
@@ -93,7 +94,7 @@ func infoFunc1(){
 	//action:=infoFindRightMentalRukes()
 
 	// создать
-	iID,_=CreateNewlastMentalActionsImagesID(0,activateBaseID,activateEmotion,	activateInfoFunc,activateMotorID)
+	iID,_=CreateNewlastMentalActionsImagesID(0,activateBaseID,activateEmotion,activatePurpose,activateInfoFunc,activateMotorID)
 
 	mentalInfoStruct.mImgID = iID // передача инфы в структуру
 	currentInfoStructId=1 // определение актуального поля mentalInfo
@@ -112,6 +113,7 @@ func infoFunc2(){
 
 	activateBaseID:=0
 	activateEmotion:=0
+	activatePurpose:=0
 	activateInfoFunc:=0
 	activateMotorID:=0
 
@@ -126,7 +128,7 @@ func infoFunc2(){
 
 
 	// создать
-	iID,_=CreateNewlastMentalActionsImagesID(0,activateBaseID,activateEmotion,	activateInfoFunc,activateMotorID)
+	iID,_=CreateNewlastMentalActionsImagesID(0,activateBaseID,activateEmotion,activatePurpose,activateInfoFunc,activateMotorID)
 
 	mentalInfoStruct.mImgID = iID // передача инфы в структуру
 	currentInfoStructId=2 // определение актуального поля mentalInfo
@@ -278,6 +280,7 @@ func todoComparison(actImgID int)(int){
 ВСЕГДА ПОСЛЕ ПОЛУЧЕНИЯ ОБРАЗА ДЕЙСТВИЯ mentalInfoStruct.ActionsImageID
 Создается моторный автоматизм (если такого еще нет), привязанный к ветке текущей активности дерева автоматизмов.
 */
+var prevMotorAtmzmID=0
 func infoFunc7() {
 	if mentalInfoStruct.ActionsImageID >0 {
 		infoCreateAndRunMentMotorAtmzmFromAction(mentalInfoStruct.ActionsImageID)
@@ -289,13 +292,21 @@ func infoCreateAndRunMentMotorAtmzmFromAction(ActionsImageID int){
 	if ActionsImageID ==0 {
 		return
 	}
-	motorID,_:=createNewAutomatizmID(0,detectedActiveLastNodID,mentalInfoStruct.ActionsImageID)
+	motorID,motorAtmzm:=createNewAutomatizmID(0,detectedActiveLastNodID,mentalInfoStruct.ActionsImageID)
+	if motorID==0{
+		return
+	}
+	if prevMotorAtmzmID==motorID{// раньше был запущен ментально такой мот.автоматизм
+		// применить мозжечковый рефлекс
+		cerebellumCoordination(motorAtmzm, 1)// 1 - усилить действие
+	}
+	prevMotorAtmzmID=motorID
 	clinerMentalInfo()
 	mentalInfoStruct.motorAtmzmID=motorID
 if motorID==0{
 	return
 }
-	actImgID,_:=CreateNewlastMentalActionsImagesID(0,0,0,0,motorID)
+	actImgID,_:=CreateNewlastMentalActionsImagesID(0,0,0,0,0,motorID)
 if actImgID==0{
 	return
 }

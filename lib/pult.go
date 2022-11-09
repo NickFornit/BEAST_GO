@@ -4,6 +4,7 @@ package lib
 
 import (
 	"fmt"
+	"regexp"
 )
 
 // строка вывода на пульт - для func WritePultConsol
@@ -12,8 +13,11 @@ var WritePultConsolStr = ""
 Сообщения накапливаются в WritePultConsolStr и откправлются с каждым пульсом
 */
 func WritePultConsol(print string) {
-	fmt.Println("НА ПУЛЬТ: ", print)
 	WritePultConsolStr =	print + "<br>" + WritePultConsolStr
+// очищать от форматирования тегами, проверка - в func RunInitialisation()
+	reg := regexp.MustCompile(`<\/?[^>]+>`)
+	print = reg.ReplaceAllString(print, " ")
+	fmt.Println("НА ПУЛЬТ: ", print)
 }
 
 // функция вызова паники с информированием в логе Пульта

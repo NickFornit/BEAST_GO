@@ -226,6 +226,19 @@ func checkUnderstandingTree(v *UnderstandingNode,Mood int,EmotionID int,
 //////////////////////////////////////
 
 
+// выдать массив узлов ветки по конечному ID, начиная с конечного к первому
+func getcurrentUnderstandingActivedNodes(lastID int)([]*UnderstandingNode){
+	var nodws []*UnderstandingNode
+node:=UnderstandingNodeFromID[lastID]
+for node!=nil{
+	nodws=append(nodws,node)
+	node=node.ParentNode
+}
+return nodws
+}
+///////////////////////////////////////
+
+
 
 
 

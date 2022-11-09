@@ -82,12 +82,15 @@ var detectedActiveLastUnderstandingNodID=0
 // нераспознанный остаток - НОВИЗНА
 var CurrentUnderstandingTreeEnd []int
 var currentUnderstandingStepCount=0
-// массив id узлов активной ветки
-var currentUnderstandingNodeID[] int
+// массив узлов активной ветки   currentUnderstandingActivedNodes=getcurrentUnderstandingActivedNodes(lastID)
+var currentUnderstandingActivedNodes[]*UnderstandingNode // начиная с конечного к первому
 
 var saveSituationImageID=0
 
 var currentMentalAutomatizmID=0
+
+// образ цели предыдущей активации для func getMentalEffect
+var prePurpose4 *PurposeImage
 
 
 /* Активация дерева ментальных автоматизмов происходит из:
@@ -131,7 +134,7 @@ func understandingSituation(activationType int)(bool){
 	ActiveBranchNodeArr=nil
 	CurrentUnderstandingTreeEnd=nil
 	currentUnderstandingStepCount=0
-	currentUnderstandingNodeID=nil
+	currentUnderstandingActivedNodes=nil
 
 	// вытащить 3 уровня условий в виде ID их образов
 	var lev1=PsyBaseMood // PsyBaseMood: -1 Плохое настроение, 0 Нормальное, 1 - хорошее настроение
@@ -177,6 +180,7 @@ func understandingSituation(activationType int)(bool){
 		detectedActiveLastUnderstandingNodID = formingUnderstandingBranch(detectedActiveLastUnderstandingNodID, currentUnderstandingStepCount, condArr)
 		CurrentUnderstandingTreeEnd=condArr // все - новизна
 	}
+	currentUnderstandingActivedNodes=getcurrentUnderstandingActivedNodes(detectedActiveLastUnderstandingNodID)
 
 	/* объективный запуск consciousness - по кативации дерева автоматизмов
 	ментальный запуск в случае произвольной переактивации дерева понимания или цикле осмысления (5-я ступень)
@@ -230,3 +234,5 @@ func conditionUnderstandingFound(level int,cond []int,node *UnderstandingNode){
 	return
 }
 ////////////////////////////////////////////////////////
+
+

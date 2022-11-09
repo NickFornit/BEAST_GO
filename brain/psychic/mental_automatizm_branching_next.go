@@ -53,7 +53,7 @@ var goNextFromIDArr=make(map[int]*goNext)
 uID=15 -> goNextFromIDArr[goNext.ID=1] -> goNextFromIDArr[goNext.ID=2] - цепочка для MotorBranchID==1
 		-> goNextFromIDArr[goNext.ID=10] -> -> goNextFromIDArr[goNext.ID=11] - цепочка для MotorBranchID==2
 Для каждого MotorBranchID создается своя линейная цепочка!
-Для каждого MotorBranchID создается своя линейная цепочка!
+
 К узлу uID дерева понимания пристегнуты 2 goNext с разными MotorBranchID,
 а к тем пристегнуты по 2 других goNext с разными MotorBranchID
 goNextFromUnderstandingNodeIDArr[1]=goNext.ID=1
@@ -176,25 +176,5 @@ func loadgoNext(){
 ///////////////////////////////////////////
 
 
-/* получить конечный goNext цепочки
-от UnderstandingNode.ID для MotorBranchID
- */
-func getLastAutomatizmFrom(UnderstandingNodeID int,MotorBranchID int)(int){
-	// если ли уже такое начало цепочки?
-	firstArr:=goNextFromUnderstandingNodeIDArr[UnderstandingNodeID]
-	if firstArr != nil {
-		for i := 0; i < len(firstArr); i++ {
-			if firstArr[i].MotorBranchID == MotorBranchID{
-				// пройти до конца
-				next:=firstArr[i].NextID
-				for next>0 {
-					next=goNextFromIDArr[next].NextID
-				}
-				return next
-			}
-		}
-	}
-	return 0
-}
-///////////////////////////////////////
+
 
