@@ -4,7 +4,7 @@
 с целью найти верное действие для моторного автоматизма, а если нет,
 то создания нового ментального автоматизма для продолжения итеации поиска.
 
-У инфо-функций не должно быть вхлжного аргумента, иначе невозможно будет их вызывать из runMenyalFunctionID(id int)
+У инфо-функций не должно быть вхлжного аргумента, иначе невозможно будет их вызывать из runMentalFunctionID(id int)
 Поэтому в инфо-функции могут вызываться вспомогательные функции с аргументами, полученными в инфофункци
 которые вызываются только если есть нужная инфа, например, сохраненная в mentalInfoStruct
 
@@ -13,6 +13,8 @@
 */
 
 package psychic
+
+import "strconv"
 
 /* Дополнительное инфо-окружение.
 Общая для всех информационных функций структура (типа информацонного окружения)
@@ -46,7 +48,7 @@ var currentInfoStructId=0
 /* Функция вызова пронумерованной функции
 
  */
-func runMenyalFunctionID(id int){
+func runMentalFunctionID(id int){
 	switch id {
 	case 1: infoFunc1()//Подобрать MentalActionsImages для базового звена цепочки
 	case 2: infoFunc2()//Подобрать MentalActionsImages для последующего звена цепочки
@@ -56,6 +58,19 @@ func runMenyalFunctionID(id int){
 	case 6: infoFunc6()//ПОДВЕРГНУТЬ СОМНЕНИЮ автоматизм, если нет опасности (не нужно реагировать аффектно) и ситуация важна
 	case 7: infoFunc7()//создать и запустить ментальный автоматизм запуска моторного автоматизма по действию ActionsImageID
 	}
+}
+
+func getMentalFunctionString(id int)string{
+	switch id {
+	case 1: return "Подобрать MentalActionsImages для базового звена цепочки"
+	case 2: return "Подобрать MentalActionsImages для последующего звена цепочки"
+	case 3: return "Найти подходящий мент.автоматизм по опыту ментальных Правил"
+	case 4: return "Анализ инфо стркутуры и др. информации по currentInfoStructId и выдача решения"
+	case 5: return "Создать и запустить ментальный автоматизм по акции"
+	case 6: return "Подвергнуть сомнению автоматизм, если нет опасности (не нужно реагировать аффектно) и ситуация важна"
+	case 7: return "Создать и запустить ментальный автоматизм запуска моторного автоматизма по действию ActionsImageID"
+	}
+	return "Нет функции с ID = "+strconv.Itoa(id)
 }
 //////////////////////////////////////////////////////////
 
@@ -78,11 +93,8 @@ c вызовом activateInfoFunc для начальной информиров
 func infoFunc1(){
 	iID:=0// ID MentalActionsImages
 
-	activateBaseID:=0
-	activateEmotion:=0
-	activatePurpose:=0
-	activateInfoFunc:=0
-	activateMotorID:=0
+	typeID:=0
+	valID:=0
 
 	// TODO подобрать
 	/*
@@ -94,7 +106,7 @@ func infoFunc1(){
 	//action:=infoFindRightMentalRukes()
 
 	// создать
-	iID,_=CreateNewlastMentalActionsImagesID(0,activateBaseID,activateEmotion,activatePurpose,activateInfoFunc,activateMotorID)
+	iID,_=CreateNewlastMentalActionsImagesID(0,typeID,valID)
 
 	mentalInfoStruct.mImgID = iID // передача инфы в структуру
 	currentInfoStructId=1 // определение актуального поля mentalInfo
@@ -111,11 +123,8 @@ func infoFunc1(){
 func infoFunc2(){
 	iID:=0// ID MentalActionsImages
 
-	activateBaseID:=0
-	activateEmotion:=0
-	activatePurpose:=0
-	activateInfoFunc:=0
-	activateMotorID:=0
+	typeID:=0
+	valID:=0
 
 	// TODO подобрать
 	/*
@@ -128,7 +137,7 @@ func infoFunc2(){
 
 
 	// создать
-	iID,_=CreateNewlastMentalActionsImagesID(0,activateBaseID,activateEmotion,activatePurpose,activateInfoFunc,activateMotorID)
+	iID,_=CreateNewlastMentalActionsImagesID(0,typeID,valID)
 
 	mentalInfoStruct.mImgID = iID // передача инфы в структуру
 	currentInfoStructId=2 // определение актуального поля mentalInfo
@@ -306,7 +315,7 @@ func infoCreateAndRunMentMotorAtmzmFromAction(ActionsImageID int){
 if motorID==0{
 	return
 }
-	actImgID,_:=CreateNewlastMentalActionsImagesID(0,0,0,0,0,motorID)
+	actImgID,_:=CreateNewlastMentalActionsImagesID(0,5,motorID)
 if actImgID==0{
 	return
 }

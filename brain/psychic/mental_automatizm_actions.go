@@ -46,29 +46,30 @@ if am.Usefulness<0{
 */
 	ai:=MentalActionsImagesArr[am.ActionsImageID]
 
+	switch ai.typeID{
+	case 1: //активация настроения Mood
+			gomeostas.CommonBadNormalWell=ai.valID
+			understandingSituation(2)
+	case 2: // активация эмоции EmotionID
+			em:=EmotionFromIdArr[ai.valID]
+			if em==nil{return false}
+			lev2:=em.BaseIDarr
+			gomeostas.SetCurContextActiveIDarr(lev2)
+			understandingSituation(2)
+	case 3:	//активация PurposeImage
+			pp:=PurposeImageFromID[ai.valID]
+			if pp==nil{return false}
+			mentalPurposeImageID=ai.valID
+			understandingSituation(2)
+	case 4: runMentalFunctionID(ai.valID) //запуск инфо-функции
+	case 5: RumAutomatizmID(ai.valID) //запуск моторного автоматизма
+	//case 6: //запуск Доминанты
+	//case 7: // создание новой Доминанты
+
+	default: return false
+	}
+
 	am.Count++
-
-	if ai.activateMotorID >0 {
-		// здесь начинается период ожидания: LastRunAutomatizmPulsCount =PulsCount
-		RumAutomatizmID(ai.activateMotorID)
-	}
-
-	if ai.activateInfoFunc >0 {
-		runMenyalFunctionID(ai.activateInfoFunc)
-	}
-
-	if ai.activateBaseID >0 {// на один текущий пульс, во время которого происходит обдумывание
-		gomeostas.CommonBadNormalWell=ai.activateBaseID
-		understandingSituation(2)
-	}
-	if ai.activateEmotion >0 {// на один текущий пульс, во время которого происходит обдумывание
-
-		// найти эмоцию по ее ID
-		lev2:=EmotionFromIdArr[ai.activateEmotion].BaseIDarr
-		gomeostas.SetCurContextActiveIDarr(lev2)
-		understandingSituation(2)
-	}
-
 	currentMentalAutomatizmID=am.ID
 	//выполнить мозжечковый рефлекс сразу после выполняющегося автоматизма
 	//runCerebellumAdditionalMentalAutomatizm(0,am.ID)
@@ -93,35 +94,40 @@ func GetMentalAutomotizmActionsString(id int,writeLog bool)(string){
 
 	ai:=MentalActionsImagesArr[am.ActionsImageID]
 
-	if ai.activateMotorID >0 {
-		motA:=AutomatizmFromIdArr[ai.activateMotorID]
-		if motA != nil {
-			if len(out)>0{out += "<hr>"}
-			out += "<span style='font-size:19px;'>Запуск моторного автоматизма:</span><br> " + GetAutomotizmActionsString(motA, writeLog)
-		}
-	}
-
-	if ai.activateInfoFunc >0 {
-		if len(out)>0{out += "<hr>"}
-		out+="Запуск информационной функции № "+strconv.Itoa(ai.activateInfoFunc)
-	}
-
-	if ai.activateBaseID >0 {
+	switch ai.typeID{
+	case 1: //активация настроения Mood
 		val:=""
-		switch ai.activateBaseID{
+		switch ai.valID{
 		case 1: val="Плохо"
 		case 2: val="Норма"
 		case 3: val="Хорошо"
 		}
 		if len(out)>0{out += "<hr>"}
 		out += "<span style='font-size:19px;'>Переактивация Базового состояния Дерева понимания на :</span> " + val
-
-	}
-	if ai.activateEmotion >0 {
+	case 2: // активация эмоции EmotionID
 		if len(out)>0{out += "<hr>"}
-		em:=EmotionFromIdArr[ai.activateEmotion]
+		em:=EmotionFromIdArr[ai.valID]
 		emS:=getEmotonsComponentStr(em)
-		out += "<span style='font-size:19px;'>Переактивация Эмоции на :</span> " + strconv.Itoa(ai.activateEmotion)+"<br>"+emS
+		out += "<span style='font-size:19px;'>Переактивация Эмоции на :</span> " + strconv.Itoa(ai.valID)+"<br>"+emS
+	case 3:	//активация PurposeImage
+		pp:=PurposeImageFromID[ai.valID]
+		if pp==nil{return "Нет ментального образа действия с ID = "+strconv.Itoa(ai.valID)}
+		out += "<span style='font-size:19px;'>Переактивация ментального образа действия:</span><br> " + getPurposeDetaileString(ai.valID)
+	case 4: //запуск инфо-функции
+		if len(out)>0{out += "<hr>"}
+		out+="Запуск информационной функции № "+strconv.Itoa(ai.valID)
+	case 5: //запуск моторного автоматизма
+		motA:=AutomatizmFromIdArr[ai.valID]
+		if motA != nil {
+			if len(out)>0{out += "<hr>"}
+			out += "<span style='font-size:19px;'>Запуск моторного автоматизма:</span><br> " + GetAutomotizmActionsString(motA, writeLog)
+		}
+	case 6: //запуск Доминанты
+		out+="Запуск  Доминанты № "+strconv.Itoa(ai.valID)
+	case 7: // создание новой Доминанты
+		out+="создание новой Доминанты"
+
+	default: out+="Нет ментального действия с ID = "+strconv.Itoa(ai.typeID)
 	}
 
 return out

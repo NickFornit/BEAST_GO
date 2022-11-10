@@ -474,10 +474,23 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 
 			get_mental_rulles_list_info := r.FormValue("get_mental_rulles_list_info")
 			if get_mental_rulles_list_info =="1" {
-				psychic.RullesMentalOutputProcess=true
-				//psychic.GetRRRRRRRRR() // тестирование
-				ref := psychic.RullesMentalOutputStr
-				_, _ = fmt.Fprint(resp, ref)
+				rulles:=psychic.GetCur10lastMentalRules()
+				_, _ = fmt.Fprint(resp, rulles)
+				return
+			}
+
+			get_mental_action_info := r.FormValue("get_mental_action_info")
+			if len(get_mental_action_info)>0 {
+				actID,_:=strconv.Atoi(get_mental_action_info)
+				rulles:=psychic.GetMentalActionInfo(actID)
+				_, _ = fmt.Fprint(resp, rulles)
+				return
+			}
+
+			get_mental_rules_cickle_info := r.FormValue("get_mental_rules_cickle_info")
+			if len(get_mental_rules_cickle_info)>0 {
+				rulles:=psychic.GetMentalRulesCickleInfo(get_mental_rules_cickle_info)
+				_, _ = fmt.Fprint(resp, rulles)
 				return
 			}
 

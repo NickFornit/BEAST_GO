@@ -155,6 +155,44 @@ if writeLog{
 }
 	return out
 }
+/////////////////////////////
+// для функций пульта
+func GetAutomotizmIDString(id int)(string){
+	am:=AutomatizmFromIdArr[id]
+	if am==nil{
+		return "Нет автоматизма с ID = "+strconv.Itoa(id)
+	}
+	var out=""
+	ai:=ActionsImageArr[am.ActionsImageID]
+	if ai.ActID != nil {
+		// учесть рефлекс мозжечка
+		addE := getCerebellumReflexAddEnergy(0,am.ID)
+		sumEnergy:=am.Energy+addE
+		if sumEnergy>10{
+			sumEnergy=10
+		}
+		if sumEnergy<1{
+			sumEnergy=1
+		}
+		am.Count++
+		out+=TerminateMotorAutomatizmActions(ai.ActID,sumEnergy)
+	}
+
+if ai.PhraseID != nil {
+addE := getCerebellumReflexAddEnergy(0,am.ID)
+out+=TerminatePraseAutomatizmActions(ai.PhraseID,am.Energy+addE)
+}
+
+if ai.ToneID != 0 {
+out+="<br>"+getToneStrFromID(ai.ToneID)+"<br>"
+}
+
+if ai.MoodID != 0 {
+out+="<br>"+getMoodStrFromID(ai.MoodID)+"<br>"
+}
+
+return out
+}
 /////////////////////////////////////////
 
 

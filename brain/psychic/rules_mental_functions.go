@@ -11,6 +11,7 @@ package psychic
 import (
 	"BOT/lib"
 	"strconv"
+	"strings"
 )
 
 ///////////////////////////////////////////////
@@ -26,13 +27,8 @@ func GetMentalRulesFromEpisodeMemory(){
 }
 //////////////////////////////////////////////////
 
-// тестовый вызов из main.go
-func GetRRRRRRRRR(){
-	RullesMentalOutputStr=getCur10lastMentalRules()
-}
-
 // вывести 10 последних Правил на Пульт в http://go/pages/rulles.php
-func getCur10lastMentalRules()string{
+func GetCur10lastMentalRules()string{
 	rCount:=lastrulesMentalID
 	if rCount >10{
 		rCount=10
@@ -58,7 +54,7 @@ func getCur10lastMentalRules()string{
 					if c>0{CickleStr+=", "}
 					CickleStr+=strconv.Itoa(taa.ShortTermMemoryID[c])
 				}
-				out += "<span style='background-color:#FFECEB;'>" + CickleStr + "</span> "
+				out += "<span style='background-color:#FFECEB;cursor:pointer' onClick='show_cickles_strings(`"+CickleStr+"`)'>" + CickleStr + "</span> "
 			}
 			out+="=> <b>Ответ:</b> <span style='background-color:#E8E8FF;'>"+GetMentalActionsString(taa.Action)+"</span> "
 			out+="<b>Эффект: "+strconv.Itoa(taa.Effect)+"</b>"
@@ -67,6 +63,33 @@ func getCur10lastMentalRules()string{
 		out+="<hr>"
 	}
 	return out
+}
+/* для http://go/pages/mental_rules.php расшифровать цикл ментиального Правила типа "2, 4, 0, 0, 0, 0"
+По строк перечисления ID goNext
+ */
+func GetMentalRulesCickleInfo(cickle string)string{
+	if len(cickle)==0{
+		return "Пустой цикл."
+	}
+	сArr:=strings.Split(cickle, ",")
+	if len(сArr)==0{
+		return "Пустой цикл."
+	}
+	out:="<br><b>Информация о звене цикла:</b><br>"
+	out+="<table cellpadding=0 cellspacing=0 border=1 class='main_table'>"
+	out+="<tr><th class='table_header'>goNext ID</th>"
+	out+="<th class='table_header'>ID дерева автоматизмов</th>"
+	out+="<th class='table_header'>ID ментального автоматизма</th></tr>"
+	for i := 0; i < len(сArr); i++ {
+		sID:=strings.Trim(сArr[i]," ")
+		id,_:=strconv.Atoi(sID)
+		if id == 0{
+			continue
+		}
+		out+=GetGoNextInfo(id)
+	}
+	out+="</table>"
+return out
 }
 ///////////////////////////////////////////
 

@@ -118,8 +118,10 @@ func SaveMentalTriggerAndActionArr(){
 	for k, v := range MentalTriggerAndActionArr {
 		out+=strconv.Itoa(k)+"|"
 		for i := 0; i < len(v.ShortTermMemoryID); i++ {
-			out+=strconv.Itoa(v.ShortTermMemoryID[i])+","
+			if i>0{out+=","}
+			out+=strconv.Itoa(v.ShortTermMemoryID[i])
 		}
+		out+="|"
 		out+=strconv.Itoa(v.Action)+"|"
 		out+=strconv.Itoa(v.Effect)
 		out+="\r\n"
@@ -146,8 +148,8 @@ func loadMentalTriggerAndActionArr(){
 			si,_:=strconv.Atoi(s[i])
 			ShortTermMemoryID=append(ShortTermMemoryID,si)
 		}
-		Action,_:=strconv.Atoi(p[1])
-		Effect,_:=strconv.Atoi(p[2])
+		Action,_:=strconv.Atoi(p[2])
+		Effect,_:=strconv.Atoi(p[3])
 var saveDoWritingFile= doWritingFile; doWritingFile =false
 		createNewlastMentalTriggerAndActionID(id,ShortTermMemoryID,Action,Effect)
 doWritingFile =saveDoWritingFile

@@ -158,8 +158,11 @@ if i>0{out+=", "}
 ///////////////////////////////////////////////////////
 // Mood
 func getMoodStr(node *UnderstandingNode)(string){
+	return getMoodString(node.Mood)
+}
+func getMoodString(id int)string{
 	moodS := ""
-	switch node.Mood {
+	switch id {
 	case -1:
 		moodS = "Плохо"
 	case 0:
@@ -168,38 +171,66 @@ func getMoodStr(node *UnderstandingNode)(string){
 		moodS = "Хорошо"
 	}
 	out := "Состояние: <b> " + moodS + "</b>"
-
 	return out
 }
 
 // EmotionID
 func getEmotionStr(node *UnderstandingNode)(string){
-em := EmotionFromIdArr[node.EmotionID]
+	return getEmotionString(node.EmotionID)
+}
+func getEmotionString(id int)string{
+	em := EmotionFromIdArr[id]
 	out := "Эмоция: <b> " + getEmotonsComponentStr(em) + "</b>"
 	return out
 }
 
 // SituationID
 func getSituationStr(node *UnderstandingNode)(string){
-pp := SituationImageFromIdArr[node.SituationID]
-out:=""
-if pp == nil {
-	out += "<span style='color:red'>Нет образа цели с ID=" + strconv.Itoa(node.SituationID)+"</span>"
-} else {
-	out += "Ситуация: <b> <span style='cursor:pointer;color:blue' onClick='get_situation(" + strconv.Itoa(node.SituationID) + ")'>" + strconv.Itoa(node.SituationID) + "</span>" + "</b>"
+	return getSituationString(node.SituationID)
 }
+func getSituationString(id int)string{
+	pp := SituationImageFromIdArr[id]
+	out:=""
+	if pp == nil {
+		out += "<span style='color:red'>Нет образа цели с ID=" + strconv.Itoa(id)+"</span>"
+	} else {
+		out += "Ситуация: <b> <span style='cursor:pointer;color:blue' onClick='get_situation(" + strconv.Itoa(id) + ")'>" + strconv.Itoa(id) + "</span>" + "</b>"
+	}
+	return out
+}
+func getSituationDetaileString(id int)string{
+	pp := SituationImageFromIdArr[id]
+	out:=""
+	if pp == nil {
+		out += "<span style='color:red'>Нет образа цели с ID=" + strconv.Itoa(id)+"</span>"
+	} else {
+		out += "Ситуация: <b> "+ GetMentalSituationsForNodeInfo(id) + "</b>"
+	}
 	return out
 }
 
 // PurposeID
 func getPurposeStr(node *UnderstandingNode)(string){
-pp:=PurposeImageFromID[node.PurposeID]
-out:=""
-if pp==nil {
-	out += "<span style='color:red'>Нет образа цели с ID=" + strconv.Itoa(node.PurposeID)+"</span>"
-} else {
-	out += "Цель: <b> <span style='cursor:pointer;color:blue' onClick='get_purpose(" + strconv.Itoa(node.PurposeID) + ")'>" + strconv.Itoa(node.PurposeID) + "</span>" + "</b>"
+	return getPurposeString(node.PurposeID)
 }
+func getPurposeString(id int)string{
+	pp:=PurposeImageFromID[id]
+	out:=""
+	if pp==nil {
+		out += "<span style='color:red'>Нет образа цели с ID=" + strconv.Itoa(id)+"</span>"
+	} else {
+		out += "Цель: <b> <span style='cursor:pointer;color:blue' onClick='get_purpose(" + strconv.Itoa(id) + ")'>" + strconv.Itoa(id) + "</span>" + "</b>"
+	}
+	return out
+}
+func getPurposeDetaileString(id int)string{
+	pp:=PurposeImageFromID[id]
+	out:=""
+	if pp==nil {
+		out += "<span style='color:red'>Нет образа цели с ID=" + strconv.Itoa(id)+"</span>"
+	} else {
+		out += "Цель: <b> " + GetMentalPurposeForNodeInfo(id) + "</b>"
+	}
 	return out
 }
 ///////////////////////////////////////////////////////

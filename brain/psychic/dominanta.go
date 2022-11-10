@@ -30,3 +30,12 @@ var isCurrentProblemDominanta *Dominanta
 func SaveProblemDominenta(){
 
 }
+/////////////////////////////////////////
+
+
+// для пульта
+func GetDominantaIDString(id int)string{
+
+	return "Еще не сделан вывод Доминант"
+}
+////////////////////////////////////////////

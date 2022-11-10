@@ -19,9 +19,6 @@ import (
 )
 
 ///////////////////////////////////
-// отслеживать Правила из Пульта в http://go/pages/rulles.php
-var RullesMentalOutputProcess=false // режим отслеживания
-var RullesMentalOutputStr="" // текущее состояние последний 10 правил
 
 /* Правила примитивного опыта, обобщающие стимулы->ответы->эффект для таких цепочек в диалогах
 На основе этих правил становятся возможны более системные обобщения.
@@ -37,9 +34,6 @@ var rulesMentalArr=make(map[int]*rulesMental)
 // вызывается из psychic.go
 func rulesMentalInit(){
 	loadrulesMentalArr()
-
-//	getCur10lastrulesMental()
-	RullesMentalOutputStr=getCur10lastMentalRules()// чтобы что-то было сразу
 }
 
 
@@ -77,7 +71,6 @@ func createNewlastrulesMentalID(id int,TAid []int)(int,*rulesMental){
 
 	}
 	if isNotMentLoading {
-		RullesMentalOutputStr=getCur10lastMentalRules()
 		if len(TAid)>1{
 			lib.WritePultConsol("<span style='color:green'>Записано групповое <b>ПРАВИЛО № " + strconv.Itoa(id) + "</b></span>")
 		}else{

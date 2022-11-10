@@ -83,11 +83,13 @@ var detectedActiveLastUnderstandingNodID=0
 var CurrentUnderstandingTreeEnd []int
 var currentUnderstandingStepCount=0
 // массив узлов активной ветки   currentUnderstandingActivedNodes=getcurrentUnderstandingActivedNodes(lastID)
-var currentUnderstandingActivedNodes[]*UnderstandingNode // начиная с конечного к первому
+var currentUnderstandingActivedNodes[]*UnderstandingNode // вначале конечный узел
 
 var saveSituationImageID=0
 
 var currentMentalAutomatizmID=0
+
+var mentalPurposeImageID=0// для произвольной переактивации с новым PurposeImageID
 
 // образ цели предыдущей активации для func getMentalEffect
 var prePurpose4 *PurposeImage
@@ -144,7 +146,14 @@ func understandingSituation(activationType int)(bool){
 	}
 
 	var lev3=situationImageID
-	var lev4,_=createPurposeImageID(0,ps.veryActual,ps.targetID,ps.actionID.ID)
+
+	var lev4=0
+	if mentalPurposeImageID ==0 {
+		lev4, _ = createPurposeImageID(0, ps.veryActual, ps.targetID, ps.actionID.ID)
+	}else{
+		lev4=mentalPurposeImageID
+	}
+	mentalPurposeImageID=0// сразу сбросить, чтобы произвольно активировалось только 1 раз
 
 
 	condArr:=getUnderstandingActiveConditionsArr(lev1, lev2, lev3, lev4)
@@ -180,6 +189,7 @@ func understandingSituation(activationType int)(bool){
 		detectedActiveLastUnderstandingNodID = formingUnderstandingBranch(detectedActiveLastUnderstandingNodID, currentUnderstandingStepCount, condArr)
 		CurrentUnderstandingTreeEnd=condArr // все - новизна
 	}
+	// все узлы активной ветки, в начале - конечный узел
 	currentUnderstandingActivedNodes=getcurrentUnderstandingActivedNodes(detectedActiveLastUnderstandingNodID)
 
 	/* объективный запуск consciousness - по кативации дерева автоматизмов

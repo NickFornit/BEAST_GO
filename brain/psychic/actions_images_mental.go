@@ -11,16 +11,27 @@ import (
 )
 
 ///////////////////////////////////
+/* виды ментальных действий для MentalActionsImages
+Можно наращивать при необходимости новые действия, добавляя в:
+func GetMentalActionsString
+func RunMentalMentalAutomatizm
+ */
+var MentalActionsType=[]int{
+	1,//активация настроения Mood в дереве понимания 1 2 3 (отражает -1 0 1 UnderstandingNode.Mood)
+	2,//активация эмоции EmotionID в дереве понимания (UnderstandingNode.EmotionID)
+	3,//активация PurposeImage в дереве понимания (UnderstandingNode.PurposeID)
+	4,//запуск инфо-функции
+	5,//запуск моторного автоматизма
+	6,//запуск Доминанты
+	7,// создание новой Доминанты
+}
+
+
+
 type MentalActionsImages struct {
 	ID    int   // идентификатор данного сочетания пусковых стимулов
-	activateBaseID int // активация настроения Mood в дереве понимания 1 2 3 (отражает -1 0 1 UnderstandingNode.Mood)
-	activateEmotion int // активация эмоции EmotionID в дереве понимания (UnderstandingNode.EmotionID)
-	activatePurpose int // активация PurposeImage в дереве понимания (UnderstandingNode.PurposeID)
-	/* Разнообразие заготовленных инфо-функций дает больший потенциал
-	   разных ментальных действий, поначалу случайных, но оптимизирующихся по эффекту Правила.
-	*/
-	activateInfoFunc int // вызов инфо функции
-	activateMotorID int // запуск моторного автоматизма по результатам инфо-функции создания автоматизма
+	typeID int // вид действия - MentalActionsType
+	valID int // ID для действия
 }
 
 
@@ -40,10 +51,9 @@ func MentalActionsImagesInit(){
 при activateBaseID==0 не задается переадресация
  */
 var lastMentalActionsImagesID=0
-func CreateNewlastMentalActionsImagesID(id int,activateBaseID int,activateEmotion int,activatePurpose int,
-	activateInfoFunc int,activateMotorID int)(int,*MentalActionsImages){
+func CreateNewlastMentalActionsImagesID(id int,typeID int,valID int)(int,*MentalActionsImages){
 
-	oldID,oldVal:=checkUnicumMentalActionsImages(activateBaseID,activateEmotion,activatePurpose,activateInfoFunc,activateMotorID)
+	oldID,oldVal:=checkUnicumMentalActionsImages(typeID,valID)
 	if oldVal!=nil{
 		return oldID,oldVal
 	}
@@ -60,10 +70,8 @@ func CreateNewlastMentalActionsImagesID(id int,activateBaseID int,activateEmotio
 
 	var node MentalActionsImages
 	node.ID = id
-	node.activateBaseID = activateBaseID
-	node.activateEmotion=activateEmotion
-	node.activateInfoFunc=activateInfoFunc
-	node.activateMotorID=activateMotorID
+	node.typeID=typeID
+	node.valID=valID
 
 	MentalActionsImagesArr[id]=&node
 
@@ -71,13 +79,10 @@ func CreateNewlastMentalActionsImagesID(id int,activateBaseID int,activateEmotio
 
 	return id,&node
 }
-func checkUnicumMentalActionsImages(activateBaseID int,activateEmotion int,activatePurpose int,activateInfoFunc int,activateMotorID int)(int,*MentalActionsImages){
+func checkUnicumMentalActionsImages(typeID int,valID int)(int,*MentalActionsImages){
 	for id, v := range MentalActionsImagesArr {
-		if activateBaseID!=v.activateBaseID || 
-			activateEmotion!=v.activateEmotion ||
-			activatePurpose!=v.activatePurpose ||
-			activateInfoFunc!=v.activateInfoFunc ||
-			activateMotorID!=v.activateMotorID {
+		if typeID!=v.typeID ||
+			valID!=v.valID  {
 			continue
 		}
 		return id,v
@@ -98,11 +103,8 @@ func SaveMentalActionsImagesArr(){
 	var out=""
 	for k, v := range MentalActionsImagesArr {
 		out+=strconv.Itoa(k)+"|"
-		out+=strconv.Itoa(v.activateBaseID)+"|"
-		out+=strconv.Itoa(v.activateEmotion)+"|"
-		out+=strconv.Itoa(v.activatePurpose)+"|"
-		out+=strconv.Itoa(v.activateInfoFunc)+"|"
-		out+=strconv.Itoa(v.activateMotorID)
+		out+=strconv.Itoa(v.typeID)+"|"
+		out+=strconv.Itoa(v.valID)
 		out+="\r\n"
 	}
 	lib.WriteFileContent(lib.GetMainPathExeFile()+"/memory_psy/action_images_mental.txt",out)
@@ -119,14 +121,11 @@ func loadMentalActionsImagesArr(){
 		}
 		p:=strings.Split(strArr[n], "|")
 		id,_:=strconv.Atoi(p[0])
-		activateBaseID,_:=strconv.Atoi(p[1])
-		activateEmotion,_:=strconv.Atoi(p[2])
-		activatePurpose,_:=strconv.Atoi(p[3])
-		activateInfoFunc,_:=strconv.Atoi(p[4])
-		activateMotorID,_:=strconv.Atoi(p[5])
+		typeID,_:=strconv.Atoi(p[1])
+		valID,_:=strconv.Atoi(p[2])
 
 var saveDoWritingFile= doWritingFile; doWritingFile =false
-		CreateNewlastMentalActionsImagesID(id,activateBaseID,activateEmotion,activatePurpose,activateInfoFunc,activateMotorID)
+		CreateNewlastMentalActionsImagesID(id,typeID,valID)
 doWritingFile =saveDoWritingFile
 	}
 	return
@@ -134,32 +133,45 @@ doWritingFile =saveDoWritingFile
 }
 ///////////////////////////////////////////
 
+//  для Пульта
 func GetMentalActionsString(act int)(string){
-	if MentalActionsImagesArr == nil || len(MentalActionsImagesArr)==0 || MentalActionsImagesArr[act]==nil{
-		return ""
+	if act==0{
+		return "Нулевой ID ментального действия."
 	}
-	var out=""
 	ai:=MentalActionsImagesArr[act]
-	if ai.activateBaseID != 0 {
-		out+=" активация настроения: "+getToneStrFromID(ai.activateBaseID)+" "
+	if ai==nil{
+		return "Несуществующий ID ментального действия: "+strconv.Itoa(act)
+	}
+	switch ai.typeID{
+	case 1: return "Активация настроения Mood <span style='color:blue;cursor:pointer' onClick='show_mental_actions("+strconv.Itoa(ai.ID)+")'>"+strconv.Itoa(ai.ID)+ "</span>в дереве понимания"
+	case 2: return "Активация эмоции  <span style='color:blue;cursor:pointer' onClick='show_mental_actions("+strconv.Itoa(ai.ID)+")'>"+strconv.Itoa(ai.ID)+ "</span>в дереве понимания"
+	case 3: return "Активация цели PurposeImage <span style='color:blue;cursor:pointer' onClick='show_mental_actions("+strconv.Itoa(ai.ID)+")'>"+strconv.Itoa(ai.ID)+ "</span>в дереве понимания"
+	case 4: return "Запуск инфо-функции № <span style='color:blue;cursor:pointer' onClick='show_mental_actions("+strconv.Itoa(ai.ID)+")'>"+strconv.Itoa(ai.ID)+"</span>"
+	case 5: return "Запуск моторного автоматизма № <span style='color:blue;cursor:pointer' onClick='show_mental_actions("+strconv.Itoa(ai.ID)+")'>"+strconv.Itoa(ai.ID)+"</span>"
+	case 6: return "Запуск Доминанты <span style='color:blue;cursor:pointer' onClick='show_mental_actions("+strconv.Itoa(ai.ID)+")'>"+strconv.Itoa(ai.ID)+"</span>"
+	case 7: return "Создание новой Доминанты"
+	case 8: return "xxxxxxx"
 	}
 
-	if ai.activateEmotion != 0 {
-		out+=" активация эмоции: "+getToneStrFromID(ai.activateEmotion)+" "
-	}
-
-	if ai.activateEmotion != 0 {
-		out+=" активация цели: "+GetMentalPurposeForNodeInfo(ai.activatePurpose)+" "
-	}
-
-	if ai.activateInfoFunc != 0 {
-		out+=" вызов инфо функции: "+getToneStrFromID(ai.activateInfoFunc)+" "
-	}
-
-	if ai.activateMotorID != 0 {
-		out+=" запуск автоматизма: "+getToneStrFromID(ai.activateInfoFunc)+" "
-	}
-
-	return out
+	return "Нет такого типа действия с ID="+strconv.Itoa(ai.typeID)
 }
 /////////////////////////////////////////
+// раскрыть значение ai.valID стврокой для Пульта
+func GetMentalActionInfo(actID int)string{
+	ai:=MentalActionsImagesArr[actID]
+	if ai==nil{
+		return "Несуществующий ID ментального действия: "+strconv.Itoa(actID)
+	}
+	switch ai.typeID { // еще есть getSituationDetaileString(
+	case 1: return getMoodString(ai.valID)
+	case 2: return getEmotionString(ai.valID)
+	case 3: return getPurposeDetaileString(ai.valID)
+	case 4: return getMentalFunctionString(ai.valID)
+	case 5: return GetAutomotizmIDString(ai.valID)
+	case 6: return GetDominantaIDString(ai.valID)
+	case 7: // нет значения
+
+	}
+	return "Несуществующий ID ментального действия: "+strconv.Itoa(actID)
+}
+///////////////////////////////////////////

@@ -160,7 +160,7 @@ func createBasicLink()(int){
 // создание или использование ментального автоматизма инфо-функции c ID= infoID
 func createNexusFromNextID(fromNextID int,infoID int)(int){
 
-	imgID,_:=CreateNewlastMentalActionsImagesID(0,0,0,0,infoID,0)
+	imgID,_:=CreateNewlastMentalActionsImagesID(0,4,infoID)
 	if imgID>0 {
 		aID, _ := createMentalAutomatizmID(0, imgID, 1)
 		if aID > 0 {
@@ -223,7 +223,7 @@ func afterWaitingPeriod(effect int){
 	}
 	mentAtmzm:=MentalAutomatizmsFromID[lastNextFrom.AutomatizmID]
 	if mentAtmzm==nil{// не должно быть такого, поэтому выдадим панику
-		lib.TodoPanic("Нет автоматизма для func afterWaitingPeriod()")
+// ???		lib.TodoPanic("Нет автоматизма для func afterWaitingPeriod()")
 		return
 	}
 	mact:= MentalActionsImagesArr[mentAtmzm.ActionsImageID]
@@ -231,7 +231,7 @@ func afterWaitingPeriod(effect int){
 		lib.TodoPanic("Нет действия автоматизма для func afterWaitingPeriod()")
 		return
 	}
-	if mact.activateMotorID ==0{// конечный член saveFromNextIDAnswerCicle не содержит мент.автоматизм моторного запуска
+	if mact.typeID !=5{// конечный член saveFromNextIDAnswerCicle не содержит мент.автоматизм моторного запуска
 /* в конце saveFromNextIDAnswerCicle должен быть мент.автоматизм моторного запуска,
    если только Стимул не возникнет, не дожидаясь ответа на предыдущий.
    В таком случае ментальное Правило не формируется.
@@ -241,8 +241,8 @@ func afterWaitingPeriod(effect int){
 
 	// оценить совокупный эффект
 	effectValuation:=getMentalEffect(effect)
-
-	mRules,_:=createNewlastMentalTriggerAndActionID(0,saveFromNextIDAnswerCicle,mact.activateMotorID,effectValuation)
+// mact.valID потому что это - точно моторный запуск, выше: if mact.typeID !=5{
+	mRules,_:=createNewlastMentalTriggerAndActionID(0,saveFromNextIDAnswerCicle,mact.valID,effectValuation)
 
 	rID,_:=createNewlastrulesMentalID(0,[]int{mRules})
 	if rID>0 {
@@ -277,8 +277,9 @@ func getMentalEffect(effect0 int)int{
 ///// оценить эффект по цели 4-го узла
 func valuationPurpose()(int){
 	effect:=0
-	node4:=currentUnderstandingActivedNodes[1:]
-	purpose4id:=node4[0].PurposeID
+	// т.к. в начале конечный узел, то берем первый (PurposeID)
+	node4:=currentUnderstandingActivedNodes[0]
+	purpose4id:=node4.PurposeID
 	purpose4:=PurposeImageFromID[purpose4id]
 	if purpose4!=nil && prePurpose4 !=nil {
 		/* использовать для сравнения с предыдущим образом var prePurpose4 *PurposeImage*/

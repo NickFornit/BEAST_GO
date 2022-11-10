@@ -42,7 +42,7 @@ func GetCicklesToPult()(string){
 	// последнгие 20 кадров кратковременной памяти
 	//	termMemory=[]shortTermMemory{{4800,5,1},{7188,4,2},{4800,3,3}} // тестирование
 	if termMemory == nil{
-		return "Еще нет кратковременной памяти."
+		return "Еще нет кратковременной памяти. Beast только что проснулся и еще ни о чем не подумал."
 	}
 	var termMemoryFrag []shortTermMemory
 	if len(termMemory)>20{
@@ -58,8 +58,13 @@ func GetCicklesToPult()(string){
 	out+="<th class='table_header'>ID ментального автоматизма</th></tr>"
 	for i := len(termMemoryFrag)-1; i >=0; i-- {
 		sm:=termMemory[i]
+		if sm.GoNextID==0{
+			return "Нулевой образ звена цикла в GetCicklesToPult()."
+		}
 		gn:=goNextFromIDArr[sm.GoNextID]
-
+		if gn==nil{
+			out+="<tr><td colspan=10>Нет образа звена цикла с ID = "+strconv.Itoa(sm.GoNextID)+"</td></tr>"
+		}
 		style:="style='font-size:19px;font-weight:bold;cursor:pointer'"
 		out+="<tr><td class='table_cell'><span style='color:#666666'>"+strconv.Itoa(gn.ID)+
 			"</span></td><td class='table_cell'><span "+style+" onClick='show_unde_tree("+strconv.Itoa(sm.uTreeNodID)+")'>"+strconv.Itoa(sm.uTreeNodID)+
@@ -68,6 +73,25 @@ func GetCicklesToPult()(string){
 			"</span></td></tr>"
 	}
 	out+="</table>"
+
+	return out
+}
+////////////////////////////////////
+
+//для http://go/pages/mental_rules.php инфа о ID goNext
+func GetGoNextInfo(id int)(string){
+	if id==0{
+		return "Нулевой образ звена цикла в GetGoNextInfo."
+	}
+		gn:=goNextFromIDArr[id]
+		if gn==nil{
+			return "Нет образа звена цикла с ID = "+strconv.Itoa(id)
+		}
+		style:="style='font-size:19px;font-weight:bold;cursor:pointer'"
+		out:="<tr><td class='table_cell'><span style='color:#666666'>"+strconv.Itoa(id)+
+			"</span></td><td class='table_cell'><span "+style+" onClick='show_atmzm_tree("+strconv.Itoa(gn.MotorBranchID)+")'>"+strconv.Itoa(gn.MotorBranchID)+"</span> "+
+			"</span></td><td class='table_cell'><span "+style+" onClick='show_ment_atmzm("+strconv.Itoa(gn.AutomatizmID)+")'>"+strconv.Itoa(gn.AutomatizmID)+
+			"</span></td></tr>"
 
 	return out
 }
@@ -83,7 +107,9 @@ func GetAtmzmTreeInfo(id int)(string){
 	out+=getStrFromCond(1,node.EmotionID)+"<br>"
 	out+=getStrFromCond(2,node.ActivityID)+"<br>"
 	out+=getStrFromCond(3,node.ToneMoodID)+"<br>"
-	out+=getStrFromCond(4,node.SimbolID)+"<br>"
+	//if node.VerbalID>0 { нафиг масикировать лажи! первый символ не должен быть в ветке, если нет фразы!
+		out += getStrFromCond(4, node.SimbolID) + "<br>"
+	//}
 	out+=getStrFromCond(5,node.VerbalID)+"<br>"
 	return out
 }
