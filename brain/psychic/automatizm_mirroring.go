@@ -85,7 +85,7 @@ func FormingMirrorAutomatizmFromList(file string) string {
 
 			NoWarningCreateShow = true
 
-			ActionsImageID,_:=CreateNewlastActionsImageID(0,aArr,answerID,t,m)
+			ActionsImageID,_:=CreateNewlastActionsImageID(0,aArr,answerID,t,m,true)
 			_, autmzm := CreateAutomatizm(nodeID, ActionsImageID)
 			NoWarningCreateShow = false
 			if autmzm != nil {
@@ -146,7 +146,7 @@ func FormingMirrorAutomatizmFromTempList(file string) string {
 		// создать автоматизм и привязать его к объекту
 		NoWarningCreateShow=true
 		// для фразы triggerPraseID создаем привязанный к ней автоматизм
-		ActionsImageID,_:=CreateNewlastActionsImageID(0,nil,answerPraseID,t,m)
+		ActionsImageID,_:=CreateNewlastActionsImageID(0,nil,answerPraseID,t,m,true)
 		_, autmzm := CreateAutomatizm(2000000 + triggerPraseID[0], ActionsImageID)
 		NoWarningCreateShow = false
 		if autmzm != nil {
@@ -181,7 +181,7 @@ func createNewMirrorAutomatizm(sourceAtmzm *Automatizm) {
 
 	// создать автоматизм и привязать его к объекту
 	// NoWarningCreateShow=true
-	ActionsImageID,_:=CreateNewlastActionsImageID(0,curActiveActions.ActID,curActiveActions.PhraseID,curActiveActions.ToneID,curActiveActions.MoodID)
+	ActionsImageID,_:=CreateNewlastActionsImageID(0,curActiveActions.ActID,curActiveActions.PhraseID,curActiveActions.ToneID,curActiveActions.MoodID,true)
 	_, autmzm := CreateAutomatizm(targetNodeID, ActionsImageID)
 	//	NoWarningCreateShow=false
 	if autmzm != nil {
@@ -227,7 +227,7 @@ var oldProvokatorAutomatizm *Automatizm
 func provokatorMirrorAutomatizm(sourceAtmzm *Automatizm, purposeGenetic *PurposeGenetic) {
 	if sourceAtmzm == nil || purposeGenetic == nil { return	}
 
-	ActionsImageID,_:=CreateNewlastActionsImageID(0,curActiveActions.ActID,curActiveActions.PhraseID,curActiveActions.ToneID,curActiveActions.MoodID)
+	ActionsImageID,_:=CreateNewlastActionsImageID(0,curActiveActions.ActID,curActiveActions.PhraseID,curActiveActions.ToneID,curActiveActions.MoodID,true)
 	// NoWarningCreateShow=true
 	// для фразы triggerPraseID создаем привязанный к ней автоматизм
 	_, autmzm := CreateAutomatizm(detectedActiveLastNodID, ActionsImageID)

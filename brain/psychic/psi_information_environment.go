@@ -78,12 +78,12 @@ func GetCurrentInformationEnvironment(){
 // определение текущего сочетания ID Базовых контекстов - оно есть всегда, даже если ничего не сделано на Пульте - нулевое сочетание.
 	bsIDarr:=gomeostas.GetCurContextActiveIDarr()
 	// текущая эмоция Emotion, может быть произвольно изменена
-_,CurrentInformationEnvironment.PsyEmotionImg=createNewBaseStyle(0,bsIDarr)
+_,CurrentInformationEnvironment.PsyEmotionImg=createNewBaseStyle(0,bsIDarr,true)
 
 	CurrentInformationEnvironment.veryActualSituation,CurrentInformationEnvironment.curTargetArrID=gomeostas.FindTargetGomeostazID()
 
 	ActID:=action_sensor.CheckCurActionsContext()
-	_,CurrentInformationEnvironment.PsyActionImg=createNewlastActivityID(0,ActID)// текущий образ сочетания действий с Пульта Activity
+	_,CurrentInformationEnvironment.PsyActionImg=createNewlastActivityID(0,ActID,true)// текущий образ сочетания действий с Пульта Activity
 
 if len(word_sensor.CurrentPhrasesIDarr)>0{
 		PhraseID := word_sensor.CurrentPhrasesIDarr

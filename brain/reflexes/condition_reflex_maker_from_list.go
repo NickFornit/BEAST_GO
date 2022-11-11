@@ -42,7 +42,7 @@ func FormingConditionsRefleaxFromList(list string) string {
 		prase := p[5]
 		wordSensor.VerbalDetection(prase, 1, 0, 0)
 		PhraseID := wordSensor.CurrentPhrasesIDarr
-		tID, vt := CreateNewlastTriggerStimulsID(0, nil, PhraseID, 0, 0)
+		tID, vt := CreateNewlastTriggerStimulsID(0, nil, PhraseID, 0, 0,true)
 		if vt != nil{}
 		SaveTriggerStimulsArr()
 		lev3 := tID
@@ -54,7 +54,7 @@ func FormingConditionsRefleaxFromList(list string) string {
 				ActionIDarr = append(ActionIDarr, b)
 			}
 		}
-		CreateNewConditionReflex(0, lev1, lev2, lev3, ActionIDarr, 0)
+		CreateNewConditionReflex(0, lev1, lev2, lev3, ActionIDarr, 0,true)
 	}
   // lib.WriteNewString(lib.GetMainPathExeFile()+"/memory_reflex/condition_reflexes.txt", out)
 	SaveConditionReflex()

@@ -129,7 +129,7 @@ func createBasicLink()(int){
 // создание или использование ментального автоматизма инфо-функции c ID= infoID
 func createNexusFromNextID(fromNextID int,infoID int)(int){
 
-	imgID,_:=CreateNewlastMentalActionsImagesID(0,4,infoID)
+	imgID,_:=CreateNewlastMentalActionsImagesID(0,4,infoID,true)
 	if imgID>0 {
 		aID, _ := createMentalAutomatizmID(0, imgID, 1)
 		if aID > 0 {
@@ -211,9 +211,9 @@ func afterWaitingPeriod(effect int){
 	// оценить совокупный эффект
 	effectValuation:=getMentalEffect(effect)
 // mact.valID потому что это - точно моторный запуск, выше: if mact.typeID !=5{
-	mRules,_:=createNewlastMentalTriggerAndActionID(0,saveFromNextIDAnswerCicle,mact.valID,effectValuation)
+	mRules,_:=createNewlastMentalTriggerAndActionID(0,saveFromNextIDAnswerCicle,mact.valID,effectValuation,true)
 
-	rID,_:=createNewlastrulesMentalID(0,[]int{mRules})
+	rID,_:=createNewlastrulesMentalID(0,[]int{mRules},true)
 	if rID>0 {
 		// записать в эпизод.пямять ментальный кадр - всегда если дошло до этой строки
 		newEpisodeMemory(rID,1)

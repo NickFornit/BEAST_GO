@@ -66,10 +66,12 @@ var lastReflexNodeID = 0 // последний узео в дереве авто
 
 // Создать новый узел дерева рефлексов
 func createNewReflexNode(parent *ReflexNode, id int, baseID int, StyleID int,
-				ActionID int, GeneticReflexID int, ConditionedReflex int)(int, *ReflexNode) {
+				ActionID int, GeneticReflexID int, ConditionedReflex int,CheckUnicum bool)(int, *ReflexNode) {
 	// если есть такой узел, то не создавать
-	idOld, nodeOld := FindReflexTreeNodeFromCondition(baseID, StyleID, ActionID)
-	if idOld > 0 { return idOld,nodeOld }
+	if CheckUnicum {
+		idOld, nodeOld := FindReflexTreeNodeFromCondition(baseID, StyleID, ActionID)
+		if idOld > 0 { return idOld,nodeOld }
+	}
 
 	if id == 0 {
 		lastReflexNodeID++
@@ -146,7 +148,7 @@ func loadReflexTree(){
 		conditionedReflex, _ := strconv.Atoi(p[6])
 		// новый узел с каждой строкой из файла
 		createNewReflexNode(ReflexTreeFromID[parentID], id, baseID, styleID,
-			actionID,geneticReflexID,conditionedReflex)
+			actionID,geneticReflexID,conditionedReflex,false)
 	}
 	return
 }
@@ -161,9 +163,9 @@ func createNulLevelReflexTree(rt *ReflexNode) {
 // создать первые три ветки базовых состояний
 func createBasicReflexTree() {
 	notAllowScanInReflexesThisTime = true // запрет показа карты при обновлении
-	createNewReflexNode(&ReflexTree,0,1,0,0,0,0)
-	createNewReflexNode(&ReflexTree,0,2,0,0,0,0)
-	createNewReflexNode(&ReflexTree,0,3,0,0,0,0)
+	createNewReflexNode(&ReflexTree,0,1,0,0,0,0,false)
+	createNewReflexNode(&ReflexTree,0,2,0,0,0,0,false)
+	createNewReflexNode(&ReflexTree,0,3,0,0,0,0,false)
 	saveReflexTree()
 	notAllowScanInReflexesThisTime = false // запрет показа карты при обновлении
 	return
@@ -257,7 +259,7 @@ func createNewReflexToTreeFromNodes(level int,cond []int,node *ReflexNode) int {
 		id,_=createNewReflexNode(node,0,cond[0],cond[1],cond[2],0,0)
 	}
 	*/
-	id, _ = createNewReflexNode(node,0, cond[0], cond[1], cond[2],0,0)
+	id, _ = createNewReflexNode(node,0, cond[0], cond[1], cond[2],0,0,true)
 	level++
 	id = createNewReflexToTreeFromNodes(level, cond, ReflexTreeFromID[id])
 	return id

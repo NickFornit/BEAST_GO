@@ -102,7 +102,7 @@ func updateNewsConditions(rank int) {
 		lev1 := gomeostas.CommonBadNormalWell
 		lev2 := gomeostas.GetCurContextActiveIDarr()
 		// ранг rank наследуется от условного рефлекса, от которого берутся действия:
-		CreateNewConditionReflex(0, lev1, lev2, oldActiveCurTriggerStimulsID, oldActivedTerminalImage, rank)
+		CreateNewConditionReflex(0, lev1, lev2, oldActiveCurTriggerStimulsID, oldActivedTerminalImage, rank,true)
 		SaveConditionReflex()
 	} else { // просто увеличить счетчик
 		tempImg.Count++

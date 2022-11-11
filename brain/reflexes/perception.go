@@ -138,7 +138,7 @@ func ActiveFromConditionChange() {
 	bsIDarr := gomeostas.GetCurContextActiveIDarr()
 
 	// создаем новый образ Базовых контекстов, если такого еще нет
-	ActiveCurBaseStyleID, _ = createNewBaseStyle(0, bsIDarr)
+	ActiveCurBaseStyleID, _ = createNewBaseStyle(0, bsIDarr,true)
 
 	// активировать дерево рефлексов
 	activeReflexTree()
@@ -175,7 +175,7 @@ func ActiveFromAction() {
 	bsIDarr := gomeostas.GetCurContextActiveIDarr()
 
 	// создаем новый образ Базовых контекстов, если такого еще нет
-	ActiveCurBaseStyleID, _ = createNewBaseStyle(0, bsIDarr)
+	ActiveCurBaseStyleID, _ = createNewBaseStyle(0, bsIDarr,true)
 
 	// создаем новый образ Пусковых стимулов, если такого еще нет
 	CreateNewTriggerStimulsImage()
@@ -217,7 +217,7 @@ func ActiveFromPhrase() {
 	// определение текущего сочетания ID Базовых контекстов
 	bsIDarr := gomeostas.GetCurContextActiveIDarr()
 	// создаем новый образ Базовых контекстов, если такого еще нет
-	ActiveCurBaseStyleID, _ = createNewBaseStyle(0, bsIDarr)
+	ActiveCurBaseStyleID, _ = createNewBaseStyle(0, bsIDarr,true)
 
 	// создать новое сочетание пусковых стимулов если такого еще нет
 	CreateNewTriggerStimulsImage()
@@ -253,8 +253,8 @@ func ActiveFromPhrase() {
 func getConditionsArr(lev1ID int, lev2 []int, lev3 []int, PhraseID []int, ToneID int, MoodID int) []int {
 	arr := make([]int, 3)
 	arr[0] = lev1ID
-	arr[1], _ = createNewBaseStyle(0, lev2)
-	arr[2], _ = CreateNewlastTriggerStimulsID(0, lev3, PhraseID, ToneID, MoodID)
+	arr[1], _ = createNewBaseStyle(0, lev2,true)
+	arr[2], _ = CreateNewlastTriggerStimulsID(0, lev3, PhraseID, ToneID, MoodID,true)
 	return arr
 }
 

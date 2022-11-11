@@ -93,18 +93,20 @@ var lastConditionReflexID = 0
 и обрабатывает это в updateNewsConditions(
 Должно уже быть не менее 2 событий образования нововго условного рефлекса
  */
-func CreateNewConditionReflex(id int, lev1 int, lev2 []int, lev3 int, ActionIDarr []int, rank int) (int, *ConditionReflex) {
+func CreateNewConditionReflex(id int, lev1 int, lev2 []int, lev3 int, ActionIDarr []int, rank int,CheckUnicum bool) (int, *ConditionReflex) {
 	// посмотреть, если рефлекс с такими же условиями уже есть
-	idOld, rOld := compareCRUnicum(lev1, lev2, lev3)
-	if idOld > 0 {
-		// если условия те же, но действия уже другие - подставить в существующий рефлекс новые действия
-		if !lib.EqualArrs(rOld.ActionIDarr, ActionIDarr) {
-			rOld.ActionIDarr = ActionIDarr
-			// установить lastActivation в актуальное состояние
-			rOld.lastActivation = int(LifeTime/(3600*24)) // последняя активация
-			rOld.birthTime = int(LifeTime/(3600*24)) // время рождения
+	if CheckUnicum {
+		idOld, rOld := compareCRUnicum(lev1, lev2, lev3)
+		if idOld > 0 {
+			// если условия те же, но действия уже другие - подставить в существующий рефлекс новые действия
+			if !lib.EqualArrs(rOld.ActionIDarr, ActionIDarr) {
+				rOld.ActionIDarr = ActionIDarr
+				// установить lastActivation в актуальное состояние
+				rOld.lastActivation = int(LifeTime/(3600*24)) // последняя активация
+				rOld.birthTime = int(LifeTime/(3600*24)) // время рождения
+			}
+			return idOld, rOld
 		}
-		return idOld, rOld
 	}
 
 	if id == 0 {
@@ -213,7 +215,7 @@ func loadConditionReflexes() {
 		lastActivation, _ := strconv.Atoi(p[6])
 		birthTime, _ := strconv.Atoi(p[7])
 
-		_, r := CreateNewConditionReflex(id, lev1, lev2, lev3, ActionIDarr, rank)
+		_, r := CreateNewConditionReflex(id, lev1, lev2, lev3, ActionIDarr, rank,false)
 		r.lastActivation = lastActivation
 		r.birthTime = birthTime
 	}

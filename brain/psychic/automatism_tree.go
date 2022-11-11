@@ -102,9 +102,9 @@ var ActiveBranchNodeArr []int
 func createBasicAutomatizmTree(){
 	notAllowScanInTreeThisTime=true // запрет показа карты при обновлении
 
-	createNewAutomatizmNode(&AutomatizmTree,0,1,0,0,0,0,0)
-	createNewAutomatizmNode(&AutomatizmTree,0,2,0,0,0,0,0)
-	createNewAutomatizmNode(&AutomatizmTree,0,3,0,0,0,0,0)
+	createNewAutomatizmNode(&AutomatizmTree,0,1,0,0,0,0,0,false)
+	createNewAutomatizmNode(&AutomatizmTree,0,2,0,0,0,0,0,false)
+	createNewAutomatizmNode(&AutomatizmTree,0,3,0,0,0,0,0,false)
 
 	if doWritingFile {SaveAutomatizmTree() }
 	//SaveAutomatizmTree()
@@ -164,7 +164,7 @@ if !WasOperatorActiveted {
 	lev1:=gomeostas.CommonBadNormalWell
 
 	bsIDarr:=gomeostas.GetCurContextActiveIDarr()
-	lev2,_:=createNewBaseStyle(0,bsIDarr)
+	lev2,_:=createNewBaseStyle(0,bsIDarr,true)
 
 	curBaseStateImage.Mood=lev1
 	curBaseStateImage.EmotionID=lev2
@@ -172,7 +172,7 @@ if !WasOperatorActiveted {
 
 ActID:=action_sensor.CheckCurActionsContext();//CheckCurActions()
 
-	lev3,_:=createNewlastActivityID(0,ActID)// текущий образ сочетания действий с Пульта Activity
+	lev3,_:=createNewlastActivityID(0,ActID,true)// текущий образ сочетания действий с Пульта Activity
 	curActiveActions.ActID=ActID// сохраняем для отзеркаливания действий оператора
 	curActiveActions.PhraseID=nil
 	curActiveActions.ToneID=0

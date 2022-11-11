@@ -22,7 +22,7 @@ limit 5 ограничивает выборку из эпиз.памяти, но
 func GetMentalRulesFromEpisodeMemory(){
 	rImg:=getLastRulesSequenceFromEpisodeMemory(5)
 	if rImg!=nil {
-		createNewlastrulesMentalID(0, rImg)//записать (если еще нет такого) групповое правило
+		createNewlastrulesMentalID(0, rImg,true)//записать (если еще нет такого) групповое правило
 	}
 }
 //////////////////////////////////////////////////
@@ -252,7 +252,7 @@ func getLastMentalRulesSequenceFromEpisodeMemory(activationType int,limit int)([
 		rImg = append(rImg, em.TriggerAndActionID)
 	}
 	if len(rImg)>1{
-		createNewlastrulesMentalID(0, rImg)// записать (если еще нет такого) групповое правило
+		createNewlastrulesMentalID(0, rImg,true)// записать (если еще нет такого) групповое правило
 
 		return rImg
 	}

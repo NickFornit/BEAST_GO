@@ -42,14 +42,17 @@ func TriggerAndActionInit(){
 ////////////////////////////////////////////////
 // создать новое сочетание ответных действий если такого еще нет
 var lastTriggerAndActionID=0
-func createNewlastTriggerAndActionID(id int,Trigger int,Action int,Effect int)(int,*TriggerAndAction){
+func createNewlastTriggerAndActionID(id int,Trigger int,Action int,Effect int,CheckUnicum bool)(int,*TriggerAndAction){
 	if Effect<0{Effect=-1}
 	if Effect>0{Effect=1}
 
-	oldID,oldVal:=checkUnicumTriggerAndAction(Trigger,Action,Effect)
-	if oldVal!=nil{
-		return oldID,oldVal
+	if CheckUnicum {
+		oldID,oldVal:=checkUnicumTriggerAndAction(Trigger,Action,Effect)
+		if oldVal!=nil{
+			return oldID,oldVal
+		}
 	}
+
 	if id==0{
 		lastTriggerAndActionID++
 		id=lastTriggerAndActionID
@@ -127,7 +130,7 @@ func loadTriggerAndActionArr(){
 		Action,_:=strconv.Atoi(p[2])
 		Effect,_:=strconv.Atoi(p[3])
 var saveDoWritingFile= doWritingFile; doWritingFile =false
-		createNewlastTriggerAndActionID(id,Trigger,Action,Effect)
+		createNewlastTriggerAndActionID(id,Trigger,Action,Effect,false)
 doWritingFile =saveDoWritingFile
 	}
 	return

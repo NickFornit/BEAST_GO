@@ -110,7 +110,7 @@ func createAndRunPurposeAutomatizm(){
 		return
 	}
 	// создать мент.автоматизм приоизвольной активацции ментальной цели
-	actImgID,_:=CreateNewlastMentalActionsImagesID(0,3,mentalInfoStruct.mentalPurposeID)
+	actImgID,_:=CreateNewlastMentalActionsImagesID(0,3,mentalInfoStruct.mentalPurposeID,true)
 	id, matmzm := createMentalAutomatizmID(0, actImgID, 1)
 	if id >0 {
 		// запустить мент.автоматизм

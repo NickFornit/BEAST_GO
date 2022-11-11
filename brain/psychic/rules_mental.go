@@ -41,15 +41,17 @@ func rulesMentalInit(){
 // создать новое сочетание ответных действий если такого еще нет
 var lastrulesMentalID=0
 var isNotMentLoading=true
-func createNewlastrulesMentalID(id int,TAid []int)(int,*rulesMental){
+func createNewlastrulesMentalID(id int,TAid []int,CheckUnicum bool)(int,*rulesMental){
 	if TAid == nil{
 		return 0,nil
 	}
-
-	oldID,oldVal:=checkUnicumrulesMental(TAid)
-	if oldVal!=nil{
-		return oldID,oldVal
+	if CheckUnicum {
+		oldID,oldVal:=checkUnicumrulesMental(TAid)
+		if oldVal!=nil{
+			return oldID,oldVal
+		}
 	}
+
 	if id==0{
 		lastrulesMentalID++
 		id=lastrulesMentalID
@@ -135,7 +137,7 @@ func loadrulesMentalArr(){
 		}
 var saveDoWritingFile= doWritingFile; doWritingFile =false
 		isNotMentLoading=false
-		createNewlastrulesMentalID(id,TAid)
+		createNewlastrulesMentalID(id,TAid,false)
 		isNotMentLoading=true
 doWritingFile =saveDoWritingFile
 	}

@@ -294,7 +294,7 @@ func ImportFileUpdate(flieArr []int) (bool, string) {
 							lev2 := lib.IntArrToStrArr(strings.Split(rf[2], ","))
 							lev3 := lib.IntArrToStrArr(strings.Split(rf[3], ","))
 							aktArr := strings.Split(rf[4], ",")
-							reflexes.CreateNewGeneticReflex(0, lev1, lev2, lev3, lib.IntArrToStrArr(aktArr))
+							reflexes.CreateNewGeneticReflex(0, lev1, lev2, lev3, lib.IntArrToStrArr(aktArr),true)
 						case updateTriggerStimulsImages: // список пусковых стимулов У-рефлексов
 							updateName = updateTriggerStimulsImages
 							if len(ActonsSincID) == 0 { // если массив соответствий ID действий пустой, нет смысла проверять
@@ -336,7 +336,7 @@ func ImportFileUpdate(flieArr []int) (bool, string) {
 								rsr := strings.Split(rt[1], ",")
 								rsar := lib.IntArrToStrArr(rsr)
 								// проверка наличия пускового стимула в базе делается в CreateNewlastTriggerStimulsID(), где создаются только новые
-								TriggerSincID[trId], _ = reflexes.CreateNewlastTriggerStimulsID(0, rsar, word_sensor.CurrentPhrasesIDarr, ton, mod)
+								TriggerSincID[trId], _ = reflexes.CreateNewlastTriggerStimulsID(0, rsar, word_sensor.CurrentPhrasesIDarr, ton, mod,true)
 							}
 						case updateConditionReflexes: // список У-рефлексов
 							updateName = updateConditionReflexes
@@ -380,7 +380,7 @@ func ImportFileUpdate(flieArr []int) (bool, string) {
 								continue
 							} // не нашлось соответствий в массиве
 							aktArr := strings.Split(rcf[4], ",")
-							reflexes.CreateNewConditionReflex(0, lev1, lev2, lev3, lib.IntArrToStrArr(aktArr), 0)
+							reflexes.CreateNewConditionReflex(0, lev1, lev2, lev3, lib.IntArrToStrArr(aktArr), 0,true)
 						}
 						if FlgBreak == true {
 							break

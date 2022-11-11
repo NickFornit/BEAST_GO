@@ -67,15 +67,18 @@ func rulesInit(){
 // создать новое сочетание ответных действий если такого еще нет
 var lastrulesID=0
 var isNotLoading=true
-func createNewlastrulesID(id int,TAid []int)(int,*rules){
+func createNewlastrulesID(id int,TAid []int,CheckUnicum bool)(int,*rules){
 
 	if TAid == nil{
 		return 0,nil
 	}
-	oldID,oldVal:=checkUnicumrules(TAid)
-	if oldVal!=nil{
-		return oldID,oldVal
+	if CheckUnicum {
+		oldID,oldVal:=checkUnicumrules(TAid)
+		if oldVal!=nil{
+			return oldID,oldVal
+		}
 	}
+
 	if id==0{
 		lastrulesID++
 		id=lastrulesID
@@ -160,7 +163,7 @@ func loadrulesArr(){
 		}
 var saveDoWritingFile= doWritingFile; doWritingFile =false
 		isNotLoading=false
-		createNewlastrulesID(id,TAid)
+		createNewlastrulesID(id,TAid,false)
 		isNotLoading=true
 doWritingFile =saveDoWritingFile
 	}

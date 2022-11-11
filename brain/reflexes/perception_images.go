@@ -45,7 +45,7 @@ func loadBaseStyleArr() {
 			si, _ := strconv.Atoi(s[i])
 			BSarr = append(BSarr, si)
 		}
-		createNewBaseStyle(id, BSarr)
+		createNewBaseStyle(id, BSarr,false)
 	}
 	return
 }
@@ -61,9 +61,12 @@ var BaseStyleArr = make(map[int]*BaseStyle)
 // создать образ сочетаний активных Базовых контекстов
 var lastBaseStyleID = 0
 
-func createNewBaseStyle(id int, BSarr []int) (int, *BaseStyle) {
-	oldID, oldVal := checkUnicumBaseStyle(BSarr)
-	if oldVal != nil { return oldID, oldVal	}
+func createNewBaseStyle(id int, BSarr []int,CheckUnicum bool) (int, *BaseStyle) {
+	if CheckUnicum {
+		oldID, oldVal := checkUnicumBaseStyle(BSarr)
+		if oldVal != nil { return oldID, oldVal	}
+	}
+
 	if id == 0 {
 		lastBaseStyleID++
 		id = lastBaseStyleID
@@ -116,11 +119,14 @@ var TriggerStimulsArr = make(map[int]*TriggerStimuls)
 var lastTriggerStimulsID = 0
 
 // Создать новый образ сочетаний пусковых стимулов
-func CreateNewlastTriggerStimulsID(id int, RSarr []int, PhraseID []int, ToneID int, MoodID int) (int, *TriggerStimuls) {
-	oldID, oldVal := checkUnicumTriggerStimuls(RSarr, PhraseID, ToneID, MoodID)
-	if oldVal != nil {
-		return oldID, oldVal
+func CreateNewlastTriggerStimulsID(id int, RSarr []int, PhraseID []int, ToneID int, MoodID int,CheckUnicum bool) (int, *TriggerStimuls) {
+	if CheckUnicum {
+		oldID, oldVal := checkUnicumTriggerStimuls(RSarr, PhraseID, ToneID, MoodID)
+		if oldVal != nil {
+			return oldID, oldVal
+		}
 	}
+
 	if id == 0 {
 		lastTriggerStimulsID++
 		id = lastTriggerStimulsID
@@ -161,7 +167,7 @@ func CreateNewTriggerStimulsImage() {
 	RSarr := action_sensor.CheckCurActions()
 
 	setOldActiveCurTriggerStimulsVal(ActiveCurTriggerStimulsID)
-	ActiveCurTriggerStimulsID, _ = CreateNewlastTriggerStimulsID(0, RSarr, PhraseID, ToneID, MoodID)
+	ActiveCurTriggerStimulsID, _ = CreateNewlastTriggerStimulsID(0, RSarr, PhraseID, ToneID, MoodID,true)
 
 	// SaveTriggerStimulsArr()
 }
@@ -221,7 +227,7 @@ func loadTriggerStimulsArr() {
 		x, _ = strconv.Atoi(p[4])
 		MoodID := x
 
-		CreateNewlastTriggerStimulsID(id, RSarr, PhraseID, ToneID, MoodID)
+		CreateNewlastTriggerStimulsID(id, RSarr, PhraseID, ToneID, MoodID,false)
 	}
 	return
 }

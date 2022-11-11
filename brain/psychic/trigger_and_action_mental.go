@@ -57,14 +57,17 @@ func MentalTriggerAndActionInit(){
 ////////////////////////////////////////////////
 // создать новое сочетание ответных действий если такого еще нет
 var lastMentalTriggerAndActionID=0
-func createNewlastMentalTriggerAndActionID(id int,ShortTermMemoryID []int,Action int,Effect int)(int,*MentalTriggerAndAction){
+func createNewlastMentalTriggerAndActionID(id int,ShortTermMemoryID []int,Action int,Effect int,CheckUnicum bool)(int,*MentalTriggerAndAction){
 	if Effect<0{Effect=-1}
 	if Effect>0{Effect=1}
 
-	oldID,oldVal:=checkUnicumMentalTriggerAndAction(ShortTermMemoryID,Action,Effect)
-	if oldVal!=nil{
-		return oldID,oldVal
+	if CheckUnicum {
+		oldID,oldVal:=checkUnicumMentalTriggerAndAction(ShortTermMemoryID,Action,Effect)
+		if oldVal!=nil{
+			return oldID,oldVal
+		}
 	}
+
 	if id==0{
 		lastMentalTriggerAndActionID++
 		id=lastMentalTriggerAndActionID
@@ -151,7 +154,7 @@ func loadMentalTriggerAndActionArr(){
 		Action,_:=strconv.Atoi(p[2])
 		Effect,_:=strconv.Atoi(p[3])
 var saveDoWritingFile= doWritingFile; doWritingFile =false
-		createNewlastMentalTriggerAndActionID(id,ShortTermMemoryID,Action,Effect)
+		createNewlastMentalTriggerAndActionID(id,ShortTermMemoryID,Action,Effect,false)
 doWritingFile =saveDoWritingFile
 	}
 	return

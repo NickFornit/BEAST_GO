@@ -180,7 +180,7 @@ lib.WritePultConsol("<span style='color:blue;background-color:#FFD0FF;'>Был �
 		      А так же просматривать эпизод память взад макчимум на EpisodeMemoryPause шагов или до паузы в общении > 30 шагов,
 		   		фиксируя цепочку правил.
 		*/
-		ai1, _ := CreateNewlastActionsImageID(0, curActiveActions.ActID, curActiveActions.PhraseID, curActiveActions.ToneID, curActiveActions.MoodID)
+		ai1, _ := CreateNewlastActionsImageID(0, curActiveActions.ActID, curActiveActions.PhraseID, curActiveActions.ToneID, curActiveActions.MoodID,true)
 		fixNewRules(lastCommonDiffValue,ai1)
 	}
 
@@ -290,9 +290,9 @@ func fixNewRules(lastCommonDiffValue int,ai1 int) int {
 	// ответный образ действий Beast
 	ai2:=LastAutomatizmWeiting.ActionsImageID
 	if ai2 == 0{return 0}
-	TriggerAndAction,_:=createNewlastTriggerAndActionID(0,ai1,ai2,lastCommonDiffValue)
+	TriggerAndAction,_:=createNewlastTriggerAndActionID(0,ai1,ai2,lastCommonDiffValue,true)
 	if TriggerAndAction == 0{return 0}
-	currentRulesID, _ = createNewlastrulesID(0, []int{TriggerAndAction})
+	currentRulesID, _ = createNewlastrulesID(0, []int{TriggerAndAction},true)
 	if currentRulesID == 0{return 0}
 
 	lib.WritePultConsol("<span style='color:green'>Записано <b>ПРАВИЛО № "+strconv.Itoa(currentRulesID)+"</b></span>")
@@ -314,7 +314,7 @@ func fixRulesBaseStateImage(lastCommonDiffValue int){
 	//корректируется успешность автоматизма - как в calcAutomatizmResult
 	automatizmCorrection(lastCommonDiffValue,nil)
 	/////////////////////// ПРАВИЛО:
-	ai1, _ := СreateNewlastBaseStateImageID(0, curBaseStateImage.Mood, curBaseStateImage.EmotionID, curBaseStateImage.SituationID)
+	ai1, _ := СreateNewlastBaseStateImageID(0, curBaseStateImage.Mood, curBaseStateImage.EmotionID, curBaseStateImage.SituationID,true)
 	ai1*=-1 // отрицательное значение идентифицирует образ - как текущего сосотояния!!!
 	currentTriggerID=ai1
 	fixNewRules(lastCommonDiffValue,ai1)

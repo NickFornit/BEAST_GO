@@ -41,16 +41,17 @@ var SituationImageFromIdArr=make(map[int]*SituationImage)
 
 
 var lastSituationImageID=0
-func createSituationImage(id int,autmzmTreeNodeID int,SituationType int)(int,*SituationImage){
-	oldID,oldVal:=checkUnicumSituationImage(autmzmTreeNodeID,SituationType)
+func createSituationImage(id int,autmzmTreeNodeID int,SituationType int,CheckUnicum bool)(int,*SituationImage){
 	if EvolushnStage < 4 { // только со стадии развития 4
 		return 0,nil
 	}
-
-	/////////////////////////////////////
-	if oldVal!=nil{
-		return oldID,oldVal
+	if CheckUnicum {
+		oldID,oldVal:=checkUnicumSituationImage(autmzmTreeNodeID,SituationType)
+		if oldVal!=nil{
+			return oldID,oldVal
+		}
 	}
+
 	if id==0{
 		lastSituationImageID++
 		id=lastSituationImageID
@@ -115,7 +116,7 @@ func loadSituationImage(){
 		SituationType,_:=strconv.Atoi(p[2])
 
 var saveDoWritingFile= doWritingFile; doWritingFile =false
-		createSituationImage(id,autmzmTreeNodeID,SituationType)
+		createSituationImage(id,autmzmTreeNodeID,SituationType,false)
 doWritingFile =saveDoWritingFile
 	}
 	return
@@ -201,13 +202,13 @@ if LastRunAutomatizmPulsCount > 0{// был и закончился ответо
 	// вышло время ожидания реакции
 	if (LastRunAutomatizmPulsCount+WaitingPeriodForActionsVal) < PulsCount {
 // оператор не прореагировал на действия в течение периода ожидания - игнорирует? нужно достучаться?
-		id, _ := createSituationImage(0, detectedActiveLastNodID, 5)
+		id, _ := createSituationImage(0, detectedActiveLastNodID, 5,true)
 		if id > 0 {
 			return id
 		}
 	}
 //было ответное действие (смотреть в автоматизме ветки Usefulness int - (БЕС)ПОЛЕЗНОСТЬ: вред: -10 0 +10 +n польза diffPsyBaseMood )
-	id, _ := createSituationImage(0, detectedActiveLastNodID, 1)
+	id, _ := createSituationImage(0, detectedActiveLastNodID, 1,true)
 	if id > 0 {
 		return id
 	}
@@ -216,7 +217,7 @@ if LastRunAutomatizmPulsCount > 0{// был и закончился ответо
 	// ЕСТЬ ЛИ АВТОМАТИЗМ В моторной ВЕТКЕ и болеее ранних?
 	if currentAutomatizmAfterTreeActivatedID > 0 {
 		//был запуск автоматизма ветки
-		id, _ := createSituationImage(0, detectedActiveLastNodID, 2)
+		id, _ := createSituationImage(0, detectedActiveLastNodID, 2,true)
 		if id > 0 {
 			return id
 		}
@@ -249,7 +250,7 @@ if max<prior{
 	}/////////////////////
 
 if sitID>0 {
-	id, _ := createSituationImage(0, detectedActiveLastNodID, sitID)
+	id, _ := createSituationImage(0, detectedActiveLastNodID, sitID,true)
 	if id > 0 {
 		return id
 	}
@@ -257,14 +258,14 @@ if sitID>0 {
 
 	if detectedActiveLastNodID == 0 {
 		// ничего не делали, но нужно осмысление
-		id, _ := createSituationImage(0, detectedActiveLastNodID, 3)
+		id, _ := createSituationImage(0, detectedActiveLastNodID, 3,true)
 		if id > 0 {
 			return id
 		}
 	}
 
 	// все спокойно, можно экспериментивароть
-	id, _ := createSituationImage(0, detectedActiveLastNodID, 4)
+	id, _ := createSituationImage(0, detectedActiveLastNodID, 4,true)
 	if id > 0 {
 		return id
 	}

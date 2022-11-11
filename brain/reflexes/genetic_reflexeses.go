@@ -43,11 +43,13 @@ actions string
 var geneticReflexesStr = make(map[int]*geneticReflexStr)
 var lastGeneticReflexID = 0
 
-func CreateNewGeneticReflex(id int, lev1 int, lev2 []int, lev3 []int, ActionIDarr []int) (int, *GeneticReflex) {
+func CreateNewGeneticReflex(id int, lev1 int, lev2 []int, lev3 []int, ActionIDarr []int,CheckUnicum bool) (int, *GeneticReflex) {
 	// посмотреть, если рефлекс с такими же условиями уже есть
-	idOld, rOld := compareUnicum(lev1, lev2, lev3)
-	if idOld > 0 {
-		return idOld, rOld
+	if CheckUnicum {
+		idOld, rOld := compareUnicum(lev1, lev2, lev3)
+		if idOld > 0 {
+			return idOld, rOld
+		}
 	}
 
 	if id == 0 {
@@ -102,7 +104,7 @@ func loadGeneticReflexes() {
 				lev2 = append(lev2, b)
 			}
 		}
-		// НЕ СОЗДАВАТЬ ЗАРАНЕЕ createNewBaseStyle(0, lev2)
+		// НЕ СОЗДАВАТЬ ЗАРАНЕЕ createNewBaseStyle(0, lev2,true)
 		// третий уровень
 		pn = strings.Split(p[3], ",")
 		var lev3 []int
@@ -121,7 +123,7 @@ func loadGeneticReflexes() {
 				ActionIDarr = append(ActionIDarr, b)
 			}
 		}
-		CreateNewGeneticReflex(id, lev1, lev2, lev3, ActionIDarr)
+		CreateNewGeneticReflex(id, lev1, lev2, lev3, ActionIDarr,false)
 		var newS geneticReflexStr
 		newS.ID=id
 		newS.lev1=p[1]

@@ -283,7 +283,7 @@ if false && !isFirstActivation {//это - не пробуждение false д�
 
 /*			// тестирование случая, когда создан мент.автоматизм, запускающий мот.автоматизм
 			if true && PulsCount > 6 {
-				mentalInfoStruct.ActionsImageID, _ = CreateNewlastActionsImageID(0, []int{111}, []int{124}, 4, 5)
+				mentalInfoStruct.ActionsImageID, _ = CreateNewlastActionsImageID(0, []int{111}, []int{124}, 4, 5,true)
 				infoFunc7()
 				goNextFromIDArr[fromNextID].AutomatizmID = mentalInfoStruct.mentalAtmzmID
 			}

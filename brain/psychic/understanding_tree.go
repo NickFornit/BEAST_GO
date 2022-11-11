@@ -149,9 +149,9 @@ func understandingSituation(activationType int)(bool){
 	newMoodID=PsyBaseMood
 
 	bsIDarr:=gomeostas.GetCurContextActiveIDarr()
-	newEmotionID,_=createNewBaseStyle(0,bsIDarr)
+	newEmotionID,_=createNewBaseStyle(0,bsIDarr,true)
 
-	newPurposeID,_ = createPurposeImageID(0, ps.veryActual, ps.targetID, ps.actionID.ID)
+	newPurposeID,_ = createPurposeImageID(0, ps.veryActual, ps.targetID, ps.actionID.ID,true)
 	////////////////////////////////
 
 

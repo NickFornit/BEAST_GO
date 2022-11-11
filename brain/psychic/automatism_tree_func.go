@@ -22,19 +22,20 @@ ID|ParentNode|BaseID|EmotionID|ActivityID|ToneMoodID|SimbolID|VerbalID
 var lastAutomatizmNodeID=0
 var noRunThisOperation=false // не проверять на дубли
 func createNewAutomatizmNode(parent *AutomatizmNode,id int,baseID int,EmotionID int,
-	ActivityID int,ToneMoodID int,SimbolID int,VerbalID int)(int,*AutomatizmNode){
+	ActivityID int,ToneMoodID int,SimbolID int,VerbalID int,CheckUnicum bool)(int,*AutomatizmNode){
 
 	if parent == nil{
 		return 0,nil
 	}
 
 	//if !noRunThisOperation { НЕЛЬЗЯ ИГНОРИРОВАТЬ ИНАЧЕ СОЗДАЕТ ЛИШНЕЕ
-		// если есть такой узел, то не создавать
+	// если есть такой узел, то не создавать
+	if CheckUnicum {
 		idOld, nodeOld := FindAutomatizmTreeNodeFromCondition(baseID, EmotionID, ActivityID, ToneMoodID, SimbolID, VerbalID)
 		if idOld > 0 {
 			return idOld, nodeOld
 		}
-	//}
+	}
 
 	if id==0{
 		lastAutomatizmNodeID++
@@ -131,7 +132,7 @@ func loadAutomatizmTree(){
 		// новый узел с каждой строкой из файла
 var saveDoWritingFile= doWritingFile; doWritingFile =false
 		createNewAutomatizmNode(AutomatizmTreeFromID[parentID],id,baseID,EmotionID,
-			ActivityID,ToneMoodID,SimbolID,VerbalID)
+			ActivityID,ToneMoodID,SimbolID,VerbalID,false)
 doWritingFile =saveDoWritingFile
 	}
 	return
@@ -285,9 +286,9 @@ func getBrangeNodeArr(lastNodeId int)([]*AutomatizmNode){
  */
 func FindConditionsNode(lev1 int,lev2 []int,actArr []int, tonMood int,fistSymb int,verbalID int)(int){
 	// образ эмоции
-	eID,_:=createNewBaseStyle(0,lev2)
+	eID,_:=createNewBaseStyle(0,lev2,true)
 	// образ действий дерева: из TriggerStimuls -> Activity
-	aID,_:=createNewlastActivityID(0,actArr)// конвертировать образ типа reflexes.TriggerStimuls в psychic.Activity
+	aID,_:=createNewlastActivityID(0,actArr,true)// конвертировать образ типа reflexes.TriggerStimuls в psychic.Activity
 
 	// проход дераева автоматизмов:
 	detectedActiveLastNodID=0
@@ -426,18 +427,18 @@ func addNewBranchFromNodes(level int,cond []int,node *AutomatizmNode)(int){
 	var id=0
 	switch(level){
 	case 0:
-		id,_=createNewAutomatizmNode(node,0,cond[0],0,0,0,0,0)
+		id,_=createNewAutomatizmNode(node,0,cond[0],0,0,0,0,0,true)
 	case 1:
-		id,_=createNewAutomatizmNode(node,0,cond[0],cond[1],0,0,0,0)
+		id,_=createNewAutomatizmNode(node,0,cond[0],cond[1],0,0,0,0,true)
 	case 2:
-		id,_=createNewAutomatizmNode(node,0,cond[0],cond[1],cond[2],0,0,0)
+		id,_=createNewAutomatizmNode(node,0,cond[0],cond[1],cond[2],0,0,0,true)
 	case 3:
-		id,_=createNewAutomatizmNode(node,0,cond[0],cond[1],cond[2],cond[3],0,0)
+		id,_=createNewAutomatizmNode(node,0,cond[0],cond[1],cond[2],cond[3],0,0,true)
 	//case 4:
 	//	id,_=createNewAutomatizmNode(node,0,cond[0],cond[1],cond[2],cond[3],cond[4],0)
 	case 4, 5:
 		// нельзя отдельно указывать символ фразы и фразу - они всегда в паре
-		id,_=createNewAutomatizmNode(node,0,cond[0],cond[1],cond[2],cond[3],cond[4],cond[5])
+		id,_=createNewAutomatizmNode(node,0,cond[0],cond[1],cond[2],cond[3],cond[4],cond[5],true)
 	}
 	level++
 	id=addNewBranchFromNodes(level,cond, AutomatizmTreeFromID[id])

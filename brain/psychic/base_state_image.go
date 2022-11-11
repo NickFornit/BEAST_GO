@@ -37,10 +37,12 @@ func BaseStateImageInit(){
 ////////////////////////////////////////////////
 // создать новое сочетание ответных действий если такого еще нет
 var lastBaseStateImageID=0
-func СreateNewlastBaseStateImageID(id int,Mood int,EmotionID int,SituationID int)(int,*BaseStateImage){
-	oldID,oldVal:=checkUnicumBaseStateImage(Mood,EmotionID,SituationID)
-	if oldVal!=nil{
-		return oldID,oldVal
+func СreateNewlastBaseStateImageID(id int,Mood int,EmotionID int,SituationID int,CheckUnicum bool)(int,*BaseStateImage){
+	if CheckUnicum {
+		oldID,oldVal:=checkUnicumBaseStateImage(Mood,EmotionID,SituationID)
+		if oldVal!=nil{
+			return oldID,oldVal
+		}
 	}
 
 	if id==0{
@@ -121,7 +123,7 @@ func loadBaseStateImageArr(){
 		SituationID,_:=strconv.Atoi(p[3])
 
 		var saveDoWritingFile= doWritingFile; doWritingFile =false
-		СreateNewlastBaseStateImageID(id,Mood,EmotionID,SituationID)
+		СreateNewlastBaseStateImageID(id,Mood,EmotionID,SituationID,false)
 		doWritingFile =saveDoWritingFile
 	}
 	return

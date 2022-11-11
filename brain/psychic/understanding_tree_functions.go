@@ -23,16 +23,18 @@ ID|ParentNode|Mood|EmotionID|SituationID|PurposeID
 */
 var lastUnderstandingNodeID=0
 func createNewUnderstandingNode(parent *UnderstandingNode,id int,Mood int,EmotionID int,
-	SituationID int,PurposeID int)(int,*UnderstandingNode){
+	SituationID int,PurposeID int,CheckUnicum bool)(int,*UnderstandingNode){
 
 	if parent == nil{
 		return 0,nil
 	}
 
 	// если есть такой узел, то не создавать
-	idOld,nodeOld:=FindUnderstandingTreeNodeFromCondition(Mood,EmotionID,SituationID,PurposeID)
-	if idOld>0{
-		return idOld,nodeOld
+	if CheckUnicum {
+		idOld,nodeOld:=FindUnderstandingTreeNodeFromCondition(Mood,EmotionID,SituationID,PurposeID)
+		if idOld>0{
+			return idOld,nodeOld
+		}
 	}
 
 	if id==0{
@@ -75,9 +77,9 @@ func createBasicUnderstandingTree(){
 	notAllowScanInTreeThisTime=true // запрет показа карты при обновлении
 
 	//PsyBaseMood: -1 Плохое настроение, 0 Нормальное, 1 - хорошее настроение
-	createNewUnderstandingNode(&UnderstandingTree,0,-1,0,0,0)
-	createNewUnderstandingNode(&UnderstandingTree,0,0,0,0,0)
-	createNewUnderstandingNode(&UnderstandingTree,0,1,0,0,0)
+	createNewUnderstandingNode(&UnderstandingTree,0,-1,0,0,0,false)
+	createNewUnderstandingNode(&UnderstandingTree,0,0,0,0,0,false)
+	createNewUnderstandingNode(&UnderstandingTree,0,1,0,0,0,false)
 	if doWritingFile {SaveUnderstandingTree() }
 	// SaveUnderstandingTree()
 	notAllowScanInTreeThisTime = false // запрет показа карты при обновлении
@@ -133,7 +135,7 @@ func loadUnderstandingTree(){
 		// новый узел с каждой строкой из файла
 var saveDoWritingFile= doWritingFile; doWritingFile =false
 		createNewUnderstandingNode(UnderstandingNodeFromID[parentID],id,Mood,EmotionID,
-			SituationID,PurposeID)
+			SituationID,PurposeID,false)
 doWritingFile =saveDoWritingFile
 	}
 	return
@@ -269,13 +271,13 @@ func addNewUnderstandingBranchFromNodes(level int,cond []int,node *Understanding
 	var id=0
 	switch(level){
 	case 0:
-		id,_=createNewUnderstandingNode(node,0,cond[0],0,0,0)
+		id,_=createNewUnderstandingNode(node,0,cond[0],0,0,0,true)
 	case 1:
-		id,_=createNewUnderstandingNode(node,0,cond[0],cond[1],0,0)
+		id,_=createNewUnderstandingNode(node,0,cond[0],cond[1],0,0,true)
 	case 2:
-		id,_=createNewUnderstandingNode(node,0,cond[0],cond[1],cond[2],0)
+		id,_=createNewUnderstandingNode(node,0,cond[0],cond[1],cond[2],0,true)
 	case 3:
-		id,_=createNewUnderstandingNode(node,0,cond[0],cond[1],cond[2],cond[3])
+		id,_=createNewUnderstandingNode(node,0,cond[0],cond[1],cond[2],cond[3],true)
 	}
 	level++
 	id=addNewUnderstandingBranchFromNodes(level,cond, UnderstandingNodeFromID[id])

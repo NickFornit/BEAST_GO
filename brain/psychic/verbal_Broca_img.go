@@ -58,11 +58,14 @@ var VerbalFromIdArr=make(map[int]*Verbal)
 // создать образ сочетаний пусковых стимулов
 //В случае отсуствия пусковых стимулов создается ID такого отсутсвия, пример такой записи: 2|||0|0| - ID=2
 var lastVerbalID=0
-func createNewlastVerbalID(id int,SimbolID int,PhraseID []int,ToneID int,MoodID int)(int,*Verbal){
-	oldID,oldVal:=checkUnicumVerbal(PhraseID,ToneID,MoodID)
-	if oldVal!=nil{
-		return oldID,oldVal
+func createNewlastVerbalID(id int,SimbolID int,PhraseID []int,ToneID int,MoodID int,CheckUnicum bool)(int,*Verbal){
+	if CheckUnicum {
+		oldID,oldVal:=checkUnicumVerbal(PhraseID,ToneID,MoodID)
+		if oldVal!=nil{
+			return oldID,oldVal
+		}
 	}
+
 	if id==0{
 		lastVerbalID++
 		id=lastVerbalID
@@ -121,7 +124,7 @@ func CreateVerbalImage(FirstSimbolID int,PhraseID []int,ToneID int,MoodID int)(i
 //	word:=wordSensor.GetPhraseStringsFromPhraseID(PhraseID[0])
 	//SimbolID:=wordSensor.GetSymbolIDfromString(rw[0])
 */
-	id,verb:=createNewlastVerbalID(0,FirstSimbolID,PhraseID,ToneID,MoodID)
+	id,verb:=createNewlastVerbalID(0,FirstSimbolID,PhraseID,ToneID,MoodID,true)
 
 	if doWritingFile {SaveVerbalFromIdArr() }
 
@@ -172,7 +175,7 @@ func loadVerbalFromIdArr(){
 		ToneID,_:=strconv.Atoi(p[3])
 		MoodID,_:=strconv.Atoi(p[4])
 var saveDoWritingFile= doWritingFile; doWritingFile =false
-		createNewlastVerbalID(id,SimbolID,PhraseID,ToneID,MoodID)
+		createNewlastVerbalID(id,SimbolID,PhraseID,ToneID,MoodID,false)
 doWritingFile =saveDoWritingFile
 	}
 	return

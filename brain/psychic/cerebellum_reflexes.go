@@ -43,9 +43,12 @@ var lastCRid = 0
 
 // создать новый автоматизм
 // В случае отсуствия автоматизма создается ID такого отсутсвия, пример такой записи: 2|||0|0| - ID=2
-func createNewCerebellumReflex(id int, typeAut int, sourceAutomatizmID int)(int, *cerebellumReflex){
-	oldID, oldVal := checkUnicumCerebellumReflex(typeAut, sourceAutomatizmID)
-	if oldVal != nil { return oldID, oldVal }
+func createNewCerebellumReflex(id int, typeAut int, sourceAutomatizmID int,CheckUnicum bool)(int, *cerebellumReflex){
+	if CheckUnicum {
+		oldID, oldVal := checkUnicumCerebellumReflex(typeAut, sourceAutomatizmID)
+		if oldVal != nil { return oldID, oldVal }
+	}
+
 	if id == 0 {
 		lastCRid++
 		id = lastCRid
@@ -126,7 +129,7 @@ func loadCerebellumReflex() {
 			additionalMentalAutID = append(additionalMentalAutID,aid)
 		}
 var saveDoWritingFile= doWritingFile; doWritingFile =false
-		_, ca := createNewCerebellumReflex(id, typeAut, sourceAutomatizmID)
+		_, ca := createNewCerebellumReflex(id, typeAut, sourceAutomatizmID,false)
 doWritingFile =saveDoWritingFile
 		ca.addEnergy = addEnergy
 		ca.additionalAutomatizmID = additionalAutomatizmID

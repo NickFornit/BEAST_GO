@@ -18,7 +18,7 @@ limit 5 ограничивает выборку из эпиз.памяти, но
 func GetRulesFromEpisodeMemory(){
 	rImg:=getLastRulesSequenceFromEpisodeMemory(5)
 	if rImg!=nil {
-		createNewlastrulesID(0, rImg)//записать (если еще нет такого) групповое правило
+		createNewlastrulesID(0, rImg,true)//записать (если еще нет такого) групповое правило
 	}
 }
 //////////////////////////////////////////////////
@@ -240,7 +240,7 @@ func getLastRulesSequenceFromEpisodeMemory(limit int)([]int){
 		rImg = append(rImg, em.TriggerAndActionID)
 	}
 	if len(rImg)>1{
-		createNewlastrulesID(0, rImg)// записать (если еще нет такого) групповое правило
+		createNewlastrulesID(0, rImg,true)// записать (если еще нет такого) групповое правило
 
 		return rImg
 	}

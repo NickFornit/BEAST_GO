@@ -123,7 +123,7 @@ func infoFunc1(){
 	//action:=infoFindRightMentalRukes()
 
 	// создать
-	iID,_=CreateNewlastMentalActionsImagesID(0,typeID,valID)
+	iID,_=CreateNewlastMentalActionsImagesID(0,typeID,valID,true)
 
 	mentalInfoStruct.mImgID = iID // передача инфы в структуру
 	currentInfoStructId=1 // определение актуального поля mentalInfo
@@ -154,7 +154,7 @@ func infoFunc2(){
 
 
 	// создать
-	iID,_=CreateNewlastMentalActionsImagesID(0,typeID,valID)
+	iID,_=CreateNewlastMentalActionsImagesID(0,typeID,valID,true)
 
 	mentalInfoStruct.mImgID = iID // передача инфы в структуру
 	currentInfoStructId=2 // определение актуального поля mentalInfo
@@ -318,7 +318,7 @@ func infoCreateAndRunMentMotorAtmzmFromAction(ActionsImageID int){
 	if ActionsImageID ==0 {
 		return
 	}
-	motorID,motorAtmzm:=createNewAutomatizmID(0,detectedActiveLastNodID,mentalInfoStruct.ActionsImageID)
+	motorID,motorAtmzm:=createNewAutomatizmID(0,detectedActiveLastNodID,mentalInfoStruct.ActionsImageID,true)
 	if motorID==0{
 		return
 	}
@@ -332,7 +332,7 @@ func infoCreateAndRunMentMotorAtmzmFromAction(ActionsImageID int){
 if motorID==0{
 	return
 }
-	actImgID,_:=CreateNewlastMentalActionsImagesID(0,5,motorID)
+	actImgID,_:=CreateNewlastMentalActionsImagesID(0,5,motorID,true)
 if actImgID==0{
 	return
 }

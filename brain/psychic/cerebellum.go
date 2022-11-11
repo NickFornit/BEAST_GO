@@ -63,7 +63,7 @@ func cerebellumCoordination(atmzm *Automatizm, todo int) bool {
 		return true
 	} else { // нет мозжечкового рефлекса
 		// добавить мозжечковый рефлекс
-		_, cr = createNewCerebellumReflex(0, 0, atmzm.ID)
+		_, cr = createNewCerebellumReflex(0, 0, atmzm.ID,true)
 		if cr != nil {
 				if todo == 1 { return false	}
 			// добавить энергичность по максимуму

@@ -52,11 +52,12 @@ func MentalActionsImagesInit(){
 при activateBaseID==0 не задается переадресация
  */
 var lastMentalActionsImagesID=0
-func CreateNewlastMentalActionsImagesID(id int,typeID int,valID int)(int,*MentalActionsImages){
-
-	oldID,oldVal:=checkUnicumMentalActionsImages(typeID,valID)
-	if oldVal!=nil{
-		return oldID,oldVal
+func CreateNewlastMentalActionsImagesID(id int,typeID int,valID int,CheckUnicum bool)(int,*MentalActionsImages){
+	if CheckUnicum {
+		oldID,oldVal:=checkUnicumMentalActionsImages(typeID,valID)
+		if oldVal!=nil{
+			return oldID,oldVal
+		}
 	}
 
 	if id==0{
@@ -126,7 +127,7 @@ func loadMentalActionsImagesArr(){
 		valID,_:=strconv.Atoi(p[2])
 
 var saveDoWritingFile= doWritingFile; doWritingFile =false
-		CreateNewlastMentalActionsImagesID(id,typeID,valID)
+		CreateNewlastMentalActionsImagesID(id,typeID,valID,false)
 doWritingFile =saveDoWritingFile
 	}
 	return

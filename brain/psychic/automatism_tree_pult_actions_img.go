@@ -47,11 +47,14 @@ var ActivityFromIdArr=make(map[int]*Activity)
 // создать образ сочетаний пусковых стимулов
 //В случае отсуствия пусковых стимулов создается ID такого отсутсвия, пример такой записи: 2|||0|0| - ID=2
 var lastActivityID=0
-func createNewlastActivityID(id int,ActID []int)(int,*Activity){
-	oldID,oldVal:=checkUnicumActivity(ActID)
-	if oldVal!=nil{
-		return oldID,oldVal
+func createNewlastActivityID(id int,ActID []int,CheckUnicum bool)(int,*Activity){
+	if CheckUnicum {
+		oldID,oldVal:=checkUnicumActivity(ActID)
+		if oldVal!=nil{
+			return oldID,oldVal
+		}
 	}
+
 	if id==0{
 		lastActivityID++
 		id=lastActivityID
@@ -86,7 +89,7 @@ func CreateNewActivityImage(ActID []int)(int,*Activity){
 		return 0,nil
 	}
 
-	id,verb:=createNewlastActivityID(0,ActID)
+	id,verb:=createNewlastActivityID(0,ActID,true)
 
 	if doWritingFile {SaveActivityFromIdArr() }
 
@@ -133,7 +136,7 @@ func loadActivityFromIdArr(){
 			ActID=append(ActID,si)
 		}
 var saveDoWritingFile= doWritingFile; doWritingFile =false
-		createNewlastActivityID(id,ActID)
+		createNewlastActivityID(id,ActID,false)
 doWritingFile =saveDoWritingFile
 	}
 	return
@@ -141,7 +144,7 @@ doWritingFile =saveDoWritingFile
 }
 //////////////////////////////
 func createInactionImg(){
-	_,CurrentInformationEnvironment.PsyActionImg=createNewlastActivityID(1,[]int{0})
+	_,CurrentInformationEnvironment.PsyActionImg=createNewlastActivityID(1,[]int{0},true)
 }
 ///////////////////////////////////////////
 

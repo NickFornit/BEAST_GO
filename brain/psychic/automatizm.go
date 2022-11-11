@@ -118,15 +118,17 @@ var NoWarningCreateShow = false // true - не выдавать сообщени
 /* создать новый автоматизм
 checkLevel - глубина проверки на идентичность: 0 - нет проверки, 1 - поверхностная, 2 - полная
  */
-func createNewAutomatizmID(id int,BranchID int,ActionsImageID int)(int,*Automatizm) {
+func createNewAutomatizmID(id int,BranchID int,ActionsImageID int,CheckUnicum bool)(int,*Automatizm) {
 /* Автоматизмы уникальны по сочетанию BranchID и ActionsImageID.
 	При попытке создать с таким же сочетанием возвращается уже созданный.
  к одной вентке могут быть прикреплены неограниченное число автоматизмов
  */
-	oldID, oldVal := checkUnicumMotorsAutomatizm(BranchID, ActionsImageID)
-	if oldVal != nil {
+	if CheckUnicum {
+		oldID, oldVal := checkUnicumMotorsAutomatizm(BranchID, ActionsImageID)
+		if oldVal != nil {
 			return oldID, oldVal
 		}
+	}
 
 	if id == 0 {
 		lastAutomatizmID++
@@ -178,7 +180,7 @@ func CreateNewAutomatizm(BranchID int, ActionsImageID int)(int, *Automatizm) {
 	// BranchID может быть ==0 для мозжечковых рефлексов
 	if ActionsImageID == 0 { return 0, nil }
 
-	id, verb := createNewAutomatizmID(0, BranchID, ActionsImageID)
+	id, verb := createNewAutomatizmID(0, BranchID, ActionsImageID,true)
 	
 	if doWritingFile {SaveAutomatizm() }
 
@@ -190,7 +192,7 @@ func CreateAutomatizm(BranchID int, ActionsImageID int)(int, *Automatizm) {
 	// BranchID может быть ==0 для мозжечковых рефлексов
 	if ActionsImageID == 0 {	return 0, nil }
 
-	id, verb := createNewAutomatizmID(0, BranchID, ActionsImageID)
+	id, verb := createNewAutomatizmID(0, BranchID, ActionsImageID,true)
 
 	return id,verb
 }
@@ -243,7 +245,7 @@ func loadAutomatizm() {
 			GomeoIdSuccesArr = append(GomeoIdSuccesArr, sp)
 		}
 var saveDoWritingFile= doWritingFile; doWritingFile =false
-		_, a := createNewAutomatizmID(id, BranchID, ActionsImageID)// без проверки на уникальность
+		_, a := createNewAutomatizmID(id, BranchID, ActionsImageID,false)// без проверки на уникальность
 		a.NextID = NextID
 		a.Usefulness = Usefulness
 		a.Energy = Energy

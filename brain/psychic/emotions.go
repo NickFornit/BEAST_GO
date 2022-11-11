@@ -38,11 +38,14 @@ var EmotionFromIdArr=make(map[int]*Emotion)
 /*  создать новую эмоцию, если такой еще нет
  */
 var lastEmotionID=0
-func createNewBaseStyle(id int,BaseIDarr []int)(int,*Emotion){
-	oldID,oldVal:=checkUnicumEmotion(BaseIDarr)
-	if oldVal!=nil{
-		return oldID,oldVal
+func createNewBaseStyle(id int,BaseIDarr []int,CheckUnicum bool)(int,*Emotion){
+	if CheckUnicum {
+		oldID,oldVal:=checkUnicumEmotion(BaseIDarr)
+		if oldVal!=nil{
+			return oldID,oldVal
+		}
 	}
+
 	if id==0{
 		lastEmotionID++
 		id=lastEmotionID
@@ -110,7 +113,7 @@ func loadEmotionArr(){
 			BaseIDarr=append(BaseIDarr,bc)
 		}
 var saveDoWritingFile= doWritingFile; doWritingFile =false
-		createNewBaseStyle(id,BaseIDarr)
+		createNewBaseStyle(id,BaseIDarr,false)
 doWritingFile =saveDoWritingFile
 	}
 	return

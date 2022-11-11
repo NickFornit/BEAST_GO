@@ -33,11 +33,14 @@ var PurposeImageFromID=make(map[int]*PurposeImage)
 
 // создать новый образ желаемой цели, если такого еще нет
 var lastPurposeImagePurposeID=0
-func createPurposeImageID(id int,veryActual bool,targetID []int,actionID int)(int,*PurposeImage){
-	oldID,oldVal:=checkUnicumPurposeImage(veryActual,targetID,actionID)
-	if oldVal!=nil{
-		return oldID,oldVal
+func createPurposeImageID(id int,veryActual bool,targetID []int,actionID int,CheckUnicum bool)(int,*PurposeImage){
+	if CheckUnicum {
+		oldID,oldVal:=checkUnicumPurposeImage(veryActual,targetID,actionID)
+		if oldVal!=nil{
+			return oldID,oldVal
+		}
 	}
+
 	if id==0{
 		lastPurposeImagePurposeID++
 		id=lastPurposeImagePurposeID
@@ -114,7 +117,7 @@ func loadPurposeImageFromIdArr(){
 		actionID,_:=strconv.Atoi(p[3])
 
 var saveDoWritingFile= doWritingFile; doWritingFile =false
-		createPurposeImageID(id,veryActual,targetID,actionID)
+		createPurposeImageID(id,veryActual,targetID,actionID,false)
 doWritingFile =saveDoWritingFile
 	}
 	return
