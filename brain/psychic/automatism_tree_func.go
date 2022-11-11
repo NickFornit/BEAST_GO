@@ -433,9 +433,10 @@ func addNewBranchFromNodes(level int,cond []int,node *AutomatizmNode)(int){
 		id,_=createNewAutomatizmNode(node,0,cond[0],cond[1],cond[2],0,0,0)
 	case 3:
 		id,_=createNewAutomatizmNode(node,0,cond[0],cond[1],cond[2],cond[3],0,0)
-	case 4:
-		id,_=createNewAutomatizmNode(node,0,cond[0],cond[1],cond[2],cond[3],cond[4],0)
-	case 5:
+	//case 4:
+	//	id,_=createNewAutomatizmNode(node,0,cond[0],cond[1],cond[2],cond[3],cond[4],0)
+	case 4, 5:
+		// нельзя отдельно указывать символ фразы и фразу - они всегда в паре
 		id,_=createNewAutomatizmNode(node,0,cond[0],cond[1],cond[2],cond[3],cond[4],cond[5])
 	}
 	level++
