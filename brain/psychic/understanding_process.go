@@ -6,43 +6,12 @@
 package psychic
 
 import (
+	"BOT/brain/gomeostas"
 	"BOT/lib"
 )
 
-///////////////////////////////
-
-
 //////////////////////////////////////////////////
-/* Определение ближайшей Цели в данной ситуации
-!!!!это - не PurposeImage (understanding_purpose_image.go)!!!
-Это - постановка цели для текущего цикла размышления, чтобы оценить эффект для Правила.
-Дополнение стека savePorposeIDcurrentCicle[]  addMewPorposeMemory(porposeID)
-*/
-func getPurposeUndestandingAndRunAutomatizm()(bool) {
 
-	/* TODO ДОДЕЛАТЬ:
-	func getPurposeUndestandingAndRunAutomatizm()(bool)
-	func valuationPorposeIDcurrentCicle()
-	СДЕЛАТЬ:
-	ментальную функцию поставновки целей !!!! альтернативную getPurposeUndestandingAndRunAutomatizm()
-	ментальную функцию оценки эффекта альтернативную getMentalEffect
-	Проставить lib.WritePultConsol() для главных событий цикла
-	 */
-
-
-	// мозжечковые рефлексы - самый первый уровень осознания - подгонка действий под заданную Цель.
-	if EvolushnStage == 4 {
-		/*  на стадии 4 - провоцировать оператора на ответы (почему, зачем, что такое?)
-
-
-		 */
-	}
-
-
-	//lib.WritePultConsol()
-	return false
-}
-////////////////////////////////////////////////
 
 
 
@@ -228,7 +197,7 @@ func afterWaitingPeriod(effect int){
 	}
 	mact:= MentalActionsImagesArr[mentAtmzm.ActionsImageID]
 	if mact==nil{// не должно быть такого, поэтому выдадим панику
-		lib.TodoPanic("Нет действия автоматизма для func afterWaitingPeriod()")
+		lib.TodoPanic("Нет действия автоматизма в func afterWaitingPeriod()")
 		return
 	}
 	if mact.typeID !=5{// конечный член saveFromNextIDAnswerCicle не содержит мент.автоматизм моторного запуска
@@ -261,14 +230,13 @@ func getMentalEffect(effect0 int)int{
 	*/
 	effect4:=valuationPurpose()
 
-	/* оценить эффект с учетом текущих целей savePorposeIDcurrentCicle []
-	И эта цель имеет значимое преимущество для EvolushnStage > 4, где произвольная цель - главное,
-	особенно в случае Доминанты.
-	 */
-	maneEffect:=valuationPorposeIDcurrentCicle()
-
-	// Коэффициенты эффектов разного вида должны сильно влиять не ментальность твари, что для нее важнее.
-	effectValuation:=effect0*3 + effect4*1 + maneEffect*4
+	// Коэффициенты эффектов разного вида должны сильно влиять не ментальность твари: что для нее важнее.
+	effectValuation:=0
+	if EvolushnStage < 5 {
+		effectValuation = effect0*3 + effect4*1
+	}else{// повышенная роль заданной цели effect4
+		effectValuation = effect0*2 + effect4*3
+	}
 	if effectValuation>1{effectValuation=1}
 	if effectValuation<1{effectValuation=-1}
 
@@ -281,6 +249,7 @@ func valuationPurpose()(int){
 	node4:=currentUnderstandingActivedNodes[0]
 	purpose4id:=node4.PurposeID
 	purpose4:=PurposeImageFromID[purpose4id]
+	prePurpose4:=PurposeImageFromID[prePurposeID]
 	if purpose4!=nil && prePurpose4 !=nil {
 		/* использовать для сравнения с предыдущим образом var prePurpose4 *PurposeImage*/
 		if !purpose4.veryActual && prePurpose4.veryActual{
@@ -289,16 +258,13 @@ func valuationPurpose()(int){
 		if purpose4.veryActual && !prePurpose4.veryActual{
 			effect-=2
 		}
-		//purpose4.targetID Уменьшилось ли число критических параметров с прошлого раза
-		if len(purpose4.targetID) < len(prePurpose4.targetID){
-			effect++
-		}
-		if len(purpose4.targetID) > len(prePurpose4.targetID){
-			effect--
-		}
-		//purpose4.actionID - непонятно как использовать, разве что по Правилам или эпиз.памяти
 
-		prePurpose4 = purpose4// сохранить для следующего
+		effect+=compareGomeoPars(purpose4.targetID,prePurpose4.targetID)
+
+		// добились ли того, что оператор сделал желаемое?
+		if purpose4.actionID>0{
+			effect+=compareOperatorsAction(purpose4.actionID)
+		}
 	}
 	if effect>0 {
 		return 1
@@ -310,14 +276,66 @@ func valuationPurpose()(int){
 }
 ////////////////////////////////////
 
-/*оценить эффект с учетом текущих целей savePorposeIDcurrentCicle []
-И эта цель имеет значимое преимущество для EvolushnStage > 4, где произвольная цель - главное,
-особенно в случае Доминанты.
- */
-func valuationPorposeIDcurrentCicle()int{
+func compareGomeoPars(gPar []int,gParPre []int)int{
+	effect:=0
+	//purpose4.targetID Уменьшилось ли число критических параметров с прошлого раза
+	if len(gPar) < len(gParPre){
+		effect++
+	}
+	if len(gPar) > len(gParPre){
+		effect--
+	}
 
+	/* сравинить бодее тщательно, по значимости параметров: чем более значмый параметр обнулился, тем сильнее эффект
+	 ID параметров гомеостаза как цели для улучшения в данных условиях
+	уже отсортированы по убыванию значимости
+	 */
+	for i := 0; i < len(gParPre); i++ {
+		if !lib.ExistsValInArr(gPar, gParPre[i]){
+	// больше нет такого значения в новом массиве, эффект увеличивается со значимостью
+			w:=gomeostas.GomeostazParamsWeight[gParPre[i]]
+			if w>50{
+				effect+=3
+			}else{
+				if w>10{
+					effect+=2
+				}else{
+					effect++
+				}
+			}
+		}
+	}
 
+	return effect
+}
 
+func compareOperatorsAction(purpose4actionID int)int{
+	ppA:=ActionsImageArr[purpose4actionID]
+	if ppA==nil{
+		return 0
+	}
+	/* curActiveActions - структура действий оператора при активации дерева автоматизмов типа ActionsImage
+		curActiveActions.ActID
+		curActiveActions.PhraseID
+		curActiveActions.ToneID=0
+		curActiveActions.MoodID=0
+		 */
+if lib.EqualArrs(ppA.ActID,curActiveActions.ActID) && lib.EqualArrs(ppA.PhraseID, curActiveActions.PhraseID){
+	// достаточно полное совпадение
+	if mentalPurposeImageID>0{// при призвольно заданной цели
+		return 4
+	}else {
+		return 2
+	}
+}
+	if lib.EqualArrs(ppA.ActID,curActiveActions.ActID) || lib.EqualArrs(ppA.PhraseID, curActiveActions.PhraseID){
+		// частичное совпадение
+		if mentalPurposeImageID>0{// при призвольно заданной цели
+			return 2
+		}else {
+			return 1
+		}
+	}
 	return 0
 }
 /////////////////////////////////////////////////////////

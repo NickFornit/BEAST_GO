@@ -88,8 +88,7 @@ func consciousness(activationType int,fromNextID int)(bool) {   //  return false
 	if activationType == 1 {
 		isActivationType2 = false
 		existAnswer = false
-		// поставить ментальную цель для оценки эффекта от saveFromNextIDAnswerCicle[]
-		getPurposeUndestandingAndRunAutomatizm()
+
 		// посмотреть, есть ли прерванные цепочки осмысления, и если есть, выбрать, с какой продолжить осмысление.
 	}
 	if activationType == 2 {
@@ -356,10 +355,8 @@ if false && !isFirstActivation {//это - не пробуждение false д�
 
 	if isFirstActivation{// проснулся, получил InterruptMemory, первые мысли
 		/* уже есть конец активной цепочки fromNextID, полученный выше при if fromNextID==0{
-		уже есть определенная цель getPurposeUndestandingAndRunAutomatizm().
-		Сориентироваться в текущем, определить savePorposeIDcurretCicle и м.б. что-то выдать оператору
 		 */
-		getPurposeUndestandingAndRunAutomatizm()
+		getMentalPurpose()
 
 		// перезапуск осмысления после просыпания, но можно и не перезапускать, а ждать Стимула
 		if EvolushnStage > 4 {// инициативность

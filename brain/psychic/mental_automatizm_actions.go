@@ -5,7 +5,6 @@
 package psychic
 
 import (
-	"BOT/brain/gomeostas"
 	"strconv"
 )
 ////////////////////////////////////////////////
@@ -48,18 +47,25 @@ if am.Usefulness<0{
 
 	switch ai.typeID{
 	case 1: //активация настроения Mood
-			gomeostas.CommonBadNormalWell=ai.valID
+		mentalMoodVolitionID=ai.valID
+		mentalMoodVolitionPulsCount=PulsCount
+			//gomeostas.CommonBadNormalWell=ai.valID  не трогать гомеостаз!
 			understandingSituation(2)
 	case 2: // активация эмоции EmotionID
 			em:=EmotionFromIdArr[ai.valID]
 			if em==nil{return false}
+		mentalEmotionVolitionID=ai.valID
+		mentalEmotionVolitionPulsCount=PulsCount
+		/*    не трогать гомеостаз!
 			lev2:=em.BaseIDarr
 			gomeostas.SetCurContextActiveIDarr(lev2)
+		 */
 			understandingSituation(2)
 	case 3:	//активация PurposeImage
 			pp:=PurposeImageFromID[ai.valID]
 			if pp==nil{return false}
-			mentalPurposeImageID=ai.valID
+		mentalPurposeImageID=ai.valID
+		mentalPurposeImagePulsCount=PulsCount
 			understandingSituation(2)
 	case 4: runMentalFunctionID(ai.valID) //запуск инфо-функции
 	case 5: RumAutomatizmID(ai.valID) //запуск моторного автоматизма

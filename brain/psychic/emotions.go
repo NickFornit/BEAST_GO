@@ -30,7 +30,7 @@ type Emotion struct {
 }
 ////////////////////////////////
 
-// последнее определенная эмоциz
+// последнее определенная эмоция
 var CurrentEmotionReception *Emotion
 
 var EmotionFromIdArr=make(map[int]*Emotion)

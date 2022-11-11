@@ -6,6 +6,8 @@
 
 package psychic
 
+import "BOT/brain/gomeostas"
+
 ///////////////////////////////
 
 // инициализирующий блок - в порядке последовательности инициализаций
@@ -89,10 +91,15 @@ var saveSituationImageID=0
 
 var currentMentalAutomatizmID=0
 
-var mentalPurposeImageID=0// для произвольной переактивации с новым PurposeImageID
 
-// образ цели предыдущей активации для func getMentalEffect
-var prePurpose4 *PurposeImage
+//текущие образы  гомеостатической этиологии, колторые могут быть произвольно перекрыты ментальными образами
+var newMoodID=0
+var newEmotionID=0
+var newPurposeID=0
+//сохраненные образы гомеостатической этиологии, колторые могут быть произвольно перекрыты ментальными образами
+var preMoodID=0
+var preEmotionID=0
+var prePurposeID=0
 
 
 /* Активация дерева ментальных автоматизмов происходит из:
@@ -138,23 +145,60 @@ func understandingSituation(activationType int)(bool){
 	currentUnderstandingStepCount=0
 	currentUnderstandingActivedNodes=nil
 
-	// вытащить 3 уровня условий в виде ID их образов
-	var lev1=PsyBaseMood // PsyBaseMood: -1 Плохое настроение, 0 Нормальное, 1 - хорошее настроение
-	var lev2=0
-	if CurrentInformationEnvironment.PsyActionImg!=nil{
-		lev2=CurrentInformationEnvironment.PsyEmotionImg.ID
+	// текушие гомео-зависимые параметы
+	newMoodID=PsyBaseMood
+
+	bsIDarr:=gomeostas.GetCurContextActiveIDarr()
+	newEmotionID,_=createNewBaseStyle(0,bsIDarr)
+
+	newPurposeID,_ = createPurposeImageID(0, ps.veryActual, ps.targetID, ps.actionID.ID)
+	////////////////////////////////
+
+
+	/* не просрочены ли произвольно активированные параметры
+	Держатся на время, пока не изменятся генетически определенные соотвествующие параметры или
+	если активация была в данном пульсе
+	 */
+	if mentalMoodVolitionPulsCount!=PulsCount && preMoodID != newMoodID{
+		mentalMoodVolitionID=0
+	}
+	if mentalEmotionVolitionPulsCount!=PulsCount && preEmotionID != newEmotionID{
+		mentalEmotionVolitionID=0
+	}
+	if mentalPurposeImagePulsCount!=PulsCount && prePurposeID != newPurposeID{
+		mentalPurposeImageID=0
+	}
+
+	// сохранять только изменившиеся значения
+	if preMoodID != newMoodID {
+		preMoodID = newMoodID
+	}
+	if preEmotionID != newEmotionID {
+		preEmotionID = newEmotionID
+	}
+	if prePurposeID != newPurposeID {
+		prePurposeID = newPurposeID
+	}
+	////////////////////////////////
+
+	// 3 уровня условий в виде ID их образов
+
+	var lev1=newMoodID // PsyBaseMood: -1 Плохое настроение, 0 Нормальное, 1 - хорошее настроение
+	if mentalPurposeImageID >0 {
+		lev1=mentalPurposeImageID
+	}
+
+	var lev2=newEmotionID
+	if mentalEmotionVolitionID >0 {
+		lev2=mentalEmotionVolitionID
 	}
 
 	var lev3=situationImageID
 
-	var lev4=0
-	if mentalPurposeImageID ==0 {
-		lev4, _ = createPurposeImageID(0, ps.veryActual, ps.targetID, ps.actionID.ID)
-	}else{
+	var lev4=newPurposeID
+	if mentalPurposeImageID >0 {
 		lev4=mentalPurposeImageID
 	}
-	mentalPurposeImageID=0// сразу сбросить, чтобы произвольно активировалось только 1 раз
-
 
 	condArr:=getUnderstandingActiveConditionsArr(lev1, lev2, lev3, lev4)
 	// основа дерева

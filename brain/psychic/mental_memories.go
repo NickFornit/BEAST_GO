@@ -34,7 +34,7 @@ var saveFromNextIDcurretCicle []int // последовательность from
 //////////////////////////////////////////////////////////////////////////
 
 func initMentalMemories(){
-	savePorposeIDcurrentCicle=nil
+	//savePorposeIDcurrentCicle=nil
 	saveFromNextIDbaseLinksCicle=nil
 	loadInterruptMemory()
 }
@@ -100,11 +100,11 @@ func saveInterruptMemory(){
 
 
 
-/* стек текущих целей
+/* стек текущих целей  НЕ ПРИГОДИЛОСЬ, непонятно, что это и зачем
 реализация оценивается как эффект правил
 При оценке успешности в afterWaitingPeriod() смотрится, какеи цели достигнуты:
 
- */
+
 var savePorposeIDcurrentCicle []int //
 func addMewPorposeMemory(porposeID int){
 	if len(InterruptMemory)>7{
@@ -113,7 +113,7 @@ func addMewPorposeMemory(porposeID int){
 	}
 	savePorposeIDcurrentCicle=append(savePorposeIDcurrentCicle, porposeID)
 }
-
+*/
 //////////////////////////////////////////////////////////////////////////
 
 
