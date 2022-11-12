@@ -84,7 +84,7 @@ func getSuitableRules()(int){
  */
 		maxSteps:=1000
 		for limit:=5; limit > 1; limit-- {
-			rID=getRulesFromEpisodicsSlice(limit,maxSteps)
+			rID,_=getRulesFromEpisodicsSlice(limit,maxSteps)
 			if rID>0{
 				return rID
 			}
@@ -132,9 +132,13 @@ func getSuitableRules()(int){
 придется выбирать из нескольких вариантов. Поиск будет быстрее, если отсортировать по Count по убыванию.
 	Отзеркаленный автоматизм тем не менее не может быть авторитарным несмотря ни на какую Count, только пробным.
 	Такое отзеркаливание, с оценкой прошлого опыта, можно назвать более осмысленным, по сравнению с попугайским рефлекторным на 3 стадии.
+
+Возвращает:
+1 - ID Правила
+2 - index эпиз.памяти с таким Правилом
 */
 
-func getRulesFromEpisodicsSlice(limit int,maxSteps int)(int){
+func getRulesFromEpisodicsSlice(limit int,maxSteps int)(int,int){
 
 	rImg:=getLastRulesSequenceFromEpisodeMemory(limit)
 
@@ -149,15 +153,18 @@ if len(rImg)>limit{// limit последних
 	lenEp:=len(EpisodeMemoryObjects)
 	var startF = lenEp - 2*lenFrag // отмотать на 2 длины, чтобы не проверять в rID саму себя
 	if startF <0{//  а нет еще достаточной длины еп.памяти
-		return 0
+		return 0,0
 	}
+//Поиск - в контексте активных деревьев detectedActiveLastNodID и detectedActiveLastUnderstandingNodID
+	var rеserve=0 // резервные Правила, если не найдено точно в контексте
+	var index=0
 		// идем назад по кускам lenFrag
 /*TODO хорошо бы оптимизировать функцию так, чтобы можно было листать назад по -=lenFrag
 если только это принципиально возможно
  */
 		for i := startF; i >= 0; i -- { // =lenFrag - пролетает мимо
 			if steps>maxSteps{
-				return 0
+				return 0,0
 			}
 			var isConc=true
 			var lastEM *EpisodeMemory
@@ -169,13 +176,11 @@ if len(rImg)>limit{// limit последних
 				}
 			}
 			if lastEM == nil{
-				return 0
+				return 0,0
 			}
 			if isConc{// уж ты, нашли такой же фрагмент! но в нем нет пускового curActiveActions (раньше уже смотрели)
 				// выдать конечное праило, если оно с хорошим эффектом
-				rArr:=rulesArr[lastEM.TriggerAndActionID]
-				lastTa:=rArr.TAid[len(rArr.TAid)-1:]
-				ta:=TriggerAndActionArr[lastTa[0]]
+				ta:=TriggerAndActionArr[lastEM.TriggerAndActionID]
 				if ta !=nil {
 						if ta.Effect >0{// с хорошим эффектом
 /* TODO тут можно посмотреть далее на сколько-то шагов вперед чтобы прикинуть, чем закончится комбинацияя Стимул-Ответ
@@ -189,9 +194,16 @@ if len(rImg)>limit{// limit последних
 							найденный фрагмент эпиз. памяти:  привет - хай/как дела - так себе/ну и дурак - сам дурак
 							если запустить реакцию последнего эпизода то получим: привет - сам дурак.
 							*/
-
-
-							return lastEM.TriggerAndActionID
+							rеserve=lastEM.TriggerAndActionID
+							index=i
+							if lastEM.NodeAID == detectedActiveLastNodID{
+								rеserve=lastEM.TriggerAndActionID
+								index=i
+								if lastEM.NodePID == detectedActiveLastUnderstandingNodID{
+									return lastEM.TriggerAndActionID,i
+								}
+							}
+							return rеserve,index
 						}
 //else - продолжает искать хороший конец далее назад, хотя это уже менее вероятно, но в прощлом при меньшей  длине шаблона можно найти.
 				}
@@ -199,12 +211,11 @@ if len(rImg)>limit{// limit последних
 			steps++
 		}
 
-	return 0
+	return 0,0
 }
 ///////////////////////////////////////////////////
 
-/*
-
+/* Вытащить из эпизод.памяти посленюю цепочку кадров
  */
 func getLastRulesSequenceFromEpisodeMemory(limit int)([]int){
 	if EpisodeMemoryLastIDFrameID==0{
@@ -256,9 +267,11 @@ func getLastRulesSequenceFromEpisodeMemory(limit int)([]int){
 используя шаблоном последнюю цепочку кадров эпизод. памяти.
  */
 func getRulesArrFromTrigger(trigID int)(int){
-	// сначала попробовать найти Правило с учетом тематического контекста
+	// сначала попробовать найти Правило с учетом тематического контекста (групповые Правила)
 	for limit:=5; limit > 1; limit-- {
+		//Вытащить из эпизод.памяти посленюю цепочку кадров
 		rImg := getLastRulesSequenceFromEpisodeMemory(limit)
+		// искать эту цепочку в групповых Правилах
 		rules := getRulesFromTemp(rImg, limit)
 		if rules>0{
 			return rules

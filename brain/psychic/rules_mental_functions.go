@@ -101,10 +101,9 @@ return out
 */
 func getSuitableMentalRules()(int){
 	var rID=0
-	var activationType=2
 // попытка срочно найти действие, в опасной ситуации
 	if CurrentInformationEnvironment.veryActualSituation || CurrentInformationEnvironment.danger{
-		rID = getMentalRulesArrFromTrigger(currentTriggerID)
+		rID = getMentalRulesArrFromTrigger(saveFromNextIDAnswerCicle)
 
 	}else{
 /* попытка более обстоятельно найти в эпиз.памяти подходящий фрагмент
@@ -114,7 +113,7 @@ func getSuitableMentalRules()(int){
  */
 		maxSteps:=1000
 		for limit:=5; limit > 1; limit-- {
-			rID=getMentalRulesFromEpisodicsSlice(activationType,limit,maxSteps)
+			rID,_=getMentalRulesFromEpisodicsSlice(limit,maxSteps)
 			if rID>0{
 				return rID
 			}
@@ -156,10 +155,15 @@ func getSuitableMentalRulesСarefully()(int){
 
 Чем больше limit тем маловероятнее найти совпадения,
 так что можно вызывать getRulesFromEpisodicsSlice постепенно уменьшая limit
- */
-func getMentalRulesFromEpisodicsSlice(activationType int,limit int,maxSteps int)(int){
 
-	rImg:=getLastMentalRulesSequenceFromEpisodeMemory(activationType,limit)
+Возвращает:
+1 - ID Правила
+2 - index эпиз.памяти с таким Правилом
+ */
+func getMentalRulesFromEpisodicsSlice(limit int,maxSteps int)(int,int){
+
+	//Вытащить из эпизод.памяти посленюю цепочку кадров
+	rImg:=getLastMentalRulesSequenceFromEpisodeMemory(limit)
 
 // найти такую последовательность в предыдущей эпизод.памяти, но не далее 1000 фрагментов
 /* уже обеспечено
@@ -172,15 +176,18 @@ if len(rImg)>limit{// limit последних
 	lenEp:=len(EpisodeMemoryObjects)
 	var startF = lenEp - 2*lenFrag // отмотать на 2 длины, чтобы не проверять в rID саму себя
 	if startF <0{//  а нет еще достаточной длины еп.памяти
-		return 0
+		return 0,0
 	}
+	//Поиск - в контексте активных деревьев detectedActiveLastNodID и detectedActiveLastUnderstandingNodID
+	var rеserve=0 // резервные Правила, если не найдено точно в контексте
+	var index=0
 		// идем назад по кускам lenFrag
 /*TODO хорошо бы оптимизировать функцию так, чтобы можно было листать назад по -=lenFrag
 если только это принципиально возможно
  */
 		for i := startF; i >= 0; i -- { // =lenFrag - пролетает мимо
 			if steps>maxSteps{
-				return 0
+				return 0,0
 			}
 			var isConc=true
 			var lastEM *EpisodeMemory
@@ -192,37 +199,40 @@ if len(rImg)>limit{// limit последних
 				}
 			}
 			if lastEM == nil{
-				return 0
+				return 0,0
 			}
-			if isConc{// уж ты, нашли такой же фрагмент! но в нем нет пускового curActiveActions (раньше уже смотрели)
+			if isConc{// нашли такой же фрагмент! но в нем нет пускового curActiveActions (раньше уже смотрели)
 				// выдать конечное праило, если оно с хорошим эффектом
-				rArr:=rulesMentalArr[lastEM.TriggerAndActionID]
-				lastTa:=rArr.TAid[len(rArr.TAid)-1:]
-				ta:=TriggerAndActionArr[lastTa[0]]
+				ta:=MentalTriggerAndActionArr[lastEM.TriggerAndActionID]
 				if ta !=nil {
 						if ta.Effect >0{// с хорошим эффектом
-							return lastEM.TriggerAndActionID
+							rеserve=lastEM.TriggerAndActionID
+							index=i
+							if lastEM.NodeAID == detectedActiveLastNodID{
+								rеserve=lastEM.TriggerAndActionID
+								index=i
+								if lastEM.NodePID == detectedActiveLastUnderstandingNodID{
+									return lastEM.TriggerAndActionID,i
+								}
+							}
+							return rеserve,index
 						}//else - продолжает искать хороший конец далее назад
 				}
 			}
 			steps++
 		}
 
-	return 0
+	return 0,0
 }
 ///////////////////////////////////////////////////
 
-/*
-
+/* Вытащить из эпизод.памяти посленюю цепочку кадров
  */
-func getLastMentalRulesSequenceFromEpisodeMemory(activationType int,limit int)([]int){
+func getLastMentalRulesSequenceFromEpisodeMemory(limit int)([]int){
 	if EpisodeMemoryLastIDFrameID==0{
 		return nil
 	}
-	var kind=0 // объективнй тип эпизод.памяти
-	if activationType==2{
-		kind=1
-	}
+	var kind=1 // ментальный тип эпизод.памяти
 
 	var beginID=0
 	var preLifeTime=0
@@ -266,11 +276,14 @@ func getLastMentalRulesSequenceFromEpisodeMemory(activationType int,limit int)([
 ///////////////////////////////////////////////////
 /*  быстро выбрать самое лучшее правило из rulesArr по пусковому стимулу
 используя шаблоном последнюю цепочку кадров эпизод. памяти.
- */
-func getMentalRulesArrFromTrigger(trigID int)(int){
+mentalID - saveFromNextIDAnswerCicle []int
+*/
+func getMentalRulesArrFromTrigger(mentalID []int)(int){
 	// сначала попробовать найти Правило с учетом тематического контекста
 	for limit:=5; limit > 1; limit-- {
-		rImg := getLastRulesSequenceFromEpisodeMemory(limit)
+		//Вытащить из эпизод.памяти посленюю цепочку кадров
+		rImg := getLastMentalRulesSequenceFromEpisodeMemory(limit)
+		// искать эту цепочку в групповых Правилах
 		rules := getRulesFromTemp(rImg, limit)
 		if rules>0{
 			return rules
@@ -279,13 +292,12 @@ func getMentalRulesArrFromTrigger(trigID int)(int){
 // раз не нашли, то смотрим одиночные правила
 	for k, v := range rulesMentalArr {
 		for i := 0; i < len(v.TAid); i++ {
-			if trigID!=v.TAid[i] || len(v.TAid)>1{
+			if len(mentalID) != len(v.TAid){
 				continue
 			}
-			ta:=TriggerAndActionArr[k]
+			ta:=MentalTriggerAndActionArr[k]
 			if ta !=nil {
-				//r.Trigger по знаку всегда совпадает с currentTriggerID
-				if ta.Trigger == currentTriggerID{// есть такой пусковой
+				if lib.EqualArrs(mentalID,v.TAid) {// есть такой пусковой
 					if ta.Effect >0{// первый попавшийся с хорошим эффектом
 						return k
 					}

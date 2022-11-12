@@ -38,8 +38,6 @@ func infoFunc8() {
 func getMentalPurpose(){
 	mentalInfoStruct.mentalPurposeID=0
 
-	// определить эмоциональный контекст по newEmotionID или прямо по CurrentEmotionReception
-	contextArr:=CurrentEmotionReception.BaseIDarr
 
 	if EvolushnStage > 4 { // главное - Доминанта нерешенной пробелмы
 		dominfntaID := getMainDominanta(CurrentEmotionReception.ID)
@@ -57,10 +55,64 @@ func getMentalPurpose(){
 	///////////////////////////
 	// если нет Доминант, то ищем PurposeImage.actionID с учетом текущего эмоционального контекста
 
-	/* ищем PurposeImage.actionID с учетом текущего эмоционального контекста
+	/* ищем PurposeImage.actionID в контексте активных деревьев
 	найти - с учетом Правил!!!!
-	На стадии 4 - провоцировать оператора на ответы (почему, зачем, что такое?)
+	??На стадии 4 - провоцировать оператора на ответы (почему, зачем, что такое?)
+Нужно искать не только в контексте эмоции, а активных веток деревьев detectedActiveLastNodID и detectedActiveLastUnderstandingNodID
+	Алгоритм:
+Ищем в ОБЪЕКТИВНЫХ Правилах подходящее действие (текущий saveFromNextIDAnswerCicle),
+	смотрим в последних кадрах эпизод.памяти такое Правило и в его продолжении есть позитивный эффект,
+	то берем оттуда действие оператора.
 	*/
+	index:=0
+	rulexID:=0
+	maxSteps:=1000
+	for limit:=5; limit > 1; limit-- {
+		rulexID,index=getRulesFromEpisodicsSlice(limit,maxSteps)
+		if rulexID>0{
+			break
+		}
+		maxSteps = maxSteps/2
+	}
+	//////////////////////////
+
+	// есть ли последующий кадр эпизодюпамяти
+	lastEM :=EpisodeMemoryObjects[index+1]
+	if lastEM ==nil{
+		return // придется обойтись без PurposeImage.actionID
+	}
+	// хороший ли эфект
+	rArr:=rulesArr[lastEM.TriggerAndActionID]
+	if rArr ==nil{
+		return // придется обойтись без PurposeImage.actionID
+	}
+	// выдать конечное праило, если оно с хорошим эффектом
+	var rеserve=0 // резервные Правила, если не найдено точно в контексте
+	ta:=TriggerAndActionArr[lastEM.TriggerAndActionID]
+		if ta ==nil{
+			return // придется обойтись без PurposeImage.actionID
+		}
+		if ta.Effect >0 { // с хорошим эффектом
+			rеserve = ta.Action
+			if lastEM.NodeAID == detectedActiveLastNodID {
+				rеserve = ta.Action
+				if lastEM.NodePID == detectedActiveLastUnderstandingNodID {
+					rеserve = ta.Action
+				}
+			}
+		}
+if rеserve>0{// нашли действие
+	if savePurposeGenetic==nil {
+		getPurposeGenetic()
+	}
+// создать Цель
+	purposeID,_ := createPurposeImageID(0, savePurposeGenetic.veryActual, savePurposeGenetic.targetID, rеserve,true)
+	// передать результат
+	mentalInfoStruct.mentalPurposeID=purposeID
+}
+	/*   оставляю как пример расшифровки эмоции
+	// определить эмоциональный контекст по newEmotionID или прямо по CurrentEmotionReception
+	contextArr:=CurrentEmotionReception.BaseIDarr
 	for i := 0; i < len(contextArr); i++ {
 		switch contextArr[i]{
 		case 1:	//Пищевой	- Пищевое поведение, восполнение энергии, на что тратится время и тормозятся антагонистические стили поведения.
@@ -87,9 +139,10 @@ func getMentalPurpose(){
 
 		case 12: //Сон - Состояние сна. Освобождение стрессового состояния. Реконструкция необработанной информации.
 
-
 		}
 	}
+	*/
+
 
 
 	// мозжечковые рефлексы - самый первый уровень осознания - подгонка действий под заданную Цель.

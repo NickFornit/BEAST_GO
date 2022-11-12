@@ -38,7 +38,7 @@ import (
  */
 type MentalTriggerAndAction struct {
 	ID int
-	ShortTermMemoryID []int // последний фрагмент Кратковременной памяти из saveFromNextIDcurretCicle []int
+	ShortTermMemoryID []int // последний фрагмент Кратковременной памяти из saveFromNextIDAnswerCicle []int
 	Action int // образ ответных действий - всегда MentalAutomatizm.ActionsImageID ->  activateMotorID
 	Effect int // эффект от действий накапливается при каждой новой перезаписи и используется уже суммарное значение.
 }
