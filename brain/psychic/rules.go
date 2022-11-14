@@ -44,13 +44,19 @@ import (
 
 /* Правила примитивного опыта, обобщающие стимулы->ответы->эффект для таких цепочек в диалогах
 На основе этих правил становятся возможны более системные обобщения.
-Т.к. в структуре нет ID веток реревьев, как в EpisodeMemory, то они - наиболее обобщенные понятия дейтвий
  */
 type rules struct {
 	ID int
+	// условия точного использования Правила:
+	NodeAID int // конечный узел активной ветки дерева моторных автоматизмов detectedActiveLastNodID
+	NodePID int // конечный узел активной ветки дерева ментальных автоматизмов detectedActiveLastUnderstandingNodID
+
 	TAid []int // цепочка стимул-ответов ID TriggerAndAction - последовательность из эпизодов памяти подряд, сохраняющая последовательность общения ( дурак -> сам дурак!, маме скажу -> ябеда, щас в морду дам -> ну попробуй)
 }
 var rulesArr=make(map[int]*rules)
+// выборка по условиям Правила: "NodeAID_NodePID"
+//sinex:=strconv.Itoa(NodeAID)+"_"+strconv.Itoa(NodePID); rulesArrConditinArr[sinex]
+var rulesArrConditinArr=make(map[string] []*rules)// Массив Правил
 
 //////////////////////////////////////////
 
@@ -68,13 +74,13 @@ func rulesInit(){
 // создать новое сочетание ответных действий если такого еще нет
 var lastrulesID=0
 var isNotLoading=true
-func createNewlastrulesID(id int,TAid []int,CheckUnicum bool)(int,*rules){
+func createNewlastrulesID(id int,NodeAID int,NodePID int,TAid []int,CheckUnicum bool)(int,*rules){
 
 	if TAid == nil{
 		return 0,nil
 	}
 	if CheckUnicum {
-		oldID,oldVal:=checkUnicumrules(TAid)
+		oldID,oldVal:=checkUnicumrules(NodeAID,NodePID,TAid)
 		if oldVal!=nil{
 			return oldID,oldVal
 		}
@@ -95,6 +101,8 @@ func createNewlastrulesID(id int,TAid []int,CheckUnicum bool)(int,*rules){
 	node.TAid=TAid
 
 	rulesArr[id]=&node
+	sinex:=strconv.Itoa(NodeAID)+"_"+strconv.Itoa(NodePID)
+	rulesArrConditinArr[sinex]=append(rulesArrConditinArr[sinex],&node)
 
 	if doWritingFile{
 		SaveRulesArr()
@@ -109,9 +117,9 @@ func createNewlastrulesID(id int,TAid []int,CheckUnicum bool)(int,*rules){
 
 	return id,&node
 }
-func checkUnicumrules(TAid []int)(int,*rules){
+func checkUnicumrules(NodeAID int,NodePID int,TAid []int)(int,*rules){
 	for id, v := range rulesArr {
-		if !lib.EqualArrs(TAid,v.TAid) {
+		if NodeAID != v.NodeAID || NodePID != v.NodePID || !lib.EqualArrs(TAid,v.TAid) {
 			continue
 		}
 		return id,v
@@ -127,11 +135,13 @@ func checkUnicumrules(TAid []int)(int,*rules){
 
 
 //////////////////// сохранить Образы rules
-// ID|TAid через ,
+// ID|NodeAID|NodePID|TAid через ,
 func SaveRulesArr(){
 	var out=""
 	for k, v := range rulesArr {
 		out+=strconv.Itoa(k)+"|"
+		out+=strconv.Itoa(v.NodeAID)+"|"
+		out+=strconv.Itoa(v.NodePID)+"|"
 		for i := 0; i < len(v.TAid); i++ {
 			out+=strconv.Itoa(v.TAid[i])+","
 		}
@@ -141,9 +151,10 @@ func SaveRulesArr(){
 
 }
 ////////////////////  загрузить образы rules
-// ID|TAid через ,
+// ID|NodeAID|NodePID|TAid через ,
 func loadrulesArr(){
 	rulesArr=make(map[int]*rules)
+	rulesArrConditinArr=make(map[string] []*rules)
 	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_psy/rules.txt")
 	cunt:=len(strArr)
 	for n := 0; n < cunt; n++ {
@@ -152,8 +163,10 @@ func loadrulesArr(){
 		}
 		p:=strings.Split(strArr[n], "|")
 		id,_:=strconv.Atoi(p[0])
+		NodeAID,_:=strconv.Atoi(p[1])
+		NodePID,_:=strconv.Atoi(p[2])
 
-		s:=strings.Split(p[1], ",")
+		s:=strings.Split(p[3], ",")
 		var TAid[] int
 		for i := 0; i < len(s); i++ {
 			if len(s[i])==0{
@@ -164,7 +177,7 @@ func loadrulesArr(){
 		}
 var saveDoWritingFile= doWritingFile; doWritingFile =false
 		isNotLoading=false
-		createNewlastrulesID(id,TAid,false)
+		createNewlastrulesID(id,NodeAID,NodePID,TAid,false)
 		isNotLoading=true
 doWritingFile =saveDoWritingFile
 	}

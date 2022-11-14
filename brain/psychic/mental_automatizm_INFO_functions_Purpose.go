@@ -1,4 +1,6 @@
-/* Инфофункция поиска Цели
+/* Инфо-функция поиска Цели - как объекта произвольного внимания:
+того из всего воспринимаемого, что имеет наибольшую значимость
+т.к. именно наибольшая значимость должна осмысливаться.
 
 targetID [] можно пока вообще не трогать, так же как и veryActual -
 оба просто констатируют что нужно бы улучшить.
@@ -38,6 +40,9 @@ func infoFunc8() {
 func getMentalPurpose(){
 	mentalInfoStruct.mentalPurposeID=0
 
+	// определяется текущий объект наибольшой значимости в воспринимаемом
+	getGreatestImportance()
+
 
 	if EvolushnStage > 4 { // главное - Доминанта нерешенной пробелмы
 		dominfntaID := getMainDominanta(CurrentEmotionReception.ID)
@@ -64,35 +69,54 @@ func getMentalPurpose(){
 	смотрим в последних кадрах эпизод.памяти такое Правило и в его продолжении есть позитивный эффект,
 	то берем оттуда действие оператора.
 	*/
-	index:=0
-	rulexID:=0
-	maxSteps:=1000
-	for limit:=5; limit > 1; limit-- {
-		rulexID,index=getRulesFromEpisodicsSlice(limit,maxSteps)
-		if rulexID>0{
-			break
-		}
-		maxSteps = maxSteps/2
+	if EpisodeMemoryObjects!=nil {// еще нет эпиз.памяти, так что и цели нет...
+		return
 	}
-	//////////////////////////
+// тупо - для 4-й ступени (и 5-й, если нет Доминанты), когда набирается значимость и Правила
+		index := 0 // индекс в массиве эпизод.памяти, чтобы по нему смотреть, что было дальне
+		rID, doubt := getRulesArrFromTrigger(currentTriggerID)
+		if doubt > 3 { // слишком сомнительно
 
-	// есть ли последующий кадр эпизодюпамяти
-	lastEM :=EpisodeMemoryObjects[index+1]
-	if lastEM ==nil{
-		return // придется обойтись без PurposeImage.actionID
-	}
-	// хороший ли эфект
-	rArr:=rulesArr[lastEM.TriggerAndActionID]
-	if rArr ==nil{
-		return // придется обойтись без PurposeImage.actionID
-	}
-	// выдать конечное праило, если оно с хорошим эффектом
-	var rеserve=0 // резервные Правила, если не найдено точно в контексте
-	ta:=TriggerAndActionArr[lastEM.TriggerAndActionID]
-		if ta ==nil{
+			rulexID := 0
+			maxSteps := 1000
+			for limit := 5; limit > 1; limit-- {
+				rulexID, index = getRulesFromEpisodicsSlice(limit, maxSteps)
+				if rulexID > 0 {
+					break
+				}
+				maxSteps = maxSteps / 2
+			}
+		} else { // вполне уверенно найдено Правило, ищем его индекс в эпиз.памчяти
+			for i := len(EpisodeMemoryObjects); i >= 0; i-- {
+				ep := EpisodeMemoryObjects[i]
+				if ep.Type == 0 && ep.TriggerAndActionID == rID {
+					index = i
+					break
+				}
+			}
+		}
+		//////////////////////////
+		if index == 0 {
+			return
+		}
+
+		// есть ли последующий кадр эпизод.памяти
+		lastEM := EpisodeMemoryObjects[index+1]
+		if lastEM == nil {
 			return // придется обойтись без PurposeImage.actionID
 		}
-		if ta.Effect >0 { // с хорошим эффектом
+		// хороший ли эфект
+		rArr := rulesArr[lastEM.TriggerAndActionID]
+		if rArr == nil {
+			return // придется обойтись без PurposeImage.actionID
+		}
+		// выдать конечное праило, если оно с хорошим эффектом
+		var rеserve = 0 // резервные Правила, если не найдено точно в контексте
+		ta := TriggerAndActionArr[lastEM.TriggerAndActionID]
+		if ta == nil {
+			return // придется обойтись без PurposeImage.actionID
+		}
+		if ta.Effect > 0 { // с хорошим эффектом
 			rеserve = ta.Action
 			if lastEM.NodeAID == detectedActiveLastNodID {
 				rеserve = ta.Action
@@ -101,15 +125,16 @@ func getMentalPurpose(){
 				}
 			}
 		}
-if rеserve>0{// нашли действие
-	if savePurposeGenetic==nil {
-		getPurposeGenetic()
+		if rеserve > 0 { // нашли действие
+			if savePurposeGenetic == nil {
+				getPurposeGenetic()
+			}
+			// создать Цель
+			purposeID, _ := createPurposeImageID(0, savePurposeGenetic.veryActual, savePurposeGenetic.targetID, rеserve, true)
+			// передать результат
+			mentalInfoStruct.mentalPurposeID = purposeID
 	}
-// создать Цель
-	purposeID,_ := createPurposeImageID(0, savePurposeGenetic.veryActual, savePurposeGenetic.targetID, rеserve,true)
-	// передать результат
-	mentalInfoStruct.mentalPurposeID=purposeID
-}
+
 	/*   оставляю как пример расшифровки эмоции
 	// определить эмоциональный контекст по newEmotionID или прямо по CurrentEmotionReception
 	contextArr:=CurrentEmotionReception.BaseIDarr
@@ -146,12 +171,12 @@ if rеserve>0{// нашли действие
 
 
 	// мозжечковые рефлексы - самый первый уровень осознания - подгонка действий под заданную Цель.
-	if EvolushnStage == 4 {
+
 		/*
 
 
 		 */
-	}
+
 
 	createAndRunPurposeAutomatizm()
 

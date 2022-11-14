@@ -18,7 +18,7 @@ limit 5 ограничивает выборку из эпиз.памяти, но
 func GetRulesFromEpisodeMemory(){
 	rImg:=getLastRulesSequenceFromEpisodeMemory(5)
 	if rImg!=nil {
-		createNewlastrulesID(0, rImg,true)//записать (если еще нет такого) групповое правило
+		createNewlastrulesID(0, detectedActiveLastNodID,detectedActiveLastUnderstandingNodID,rImg,true)//записать (если еще нет такого) групповое правило
 	}
 }
 //////////////////////////////////////////////////
@@ -35,7 +35,7 @@ func GetCur10lastRules()string{
 	var out=""
 	for i := 0; i < rCount; i++ {
 		r:=rulesArr[lastrulesID-i]
-		out+="ID="+strconv.Itoa(r.ID)+":"
+		out+="ID="+strconv.Itoa(r.ID)+" для <span title='ID дерева автоматизмов'>"+strconv.Itoa(r.NodeAID)+"</span> и <span title='ID дерева понимания'>"+strconv.Itoa(r.NodePID)+"</span> :"
 		for n := 0; n < len(r.TAid); n++ {
 			taa:=TriggerAndActionArr[r.TAid[n]]
 			if taa == nil{
@@ -70,18 +70,24 @@ func GetCur10lastRules()string{
 активный пусковой стимул currentTriggerID типов curActiveActions или curBaseStateImage.
 */
 func getSuitableRules()(int){
-	var rID=0
 
+	rID,doubt := getRulesArrFromTrigger(currentTriggerID)
 // попытка срочно найти действие, в опасной ситуации
 	if CurrentInformationEnvironment.veryActualSituation || CurrentInformationEnvironment.danger{
-		rID = getRulesArrFromTrigger(currentTriggerID)
-
-	}else{
+// на смотрим на сомнительность doubt
+		return rID
+	}else{ //
 /* попытка более обстоятельно найти в эпиз.памяти подходящий фрагмент
 	Чем больше limit тем маловероятнее найти совпадения сочетания Правил в ранней эпизодюпамяти,
    так что можно вызывать getRulesFromEpisodicsSlice постепенно уменьшая limit
 Чем больше 	limit тем точнее результат обобщения, но меньше вероятность нахождения данного сочетания Правил
  */
+		if doubt<3{// пойдет...
+			return rID
+		}
+
+
+		/*
 		maxSteps:=1000
 		for limit:=5; limit > 1; limit-- {
 			rID,_=getRulesFromEpisodicsSlice(limit,maxSteps)
@@ -89,10 +95,10 @@ func getSuitableRules()(int){
 				return rID
 			}
 			maxSteps = maxSteps/2
-		}
+		}*/
 	}
 
-	return rID
+	return 0
 }
 
 /////////////////////////////////////////////////
@@ -251,7 +257,7 @@ func getLastRulesSequenceFromEpisodeMemory(limit int)([]int){
 		rImg = append(rImg, em.TriggerAndActionID)
 	}
 	if len(rImg)>1{
-		createNewlastrulesID(0, rImg,true)// записать (если еще нет такого) групповое правило
+		createNewlastrulesID(0, detectedActiveLastNodID,detectedActiveLastUnderstandingNodID,rImg,true)// записать (если еще нет такого) групповое правило
 
 		return rImg
 	}
@@ -263,41 +269,46 @@ func getLastRulesSequenceFromEpisodeMemory(limit int)([]int){
 
 
 ///////////////////////////////////////////////////
-/*  быстро выбрать самое лучшее правило из rulesArr по пусковому стимулу
+/*  быстро выбрать ранее успешное правило из rulesArr для данных условий
 используя шаблоном последнюю цепочку кадров эпизод. памяти.
+
+Возвращает:
+1 - ID Правила
+2 - неуверенность нахождения: 0 - макисмальная уваеренность, чем ниже, тем неопределеннее
  */
-func getRulesArrFromTrigger(trigID int)(int){
+func getRulesArrFromTrigger(trigID int)(int,int){
+	doubt:=0 // сомнение
 	// сначала попробовать найти Правило с учетом тематического контекста (групповые Правила)
 	for limit:=5; limit > 1; limit-- {
 		//Вытащить из эпизод.памяти посленюю цепочку кадров
 		rImg := getLastRulesSequenceFromEpisodeMemory(limit)
-		// искать эту цепочку в групповых Правилах
-		rules := getRulesFromTemp(rImg, limit)
-		if rules>0{
-			return rules
-		}
-	}
-// раз не нашли, то смотрим одиночные правила
-	for k, v := range rulesArr {
-		for i := 0; i < len(v.TAid); i++ {
-			if trigID!=v.TAid[i] || len(v.TAid)>1{
+		sinex:=strconv.Itoa(detectedActiveLastNodID)+"_"+strconv.Itoa(detectedActiveLastUnderstandingNodID);
+		rArr:=rulesArrConditinArr[sinex] // все правила для данного индекса
+		rules:=0
+		for _, v := range rArr {
+			if len(v.TAid)!=limit {
 				continue
 			}
-			ta:=TriggerAndActionArr[k]
-			if ta !=nil {
-				//r.Trigger по знаку всегда совпадает с currentTriggerID
-				if ta.Trigger == currentTriggerID{// есть такой пусковой
-					if ta.Effect >0{// первый попавшийся с хорошим эффектом
-						return k
-					}
+			if lib.EqualArrs(rImg, v.TAid){
+				lastTa:=v.TAid[len(v.TAid)-1:]
+				ta:=TriggerAndActionArr[lastTa[0]]
+				if ta !=nil {
+					if ta.Effect >0{// с хорошим эффектом
+						rules = lastTa[0]
+					}//else - продолжает искать хороший конец далее назад
 				}
 			}
 		}
+		if rules>0{
+			return rules,doubt
+		}
+		doubt++
 	}
 
-	return 0
+	return 0,10
 }
 ///////////////////////////////////////////////
+/*
 func getRulesFromTemp(rImg []int,limit int)(int){
 	for _, v := range rulesArr {
 		if len(v.TAid)!=limit{
@@ -314,5 +325,5 @@ func getRulesFromTemp(rImg []int,limit int)(int){
 		}
 	}
 	return 0
-}
+}*/
 ////////////////////////////////////////////////

@@ -216,7 +216,7 @@ func afterWaitingPeriod(effect int){
 // mact.valID потому что это - точно моторный запуск, выше: if mact.typeID !=5{
 	mRules,_:=createNewlastMentalTriggerAndActionID(0,saveFromNextIDAnswerCicle,mact.valID,effectValuation,true)
 
-	rID,_:=createNewlastrulesMentalID(0,[]int{mRules},true)
+	rID,_:=createNewlastrulesMentalID(0,detectedActiveLastNodID,detectedActiveLastUnderstandingNodID,[]int{mRules},true)
 	if rID>0 {
 		// записать в эпизод.пямять ментальный кадр - всегда если дошло до этой строки
 		newEpisodeMemory(rID,1)

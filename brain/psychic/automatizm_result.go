@@ -292,7 +292,7 @@ func fixNewRules(lastCommonDiffValue int,ai1 int) int {
 	if ai2 == 0{return 0}
 	TriggerAndAction,_:=createNewlastTriggerAndActionID(0,ai1,ai2,lastCommonDiffValue,true)
 	if TriggerAndAction == 0{return 0}
-	currentRulesID, _ = createNewlastrulesID(0, []int{TriggerAndAction},true)
+	currentRulesID, _ = createNewlastrulesID(0, detectedActiveLastNodID,detectedActiveLastUnderstandingNodID,[]int{TriggerAndAction},true)
 	if currentRulesID == 0{return 0}
 
 	lib.WritePultConsol("<span style='color:green'>Записано <b>ПРАВИЛО № "+strconv.Itoa(currentRulesID)+"</b></span>")

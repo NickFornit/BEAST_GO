@@ -22,14 +22,20 @@ import (
 
 /* Правила примитивного опыта, обобщающие стимулы->ответы->эффект для таких цепочек в диалогах
 На основе этих правил становятся возможны более системные обобщения.
-Т.к. в структуре нет ID веток реревьев, как в EpisodeMemory, то они - наиболее обобщенные понятия дейтвий.
  */
 type rulesMental struct {
 	ID int
+	// условия точного использования Правила:
+	NodeAID int // конечный узел активной ветки дерева моторных автоматизмов detectedActiveLastNodID
+	NodePID int // конечный узел активной ветки дерева ментальных автоматизмов detectedActiveLastUnderstandingNodID
+
 	TAid []int // цепочка стимул-ответов ID MentalTriggerAndAction - последовательность из эпизодов памяти подряд, сохраняющая последовательность общения ( дурак -> сам дурак!, маме скажу -> ябеда, щас в морду дам -> ну попробуй)
 }
 var rulesMentalArr=make(map[int]*rulesMental)
 
+// выборка по условиям Правила: "NodeAID_NodePID"
+//sinex:=strconv.Itoa(NodeAID)+"_"+strconv.Itoa(NodePID); rulesArrConditinArr[sinex]
+var rulesMentalArrConditinArr=make(map[string] []*rulesMental)// Массив Правил
 //////////////////////////////////////////
 
 // вызывается из psychic.go
@@ -42,12 +48,12 @@ func rulesMentalInit(){
 // создать новое сочетание ответных действий если такого еще нет
 var lastrulesMentalID=0
 var isNotMentLoading=true
-func createNewlastrulesMentalID(id int,TAid []int,CheckUnicum bool)(int,*rulesMental){
+func createNewlastrulesMentalID(id int,NodeAID int,NodePID int,TAid []int,CheckUnicum bool)(int,*rulesMental){
 	if TAid == nil{
 		return 0,nil
 	}
 	if CheckUnicum {
-		oldID,oldVal:=checkUnicumrulesMental(TAid)
+		oldID,oldVal:=checkUnicumrulesMental(NodeAID,NodePID,TAid)
 		if oldVal!=nil{
 			return oldID,oldVal
 		}
@@ -68,6 +74,8 @@ func createNewlastrulesMentalID(id int,TAid []int,CheckUnicum bool)(int,*rulesMe
 	node.TAid=TAid
 
 	rulesMentalArr[id]=&node
+	sinex:=strconv.Itoa(NodeAID)+"_"+strconv.Itoa(NodePID)
+	rulesMentalArrConditinArr[sinex]=append(rulesMentalArrConditinArr[sinex],&node)
 
 	if doWritingFile{
 		SaverulesMentalArr()
@@ -83,7 +91,7 @@ func createNewlastrulesMentalID(id int,TAid []int,CheckUnicum bool)(int,*rulesMe
 
 	return id,&node
 }
-func checkUnicumrulesMental(TAid []int)(int,*rulesMental){
+func checkUnicumrulesMental(NodeAID int,NodePID int,TAid []int)(int,*rulesMental){
 	for id, v := range rulesMentalArr {
 		if !lib.EqualArrs(TAid,v.TAid) {
 			continue
@@ -101,11 +109,13 @@ func checkUnicumrulesMental(TAid []int)(int,*rulesMental){
 
 
 //////////////////// сохранить Образы rulesMental
-// ID|TAid через ,
+// ID|NodeAID|NodePID|TAid через ,
 func SaverulesMentalArr(){
 	var out=""
 	for k, v := range rulesMentalArr {
 		out+=strconv.Itoa(k)+"|"
+		out+=strconv.Itoa(v.NodeAID)+"|"
+		out+=strconv.Itoa(v.NodePID)+"|"
 		for i := 0; i < len(v.TAid); i++ {
 			out+=strconv.Itoa(v.TAid[i])+","
 		}
@@ -115,7 +125,7 @@ func SaverulesMentalArr(){
 
 }
 ////////////////////  загрузить образы rulesMental
-// ID|TAid через ,
+// ID|NodeAID|NodePID|TAid через ,
 func loadrulesMentalArr(){
 	rulesMentalArr=make(map[int]*rulesMental)
 	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_psy/rulesMental.txt")
@@ -126,8 +136,10 @@ func loadrulesMentalArr(){
 		}
 		p:=strings.Split(strArr[n], "|")
 		id,_:=strconv.Atoi(p[0])
+		NodeAID,_:=strconv.Atoi(p[1])
+		NodePID,_:=strconv.Atoi(p[2])
 
-		s:=strings.Split(p[1], ",")
+		s:=strings.Split(p[3], ",")
 		var TAid[] int
 		for i := 0; i < len(s); i++ {
 			if len(s[i])==0{
@@ -138,7 +150,7 @@ func loadrulesMentalArr(){
 		}
 var saveDoWritingFile= doWritingFile; doWritingFile =false
 		isNotMentLoading=false
-		createNewlastrulesMentalID(id,TAid,false)
+		createNewlastrulesMentalID(id,NodeAID,NodePID,TAid,false)
 		isNotMentLoading=true
 doWritingFile =saveDoWritingFile
 	}

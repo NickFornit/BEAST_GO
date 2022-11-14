@@ -22,7 +22,7 @@ limit 5 ограничивает выборку из эпиз.памяти, но
 func GetMentalRulesFromEpisodeMemory(){
 	rImg:=getLastRulesSequenceFromEpisodeMemory(5)
 	if rImg!=nil {
-		createNewlastrulesMentalID(0, rImg,true)//записать (если еще нет такого) групповое правило
+		createNewlastrulesMentalID(0, detectedActiveLastNodID,detectedActiveLastUnderstandingNodID,rImg,true)//записать (если еще нет такого) групповое правило
 	}
 }
 //////////////////////////////////////////////////
@@ -36,7 +36,7 @@ func GetCur10lastMentalRules()string{
 	var out=""
 	for i := 0; i < rCount; i++ {
 		r:=rulesMentalArr[lastrulesMentalID-i]
-		out+="ID="+strconv.Itoa(r.ID)+":"
+		out+="ID="+strconv.Itoa(r.ID)+" для <span title='ID дерева автоматизмов'>"+strconv.Itoa(r.NodeAID)+"</span> и <span title='ID дерева понимания'>"+strconv.Itoa(r.NodePID)+"</span> :"
 		for n := 0; n < len(r.TAid); n++ {
 			taa:=MentalTriggerAndActionArr[r.TAid[n]]
 			if taa == nil{
@@ -100,17 +100,21 @@ return out
 активный пусковой стимул currentTriggerID типов curActiveActions или curBaseStateImage.
 */
 func getSuitableMentalRules()(int){
-	var rID=0
+	rID,doubt := getMentalRulesArrFromTrigger(saveFromNextIDAnswerCicle)
 // попытка срочно найти действие, в опасной ситуации
 	if CurrentInformationEnvironment.veryActualSituation || CurrentInformationEnvironment.danger{
-		rID = getMentalRulesArrFromTrigger(saveFromNextIDAnswerCicle)
-
+		// на смотрим на сомнительность doubt
+		return rID
 	}else{
 /* попытка более обстоятельно найти в эпиз.памяти подходящий фрагмент
 	Чем больше limit тем маловероятнее найти совпадения сочетания Правил в ранней эпизодюпамяти,
    так что можно вызывать getRulesFromEpisodicsSlice постепенно уменьшая limit
 Чем больше 	limit тем точнее результат обобщения, но меньше вероятность нахождения данного сочетания Правил
  */
+		if doubt<3{// пойдет...
+			return rID
+		}
+		/*
 		maxSteps:=1000
 		for limit:=5; limit > 1; limit-- {
 			rID,_=getMentalRulesFromEpisodicsSlice(limit,maxSteps)
@@ -118,10 +122,10 @@ func getSuitableMentalRules()(int){
 				return rID
 			}
 			maxSteps = maxSteps/2
-		}
+		}*/
 	}
 
-	return rID
+	return 0
 }
 /////////////////////////////////////////////////////////////
 /* Внимательно выбрать наилучшее Правило rulesID по действию с Пульта или измееннию состояния.
@@ -262,7 +266,7 @@ func getLastMentalRulesSequenceFromEpisodeMemory(limit int)([]int){
 		rImg = append(rImg, em.TriggerAndActionID)
 	}
 	if len(rImg)>1{
-		createNewlastrulesMentalID(0, rImg,true)// записать (если еще нет такого) групповое правило
+		createNewlastrulesMentalID(0, detectedActiveLastNodID,detectedActiveLastUnderstandingNodID,rImg,true)// записать (если еще нет такого) групповое правило
 
 		return rImg
 	}
@@ -277,18 +281,48 @@ func getLastMentalRulesSequenceFromEpisodeMemory(limit int)([]int){
 /*  быстро выбрать самое лучшее правило из rulesArr по пусковому стимулу
 используя шаблоном последнюю цепочку кадров эпизод. памяти.
 mentalID - saveFromNextIDAnswerCicle []int
+
+Возвращает:
+1 - ID Правила
+2 - неуверенность нахождения: 0 - макисмальная уваеренность, чем ниже, тем неопределеннее
 */
-func getMentalRulesArrFromTrigger(mentalID []int)(int){
+func getMentalRulesArrFromTrigger(mentalID []int)(int,int) {
 	// сначала попробовать найти Правило с учетом тематического контекста
-	for limit:=5; limit > 1; limit-- {
+	for limit := 5; limit > 1; limit-- {
 		//Вытащить из эпизод.памяти посленюю цепочку кадров
 		rImg := getLastMentalRulesSequenceFromEpisodeMemory(limit)
-		// искать эту цепочку в групповых Правилах
-		rules := getRulesFromTemp(rImg, limit)
-		if rules>0{
-			return rules
+		doubt:=0 // сомнение
+		sinex := strconv.Itoa(detectedActiveLastNodID) + "_" + strconv.Itoa(detectedActiveLastUnderstandingNodID);
+		rArr := rulesMentalArrConditinArr[sinex] // все правила для данного индекса
+		rules := 0
+		for _, v := range rArr {
+			if len(v.TAid) != limit {
+				continue
+			}
+			if lib.EqualArrs(rImg, v.TAid) {
+				lastTa := v.TAid[len(v.TAid)-1:]
+				ta := MentalTriggerAndActionArr[lastTa[0]]
+				if ta != nil {
+					if ta.Effect > 0 { // с хорошим эффектом
+						rules = lastTa[0]
+					} //else - продолжает искать хороший конец далее назад
+				}
+			}
 		}
+		if rules > 0 {
+			return rules, doubt
+		}
+		doubt++
 	}
+
+	return 0, 10
+}
+	/*
+			// искать эту цепочку в групповых Правилах
+			rules := getMentalRulesFromTemp(rImg, limit)
+			if rules>0{
+				return rules
+			}
 // раз не нашли, то смотрим одиночные правила
 	for k, v := range rulesMentalArr {
 		for i := 0; i < len(v.TAid); i++ {
@@ -307,8 +341,9 @@ func getMentalRulesArrFromTrigger(mentalID []int)(int){
 	}
 
 	return 0
-}
+}*/
 ///////////////////////////////////////////////
+/*
 func getMentalRulesFromTemp(rImg []int,limit int)(int){
 	for _, v := range rulesMentalArr {
 		if len(v.TAid)!=limit{
@@ -325,5 +360,5 @@ func getMentalRulesFromTemp(rImg []int,limit int)(int){
 		}
 	}
 	return 0
-}
+}*/
 ////////////////////////////////////////////////
