@@ -95,6 +95,9 @@ func PhraseDetection(words []int) string {
 	}
 	if needSave { SavePhraseTree() }
 	out := GetPhraseStringsFromPhraseID(DetectedUnicumPhraseID)
+	// заполнить PhraseTreeFromWordID
+	finishScanAllTree()
+
 	return out //pultOut+"{"+strconv.Itoa(DetectedUnicumPhraseID)+")"
 }
 
@@ -109,6 +112,7 @@ func getPhraseTreeNode(words []int, wt *PhraseTree) {
 	for n := 0; n < len(wt.Children); n++ {
 		getPhraseTreeNode(ost, &wt.Children[n])
 	}
+
 	return
 }
 

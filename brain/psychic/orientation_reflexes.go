@@ -118,7 +118,7 @@ func orientation_1()(*Automatizm){
 		if WasOperatorActiveted { // оператор отреагировал
 			purpose := getPurposeGenetic()
 			// повторить действия оператора
-			purpose.actionID=&curActiveActions
+			purpose.actionID=curActiveActions
 			atmzm := createAndRunAutomatizmFromPurpose(purpose)
 			if doWritingFile {SaveAutomatizm() }
 			return atmzm

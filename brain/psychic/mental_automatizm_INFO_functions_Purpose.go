@@ -37,11 +37,12 @@ func infoFunc8() {
 }
 //////////////////////////////////////
 // найти подходящий PurposeImage.actionID и определить mentalInfoStruct.mentalPurposeID
+// вызов из if isFirstActivation{
 func getMentalPurpose(){
 	mentalInfoStruct.mentalPurposeID=0
 
 	// определяется текущий объект наибольшой значимости в воспринимаемом
-	getGreatestImportance()
+	getGreatestImportance()	//curImportanceJbjectArr []int - здесь теперь - текущие цели внимания к наиболее важному
 
 
 	if EvolushnStage > 4 { // главное - Доминанта нерешенной пробелмы

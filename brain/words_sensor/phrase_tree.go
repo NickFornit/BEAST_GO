@@ -43,10 +43,12 @@ type PhraseTree struct {
 var VernikePhraseTree PhraseTree
 // карта поиска дерева фраз
 var PhraseTreeFromID = make(map[int]*PhraseTree)
-// масссив wordID из PhraseID
+
+// Последовательность wordID в ветке дерева получается из GetWordArrFromPhraseID(PhraseID int)
 var WordsArrFromPhraseID = make(map[int][]int)
-// этот масссив есть всегда - Последовательность wordID в ветке дерева
-var PhraseTreeFromWordID = make(map[int][]*PhraseTree) // массив узлов с таким wordID
+
+// Все ID фраз по wordID: в каких ID фраз содержится данное слово
+var PhraseTreeFromWordID = make(map[int][]int)
 
 // для обеспечения уникальности узлов:
 /*  лишнее
@@ -94,24 +96,21 @@ func createNewNodePhraseTree(parent *PhraseTree, id int, wordID int) *PhraseTree
 			newTP = &parent.Children[i]
 		}
 	}
-	// PhraseTreeFromID[new.ID]=new
-	// т.к. append меняет длину массива, перетусовывая адреса, то нужно:
-	updatePhraseTreeFromID(parent) // здесь потому, что при загрузке из файла нужно на лету получать адреса
-	if newTP != nil {
+	//!!!! PhraseTreeFromID[new.ID]=new  т.к. append меняет длину массива, перетусовывая адреса, то нужно:
+	scanAllTree(parent) // здесь потому, что при загрузке из файла нужно на лету получать адреса
+	/*if newTP != nil {
 		WordsArrFromPhraseID[newTP.ID] = append(WordsArrFromPhraseID[newTP.ID], newTP.WordID)
 		PhraseTreeFromWordID[newTP.WordID] = append(PhraseTreeFromWordID[newTP.WordID], newTP)
-	}
+	}*/
 	// notAllowScanInThisTime=false
+
 	return newTP
 }
 
 // корректируем адреса всех узлов
-func updatePhraseTreeFromID(parent *PhraseTree) {
-	// updatingPhraseTreeFromID(&VernikePhraseTree)
+func scanAllTree(parent *PhraseTree){
 	updatingPhraseTreeFromID(parent)
 }
-
-// проход всего дерева
 func updatingPhraseTreeFromID(wt *PhraseTree) {
 	if wt.ID > 0 {
 		wt.ParentNode = PhraseTreeFromID[wt.ParentID] // wt.ParentNode адрес меняется из=за corretsParent(,
@@ -122,6 +121,8 @@ func updatingPhraseTreeFromID(wt *PhraseTree) {
 		updatingPhraseTreeFromID(&wt.Children[i])
 	}
 }
+
+
 
 // Загрузка дерева фраз
 func loadPhraseTree() {
@@ -145,9 +146,51 @@ func loadPhraseTree() {
 		// новый узел с каждой строкой из файла
 		createNewNodePhraseTree(PhraseTreeFromID[parentID], id, wordID)
 	}
+
+// заполнить PhraseTreeFromWordID
+	finishScanAllTree()
+
 	return
 }
+var curBrangeArr []int
+func finishScanAllTree(){
+	WordsArrFromPhraseID = make(map[int][]int)
+	PhraseTreeFromWordID = make(map[int][]int)
+	curBrangeArr=nil
+	curScanAllTree(&VernikePhraseTree)
+}
+func curScanAllTree(wt *PhraseTree) {
+	if wt.ID > 0 {
+		wt.ParentNode = PhraseTreeFromID[wt.ParentID] // wt.ParentNode адрес меняется из=за corretsParent(,
+		curBrangeArr=append(curBrangeArr,wt.WordID)
+	}
+	if wt.Children == nil {	// конец ветки
+		WordsArrFromPhraseID[wt.ID]=curBrangeArr
+		// перебрать все слова                       wordID - ЭТО НЕТ nodePhraseID !!!!!!!!!
+		for i := 0; i < len(curBrangeArr); i++ {
+			PhraseTreeFromWordID[curBrangeArr[i]]=append(PhraseTreeFromWordID[curBrangeArr[i]],wt.ID)
+		}
+		if len(curBrangeArr)>1{
+			curBrangeArr=nil
+		}
+		if len(PhraseTreeFromWordID[wt.ID])>1{
+			curBrangeArr=nil
+		}
+		curBrangeArr=nil
+		return
+	}
+	for i := 0; i < len(wt.Children); i++ {
+		//curBrangeArr=nil
+		curScanAllTree(&wt.Children[i])
+	}
+}
+////////////////////////////////////////////////////////////
 
+
+
+
+
+/////////////////////////////////////////////////////////
 // создать первый, нулевой уровень дерева
 func initPhraseTree(vt *PhraseTree) {
 	// createNewNodePhraseTree(vt,0,0)

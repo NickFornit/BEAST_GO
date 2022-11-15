@@ -164,13 +164,31 @@ func PhraseSeparator(text string) string {
 	return pultOut
 }
 
-// получить последователньость wordID из уникального идентификатора фразы CurrentPhrasesIDarr[i]
-func GetWordArrFromPhraseID(PhraseID int) []int {
-	var wordIDarr []int
-	for k, v := range WordsArrFromPhraseID {
-		if PhraseID == k {
-			wordIDarr = v //append(wordIDarr,v)
+/* получить последователньость wordID из уникального идентификатора фразы CurrentPhrasesIDarr[i]
+начиная с любого узла дерева Фраз (не обязательно конечного!) - к первому узлу ветки
+ */
+func GetWordArrFromPhraseID(PhraseNodeID int) []int {
+	var wArr []int
+	// пройти фразу от последнего слова до первого
+	w:=PhraseTreeFromID[PhraseNodeID]
+	if w==nil{
+		return wArr
+	}
+	wArr=append(wArr,w.ID)
+	for w.ParentID >0{
+		w=PhraseTreeFromID[w.ParentID]
+		if w!=nil {
+			wArr = append(wArr, w.ID)
 		}
+	}
+	// восстановить порядок слов
+	var wordIDarr []int
+	for i := len(wArr)-1; i >=0 ; i-- {
+		wordIDarr=append(wordIDarr,wArr[i])
 	}
 	return wordIDarr
 }
+////////////////////////////////////////
+
+
+

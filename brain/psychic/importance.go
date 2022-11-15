@@ -2,7 +2,7 @@
 того из всего воспринимаемого, что имеет наибольшую значимость
 т.к. именно наибольшая значимость должна осмысливаться.
 
-Сохраняется в файле importance.txt в формате ID|NodeAID|NodePID|Type|Value
+Сохраняется в файле importance.txt в формате ID|NodeAID|NodePID|Type|ObjectID|Value
 
 Значимость - величина от -10 0 до 10, приобретаемая объектов внимания в данной ситуации
 - берется из результата пробных действий и связывается ос всеми компонентами воспринимаемого в этих условиях
@@ -53,6 +53,7 @@ type importance struct {
 	NodePID int // конечный узел активной ветки дерева ментальных автоматизмов detectedActiveLastUnderstandingNodID
 
 	Type int // тип объекта importanceType
+	ObjectID int // ID объекта восприянтия
 	Value int // значимость от -10 0 до 10
 }
 var importanceFromID=make(map[int]*importance)
@@ -70,13 +71,13 @@ func ImportanceInit(){
 
 
 ////////////////////////////////////////////////
-// создать новое сочетание ответных действий если такого еще нет
+// создать новый образ значимости объекта восприятия если такого еще нет
 var lastImportanceID=0
 var isNotImpLoading=true
-func createNewlastImportanceID(id int,NodeAID int,NodePID int,Type int,Value int,CheckUnicum bool)(int,*importance){
+func createNewlastImportanceID(id int,NodeAID int,NodePID int,Type int,ObjectID int,Value int,CheckUnicum bool)(int,*importance){
 
 	if CheckUnicum {
-		oldID,oldVal:=checkUnicumImportance(NodeAID,NodePID,Type,Value)
+		oldID,oldVal:=checkUnicumImportance(NodeAID,NodePID,Type,ObjectID,Value)
 		if oldVal!=nil{
 			return oldID,oldVal
 		}
@@ -97,6 +98,7 @@ func createNewlastImportanceID(id int,NodeAID int,NodePID int,Type int,Value int
 	node.NodeAID=NodeAID
 	node.NodePID=NodePID
 	node.Type=Type
+	node.ObjectID=ObjectID
 	node.Value=Value
 
 	importanceFromID[id]=&node
@@ -109,9 +111,9 @@ func createNewlastImportanceID(id int,NodeAID int,NodePID int,Type int,Value int
 
 	return id,&node
 }
-func checkUnicumImportance(NodeAID int,NodePID int,Type int,Value int)(int,*importance){
+func checkUnicumImportance(NodeAID int,NodePID int,Type int,ObjectID int,Value int)(int,*importance){
 	for id, v := range importanceFromID {
-		if NodeAID != v.NodeAID || NodePID != v.NodePID || Type != v.Type || Value != v.Value  {
+		if NodeAID != v.NodeAID || NodePID != v.NodePID || Type != v.Type || ObjectID != v.ObjectID || Value != v.Value  {
 			continue
 		}
 		return id,v
@@ -127,13 +129,15 @@ func checkUnicumImportance(NodeAID int,NodePID int,Type int,Value int)(int,*impo
 
 
 //////////////////// сохранить Образы Importance
-// ID|NodeAID|NodePID|Type|Value
+// ID|NodeAID|NodePID|Type|ObjectID|Value
 func Saveimportance(){
 	var out=""
 	for k, v := range importanceFromID {
 		out+=strconv.Itoa(k)+"|"
 		out+=strconv.Itoa(v.NodeAID)+"|"
 		out+=strconv.Itoa(v.NodePID)+"|"
+		out+=strconv.Itoa(v.Type)+"|"
+		out+=strconv.Itoa(v.ObjectID)+"|"
 		out+=strconv.Itoa(v.Value)+"|"
 
 		out+="\r\n"
@@ -157,11 +161,12 @@ func loadImportance(){
 		NodeAID,_:=strconv.Atoi(p[1])
 		NodePID,_:=strconv.Atoi(p[2])
 		Type,_:=strconv.Atoi(p[3])
-		Value,_:=strconv.Atoi(p[4])
+		ObjectID,_:=strconv.Atoi(p[4])
+		Value,_:=strconv.Atoi(p[5])
 
 		var saveDoWritingFile= doWritingFile; doWritingFile =false
 		isNotImpLoading=false
-		createNewlastImportanceID(id,NodeAID,NodePID,Type,Value,false)
+		createNewlastImportanceID(id,NodeAID,NodePID,Type,Value,ObjectID,false)
 		isNotImpLoading=true
 		doWritingFile =saveDoWritingFile
 	}
@@ -171,13 +176,15 @@ func loadImportance(){
 /////////////////////////////////////////
 
 
-// получить все значимости объекта внимания в контексте текущих условий
-func getAllObjectsImportance(importanceTypeID int, NodeAID int,NodePID int) []*importance {
+
+
+// получить все значимости ID объекта внимания в контексте текущих условий
+func getObjectsImportance(ObjectID int, NodeAID int,NodePID int) []*importance {
 	sinex:=strconv.Itoa(NodeAID)+"_"+strconv.Itoa(NodePID)
-var imp []*importance
+	var imp []*importance
 
 	for _, v := range importanceConditinArr[sinex] {
-		if v.Type==importanceTypeID{
+		if v.ObjectID==ObjectID{
 			imp=append(imp,v)
 		}
 	}
@@ -189,29 +196,35 @@ var imp []*importance
 }
 ///////////////////////////////////////////////////////
 
-/* средняя значимость объекта внимания
+/* средняя значимость ID объекта внимания
 Возвращает:
-1 - среднее значение значимости
-2 - число значений
- */
-func getObjectsImportanceValue(importanceTypeID int, NodeAID int,NodePID int)(int,int){
+1 - ID объекта значимости
+2 - сумма значимости
+3 - число значений
+*/
+func getObjectsImportanceValue(kind int,ObjectID int, NodeAID int,NodePID int)(int,int,int){
 	sinex:=strconv.Itoa(NodeAID)+"_"+strconv.Itoa(NodePID)
 	var value=0
 	var count=0
+	var id=0
 
 	for _, v := range importanceConditinArr[sinex] {
-		if v.Type==importanceTypeID{
+		if v.Type==kind && v.ObjectID ==ObjectID{
 			value+=v.Value
 			count++
+			id=v.ID
 		}
 	}
 	if count>0{
-		return value,count
+		return id,value,count
 	}
 
-	return 0,0
+	return 0,0,0
 }
 ///////////////////////////////////////////////////////////
+
+
+
 
 
 

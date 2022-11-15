@@ -113,8 +113,14 @@ func createBasicAutomatizmTree(){
 }
 /////////////////////////////////////////////////////
 
+// временная структура действий оператора (всегда с ID=0) для формирования постоянного образа curActiveActions
+var curActions ActionsImage//
 // структура действий оператора при активации дерева автоматизмов
-var curActiveActions ActionsImage
+var curActiveActions *ActionsImage // зеркалит текущий ActionsImage
+var curActiveActionsID=0
+
+////////////////////////////////////////
+var curActiveVerbalID=0
 // структура образа текущего сосотояния
 var curBaseStateImage BaseStateImage
 
@@ -173,10 +179,8 @@ if !WasOperatorActiveted {
 ActID:=action_sensor.CheckCurActionsContext();//CheckCurActions()
 
 	lev3,_:=createNewlastActivityID(0,ActID,true)// текущий образ сочетания действий с Пульта Activity
-	curActiveActions.ActID=ActID// сохраняем для отзеркаливания действий оператора
-	curActiveActions.PhraseID=nil
-	curActiveActions.ToneID=0
-	curActiveActions.MoodID=0
+	curActiveActionsID=0
+	curActiveActions = nil
 
 	var lev4=0
 	var lev5=0
@@ -186,7 +190,7 @@ ActID:=action_sensor.CheckCurActionsContext();//CheckCurActions()
 		FirstSimbolID:=wordSensor.GetFirstSymbolFromPraseID(PhraseID)
 		ToneID := wordSensor.DetectedTone
 		MoodID := wordSensor.CurPultMood
-		_,verb:= CreateVerbalImage(FirstSimbolID,PhraseID, ToneID, MoodID)
+		verbID,verb:= CreateVerbalImage(FirstSimbolID,PhraseID, ToneID, MoodID)
 		lev4= GetToneMoodID(verb.ToneID, verb.MoodID)
 		lev5=verb.SimbolID
 		/* для дерева берется только первая фраза, остальные можно восстановить для сопоставлений из
@@ -195,9 +199,14 @@ ActID:=action_sensor.CheckCurActionsContext();//CheckCurActions()
 		*/
 		lev6=verb.PhraseID[0]
 		// сохраняем для отзеркаливания действий оператора
-		curActiveActions.PhraseID=PhraseID
-		curActiveActions.ToneID=ToneID
-		curActiveActions.MoodID=MoodID
+			curActiveVerbalID = verbID
+			curActions.PhraseID = PhraseID
+			curActions.ToneID = ToneID
+			curActions.MoodID = MoodID
+// всегда делать образ действий оператора
+		//if ActivationTypeSensor!=1 { пусть делает образ нулевой акции
+			curActiveActionsID, curActiveActions = CreateNewlastActionsImageID(0, curActions.ActID, curActions.PhraseID, curActions.ToneID, curActions.MoodID, true)
+		//}
 	}
 
 	condArr:=getActiveConditionsArr(lev1, lev2, lev3, lev4, lev5, lev6)

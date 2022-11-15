@@ -222,6 +222,10 @@ func afterWaitingPeriod(effect int){
 		newEpisodeMemory(rID,1)
 	}
 
+// образ значимости ментального действия
+createNewlastImportanceID(0, detectedActiveLastNodID, detectedActiveLastUnderstandingNodID, 2, mentAtmzm.ActionsImageID, effectValuation, true)
+
+
 	// нужно ли осмыслить это?
 	//??  consciousness(2,currrentFromNextID)
 }

@@ -33,5 +33,6 @@ func GetSleepCondition()(bool){
 // разбудить - сторожевая функция
 func WakeUpping(){
 	IsSleeping=false
+
 }
 ////////////////////////////////////
