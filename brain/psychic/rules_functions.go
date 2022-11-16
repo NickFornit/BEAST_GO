@@ -341,14 +341,12 @@ func getRulesArrFromAttentionObject(objID int, kind int)(int){
 	if extremImportanceObject == nil{
 		return 0
 	}
-	var act = ActionsImageArr[LastAutomatizmWeiting.ActionsImageID] // действие, совершенное в ответ на Стимул, в котром меняем значащую чать составляющих
-	if act == nil{
-		return 0
-	}
-	// определить actID по extremImportanceObject
+	// пустое ответное действие
+	var act ActionsImage
+// После Стимула ищется Ответ и еще нет действия дла него, нужно сформировать по образу extremImportanceObject
 switch extremImportanceObject.kind{
 case 1: // ID ActionsImage
-	act = ActionsImageArr[extremImportanceObject.objID]
+	act = *ActionsImageArr[extremImportanceObject.objID]
 case 2: // ID MentalActionsImages
 
 case 3: // ID несловестного действия ActionsImage.ActID[n]

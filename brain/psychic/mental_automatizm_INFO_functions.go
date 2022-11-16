@@ -385,11 +385,13 @@ func infoFindAttentionObjImprovement()bool {
 	rulesID:=getRulesArrFromAttentionObject(extremImportanceObject.objID, extremImportanceObject.kind)
 	if rulesID>0 {// достаточная уверенность
 		// действие из Правила
-
+		rules:=rulesArr[rulesID]
+		if rules==nil{return false}
+		actID:=TriggerAndActionArr[rules.TAid[0]].Action
+		// создание мент.авто-ма запуска действия, улучшающего значимость объекта внимания - return true
+		infoCreateAndRunMentMotorAtmzmFromAction(actID)
+		return true
 	}
-
-// создание мент.авто-ма запуска действия, улучшающего значимость объекта внимания - return true
-
 return false
 }
 ////////////////////////////////////////////////////////////////////////
