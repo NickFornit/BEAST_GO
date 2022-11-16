@@ -270,6 +270,7 @@ func getLastRulesSequenceFromEpisodeMemory(limit int)([]int){
 
 ///////////////////////////////////////////////////
 /*  быстро выбрать ранее успешное правило из rulesArr для данных условий
+и заданного Стимула trigID типа ActionsImage
 используя шаблоном последнюю цепочку кадров эпизод. памяти.
 
 Возвращает:
@@ -292,7 +293,7 @@ func getRulesArrFromTrigger(trigID int)(int,int){
 			if lib.EqualArrs(rImg, v.TAid){
 				lastTa:=v.TAid[len(v.TAid)-1:]
 				ta:=TriggerAndActionArr[lastTa[0]]
-				if ta !=nil {
+				if ta !=nil && ta.Trigger==trigID {
 					if ta.Effect >0{// с хорошим эффектом
 						rules = lastTa[0]
 					}//else - продолжает искать хороший конец далее назад
@@ -327,3 +328,75 @@ func getRulesFromTemp(rImg []int,limit int)(int){
 	return 0
 }*/
 ////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////
+/*  Выбрать ранее успешное правило из rulesArr для данных условий
+КОНКРЕТНО ДЛЯ определенного объекта внимания extremImportanceObject (objID int, kind int) в структуре ActionsImage,
+используя шаблоном последнюю цепочку кадров эпизод. памяти.
+Возвращает - ID одиночного Правила
+Чем более частный вид объекта внимания extremImportanceObject, тем более недостовеный резаультат.
+*/
+func getRulesArrFromAttentionObject(objID int, kind int)(int){
+	if extremImportanceObject == nil{
+		return 0
+	}
+	var act = ActionsImageArr[LastAutomatizmWeiting.ActionsImageID] // действие, совершенное в ответ на Стимул, в котром меняем значащую чать составляющих
+	if act == nil{
+		return 0
+	}
+	// определить actID по extremImportanceObject
+switch extremImportanceObject.kind{
+case 1: // ID ActionsImage
+	act = ActionsImageArr[extremImportanceObject.objID]
+case 2: // ID MentalActionsImages
+
+case 3: // ID несловестного действия ActionsImage.ActID[n]
+	act.ActID=nil
+	act.ActID =append(act.ActID,extremImportanceObject.objID)
+case 4: // ID Verbal - при активации дерева автоматизмов
+verb:=VerbalFromIdArr[extremImportanceObject.objID]
+if verb==nil{return 0}
+	act.PhraseID=verb.PhraseID
+	act.MoodID=verb.MoodID
+	act.ToneID=verb.ToneID
+case 5: // ID отдельной фразы Verbal.PhraseID[n]
+	act.PhraseID=nil
+	act.PhraseID =append(act.PhraseID,extremImportanceObject.objID)
+case 6:// ID отдельного слова  из Verbal.PhraseID[n]
+	verb:=VerbalFromIdArr[extremImportanceObject.objID]
+	if verb==nil{return 0}// м.б. применялось такое слово в Правилах... ??
+	// сделать фразу из слова
+	PhraseID:=AddwordIDToPhraseTree([]int{extremImportanceObject.objID})
+	act.PhraseID=PhraseID
+case 7:// ID тон сообщения с Пульта  Verbal.ToneID
+	act.ToneID = extremImportanceObject.objID
+case 8:// ID настроение оператора  Verbal.MoodID
+	act.MoodID = extremImportanceObject.objID
+
+}
+	// образ ActionsImage
+	ActionsImageID,_:=CreateNewlastActionsImageID(0,act.ActID,act.PhraseID,act.ToneID,act.MoodID,true)
+
+	rules:=0
+	// найти одиночное (а не групповое) Правило с учетом тематического контекста (групповые Правила)
+		sinex:=strconv.Itoa(detectedActiveLastNodID)+"_"+strconv.Itoa(detectedActiveLastUnderstandingNodID);
+		rArr:=rulesArrConditinArr[sinex] // все правила для данного индекса
+		for _, v := range rArr {
+			if len(v.TAid)>1{// найти одиночное (а не групповое)
+				continue
+			}
+			lastTa:=v.TAid[len(v.TAid)-1:]
+				ta:=TriggerAndActionArr[lastTa[0]]
+				if ta !=nil && ta.Trigger==ActionsImageID{
+					act:=ActionsImageArr[ta.Action]
+					if act==nil{continue}
+					if ta.Effect >0{// с хорошим эффектом
+						rules = lastTa[0]
+					}//else - продолжает искать хороший конец далее назад
+				}
+		}
+
+	return rules
+}
+///////////////////////////////////////////////

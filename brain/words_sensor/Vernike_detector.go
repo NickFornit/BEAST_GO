@@ -100,14 +100,16 @@ func addNewMemoryDetected() {
  */
 var wlev = 0
 var pultOut = ""
-var NoCheckWordCount = false
+
+//// если обычный режим диалога (на ПУльте не стоит галка "набивка рабочих фраз без отсеивания мусорных слов ")
+var NoCheckWordCount = false // is_input_rejim - набивка рабочих фраз с отсеиванием мусорных слов
 
 // вызывается фразой с Пульта
 func VerbalDetection(text string, isDialog int, toneID int, moodID int) string {
 	notAllowScanInThisTime = true // запрет показа карты при обновлении
 	NoCheckWordCount = false
 	CurrentPhrasesIDarr = nil
-	if isDialog == 0 { // это набивка работчих фраз без отсеивания мусорных слов
+	if isDialog == 0 { // это набивка рабочих фраз без отсеивания мусорных слов
 		// игнорировать getWordTemparrCount и всегда распознавать слова
 		NoCheckWordCount = true
 	}
@@ -189,6 +191,9 @@ func GetWordArrFromPhraseID(PhraseNodeID int) []int {
 	return wordIDarr
 }
 ////////////////////////////////////////
+
+
+
 
 
 

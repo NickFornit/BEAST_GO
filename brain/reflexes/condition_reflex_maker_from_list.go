@@ -40,7 +40,7 @@ func FormingConditionsRefleaxFromList(list string) string {
 		// третий уровень - создать образ пускового стимула фразы типа TriggerStimulsID
 		// засунуть фразу в дерево слов и дерево фраз
 		prase := p[5]
-		wordSensor.VerbalDetection(prase, 1, 0, 0)
+		wordSensor.VerbalDetection(prase, 0, 0, 0)
 		PhraseID := wordSensor.CurrentPhrasesIDarr
 		tID, vt := CreateNewlastTriggerStimulsID(0, nil, PhraseID, 0, 0,true)
 		if vt != nil{}

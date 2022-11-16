@@ -76,13 +76,22 @@ func setImportanceMental(effect int){
 При каждом ОБъективном вызове consciousness определяется текущий объект наибольшой значимости в воспринимаемом -
 в функции определения текущей Цели getMentalPurpose()
 */
+type extremImportance struct {
+	objID int//  объект значимости
+	kind int // тип объекта
+	extremVal int// экстремальная значимость
+}
+var curImportanceObjectArr []extremImportance //- здесь сохраняются текущие цели внимания к наиболее важному
 func getGreatestImportance(){
-	curImportanceJbjectArr = nil
-	var id,s,c = 0,0,0
+	if curActiveActions == nil{
+		return
+	}
+	curImportanceObjectArr = nil
+	var id,v = 0,0
 	// целостный образ действий
-	id,s,c=getObjectsImportanceValue(1,curActiveActions.ID, detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
-	if s/c <0{
-		curImportanceJbjectArr=append(curImportanceJbjectArr,id)
+	id,v=getObjectsImportanceValue(1,curActiveActions.ID, detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
+	if v <0{
+		curImportanceObjectArr =append(curImportanceObjectArr,extremImportance{id,1,v})
 	}
 
 	// ID несловестного действия ActionsImage.ActID[n]
@@ -90,24 +99,24 @@ func getGreatestImportance(){
 		min:=0
 		minID:=0
 		for i := 0; i < len(curActiveActions.ActID); i++ {
-			id,s,c=getObjectsImportanceValue(3,curActiveActions.ActID[i], detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
-			if s/c <0{
-				if min > s/c{
-					min = s/c
-					id=minID
+			id,v=getObjectsImportanceValue(3,curActiveActions.ActID[i], detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
+			if v <0{
+				if min > v{
+					min = v
+					minID=id
 				}
 			}
 		}
 		if minID>0{
-			curImportanceJbjectArr=append(curImportanceJbjectArr,minID)
+			curImportanceObjectArr =append(curImportanceObjectArr,extremImportance{minID,3,min})
 		}
 	}
 
 	// ID Verbal - при активации дерева автоматизмов
 	if curActiveVerbalID >0 {
-		id,s,c=getObjectsImportanceValue(4,curActiveVerbalID, detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
-		if s/c <0{
-			curImportanceJbjectArr=append(curImportanceJbjectArr,id)
+		id,v=getObjectsImportanceValue(4,curActiveVerbalID, detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
+		if v <0{
+			curImportanceObjectArr =append(curImportanceObjectArr,extremImportance{id,4,v})
 		}
 	}
 
@@ -116,11 +125,11 @@ func getGreatestImportance(){
 		min:=0
 		minID:=0
 		for i := 0; i < len(curActiveActions.PhraseID); i++ {
-			id,s,c=getObjectsImportanceValue(5,curActiveActions.PhraseID[i], detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
-			if s/c <0{
-				if min > s/c{
-					min = s/c
-					id=minID
+			id,v=getObjectsImportanceValue(5,curActiveActions.PhraseID[i], detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
+			if v <0{
+				if min > v{
+					min = v
+					minID=id
 				}
 			}
 
@@ -129,49 +138,77 @@ func getGreatestImportance(){
 			minID2:=0
 			wRr:=word_sensor.WordsArrFromPhraseID[curActiveActions.PhraseID[i]]
 			for j := 0; j < len(wRr); j++ {
-				id,s,c=getObjectsImportanceValue(6,wRr[j], detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
-				if s/c <0{
-					if min2 > s/c{
-						min2 = s/c
-						id=minID2
+				id,v=getObjectsImportanceValue(6,wRr[j], detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
+				if v <0{
+					if min2 > v{
+						min2 = v
+						minID2=id
 					}
 				}
 			}
 			if minID2>0{
-				curImportanceJbjectArr=append(curImportanceJbjectArr,minID2)
+				curImportanceObjectArr =append(curImportanceObjectArr,extremImportance{minID2,6,min2})
 			}
 
 		}
 		if minID>0{
-			curImportanceJbjectArr=append(curImportanceJbjectArr,minID)
+			curImportanceObjectArr =append(curImportanceObjectArr,extremImportance{minID,5,min})
 		}
 	}
 
 	// ID тон сообщения с Пульта  Verbal.ToneID
 	if curActiveActions.MoodID>0{
-		id,s,c=getObjectsImportanceValue(7,curActiveActions.MoodID, detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
-		if s/c <0{
-			curImportanceJbjectArr=append(curImportanceJbjectArr,id)
+		id,v=getObjectsImportanceValue(7,curActiveActions.MoodID, detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
+		if v <0{
+			curImportanceObjectArr =append(curImportanceObjectArr,extremImportance{id,7,v})
 		}
 	}
 
 	// ID настроение оператора  Verbal.MoodID
 	if curActiveActions.ToneID>0{
-		id,s,c=getObjectsImportanceValue(8,curActiveActions.ToneID, detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
-		if s/c <0{
-			curImportanceJbjectArr=append(curImportanceJbjectArr,id)
+		id,v=getObjectsImportanceValue(8,curActiveActions.ToneID, detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
+		if v <0{
+			curImportanceObjectArr =append(curImportanceObjectArr,extremImportance{id,8,v})
 		}
 	}
+}
+/////////////////////////////////////////////////
+
+/* выбрать один, самый актуальный объект из curImportanceJbjectArr []extremImportance
+Возвращает индекс массива curImportanceObjectArr или -1
+ */
+func getTopAttentionObject()int{
+	if curImportanceObjectArr==nil{
+		return -1
+	}
+	// тупо выбираем самый негативный
+	min:=0
+	index:=-1
+	for i := 0; i < len(curImportanceObjectArr); i++ {
+		if min > curImportanceObjectArr[i].extremVal{
+			min = curImportanceObjectArr[i].extremVal
+			index=i
+		}
+	}
+	return index
 }
 /////////////////////////////////////////////////
 
 
 
 
-/* выделить наиболее нзачимое в мыслях в текущем цикле
+
+
+////////////////////////////////////////////////////
+/* выделить наиболее значимое в мыслях в текущем цикле - привлечение внимания к собственным мыслям.
 При каждом СУБъективном вызове consciousness
  */
-var curImportanceJbjectArr []int // сюда складываются текущие цели внимания к наиболее важному
+type extremImportanceMental struct {
+	objID int//  объект значимости
+	kind int // тип объекта
+	extremVal int// экстремальная значимость
+}
+var curImportanceObjectMentalArr []extremImportanceMental // сюда складываются текущие цели внимания к наиболее важному
 func getGreatestImportanceMental(){
 
 

@@ -67,13 +67,16 @@ var currentInfoStructId=0
  */
 func runMentalFunctionID(id int){
 	switch id {
-	case 1: infoFunc1()//Подобрать MentalActionsImages для базового звена цепочки
+	case 1: infoFunc1()//Подобрать MentalActionsImages для начального звена цепочки
 	case 2: infoFunc2()//Подобрать MentalActionsImages для последующего звена цепочки
 	case 3: infoFunc3()//айти подходящий мент.автоматизм по опыту ментальных Правил
 	case 4: infoFunc4()//нализ инфо стркутуры и др. информации по currentInfoStructId и выдача решения
 	case 5: infoFunc5()//создать и запустить ментальный автоматизм по акции
 	case 6: infoFunc6()//ПОДВЕРГНУТЬ СОМНЕНИЮ автоматизм, если нет опасности (не нужно реагировать аффектно) и ситуация важна
 	case 7: infoFunc7()//создать и запустить ментальный автоматизм запуска моторного автоматизма по действию ActionsImageID
+	case 8: infoFunc8()//Ментальное определение ближайшей Цели в данной ситуации
+	case 9: infoFunc9()//найти способ улучшения значимости объекта внимания extremImportanceObject
+	case 10: infoFunc10()//найти способ улучшения значимости субъекта внимания extremImportanceMentalObject
 	}
 }
 
@@ -86,6 +89,9 @@ func getMentalFunctionString(id int)string{
 	case 5: return "Создать и запустить ментальный автоматизм по акции"
 	case 6: return "Подвергнуть сомнению автоматизм, если нет опасности (не нужно реагировать аффектно) и ситуация важна"
 	case 7: return "Создать и запустить ментальный автоматизм запуска моторного автоматизма по действию ActionsImageID"
+	case 8: return "Ментальное определение ближайшей Цели в данной ситуации"
+	case 9: return "Найти способ улучшения значимости объекта внимания extremImportanceObject"
+	case 10: return "Найти способ улучшения значимости субъекта внимания extremImportanceMentalObject"
 	}
 	return "Нет функции с ID = "+strconv.Itoa(id)
 }
@@ -103,7 +109,8 @@ func getMentalFunctionString(id int)string{
 
 
 
-/* №0 Подобрать MentalActionsImages для базового звена цепочки
+/* НЕ ИСПОЛЬЗУЕТСЯ т.к. базовое звено цикла теперь всегда пустое. Применяется infoFunc2()
+№0 Подобрать MentalActionsImages для базового звена цепочки
 c вызовом activateInfoFunc для начальной информированности,
 случайно или по заготовке редактора с Пульта
 */
@@ -143,6 +150,8 @@ func infoFunc2(){
 	typeID:=0
 	valID:=0
 
+	// infoFunc2() -> getMentalPurpose() уже запускалось
+
 	// TODO подобрать
 	/*
 		1. Поиск MentalActionsImages для следующего .NextID начинается по ментальным Правилам.
@@ -151,6 +160,21 @@ func infoFunc2(){
 	*/
 	// поиск в Правилах
 	//action:=infoFindRightMentalRukes()
+
+	if extremImportanceObject!=nil{// есть актуальный объект внимания с отрицательной значимостью
+		// найти способ улучшения значимости объекта extremImportanceObject
+		if infoFindAttentionObjImprovement(){
+			return // больше не искать, уже создан мент.автоматизм объективного действия
+		}
+	}
+
+	/* TODO другие способы улучшеие (пока не реализовано) -
+	// текущий субъект внимания
+	var extremImportanceMentalObject extremImportance
+	 */
+	if infoFindAttentionObjMentalImprovement(){
+		return // больше не искать, уже создан мент.автоматизм объективного действия
+	}
 
 
 	// создать
@@ -347,9 +371,47 @@ if actImgID==0{
 
 
 
+// найти способ улучшения значимости объекта extremImportanceObject
+func infoFunc9() {
+	infoFindAttentionObjImprovement()
+	currentInfoStructId=9 // определение актуального поля mentalInfo
+}
+// улучшение объекта внимания
+func infoFindAttentionObjImprovement()bool {
+	if extremImportanceObject == nil {
+		return false
+	}
+	// найти в Правилах ответное действие с объектом extremImportanceObject, приводящее к успеху
+	rulesID:=getRulesArrFromAttentionObject(extremImportanceObject.objID, extremImportanceObject.kind)
+	if rulesID>0 {// достаточная уверенность
+		// действие из Правила
+
+	}
+
+// создание мент.авто-ма запуска действия, улучшающего значимость объекта внимания - return true
+
+return false
+}
+////////////////////////////////////////////////////////////////////////
+// найти способ улучшения значимости субъекта внимания extremImportanceMentalObject
+func infoFunc10() {
+	infoFindAttentionObjMentalImprovement()
+	currentInfoStructId=10 // определение актуального поля mentalInfo
+}
+// улучшение объекта внимания
+func infoFindAttentionObjMentalImprovement()bool {
+	if extremImportanceMentalObject == nil {
+		return false
+	}
+
+	// найти в Правилах ответное действие с объектом extremImportanceMentalObject, приводящее к успеху
 
 
+	// создание мент.авто-ма запуска действия, улучшающего значимость субъекта внимания - return true
 
+	return false
+}
+////////////////////////////////////////////////////////////////////////
 
 
 

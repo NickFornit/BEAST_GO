@@ -16,6 +16,7 @@ MemoryDetectedArr - как бы оперативная память фраз д�
 package psychic
 
 import (
+	wordSensor "BOT/brain/words_sensor"
 	"BOT/lib"
 	"strconv"
 	"strings"
@@ -261,4 +262,45 @@ case 7: ret="Протест"
 return ret
 }
 ////////////////////////////////
+
+
+
+// ПРОИЗВОЛЬНОЕ ТВОРЕНИЕ ФРАЗ
+
+
+/* сделать фразу PhraseID из wordID []
+Возвращает PhraseID
+*/
+func AddwordIDToPhraseTree(wordID []int)([]int){
+	// засунуть фразу в дерево слов и дерево фраз
+	// проход одной фразы - распознавание ID слов фразы
+	wordSensor.PhraseDetection(wordID)
+	PhraseID := wordSensor.CurrentPhrasesIDarr
+
+	// первый символ ответной фразы
+	FirstSimbolID := wordSensor.GetFirstSymbolFromPraseID(PhraseID)
+	// создать образ Брока
+	CreateVerbalImage(FirstSimbolID, PhraseID, 0, 0)
+
+	return PhraseID
+}
+////////////////////////////////////////////
+
+
+/* сделать фразу PhraseID из string
+Возвращает PhraseID
+*/
+func AddStringToPhraseTree(str string)([]int){
+	// засунуть фразу в дерево слов и дерево фраз
+	wordSensor.VerbalDetection(str, 0, 0, 0)
+	PhraseID := wordSensor.CurrentPhrasesIDarr
+
+	// первый символ ответной фразы
+	FirstSimbolID := wordSensor.GetFirstSymbolFromPraseID(PhraseID)
+	// создать образ Брока
+	CreateVerbalImage(FirstSimbolID, PhraseID, 0, 0)
+
+	return PhraseID
+}
+////////////////////////////////////////////
 

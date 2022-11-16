@@ -54,7 +54,7 @@ type importance struct {
 
 	Type int // тип объекта importanceType
 	ObjectID int // ID объекта восприянтия
-	Value int // значимость от -10 0 до 10
+	Value int // значимость от -10 0 до 10 Чудовищно большие будут говорить о сверх значимости.
 }
 var importanceFromID=make(map[int]*importance)
 // выборка по условиям: "NodeAID_NodePID"
@@ -77,8 +77,9 @@ var isNotImpLoading=true
 func createNewlastImportanceID(id int,NodeAID int,NodePID int,Type int,ObjectID int,Value int,CheckUnicum bool)(int,*importance){
 
 	if CheckUnicum {
-		oldID,oldVal:=checkUnicumImportance(NodeAID,NodePID,Type,ObjectID,Value)
+		oldID,oldVal:=checkUnicumImportance(NodeAID,NodePID,Type,ObjectID)
 		if oldVal!=nil{
+			oldVal.Value+=Value
 			return oldID,oldVal
 		}
 	}
@@ -111,9 +112,9 @@ func createNewlastImportanceID(id int,NodeAID int,NodePID int,Type int,ObjectID 
 
 	return id,&node
 }
-func checkUnicumImportance(NodeAID int,NodePID int,Type int,ObjectID int,Value int)(int,*importance){
+func checkUnicumImportance(NodeAID int,NodePID int,Type int,ObjectID int)(int,*importance){
 	for id, v := range importanceFromID {
-		if NodeAID != v.NodeAID || NodePID != v.NodePID || Type != v.Type || ObjectID != v.ObjectID || Value != v.Value  {
+		if NodeAID != v.NodeAID || NodePID != v.NodePID || Type != v.Type || ObjectID != v.ObjectID {
 			continue
 		}
 		return id,v
@@ -178,48 +179,41 @@ func loadImportance(){
 
 
 
-// получить все значимости ID объекта внимания в контексте текущих условий
-func getObjectsImportance(ObjectID int, NodeAID int,NodePID int) []*importance {
-	sinex:=strconv.Itoa(NodeAID)+"_"+strconv.Itoa(NodePID)
-	var imp []*importance
 
-	for _, v := range importanceConditinArr[sinex] {
-		if v.ObjectID==ObjectID{
-			imp=append(imp,v)
-		}
-	}
-	if imp!=nil{
-		return imp
-	}
-
-	return imp
-}
 ///////////////////////////////////////////////////////
-
-/* средняя значимость ID объекта внимания
+/* объект значимости (kind int,ObjectID int)
 Возвращает:
-1 - ID объекта значимости
-2 - сумма значимости
-3 - число значений
+ссылку на объект значимости
 */
-func getObjectsImportanceValue(kind int,ObjectID int, NodeAID int,NodePID int)(int,int,int){
+func getObjectImportance(kind int,ObjectID int, NodeAID int,NodePID int)(*importance){
 	sinex:=strconv.Itoa(NodeAID)+"_"+strconv.Itoa(NodePID)
-	var value=0
-	var count=0
-	var id=0
-
 	for _, v := range importanceConditinArr[sinex] {
 		if v.Type==kind && v.ObjectID ==ObjectID{
-			value+=v.Value
-			count++
-			id=v.ID
+			return v
 		}
 	}
-	if count>0{
-		return id,value,count
+
+	return nil
+}
+///////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////
+/* значимость ID объекта внимания (kind int,ObjectID int)
+в условиях detectedActiveLastNodID, detectedActiveLastUnderstandingNodID
+Возвращает:
+1 - ID объекта значимости
+2 - значимость
+*/
+func getObjectsImportanceValue(kind int,ObjectID int, NodeAID int,NodePID int)(int,int){
+	sinex:=strconv.Itoa(NodeAID)+"_"+strconv.Itoa(NodePID)
+	for _, v := range importanceConditinArr[sinex] {
+		if v.Type==kind && v.ObjectID ==ObjectID{
+			return v.ID,v.Value
+		}
 	}
 
-	return 0,0,0
+	return 0,0
 }
 ///////////////////////////////////////////////////////////
 

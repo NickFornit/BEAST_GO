@@ -129,9 +129,14 @@ func createBasicLink()(int){
 
 
 ///////////////////////////////////////////////////////
-// создание или использование ментального автоматизма инфо-функции c ID= infoID
-func createNexusFromNextID(fromNextID int,infoID int)(int){
+/* Продолжить цепочку осмысления: найти мотивированное продолжение:
+- создается мент.авт-м запуска infoFuncNNN() - infoID
+ т.е. - создание ментального автоматизма инфо-функции c ID= infoID
+Это не ментальная функция! а наследственная структура для мотивации действий и направления мышления.
+ */
 
+func createNexusFromNextID(fromNextID int,infoID int)(int){
+// typeD==4 - запуск инфо-функции
 	imgID,_:=CreateNewlastMentalActionsImagesID(0,4,infoID,true)
 	if imgID>0 {
 		aID, _ := createMentalAutomatizmID(0, imgID, 1)
@@ -184,6 +189,9 @@ func calcNexusFromNextID(fromNextID int)(int){
 effect =lastCommonDiffValue
 */
 func afterWaitingPeriod(effect int){
+	/* Если не было цикла осмысления, а проходилиь только уровни до 3-го,
+	то и нет обработки, нет записи в Эпизод.память ментальныз кадров. Что определяет ощцщение субъективного времени.
+	 */
 	if saveFromNextIDAnswerCicle==nil || len(saveFromNextIDAnswerCicle)==0{
 		return
 	}
@@ -237,12 +245,38 @@ func getMentalEffect(effect0 int)int{
 	*/
 	effect4:=valuationPurpose()
 
+	// улучшилась ли значимость объекта внимания
+	effectA:=0
+	if extremImportanceObject!=nil {
+		oldVal := extremImportanceObject.extremVal
+		_, newVal := getObjectsImportanceValue(extremImportanceObject.kind, extremImportanceObject.objID, detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
+		if newVal > oldVal { // улучшилось
+			effectA = 1
+		}
+		if newVal < oldVal { // улучшилось
+			effectA = -1
+		}
+	}
+
+	// улучшилась ли значимость субъекта внимания
+	effectMA:=0
+	if extremImportanceMentalObject!=nil {
+		oldVal := extremImportanceMentalObject.extremVal
+		_, newVal := getObjectsImportanceValue(extremImportanceMentalObject.kind, extremImportanceMentalObject.objID, detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
+		if newVal > oldVal { // улучшилось
+			effectMA = 1
+		}
+		if newVal < oldVal { // улучшилось
+			effectMA = -1
+		}
+	}
+
 	// Коэффициенты эффектов разного вида должны сильно влиять не ментальность твари: что для нее важнее.
 	effectValuation:=0
 	if EvolushnStage < 5 {
-		effectValuation = effect0*3 + effect4*1
-	}else{// повышенная роль заданной цели effect4
-		effectValuation = effect0*2 + effect4*3
+		effectValuation = effect0*3 + effect4*1 + effectA*1 +effectMA*0
+	}else{// повышенная роль заданной цели effect4 и объекта внимания
+		effectValuation = effect0*2 + effect4*3 + effectA*3 +effectMA*2
 	}
 	if effectValuation>1{effectValuation=1}
 	if effectValuation<1{effectValuation=-1}

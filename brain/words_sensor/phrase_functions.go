@@ -151,3 +151,5 @@ func GetFirstSymbolFromWordID(wordID int) int {
 
 	return first
 }
+/////////////////////////////////////////////
+

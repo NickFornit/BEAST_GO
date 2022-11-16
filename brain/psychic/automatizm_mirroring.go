@@ -49,7 +49,7 @@ func FormingMirrorAutomatizmFromList(file string) string {
 
 		// засунуть фразу в дерево слов и дерево фраз
 		prase := p[0]
-		wordSensor.VerbalDetection(prase, 1, 0, 0)
+		wordSensor.VerbalDetection(prase, 0, 0, 0)
 		PhraseID := wordSensor.CurrentPhrasesIDarr
 
 		// первый символ ответной фразы
@@ -68,7 +68,7 @@ func FormingMirrorAutomatizmFromList(file string) string {
 			// создать автоматизм и привязать его к nodeID
 			//var sequence = "Snn:" // ответная фраза
 			// засунуть фразу в дерево слов и дерево фраз
-			wordSensor.VerbalDetection(p[3], 1, 0, 0)
+			wordSensor.VerbalDetection(p[3], 0, 0, 0)
 			answerID := wordSensor.CurrentPhrasesIDarr
 
 			//sequence += "|Тnn:" // тон и настроение
@@ -137,10 +137,10 @@ func FormingMirrorAutomatizmFromTempList(file string) string {
 		//tm := GetToneMoodID(t, m + 19)
 
 		// засунуть фразу в дерево слов и дерево фраз
-		wordSensor.VerbalDetection(triggerPrase, 1, 0, 0)
+		wordSensor.VerbalDetection(triggerPrase, 0, 0, 0)
 		triggerPraseID := wordSensor.CurrentPhrasesIDarr
 
-		wordSensor.VerbalDetection(answerPrase, 1, 0, 0)
+		wordSensor.VerbalDetection(answerPrase, 0, 0, 0)
 		answerPraseID := wordSensor.CurrentPhrasesIDarr
 
 		// создать автоматизм и привязать его к объекту

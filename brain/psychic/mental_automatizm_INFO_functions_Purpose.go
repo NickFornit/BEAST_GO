@@ -38,11 +38,16 @@ func infoFunc8() {
 //////////////////////////////////////
 // найти подходящий PurposeImage.actionID и определить mentalInfoStruct.mentalPurposeID
 // вызов из if isFirstActivation{
-func getMentalPurpose(){
+func getMentalPurpose()bool{
 	mentalInfoStruct.mentalPurposeID=0
 
 	// определяется текущий объект наибольшой значимости в воспринимаемом
-	getGreatestImportance()	//curImportanceJbjectArr []int - здесь теперь - текущие цели внимания к наиболее важному
+	getGreatestImportance()	//curImportanceObjectArr []extremImportance - здесь теперь - текущие цели внимания к наиболее важному
+	//выбрать один, самый актуальный объект из curImportanceJbjectArr []extremImportance
+	indexA:=getTopAttentionObject()// - индекс объекта внимания
+	if indexA>0{//выбран curImportanceObjectArr[indexA]
+		extremImportanceObject = &curImportanceObjectArr[indexA]
+	}
 
 
 	if EvolushnStage > 4 { // главное - Доминанта нерешенной пробелмы
@@ -54,7 +59,7 @@ func getMentalPurpose(){
 
 			if mentalInfoStruct.mentalPurposeID >0 {
 				createAndRunPurposeAutomatizm()
-				return
+				return false
 			}
 		}
 	}
@@ -71,17 +76,17 @@ func getMentalPurpose(){
 	то берем оттуда действие оператора.
 	*/
 	if EpisodeMemoryObjects!=nil {// еще нет эпиз.памяти, так что и цели нет...
-		return
+		return false
 	}
 // тупо - для 4-й ступени (и 5-й, если нет Доминанты), когда набирается значимость и Правила
-		index := 0 // индекс в массиве эпизод.памяти, чтобы по нему смотреть, что было дальне
+		indexE := 0 // индекс в массиве эпизод.памяти, чтобы по нему смотреть, что было дальне
 		rID, doubt := getRulesArrFromTrigger(currentTriggerID)
 		if doubt > 3 { // слишком сомнительно
 
 			rulexID := 0
 			maxSteps := 1000
 			for limit := 5; limit > 1; limit-- {
-				rulexID, index = getRulesFromEpisodicsSlice(limit, maxSteps)
+				rulexID, indexE = getRulesFromEpisodicsSlice(limit, maxSteps)
 				if rulexID > 0 {
 					break
 				}
@@ -91,31 +96,31 @@ func getMentalPurpose(){
 			for i := len(EpisodeMemoryObjects); i >= 0; i-- {
 				ep := EpisodeMemoryObjects[i]
 				if ep.Type == 0 && ep.TriggerAndActionID == rID {
-					index = i
+					indexE = i
 					break
 				}
 			}
 		}
 		//////////////////////////
-		if index == 0 {
-			return
+		if indexE == 0 {
+			return false
 		}
 
 		// есть ли последующий кадр эпизод.памяти
-		lastEM := EpisodeMemoryObjects[index+1]
+		lastEM := EpisodeMemoryObjects[indexE+1]
 		if lastEM == nil {
-			return // придется обойтись без PurposeImage.actionID
+			return false // придется обойтись без PurposeImage.actionID
 		}
 		// хороший ли эфект
 		rArr := rulesArr[lastEM.TriggerAndActionID]
 		if rArr == nil {
-			return // придется обойтись без PurposeImage.actionID
+			return false // придется обойтись без PurposeImage.actionID
 		}
 		// выдать конечное праило, если оно с хорошим эффектом
 		var rеserve = 0 // резервные Правила, если не найдено точно в контексте
 		ta := TriggerAndActionArr[lastEM.TriggerAndActionID]
 		if ta == nil {
-			return // придется обойтись без PurposeImage.actionID
+			return false// придется обойтись без PurposeImage.actionID
 		}
 		if ta.Effect > 0 { // с хорошим эффектом
 			rеserve = ta.Action
@@ -181,7 +186,7 @@ func getMentalPurpose(){
 
 	createAndRunPurposeAutomatizm()
 
-	return
+	return true
 }
 ////////////////////////////////////
 func createAndRunPurposeAutomatizm(){
