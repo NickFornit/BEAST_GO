@@ -32,7 +32,7 @@ func UnderstandingTreeInit(){
 
 Дерево может переактивароваться при срабатывании мент.автоматизмов с действиями
 MentalActionsImages.activateBaseID и MentalActionsImages.activateEmotion
-в mental_automatizm_actions.go RunMentalMentalAutomatizm(
+в mental_automatizm_actions.go RunMentalAutomatizm(
  */
 type UnderstandingNode struct { // узел дерева понимания
 	ID int

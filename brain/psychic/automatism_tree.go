@@ -139,75 +139,76 @@ var currentStepCount=0
 var currentAutomatizmAfterTreeActivatedID=0 //! это  не обязательно штатный автоматизм ветки, а выбранный мягким алгоритмом
 
 
-func automatizmTreeActivation()(int){
-	if PulsCount<4{// не активировать пока все не устаканится
+func automatizmTreeActivation()(int) {
+	if PulsCount < 4 { // не активировать пока все не устаканится
 		return 0
 	}
-/* НУЖНО, просто новый ор.рефлекс будет ждать окончания периода LastRunAutomatizmPulsCount
+	/* НУЖНО, просто новый ор.рефлекс будет ждать окончания периода LastRunAutomatizmPulsCount
 	if LastRunAutomatizmPulsCount >0{// не активировать в период ожидания результатов действий!
 		return 0
 	}
- */
+	*/
 
-/* ТЕПЕПЕРЬ ВСЕГДА АКТИВИРОВАТЬ потому как и по изменению состояния формируются Правила.
-Но нужно блокировать ор.рефлексы!
-// не активировать дерево по изменению гомеостатуса во время ожидания ответа оператора
-//  LastRunAutomatizmPulsCount устанавливается в RumAutomatizm(
-if LastRunAutomatizmPulsCount > 0{
-if !WasOperatorActiveted {
-	return 0
-}
- */
+	/* ТЕПЕПЕРЬ ВСЕГДА АКТИВИРОВАТЬ потому как и по изменению состояния формируются Правила.
+	   Но нужно блокировать ор.рефлексы!
+	   // не активировать дерево по изменению гомеостатуса во время ожидания ответа оператора
+	   //  LastRunAutomatizmPulsCount устанавливается в RumAutomatizm(
+	   if LastRunAutomatizmPulsCount > 0{
+	   if !WasOperatorActiveted {
+	   	return 0
+	   }
+	*/
 
-	detectedActiveLastNodID=0
-	ActiveBranchNodeArr=nil
-	CurrentAutomatizTreeEnd=nil
-	currentStepCount=0
-	currentAutomatizmAfterTreeActivatedID=0
+	detectedActiveLastNodID = 0
+	ActiveBranchNodeArr = nil
+	CurrentAutomatizTreeEnd = nil
+	currentStepCount = 0
+	currentAutomatizmAfterTreeActivatedID = 0
 
 	// вытащить 3 уровня условий в виде ID их образов
 	//Еще нет InformationEnvironment т.к. Дерево активруется ДО ор.рефлексов
-	lev1:=gomeostas.CommonBadNormalWell
+	lev1 := gomeostas.CommonBadNormalWell
 
-	bsIDarr:=gomeostas.GetCurContextActiveIDarr()
-	lev2,_:=createNewBaseStyle(0,bsIDarr,true)
+	bsIDarr := gomeostas.GetCurContextActiveIDarr()
+	lev2, _ := createNewBaseStyle(0, bsIDarr, true)
 
-	curBaseStateImage.Mood=lev1
-	curBaseStateImage.EmotionID=lev2
-	curBaseStateImage.SituationID=0 // будет определн при активации дерева понимания, может и не быть выбранной ситуации
+	curBaseStateImage.Mood = lev1
+	curBaseStateImage.EmotionID = lev2
+	curBaseStateImage.SituationID = 0 // будет определн при активации дерева понимания, может и не быть выбранной ситуации
 
-ActID:=action_sensor.CheckCurActionsContext();//CheckCurActions()
+	ActID := action_sensor.CheckCurActionsContext(); //CheckCurActions()
 
-	lev3,_:=createNewlastActivityID(0,ActID,true)// текущий образ сочетания действий с Пульта Activity
-	curActiveActionsID=0
+	lev3, _ := createNewlastActivityID(0, ActID, true) // текущий образ сочетания действий с Пульта Activity
+	curActiveActionsID = 0
 	curActiveActions = nil
 
-	var lev4=0
-	var lev5=0
-	var lev6=0
-	if len(wordSensor.CurrentPhrasesIDarr)>0{
+	var lev4 = 0
+	var lev5 = 0
+	var lev6 = 0
+	if len(wordSensor.CurrentPhrasesIDarr) > 0 {
 		PhraseID := wordSensor.CurrentPhrasesIDarr
-		FirstSimbolID:=wordSensor.GetFirstSymbolFromPraseID(PhraseID)
+		FirstSimbolID := wordSensor.GetFirstSymbolFromPraseID(PhraseID)
 		ToneID := wordSensor.DetectedTone
 		MoodID := wordSensor.CurPultMood
-		verbID,verb:= CreateVerbalImage(FirstSimbolID,PhraseID, ToneID, MoodID)
-		lev4= GetToneMoodID(verb.ToneID, verb.MoodID)
-		lev5=verb.SimbolID
+		verbID, verb := CreateVerbalImage(FirstSimbolID, PhraseID, ToneID, MoodID)
+		lev4 = GetToneMoodID(verb.ToneID, verb.MoodID)
+		lev5 = verb.SimbolID
 		/* для дерева берется только первая фраза, остальные можно восстановить для сопоставлений из
 		AutomatizmNode.VerbalID.PhraseID[]
 		или из памяти о воспринятых фразах (Vernike_detector.go): var MemoryDetectedArr []MemoryDetected
 		*/
-		lev6=verb.PhraseID[0]
-		// сохраняем для отзеркаливания действий оператора
-			curActiveVerbalID = verbID
-			curActions.PhraseID = PhraseID
-			curActions.ToneID = ToneID
-			curActions.MoodID = MoodID
+		lev6 = verb.PhraseID[0]
+
+	// сохраняем для отзеркаливания действий оператора
+	curActiveVerbalID = verbID
+	curActions.PhraseID = PhraseID
+	curActions.ToneID = ToneID
+	curActions.MoodID = MoodID
+}
 // всегда делать образ действий оператора
 		//if ActivationTypeSensor!=1 { пусть делает образ нулевой акции
 			curActiveActionsID, curActiveActions = CreateNewlastActionsImageID(0, curActions.ActID, curActions.PhraseID, curActions.ToneID, curActions.MoodID, true)
 		//}
-	}
 
 	condArr:=getActiveConditionsArr(lev1, lev2, lev3, lev4, lev5, lev6)
 	notAllowScanInTreeThisTime=true // защелка от повтора во время обработки

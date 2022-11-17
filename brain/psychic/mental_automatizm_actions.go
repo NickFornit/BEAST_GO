@@ -9,22 +9,23 @@ import (
 )
 ////////////////////////////////////////////////
 
-
+// момент запуска автоматизма в числе пульсов
+var LastRunMentalAutomatizmPulsCount =0
 
 /////////////////////////////////////////
 /* запуск автоматизма на выполнение
 возвращает true при успехе
  */
-func RunMentalMentalAutomatizmsID(id int)(bool){
+func RunMentalAutomatizmsID(id int)(bool){
 	a:=MentalAutomatizmsFromID[id]
 	if a==nil{
 		return false
 	}
-	return RunMentalMentalAutomatizm(a)
+	return RunMentalAutomatizm(a)
 }
 ////////////////////
 // Запуск
-func RunMentalMentalAutomatizm(am *MentalAutomatizm)(bool){
+func RunMentalAutomatizm(am *MentalAutomatizm)(bool){
 	if am==nil{
 		return false
 	}
@@ -77,6 +78,7 @@ if am.Usefulness<0{
 
 	am.Count++
 	currentMentalAutomatizmID=am.ID
+	LastRunMentalAutomatizmPulsCount =PulsCount // активность мот.автоматизма в чисде пульсов
 	//выполнить мозжечковый рефлекс сразу после выполняющегося автоматизма
 	//runCerebellumAdditionalMentalAutomatizm(0,am.ID)
 //	notAllowReflexRuning=true // блокировка рефлексов

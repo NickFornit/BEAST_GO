@@ -30,9 +30,35 @@ func saveLifeTime() {
 	}
 }
 
+/* запуск пульса по сигналам из getParams := r.FormValue("get_params")
+
+ */
+var blockinfP=0
+func SincroTic(){
+	blockinfP=1
+	Puls()
+}
+////////////////////////////////
+
+
+
 var IsPultActivnost = false	// начало активности с Пульта  brain.IsPultActivnost=true brain.IsPultActivnost=false
 func Puls() {
+	if blockinfP>0{// не запускать генеретор пульса в этот раз - синхронизация из Пульта
+		pulsActions()// действия дял этого такта пульса
+		blockinfP=0
+		return
+	}
 	time.AfterFunc(1 * time.Second, func() {
+
+		// действия дял этого такта пульса
+		pulsActions()
+
+		Puls()
+	})
+}
+////////////////////////////////////////////////
+func pulsActions(){
 	// сканирование состояния (пульс):
 	//now := time.Now()
 	//curTime := now.Second()//.Millisecond()
@@ -48,25 +74,24 @@ func Puls() {
 		NotAllowAnyActions=false
 	}
 	*/
-		if !noWorkung {
-			Аctivation(LifeTime) // Главный цикл (пульс) опроса состояния Beast и его ответов в brain.go
+	if !noWorkung {
+		Аctivation(LifeTime) // Главный цикл (пульс) опроса состояния Beast и его ответов в brain.go
+	}
+	if startWait > 0 && !IsPultActivnost { // ждем следующего цикла и выполняем inaction
+		if PulsCount > (startWait + 1) {
+			inaction()
+			noWorkung = false // конец ожидания
 		}
-		if startWait > 0 && !IsPultActivnost { // ждем следующего цикла и выполняем inaction
-			if PulsCount > (startWait + 1) {
-				inaction()
-				noWorkung = false // конец ожидания
-			}
-		}
-		LifeTime++
-		if (PulsCount + 1) % 10 == 0 {
-			saveLifeTime()
-		}
-		//ac := time.Date(0, time.January, 1, 0, 0, 0, 0, time.UTC)
-		//lastPulsTime=curTime
-		PulsCount++
-		Puls()
-	})
+	}
+	LifeTime++
+	if (PulsCount + 1) % 10 == 0 {
+		saveLifeTime()
+	}
+	//ac := time.Date(0, time.January, 1, 0, 0, 0, 0, time.UTC)
+	//lastPulsTime=curTime
+	PulsCount++
 }
+///////////////////////////////////////////////////
 
 var NotAllowAnyActions = false // - запрет любой активности  brain.NotAllowAnyActions
 // то, что должно выполнять в тишине, в бездействии

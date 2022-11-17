@@ -343,6 +343,8 @@ func getRulesArrFromAttentionObject(objID int, kind int)(int){
 	}
 	// пустое ответное действие
 	var act ActionsImage
+// м.б. лучше взять за основу прошлый ответный образ действий Beast? хотя он уже не должен быть ответом на новый Стимул...
+	//act:=*ActionsImageArr[LastAutomatizmWeiting.ActionsImageID]
 // После Стимула ищется Ответ и еще нет действия дла него, нужно сформировать по образу extremImportanceObject
 switch extremImportanceObject.kind{
 case 1: // ID ActionsImage

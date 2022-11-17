@@ -82,24 +82,26 @@ type extremImportance struct {
 	extremVal int// экстремальная значимость
 }
 var curImportanceObjectArr []extremImportance //- здесь сохраняются текущие цели внимания к наиболее важному
-func getGreatestImportance(){
-	if curActiveActions == nil{
-		return
+
+
+func getGreatestImportance(curActions *ActionsImage)[]extremImportance{
+	var importanceObjectArr []extremImportance
+	if curActions == nil{
+		return nil
 	}
-	curImportanceObjectArr = nil
 	var id,v = 0,0
 	// целостный образ действий
-	id,v=getObjectsImportanceValue(1,curActiveActions.ID, detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
+	id,v=getObjectsImportanceValue(1,curActions.ID, detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
 	if v <0{
-		curImportanceObjectArr =append(curImportanceObjectArr,extremImportance{id,1,v})
+		importanceObjectArr =append(importanceObjectArr,extremImportance{id,1,v})
 	}
 
 	// ID несловестного действия ActionsImage.ActID[n]
-	if len(curActiveActions.ActID) > 0{
+	if len(curActions.ActID) > 0{
 		min:=0
 		minID:=0
-		for i := 0; i < len(curActiveActions.ActID); i++ {
-			id,v=getObjectsImportanceValue(3,curActiveActions.ActID[i], detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
+		for i := 0; i < len(curActions.ActID); i++ {
+			id,v=getObjectsImportanceValue(3,curActions.ActID[i], detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
 			if v <0{
 				if min > v{
 					min = v
@@ -108,7 +110,7 @@ func getGreatestImportance(){
 			}
 		}
 		if minID>0{
-			curImportanceObjectArr =append(curImportanceObjectArr,extremImportance{minID,3,min})
+			importanceObjectArr =append(importanceObjectArr,extremImportance{minID,3,min})
 		}
 	}
 
@@ -116,16 +118,16 @@ func getGreatestImportance(){
 	if curActiveVerbalID >0 {
 		id,v=getObjectsImportanceValue(4,curActiveVerbalID, detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
 		if v <0{
-			curImportanceObjectArr =append(curImportanceObjectArr,extremImportance{id,4,v})
+			importanceObjectArr =append(importanceObjectArr,extremImportance{id,4,v})
 		}
 	}
 
 	//ID отдельной фразы Verbal.PhraseID[n]
-	if len(curActiveActions.PhraseID) >0 {
+	if len(curActions.PhraseID) >0 {
 		min:=0
 		minID:=0
-		for i := 0; i < len(curActiveActions.PhraseID); i++ {
-			id,v=getObjectsImportanceValue(5,curActiveActions.PhraseID[i], detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
+		for i := 0; i < len(curActions.PhraseID); i++ {
+			id,v=getObjectsImportanceValue(5,curActions.PhraseID[i], detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
 			if v <0{
 				if min > v{
 					min = v
@@ -136,7 +138,7 @@ func getGreatestImportance(){
 			//ID отдельного слова  из Verbal.PhraseID[n]
 			min2:=0
 			minID2:=0
-			wRr:=word_sensor.WordsArrFromPhraseID[curActiveActions.PhraseID[i]]
+			wRr:=word_sensor.WordsArrFromPhraseID[curActions.PhraseID[i]]
 			for j := 0; j < len(wRr); j++ {
 				id,v=getObjectsImportanceValue(6,wRr[j], detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
 				if v <0{
@@ -147,46 +149,47 @@ func getGreatestImportance(){
 				}
 			}
 			if minID2>0{
-				curImportanceObjectArr =append(curImportanceObjectArr,extremImportance{minID2,6,min2})
+				importanceObjectArr =append(importanceObjectArr,extremImportance{minID2,6,min2})
 			}
 
 		}
 		if minID>0{
-			curImportanceObjectArr =append(curImportanceObjectArr,extremImportance{minID,5,min})
+			importanceObjectArr =append(importanceObjectArr,extremImportance{minID,5,min})
 		}
 	}
 
 	// ID тон сообщения с Пульта  Verbal.ToneID
-	if curActiveActions.MoodID>0{
-		id,v=getObjectsImportanceValue(7,curActiveActions.MoodID, detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
+	if curActions.MoodID>0{
+		id,v=getObjectsImportanceValue(7,curActions.MoodID, detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
 		if v <0{
-			curImportanceObjectArr =append(curImportanceObjectArr,extremImportance{id,7,v})
+			importanceObjectArr =append(importanceObjectArr,extremImportance{id,7,v})
 		}
 	}
 
 	// ID настроение оператора  Verbal.MoodID
-	if curActiveActions.ToneID>0{
-		id,v=getObjectsImportanceValue(8,curActiveActions.ToneID, detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
+	if curActions.ToneID>0{
+		id,v=getObjectsImportanceValue(8,curActions.ToneID, detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
 		if v <0{
-			curImportanceObjectArr =append(curImportanceObjectArr,extremImportance{id,8,v})
+			importanceObjectArr =append(importanceObjectArr,extremImportance{id,8,v})
 		}
 	}
+	return importanceObjectArr
 }
 /////////////////////////////////////////////////
 
 /* выбрать один, самый актуальный объект из curImportanceJbjectArr []extremImportance
 Возвращает индекс массива curImportanceObjectArr или -1
  */
-func getTopAttentionObject()int{
-	if curImportanceObjectArr==nil{
+func getTopAttentionObject(eij []extremImportance)int{
+	if eij==nil{
 		return -1
 	}
 	// тупо выбираем самый негативный
 	min:=0
 	index:=-1
-	for i := 0; i < len(curImportanceObjectArr); i++ {
-		if min > curImportanceObjectArr[i].extremVal{
-			min = curImportanceObjectArr[i].extremVal
+	for i := 0; i < len(eij); i++ {
+		if min > eij[i].extremVal{
+			min = eij[i].extremVal
 			index=i
 		}
 	}

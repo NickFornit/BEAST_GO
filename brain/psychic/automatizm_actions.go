@@ -103,7 +103,12 @@ if am.Usefulness<0{
 	LastAutomatizmWeiting=am
 	LastRunAutomatizmPulsCount =PulsCount // активность мот.автоматизма в чисде пульсов
 
-	var out="3|"
+	var out=""
+	if LastRunMentalAutomatizmPulsCount ==PulsCount { // активность мот.автоматизма в чисде пульсов
+		out="4|" // ментальный запуск моторного автоматизма
+	}else{
+		out="3|"
+	}
 	out+=GetAutomotizmActionsString(am,true)
 
 	lib.SentActionsForPult(out)
@@ -124,7 +129,9 @@ if am.Usefulness<0{
 func GetAutomotizmActionsString(am *Automatizm,writeLog bool)(string){
 	var out=""
 	ai:=ActionsImageArr[am.ActionsImageID]
-	if ai.ActID != nil {
+	if ai.ActID == nil {
+		return ""
+	}
 		// учесть рефлекс мозжечка
 		addE := getCerebellumReflexAddEnergy(0,am.ID)
 		sumEnergy:=am.Energy+addE
@@ -136,7 +143,6 @@ func GetAutomotizmActionsString(am *Automatizm,writeLog bool)(string){
 		}
 		am.Count++
 		out+=TerminateMotorAutomatizmActions(ai.ActID,sumEnergy)
-	}
 
 	if ai.PhraseID != nil {
 		addE := getCerebellumReflexAddEnergy(0,am.ID)
@@ -151,7 +157,11 @@ func GetAutomotizmActionsString(am *Automatizm,writeLog bool)(string){
 		out+="<br>"+getMoodStrFromID(ai.MoodID)+"<br>"
 	}
 if writeLog{
-	lib.WritePultConsol("<span style='color:blue;background-color:#FFFFA3;'>Запускается АВТОМАТИЗМ ID = "+strconv.Itoa(am.ActionsImageID)+" "+out+"</span>: ")
+	if LastRunMentalAutomatizmPulsCount ==PulsCount { // активность мот.автоматизма в чисде пульсов
+		lib.WritePultConsol("<span style='color:blue;background-color:#FFFFA3;'>Запускается ментально АВТОМАТИЗМ ID = " + strconv.Itoa(am.ActionsImageID) + " " + out + "</span>: ")
+	}else {
+		lib.WritePultConsol("<span style='color:blue;background-color:#FFFFA3;'>Запускается АВТОМАТИЗМ ID = " + strconv.Itoa(am.ActionsImageID) + " " + out + "</span>: ")
+	}
 }
 	return out
 }

@@ -90,6 +90,15 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 			}
 
 			// отправить на пульт состояние гомеостаза Beast и его базовые контексты
+			sincronism := r.FormValue("sincronism")
+			if len(sincronism) > 0 {
+				// выполнить цикл действий по пульсу перед отправкой результата на Пульт
+				brain.SincroTic()
+				_, _ = fmt.Fprint(resp, "sincronism")
+				return
+			}
+
+			// отправить на пульт состояние гомеостаза Beast и его базовые контексты
 			getParams := r.FormValue("get_params")
 			if len(getParams) > 0 {
 				brain.IsPultActivnost = true
@@ -116,6 +125,7 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 					"#|#" + waitingPeriod +
 					"#|#" + psichicReady
 				brain.IsPultActivnost = false
+
 				_, _ = fmt.Fprint(resp, outStr)
 				return
 			}

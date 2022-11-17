@@ -14,7 +14,7 @@ import (
 /* виды ментальных действий для MentalActionsImages
 Можно наращивать при необходимости новые действия, добавляя в:
 func GetMentalActionsString
-func RunMentalMentalAutomatizm
+func RunMentalAutomatizm
  */
 var MentalActionsType=[]int{
 	1,//активация настроения Mood в дереве понимания 1 2 3 (отражает -1 0 1 UnderstandingNode.Mood)
@@ -34,8 +34,6 @@ type MentalActionsImages struct {
 	typeID int // вид действия - MentalActionsType
 	valID int // ID для действия
 }
-
-
 var MentalActionsImagesArr=make(map[int]*MentalActionsImages)
 
 //////////////////////////////////////////

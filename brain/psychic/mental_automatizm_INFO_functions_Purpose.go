@@ -42,9 +42,9 @@ func getMentalPurpose()bool{
 	mentalInfoStruct.mentalPurposeID=0
 
 	// определяется текущий объект наибольшой значимости в воспринимаемом
-	getGreatestImportance()	//curImportanceObjectArr []extremImportance - здесь теперь - текущие цели внимания к наиболее важному
+	curImportanceObjectArr=getGreatestImportance(curActiveActions)	//curImportanceObjectArr []extremImportance - здесь теперь - текущие цели внимания к наиболее важному
 	//выбрать один, самый актуальный объект из curImportanceJbjectArr []extremImportance
-	indexA:=getTopAttentionObject()// - индекс объекта внимания
+	indexA:=getTopAttentionObject(curImportanceObjectArr)// - индекс объекта внимания
 	if indexA>0{//выбран curImportanceObjectArr[indexA]
 		extremImportanceObject = &curImportanceObjectArr[indexA]
 	}
@@ -198,7 +198,7 @@ func createAndRunPurposeAutomatizm(){
 	id, matmzm := createMentalAutomatizmID(0, actImgID, 1)
 	if id >0 {
 		// запустить мент.автоматизм
-		RunMentalMentalAutomatizm(matmzm)
+		RunMentalAutomatizm(matmzm)
 
 		lib.WritePultConsol("Найдена и активирована Цель.")
 	}
