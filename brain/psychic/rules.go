@@ -99,6 +99,8 @@ func createNewlastrulesID(id int,NodeAID int,NodePID int,TAid []int,CheckUnicum 
 	var node rules
 	node.ID = id
 	node.TAid=TAid
+	node.NodeAID = NodeAID
+	node.NodePID = NodePID
 
 	rulesArr[id]=&node
 	sinex:=strconv.Itoa(NodeAID)+"_"+strconv.Itoa(NodePID)
