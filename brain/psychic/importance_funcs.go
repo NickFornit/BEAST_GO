@@ -48,12 +48,12 @@ func setImportance(effect int){
 	}
 
 	// ID тон сообщения с Пульта  Verbal.ToneID
-	if curActiveActions.MoodID>0{
+	if curActiveActions.ToneID>0{
 		createNewlastImportanceID(0, detectedActiveLastNodID, detectedActiveLastUnderstandingNodID, 7, curActiveActions.MoodID, effect, true)
 	}
 
 	// ID настроение оператора  Verbal.MoodID
-	if curActiveActions.ToneID>0{
+	if curActiveActions.MoodID>0{
 		createNewlastImportanceID(0, detectedActiveLastNodID, detectedActiveLastUnderstandingNodID, 8, curActiveActions.ToneID, effect, true)
 	}
 }
@@ -159,20 +159,21 @@ func getGreatestImportance(curActions *ActionsImage)[]extremImportance{
 	}
 
 	// ID тон сообщения с Пульта  Verbal.ToneID
-	if curActions.MoodID>0{
-		id,v=getObjectsImportanceValue(7,curActions.MoodID, detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
+	if curActions.ToneID>0{
+		id,v=getObjectsImportanceValue(7,curActions.ToneID, detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
 		if v <0{
 			importanceObjectArr =append(importanceObjectArr,extremImportance{id,7,v})
 		}
 	}
 
 	// ID настроение оператора  Verbal.MoodID
-	if curActions.ToneID>0{
-		id,v=getObjectsImportanceValue(8,curActions.ToneID, detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
+	if curActions.MoodID>0{
+		id,v=getObjectsImportanceValue(8,curActions.MoodID, detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
 		if v <0{
 			importanceObjectArr =append(importanceObjectArr,extremImportance{id,8,v})
 		}
 	}
+
 	return importanceObjectArr
 }
 /////////////////////////////////////////////////

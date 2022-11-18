@@ -264,6 +264,28 @@ return ret
 ////////////////////////////////
 
 
+// выдать инфу про VerbalID
+func GetStringsFromVerbalID(vID int)string{
+
+	v:=VerbalFromIdArr[vID]
+if v==nil{
+	lib.WritePultConsol("Нет карты VerbalFromIdArr для iD="+strconv.Itoa(vID))
+	return "Ошибка получения информации."
+}
+	out:="Вербальный образ ID="+strconv.Itoa(vID)
+
+	out+=":<br> Фраза: "
+	for i := 0; i < len(v.PhraseID); i++ {
+		if i>0{out+=" | "}
+		out+=wordSensor.GetPhraseStringsFromPhraseID(v.PhraseID[i]) + ":<br>"
+	}
+	out+="Тон: "+getToneStrFromID(v.ToneID)+":<br>"
+	out+="Настроение: "+getMoodStrFromID(v.MoodID)+":<br>"
+return out
+}
+/////////////////////////////////////////////////////
+
+
 
 // ПРОИЗВОЛЬНОЕ ТВОРЕНИЕ ФРАЗ
 

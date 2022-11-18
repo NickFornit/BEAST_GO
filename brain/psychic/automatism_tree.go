@@ -188,7 +188,10 @@ func automatizmTreeActivation()(int) {
 	if len(wordSensor.CurrentPhrasesIDarr) > 0 {
 		PhraseID := wordSensor.CurrentPhrasesIDarr
 		FirstSimbolID := wordSensor.GetFirstSymbolFromPraseID(PhraseID)
-		ToneID := wordSensor.DetectedTone
+		ToneID := wordSensor.CurPultTone
+		if ToneID==0 && wordSensor.DetectedTone ==1{// повышенный из-за знака "!"
+			ToneID=4 // 4- разница в кодировке тона
+		}
 		MoodID := wordSensor.CurPultMood
 		verbID, verb := CreateVerbalImage(FirstSimbolID, PhraseID, ToneID, MoodID)
 		lev4 = GetToneMoodID(verb.ToneID, verb.MoodID)
@@ -206,9 +209,9 @@ func automatizmTreeActivation()(int) {
 	curActions.MoodID = MoodID
 }
 // всегда делать образ действий оператора
-		//if ActivationTypeSensor!=1 { пусть делает образ нулевой акции
-			curActiveActionsID, curActiveActions = CreateNewlastActionsImageID(0, curActions.ActID, curActions.PhraseID, curActions.ToneID, curActions.MoodID, true)
-		//}
+//if ActivationTypeSensor!=1 { пусть делает образ нулевой акции
+	curActiveActionsID, curActiveActions = CreateNewlastActionsImageID(0, curActions.ActID, curActions.PhraseID, curActions.ToneID, curActions.MoodID, true)
+//}
 
 	condArr:=getActiveConditionsArr(lev1, lev2, lev3, lev4, lev5, lev6)
 	notAllowScanInTreeThisTime=true // защелка от повтора во время обработки

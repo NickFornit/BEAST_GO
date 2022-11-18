@@ -4,7 +4,11 @@
 
 package psychic
 
-import "strconv"
+import (
+	word_sensor "BOT/brain/words_sensor"
+	"sort"
+	"strconv"
+)
 
 /////////////////////////////////////////////
 
@@ -140,3 +144,70 @@ func GetMentAtmzmInfo(id int)(string){
 	return out
 }
 //////////////////////////////////////////////////////////////////
+
+
+
+// выдать текущую инфу Oбъекты значимости для http://go/pages/mental_importance.php
+func GetImportanceToPult()(string){
+
+	//	saveFromNextIDcurretCicle=[]int{1,2,3} // тестирвоание
+	out:=""
+	iArr:=importanceFromID
+	if iArr==nil || len(iArr)==0{
+		out+="Еще нет объектов значимости.<hr><br><br>"
+	}else{
+		out+="<table cellpadding=0 cellspacing=0 border=1 class='main_table'>"
+		out+="<tr><th class='table_header'>объект ID</th>"
+		out+="<th class='table_header'>ID<br>дерева<br>автоматизмов</th>"
+		out+="<th class='table_header'>ID<br>дерева<br>понимания</th></th>"
+		out+="<th class='table_header' width=350>Тип объекта</th>"
+		out+="<th class='table_header'>Значимость</th></tr>"
+		keys := make([]int, 0, len(iArr))
+		for k := range iArr {
+			keys = append(keys, k)
+		}
+		sort.Ints(keys)
+		for _, k := range keys {
+			oi:=importanceFromID[k]
+
+				style:="style='font-size:19px;font-weight:bold;cursor:pointer'"
+				out+="<tr><td class='table_cell'><span style='color:#666666'>"+strconv.Itoa(oi.ID)+"</span>"+
+
+"</td><td class='table_cell' "+style+" onClick='show_atmzm_tree("+strconv.Itoa(oi.NodeAID)+")'>"+strconv.Itoa(oi.NodeAID)+
+"<td class='table_cell' "+style+" onClick='show_unde_tree("+strconv.Itoa(oi.NodePID)+")'>"+strconv.Itoa(oi.NodePID)
+
+out+="</td><td class='table_cell' onClick='show_object("+strconv.Itoa(oi.Type)+","+strconv.Itoa(oi.ObjectID)+")'>id="+strconv.Itoa(oi.ObjectID)+" (type="+strconv.Itoa(oi.Type)+"): <b>"+importanceTypeName[oi.Type]+"</b>"+
+"</td><td class='table_cell'>"+strconv.Itoa(oi.Value)+
+"</td></tr>"
+			}
+		}
+		out+="</table>"
+
+	return out
+}
+// информация об объекте значимости
+func GetImportanceObjectInfo(objID int,objType int)(string){
+out:=""
+
+switch objType {
+case 1:     // ID ActionsImage
+	out=GetActionsString(objID)
+case 2: // ID MentalActionsImages
+	out=GetMentalAutomotizmActionsString(objID, false) // GetMentalActionInfo(objID) ?
+case 3: // ID несловестного действия ActionsImage.ActID[n]
+	//out=GetAutomatizmSequenceInfo(objID,true)
+case 4: // ID Verbal - при активации дерева автоматизмов
+	out=GetStringsFromVerbalID(objID)
+case 5: // ID отдельной фразы Verbal.PhraseID[n]
+	out=word_sensor.GetPhraseStringsFromPhraseID(objID)
+case 6: // ID отдельного слова  из Verbal.PhraseID[n]
+	out=word_sensor.GetWordFromWordID(objID)
+case 7: // ID тон сообщения с Пульта  Verbal.ToneID
+	out=getToneStrFromID(objID)
+case 8: // ID настроение оператора  Verbal.MoodID
+	out=getMoodStrFromID(objID-19)
+}
+
+	return out
+}
+/////////////////////////////////////////////////

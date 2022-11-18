@@ -46,9 +46,20 @@ var importanceType=[]int{
 	7,// ID тон сообщения с Пульта  Verbal.ToneID
 	8,// ID настроение оператора  Verbal.MoodID
 }
+// названия типов объектов значимости
+var importanceTypeName=[]string{
+	1:"Образ действия",
+	2:"образ мысли",
+	3:"Моторное действие",
+	4:"Вербальный образ",
+	5:"Фраза",
+	6:"Слово",
+	7:"Тон",
+	8:"Настроение",
+}
 
 
-// Тот объект, применение которого привело к данной значимости  ID|NodeAID|NodePID|Type|Value
+// Тот объект, применение которого привело к данной значимости  ID|NodeAID|NodePID|Type|ObjectID|Value
 type importance struct {
 	ID int
 	// условия точного использования Правила:
@@ -142,7 +153,7 @@ func Saveimportance(){
 		out+=strconv.Itoa(v.NodePID)+"|"
 		out+=strconv.Itoa(v.Type)+"|"
 		out+=strconv.Itoa(v.ObjectID)+"|"
-		out+=strconv.Itoa(v.Value)+"|"
+		out+=strconv.Itoa(v.Value)
 
 		out+="\r\n"
 	}
@@ -154,7 +165,7 @@ func Saveimportance(){
 func loadImportance(){
 	importanceFromID=make(map[int]*importance)
 	importanceConditinArr=make(map[string] []*importance)
-	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_psy/Iimportance.txt")
+	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_psy/importance.txt")
 	cunt:=len(strArr)
 	for n := 0; n < cunt; n++ {
 		if len(strArr[n])==0{
@@ -170,7 +181,7 @@ func loadImportance(){
 
 		var saveDoWritingFile= doWritingFile; doWritingFile =false
 		isNotImpLoading=false
-		createNewlastImportanceID(id,NodeAID,NodePID,Type,Value,ObjectID,false)
+		createNewlastImportanceID(id,NodeAID,NodePID,Type,ObjectID,Value,false)
 		isNotImpLoading=true
 		doWritingFile =saveDoWritingFile
 	}

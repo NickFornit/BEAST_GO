@@ -544,6 +544,21 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				_, _ = fmt.Fprint(resp, ref)
 				return
 			}
+// объект значимости
+			get_mental_importance_list_info := r.FormValue("get_mental_importance_list_info")
+			if get_mental_importance_list_info =="1" {
+				ref := psychic.GetImportanceToPult()
+				_, _ = fmt.Fprint(resp, ref)
+				return
+			}
+			get_importance_object_info := r.FormValue("get_importance_object_info")
+			if get_importance_object_info =="1" {
+				objID,_:=strconv.Atoi(r.FormValue("objID"))
+				objType,_:=strconv.Atoi(r.FormValue("objType"))
+				ref := psychic.GetImportanceObjectInfo(objID,objType)
+				_, _ = fmt.Fprint(resp, ref)
+				return
+			}
 
 			// обнулить параметры гомеостаза Beast
 			cliner_gomeo_pars := r.FormValue("cliner_gomeo_pars")
