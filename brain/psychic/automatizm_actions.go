@@ -129,20 +129,23 @@ if am.Usefulness<0{
 func GetAutomotizmActionsString(am *Automatizm,writeLog bool)(string){
 	var out=""
 	ai:=ActionsImageArr[am.ActionsImageID]
-	if ai.ActID == nil {
+	if ai == nil {
+		lib.WritePultConsol("Нет карты ActionsImageArr для образа действий iD="+strconv.Itoa(am.ActionsImageID))
 		return ""
 	}
+	if ai.ActID != nil {
 		// учесть рефлекс мозжечка
-		addE := getCerebellumReflexAddEnergy(0,am.ID)
-		sumEnergy:=am.Energy+addE
-		if sumEnergy>10{
-			sumEnergy=10
+		addE := getCerebellumReflexAddEnergy(0, am.ID)
+		sumEnergy := am.Energy + addE
+		if sumEnergy > 10 {
+			sumEnergy = 10
 		}
-		if sumEnergy<1{
-			sumEnergy=1
+		if sumEnergy < 1 {
+			sumEnergy = 1
 		}
 		am.Count++
-		out+=TerminateMotorAutomatizmActions(ai.ActID,sumEnergy)
+		out += TerminateMotorAutomatizmActions(ai.ActID, sumEnergy)
+	}
 
 	if ai.PhraseID != nil {
 		addE := getCerebellumReflexAddEnergy(0,am.ID)

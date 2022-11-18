@@ -66,6 +66,9 @@ func CreateNewlastActionsImageID(id int,ActID []int,PhraseID []int,ToneID int,Mo
 	node.MoodID=MoodID
 
 	ActionsImageArr[id]=&node
+	if id==1616{
+		id=1616
+	}
 
 	if doWritingFile { SaveActionsImageArr() }
 

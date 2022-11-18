@@ -76,7 +76,7 @@ activationType == 2 - активация "внутренним" (произво�
 
 fromNextID - ID MentalNext на котором была запущена переактивация consciousness при обдумывании
 */
-func consciousness(activationType int,fromNextID int)(bool) {   //  return false
+func consciousness(activationType int,fromNextID int)(bool) {     return false
 	if !AllowConsciousnessProcess {// при включении и просыпании - 1 раз AllowConsciousnessProcess=true
 		isFirstConsciousnessActivation=false
 		return false
