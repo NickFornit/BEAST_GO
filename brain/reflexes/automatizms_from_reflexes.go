@@ -81,7 +81,7 @@ func RunMakeAutomatizmsFromReflexes() string {
 
 			psychic.NoWarningCreateShow = true
 			ActionsImageID,_:=psychic.CreateNewlastActionsImageID(0,v.ActionIDarr,nil,0,0,true)
-			_, autmzm := psychic.CreateAutomatizm(nodeID, ActionsImageID)
+			_, autmzm := psychic.CreateAtutomatizmNoSaveFile(nodeID, ActionsImageID)
 			psychic.NoWarningCreateShow = false
 			if autmzm != nil {
 				psychic.SetAutomatizmBelief(autmzm, 2) // сделать автоматизм штатным
@@ -150,7 +150,7 @@ func RunMakeAutomatizmsFromGeneticReflexes() string {
 			//  создать автоматизм и привязать его к nodeID
 			psychic.NoWarningCreateShow = true
 			ActionsImageID,_:=psychic.CreateNewlastActionsImageID(0,v.ActionIDarr,nil,0,0,true)
-			_, autmzm := psychic.CreateAutomatizm(nodeID, ActionsImageID)
+			_, autmzm := psychic.CreateAtutomatizmNoSaveFile(nodeID, ActionsImageID)
 			psychic.NoWarningCreateShow = false
 			if autmzm != nil {
 				psychic.SetAutomatizmBelief(autmzm, 2) // сделать автоматизм штатным

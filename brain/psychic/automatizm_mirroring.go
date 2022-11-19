@@ -86,7 +86,7 @@ func FormingMirrorAutomatizmFromList(file string) string {
 			NoWarningCreateShow = true
 
 			ActionsImageID,_:=CreateNewlastActionsImageID(0,aArr,answerID,t,m,true)
-			_, autmzm := CreateAutomatizm(nodeID, ActionsImageID)
+			_, autmzm := CreateAtutomatizmNoSaveFile(nodeID, ActionsImageID)
 			NoWarningCreateShow = false
 			if autmzm != nil {
 				SetAutomatizmBelief(autmzm, 2) // сделать автоматизм штатным
@@ -147,7 +147,7 @@ func FormingMirrorAutomatizmFromTempList(file string) string {
 		NoWarningCreateShow=true
 		// для фразы triggerPraseID создаем привязанный к ней автоматизм
 		ActionsImageID,_:=CreateNewlastActionsImageID(0,nil,answerPraseID,t,m,true)
-		_, autmzm := CreateAutomatizm(2000000 + triggerPraseID[0], ActionsImageID)
+		_, autmzm := CreateAtutomatizmNoSaveFile(2000000 + triggerPraseID[0], ActionsImageID)
 		NoWarningCreateShow = false
 		if autmzm != nil {
 			SetAutomatizmBelief(autmzm, 2) // сделать автоматизм штатным
@@ -182,7 +182,7 @@ func createNewMirrorAutomatizm(sourceAtmzm *Automatizm) {
 	// создать автоматизм и привязать его к объекту
 	// NoWarningCreateShow=true
 	ActionsImageID,_:=CreateNewlastActionsImageID(0,curActiveActions.ActID,curActiveActions.PhraseID,curActiveActions.ToneID,curActiveActions.MoodID,true)
-	_, autmzm := CreateAutomatizm(targetNodeID, ActionsImageID)
+	_, autmzm := CreateAtutomatizmNoSaveFile(targetNodeID, ActionsImageID)
 	//	NoWarningCreateShow=false
 	if autmzm != nil {
 		SetAutomatizmBelief(autmzm, 2) // сделать автоматизм штатным, т.к. действия авторитарно верные
@@ -230,7 +230,7 @@ func provokatorMirrorAutomatizm(sourceAtmzm *Automatizm, purposeGenetic *Purpose
 	ActionsImageID,_:=CreateNewlastActionsImageID(0,curActiveActions.ActID,curActiveActions.PhraseID,curActiveActions.ToneID,curActiveActions.MoodID,true)
 	// NoWarningCreateShow=true
 	// для фразы triggerPraseID создаем привязанный к ней автоматизм
-	_, autmzm := CreateAutomatizm(detectedActiveLastNodID, ActionsImageID)
+	_, autmzm := CreateAtutomatizmNoSaveFile(detectedActiveLastNodID, ActionsImageID)
 	// NoWarningCreateShow=false
 	if autmzm != nil {
 		oldProvokatorAutomatizm=autmzm

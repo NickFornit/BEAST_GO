@@ -188,7 +188,7 @@ func CreateNewAutomatizm(BranchID int, ActionsImageID int)(int, *Automatizm) {
 }
 
 // создать новый автоматизм без записи в файл
-func CreateAutomatizm(BranchID int, ActionsImageID int)(int, *Automatizm) {
+func CreateAtutomatizmNoSaveFile(BranchID int, ActionsImageID int)(int, *Automatizm) {
 	// BranchID может быть ==0 для мозжечковых рефлексов
 	if ActionsImageID == 0 {	return 0, nil }
 

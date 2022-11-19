@@ -183,7 +183,7 @@ func createNodeUnattachedAutomatizm(nodeID int,aID int){
 		return }
 
 	if node.VerbalID>0 { // это узел фразы
-		_,autmzm:=CreateAutomatizm(2000000+node.VerbalID,autmzm0.ActionsImageID)
+		_,autmzm:= CreateAtutomatizmNoSaveFile(2000000+node.VerbalID,autmzm0.ActionsImageID)
 		if autmzm!=nil{
 			SetAutomatizmBelief(autmzm, 2)// сделать автоматизм штатным
 			autmzm.Usefulness=1 // полезность
@@ -191,7 +191,7 @@ func createNodeUnattachedAutomatizm(nodeID int,aID int){
 	}
 	/////////////
 	if node.ActivityID>0 && node.ToneMoodID==0 { // это узел действий - конечный в активной ветке
-		_,autmzm:=CreateAutomatizm(1000000+node.ActivityID,autmzm0.ActionsImageID)
+		_,autmzm:= CreateAtutomatizmNoSaveFile(1000000+node.ActivityID,autmzm0.ActionsImageID)
 		if autmzm!=nil{
 			SetAutomatizmBelief(autmzm, 2)// сделать автоматизм штатным
 			autmzm.Usefulness=1 // полезность

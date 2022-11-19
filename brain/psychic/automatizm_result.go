@@ -296,7 +296,7 @@ func fixNewRules(lastCommonDiffValue int,ai1 int) int {
 	currentRulesID, _ = createNewlastrulesID(0, detectedActiveLastNodID,detectedActiveLastUnderstandingNodID,[]int{TriggerAndAction},true)
 	if currentRulesID == 0{return 0}
 
-	lib.WritePultConsol("<span style='color:green'>Записано <b>ПРАВИЛО № "+strconv.Itoa(currentRulesID)+"</b></span>")
+	//lib.WritePultConsol("<span style='color:green'>Записано <b>ПРАВИЛО № "+strconv.Itoa(currentRulesID)+"</b></span>") // уже есть сообщение в createNewlastrulesID()
 /* В эпиз.память пишется только если не вызвало автоматических (неосознанных) действий,
 а было привлечено осознанное внимание consciousness(2
 	// новый кадр эпизодической памяти, сохраняющий
