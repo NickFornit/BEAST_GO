@@ -27,6 +27,25 @@ func RemoveDuplicateValues(intSlice []int) []int {
 	return list
 }
 
+// удалить повторяющиеся значения строк
+/*
+func RemoveDuplicateStringValues(intSlice []string) []string {
+	keys := make(map[int]bool)
+	list := []string{}
+
+	// If the key(values of the slice) is not equal
+	// to the already present value in new slice (list)
+	// then we append it. else we jump on another element.
+	for _, entry := range intSlice {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+	return list
+}
+ */
+
 // случайное из диапазона чисел
 func RandChooseDiapazonQuest(first int, last int) int {
 	rand.Seed(time.Now().UnixNano())
@@ -113,6 +132,16 @@ func IndexValInArr(arr []int, val int) (bool, int) {
 
 // есть такое значение в массиве
 func ExistsValInArr(arr []int, val int) bool {
+	for _, n := range arr {
+		if n == val {
+			return true
+		}
+	}
+	return false
+}
+
+// есть такое значение в массиве строк
+func ExistsValInStringArr(arr []string, val string) bool {
 	for _, n := range arr {
 		if n == val {
 			return true

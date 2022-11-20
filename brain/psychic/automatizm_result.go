@@ -12,6 +12,7 @@ oldlastBetterOrWorse,oldBetterOrWorse,oldParIdSuccesArr = wasChangingMoodConditi
 package psychic
 
 import (
+	"BOT/brain/action_sensor"
 	"BOT/brain/gomeostas"
 	"BOT/lib"
 	"strconv"
@@ -261,6 +262,14 @@ func wasChangingMoodCondition(kind int)(int,int,[]int){
 	//стало хуже или лучше теперь, возвращает величину измнения от -10 через 9 до 10
 	res0,res,wellIDarr:=gomeostas.BetterOrWorseNow(kind)
 
+	//авторитарные оценки при нажатии на кнопки Наказать (3) и Поощрить (4) имеют преимущество над всем остальным
+	aArr:=action_sensor.CheckCurActions()
+	if lib.ExistsValInArr(aArr, 3){// Наказать
+		res0=-5
+	}
+	if lib.ExistsValInArr(aArr, 4){// Поощрить
+		res0=5
+	}
 	return res0,res,wellIDarr
 }
 /////////////////////////////////////////////////////////////////////////

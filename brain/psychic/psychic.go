@@ -177,10 +177,12 @@ func wakingUp(){
 Для блокировки активации дерева рефлексов вернуть true
  */
 var firstStadiesWarning=true // защелка от повторов
+var ActivationTypeSensor=0//передача типа акетивации в психику из рефлексов
 func SensorActivation(activationType int)(bool){
 	if PulsCount<4{
 		return false
 	}
+	ActivationTypeSensor=activationType
 
 	if EvolushnStage<2{// недостаточная стадия развития
 		if firstStadiesWarning {

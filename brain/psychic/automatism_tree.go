@@ -48,6 +48,7 @@ import (
 	"BOT/brain/action_sensor"
 	"BOT/brain/gomeostas"
 	wordSensor "BOT/brain/words_sensor"
+	"BOT/lib"
 )
 
 // психика инициализирована
@@ -95,6 +96,8 @@ var AutomatizmTreeFromID=make(map[int]*AutomatizmNode)
 // последовательность узлов активной ветки
 var ActiveBranchNodeArr []int
 
+// список конечных узлов лерева
+var lastnodsTreeArr =make(map[int]*AutomatizmNode)
 ////////////////////////////////////////////////
 
 
@@ -319,8 +322,10 @@ func afterTreeActivation()(bool){
 	currentAutomatizmAfterTreeActivatedID = getAutomatizmFromNodeID(detectedActiveLastNodID)
 	 */
 
-// Был запущен моторный автоматизм (в том числе и ментальным автоматизмом)
-if LastRunAutomatizmPulsCount >0{// обработка периода ожидания ответа оператора
+/*ПЕРИОД ОЖИДАНИЯ ОТВЕТА ОПЕРАТОРА, реагировать только на действия Оператора ActivationTypeSensor >1
+	Был запущен моторный автоматизм (в том числе и ментальным автоматизмом)
+ */
+if LastRunAutomatizmPulsCount >0 && ActivationTypeSensor >1{//Обработка нового ответа оператора
 	effect:=0
 		// 	Контроль за изменением состояния, возвращает:
 		//	lastCommonDiffValue - насколько изменилось общее состояние
@@ -396,6 +401,11 @@ if LastRunAutomatizmPulsCount >0{// обработка периода ожида
 		atzm:=orientation(0)
 		if atzm>0{// блокировка рефлексов, если automatizmID > 0
 			return true
+		}else { // нет реакции
+			if EvolushnStage < 4 {
+				lib.SentСonfusion("Не смог сориентироваться.")
+				return true
+			}
 		}
 	}
 

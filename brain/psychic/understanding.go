@@ -31,6 +31,8 @@
 
 package psychic
 
+import "BOT/lib"
+
 //////////////////////////////
 var AllowConsciousnessProcess=false // при включении и просыпании - 1 раз
 var isFirstConsciousnessActivation=false // первый вызов consciousness при включении или просыпании
@@ -43,13 +45,18 @@ var isActivationType2=false
 
 var currrentFromNextID=0 // текущий fromNextID в текущем запуске consciousness
 
-// true - после объективной активации (стимул) был запущен моторный автоматизм и ожидается новый Стимул от оператора.
-var existAnswer = false
+
 
 // текущий объект внимания
 var extremImportanceObject *extremImportance
 // текущий субъект внимания
 var extremImportanceMentalObject *extremImportance
+
+// true - после объективной активации (стимул) был запущен моторный автоматизм и ожидается новый Стимул от оператора.
+var existAnswer = false
+// не было моторного ответа на прошлый стимул, а уже последовавл новый
+var isСonfusion=false
+var timeOfLastStimul=0 //время с прошлого Стимула
 ///////////////////////////////////////////////////////////
 
 
@@ -90,6 +97,10 @@ func consciousness(activationType int,fromNextID int)(bool) {   //  return false
 
 	if activationType == 1 {
 		isActivationType2 = false
+		//
+		if !existAnswer{//не было моторного ответа на прошлый стимул, а уже последовавл новый
+			isСonfusion=true
+		}
 		existAnswer = false
 		extremImportanceObject=nil
 		extremImportanceMentalObject=nil
@@ -129,6 +140,8 @@ func consciousness(activationType int,fromNextID int)(bool) {   //  return false
 	//////////////////////////////////////////////////////////
 
 	var limitCickleCountForEvolushnStage4 = 10 // ограничить число циклов для 4-й стадии
+
+	timeOfLastStimul=PulsCount-timeOfLastStimul //время с прошлого Стимула
 	/////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -315,10 +328,19 @@ if false && !isFirstActivation {//это - не пробуждение false д�
 			return false                      // пусть выполняется все менее высокоуровневое
 		} //if isIdleness()
 		/////////////////////////
-
-
-
 		/////////////////////////  НЕТ ЛЕНИ
+
+		if isСonfusion {
+			if timeOfLastStimul<1{
+				lib.SentСonfusion("Beast не успел обдумать прошлый ответ, а уже есть новый.")
+			}else{
+				lib.SentСonfusion("Beast задумался...")
+			}
+		}
+
+
+
+
 
 
 		// ограничить число циклов для 4-й стадии

@@ -263,7 +263,9 @@ func prepBetterOrWorseNow() {
 var commonPerception = 0 // постоянно обновляемое значение
 // предыдущее общее ощущение
 var commonOldPerception = 0 // меняется только по запросам психики функции BetterOrWorseNow()
-// насколько изменилось общее состояние, значение от  -10(максимально Плохо) через 0 до 10(максимально Хорошо)
+/* насколько изменилось общее состояние, значение от  -10(максимально Плохо) через 0 до 10(максимально Хорошо)
+Это значение учитывается как Эффект реагирования
+ */
 var commonDiffValue = 0
 var curcommonOldPerceptionPulsCount=0
 
@@ -306,7 +308,9 @@ func BetterOrWorseNow(kind int)(int, int, []int) {
 	prepBetterOrWorseNow()
 	CommonOldBadValue = CommonBadValue
 
-	// применить "эффект" кнопок с Пульта (в таблице он забивался в виде "+" "-")
+	// commonDiffValue - главный параметр для формирования Эффекта реакции (В оценке автоматизма и Правилах)
+
+	// применить "эффект" кнопок с Пульта (в таблице http://go/pages/gomeostaz.php он забивался в виде "+" "-")
 	if kind == 2 { // второй вызов при измерении эффекта реакции
 		if commonDiffValue == 0 {
 			if CommonMoodAfterAction == "+" {
@@ -317,6 +321,9 @@ func BetterOrWorseNow(kind int)(int, int, []int) {
 			}
 		}
 	}
+	/* авторитарные оценки Наказать (3) и Поощрить (4) имеют преимущество над всем остальным:
+	Это делается в психике (в func wasChangingMoodCondition), при передаче значений от BetterOrWorseNow
+	 */
 
 	return commonDiffValue, lastBetterOrWorse, GomeoParIdSuccesArr
 }

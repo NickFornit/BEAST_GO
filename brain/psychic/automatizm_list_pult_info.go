@@ -8,8 +8,10 @@ import (
 	"BOT/brain/gomeostas"
 	termineteAction "BOT/brain/terminete_action"
 	word_sensor "BOT/brain/words_sensor"
+	"BOT/lib"
 	"sort"
 	"strconv"
+	"strings"
 )
 
 //////////////////////////////////////////
@@ -181,4 +183,91 @@ func GetStrnameFromobjectID(objectID int)(string){
 	return ""
 }
 /////////////////////////////////////
+
+
+/* Список фраз, для которых есть автоматизм Beast в этих условиях.
+Для иконки http://go/img/words.png нал полем ввода.
+ */
+func GetAutomatizmPraseList(basicID int,contexts string)string{
+	out:=""
+	nCol:=0
+	// образ эмоции
+	var contextsArr []int
+	cArr:=strings.Split(contexts, ",")
+	for i := 0; i < len(cArr); i++ {
+		cID,_:=strconv.Atoi(cArr[i])
+		contextsArr=append(contextsArr,cID)
+	}
+	emID, _ := createNewBaseStyle(0, contextsArr, true)
+	// ШТАТНЫЕ автоматизмы, прикрепленные к ID узла Дерева
+	var outArr []string
+	for _, v := range AutomatizmBelief2FromTreeNodeId {
+		brnch:=AutomatizmTreeFromID[v.BranchID]
+		if brnch == nil{ continue}
+		if brnch.BaseID!=basicID && brnch.EmotionID!=emID{ continue}
+		if brnch.VerbalID!=0 {
+		varb:=VerbalFromIdArr[brnch.VerbalID]
+		if varb==nil{ continue}
+		if len(varb.PhraseID)==1 {
+			prase:=word_sensor.GetPhraseStringsFromPhraseID(varb.PhraseID[0])
+			if len(prase)>1 {
+				if !lib.ExistsValInStringArr(outArr, prase) {
+					outArr = append(outArr, prase)
+				}
+			}
+		}
+	}
+	}
+	if len(outArr)>0 {
+		sort.Strings(outArr)
+	nCol=0
+	out = "<b>Штатные автоматизмы:</b> <table border=0 style='width:800px;font-size:14px;'><tr>"
+		for i := 0; i < len(outArr); i++ {
+			if !lib.ExistsValInStringArr(outArr, outArr[i]) {
+				outArr = append(outArr, outArr[i])
+			}
+			if (nCol == 6) {
+				out += "</tr><tr>"
+				nCol = 0
+			}
+			out += "<td align='left' style='cursor:pointer;' onClick='insert_pult_word(`" + outArr[i] + "`)'><nobr>" + outArr[i] + "</nobr></td>"
+			nCol++
+		}
+		out += "</tr></table><hr>";
+	}
+
+
+	//автоматизмы, привязанные к ID фразе VerbalID и тогда их branchID начинается с 2000000
+	outArr=nil
+	out2:=""
+	for praaseID, _ := range AutomatizmIdFromPhraseId {
+			prase:=word_sensor.GetPhraseStringsFromPhraseID(praaseID)
+					if len(prase)>1 {
+						if !lib.ExistsValInStringArr(outArr, prase) {
+							outArr = append(outArr, prase)
+						}
+					}
+	}
+	if len(outArr)>0 {
+		sort.Strings(outArr)
+		nCol=0
+		out2 = "<span title='Эти автоматизмы срабаотывают по фразам, отвечая на них.'><b>Общие автоматизмы:</b></span> <table border=0 style='width:800px;font-size:14px;'><tr>"
+		for i := 0; i < len(outArr); i++ {
+			if !lib.ExistsValInStringArr(outArr, outArr[i]) {
+				outArr = append(outArr, outArr[i])
+			}
+			if (nCol == 6) {
+				out2 += "</tr><tr>"
+				nCol = 0
+			}
+			out2 += "<td align='left' style='cursor:pointer;' onClick='insert_pult_word(`" + outArr[i] + "`)'><nobr>" + outArr[i] + "</nobr></td>"
+			nCol++
+		}
+		out2 += "</tr></table>";
+		out+=out2
+	}
+
+return out
+}
+//////////////////////////////////////////////////
 

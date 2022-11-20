@@ -560,6 +560,21 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 				return
 			}
 
+			//получить фразы, используемые в автоматизмах для иконки выбора Пульта
+			conditions_words_basic := r.FormValue("conditions_words_basic")
+			if conditions_words_basic =="1" {
+				// против concurrent map iteration and map write
+				brain.IsPultActivnost = true
+				bID:=r.FormValue("basicID")
+				bID=strings.Trim(bID," ")
+				basicID,_:=strconv.Atoi(bID)
+				contexts:=r.FormValue("contexts")
+				ref := psychic.GetAutomatizmPraseList(basicID,contexts)
+				brain.IsPultActivnost = false
+				_, _ = fmt.Fprint(resp, ref)
+				return
+			}
+
 			// обнулить параметры гомеостаза Beast
 			cliner_gomeo_pars := r.FormValue("cliner_gomeo_pars")
 			if len(cliner_gomeo_pars) > 0 {

@@ -53,7 +53,7 @@ func ActionSensorPuls(evolushnStage int, lifeTime int, puls int, isSlipping bool
 16 Простить
 17 Вылечить
  */
-var ActionFromPult[18]int // живет на время активации с пульта до завершения прохода дерева
+var ActionFromPult[18]int // время активации действия живет на время активации с пульта до завершения прохода дерева
 // сохрянять текущий контекст ActionFromPultContext=ActionFromPult
 var ActionFromPultContext [18]int // эти не очищаются
 

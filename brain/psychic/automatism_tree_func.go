@@ -135,6 +135,10 @@ var saveDoWritingFile= doWritingFile; doWritingFile =false
 			ActivityID,ToneMoodID,SimbolID,VerbalID,false)
 doWritingFile =saveDoWritingFile
 	}
+
+	// вытащить конечные узлы веток дерева, заполнить var lastnodsTreeArr =make(map[int]*AutomatizmNode)
+	//finishScanAllTree()
+
 	return
 }
 /*
@@ -447,3 +451,25 @@ func addNewBranchFromNodes(level int,cond []int,node *AutomatizmNode)(int){
 /////////////////////////////////////
 
 
+
+
+
+// список конечных узлов лерева
+/*
+func finishScanAllTree(){
+	lastnodsTreeArr =make(map[int]*AutomatizmNode)
+	curScanAllTree(&AutomatizmTree)
+}
+func curScanAllTree(wt *AutomatizmNode) {
+	if wt.ID > 0 {
+		wt.ParentNode = AutomatizmTreeFromID[wt.ParentID] // wt.ParentNode адрес меняется из=за corretsParent(,
+	}
+	if wt.Children == nil {	// конец ветки
+		lastnodsTreeArr[wt.ID]=wt
+		return
+	}
+	for i := 0; i < len(wt.Children); i++ {
+		curScanAllTree(&wt.Children[i])
+	}
+}*/
+////////////////////////////////////////////////////////////

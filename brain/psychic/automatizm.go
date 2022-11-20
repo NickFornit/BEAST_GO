@@ -92,7 +92,7 @@ var AutomatizmBelief2FromTreeNodeId = make(map[int]*Automatizm)
 // среди привязанный к данному образуID может быть один штатный с Belief==2
 var AutomatizmIdFromActionId = make(map[int] []*Automatizm)
 //привязанные к ID фразы VerbalID и тогда их branchID начинается с 2000000
-// среди привязанный к данной фразеID может быть один штатный с Belief==2
+// среди привязанных к данной фразеID (неважны предыдущие условия) может быть один штатный с Belief==2
 var AutomatizmIdFromPhraseId = make(map[int] []*Automatizm)
 
 /* список удачных автоматизмов, относящихся к определенным условиям (привзяанных к определенной ветке Дерева)

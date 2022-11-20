@@ -39,7 +39,10 @@ var MotorTerminalBlocking=false
 ////////////////////////////////////////////////
 
 
-// момент запуска автоматизма в числе пульсов
+/*НАЧАЛО ПЕРИОДА ОЖИДАНИЯ ОТВЕТА с Пульта
+момент запуска автоматизма в числе пульсов -
+только если LastAutomatizmWeiting был в ответ на действия Оператора!
+ */
 var LastRunAutomatizmPulsCount =0 //сбрасывать ожидание результата автоматизма если прошло 20 пульсов
 // ожидается результат запущенного MotAutomatizm
 var LastAutomatizmWeiting *Automatizm
@@ -101,7 +104,9 @@ if am.Usefulness<0{
 }
 	notAllowReflexRuning=true // блокировка рефлексов
 	LastAutomatizmWeiting=am
-	LastRunAutomatizmPulsCount =PulsCount // активность мот.автоматизма в чисде пульсов
+	if ActivationTypeSensor>1 {// только при активации Оператором, а не изменением состояния
+		LastRunAutomatizmPulsCount = PulsCount // активность мот.автоматизма в чисде пульсов
+	}
 
 	var out=""
 	if LastRunMentalAutomatizmPulsCount ==PulsCount { // активность мот.автоматизма в чисде пульсов
