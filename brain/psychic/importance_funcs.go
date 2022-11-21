@@ -42,7 +42,7 @@ func setImportance(effect int){
 			// по каждому слову фразы
 			wRr:=word_sensor.WordsArrFromPhraseID[curActiveActions.PhraseID[i]]
 			for j := 0; j < len(wRr); j++ {
-				createNewlastImportanceID(0, detectedActiveLastNodID, detectedActiveLastUnderstandingNodID, 6, curActiveActions.PhraseID[j],effect, true)
+				createNewlastImportanceID(0, detectedActiveLastNodID, detectedActiveLastUnderstandingNodID, 6, curActiveActions.PhraseID[i],effect, true)
 			}
 		}
 	}

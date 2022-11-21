@@ -227,25 +227,27 @@ if LastRunAutomatizmPulsCount > 0{// был и закончился ответо
 /////////////// ситуации действий с пульта
 var max=0
 // сначала настроение, чтобы оно перекрылось кнопками действий если они есть
-	mood:=curActiveActions.MoodID
-	if mood != 0{// есть настроение
-		prior:=getPrioritetOfPultMoodActions(mood)
-			if max<prior{
-				sitID=10+mood
-				max=prior
-			}
-	}/////////////////////
+if curActiveActions !=nil {
+	mood := curActiveActions.MoodID
+	if mood != 0 { // есть настроение
+		prior := getPrioritetOfPultMoodActions(mood)
+		if max < prior {
+			sitID = 10 + mood
+			max = prior
+		}
+	}
 
 // кнопки действий
 aArr:=curActiveActions.ActID
 	if aArr != nil{// есть действия кнопок с Пульта
 		max=0 // перекрываем
 		for i := 0; i < len(aArr); i++ {
-			prior:=getPrioritetOfPultButtonActions(aArr[i])
-if max<prior{
-	sitID=20+aArr[i]
-	max=prior
-}
+			prior := getPrioritetOfPultButtonActions(aArr[i])
+			if max < prior {
+				sitID = 20 + aArr[i]
+				max = prior
+			}
+		}
 		}
 	}/////////////////////
 

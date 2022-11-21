@@ -187,8 +187,8 @@ func automatizmTreeActivation()(int) {
 	ActID := action_sensor.CheckCurActionsContext(); //CheckCurActions()
 
 	lev3, _ := createNewlastActivityID(0, ActID, true) // текущий образ сочетания действий с Пульта Activity
-	curActiveActionsID = 0
-	curActiveActions = nil
+	//!!!!curActiveActionsID = 0
+	//!!!!curActiveActions = nil
 
 	var lev4 = 0
 	var lev5 = 0

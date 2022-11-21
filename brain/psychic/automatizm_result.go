@@ -298,6 +298,9 @@ func fixNewRules(lastCommonDiffValue int,stimul int) int {
 	if stimul == 0  || LastAutomatizmWeiting == nil {
 		return 0
 	}
+	if curStimulImage.ActID == nil && curStimulImage.PhraseID ==nil{ // не писать Правила с пустым Стимулом
+		return 0
+	}
 	// ответный образ действий Beast
 	answer:=LastAutomatizmWeiting.ActionsImageID
 	if answer == 0{return 0}
