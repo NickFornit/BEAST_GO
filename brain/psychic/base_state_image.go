@@ -1,10 +1,11 @@
-/* Образ текущего сосотояния.
+/* Образ текущего сосотояния для func understandingSituation
 Возникает только при активации дерева от ActiveFromConditionChange()
 т.е. только если это - не действия оператора Пульта: if !WasOperatorActiveted {
 
 Аналогично образу действий BaseStateImage (оператора или Beast) 
 этот образ участвует в формировании Правил.
 
+Ранее использовалось для записи Правила по изменению состояния, а не ответу оператора, теперь НЕ ИСПОЛЬЗУЕТСЯ в Правилах.
 */
 
 
@@ -35,9 +36,8 @@ func BaseStateImageInit(){
 
 
 ////////////////////////////////////////////////
-// создать новое сочетание ответных действий если такого еще нет
 var lastBaseStateImageID=0
-func СreateNewlastBaseStateImageID(id int,Mood int,EmotionID int,SituationID int,CheckUnicum bool)(int,*BaseStateImage){
+func CreateNewStatImageID(id int,Mood int,EmotionID int,SituationID int,CheckUnicum bool)(int,*BaseStateImage){
 	if CheckUnicum {
 		oldID,oldVal:=checkUnicumBaseStateImage(Mood,EmotionID,SituationID)
 		if oldVal!=nil{
@@ -123,7 +123,7 @@ func loadBaseStateImageArr(){
 		SituationID,_:=strconv.Atoi(p[3])
 
 		var saveDoWritingFile= doWritingFile; doWritingFile =false
-		СreateNewlastBaseStateImageID(id,Mood,EmotionID,SituationID,false)
+		CreateNewStatImageID(id,Mood,EmotionID,SituationID,false)
 		doWritingFile =saveDoWritingFile
 	}
 	return

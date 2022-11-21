@@ -181,9 +181,9 @@ lib.WritePultConsol("<span style='color:blue;background-color:#FFD0FF;'>Был �
 		      А так же просматривать эпизод память взад макчимум на EpisodeMemoryPause шагов или до паузы в общении > 30 шагов,
 		   		фиксируя цепочку правил.
 		*/
-//		ai1, _ := CreateNewlastActionsImageID(0, curActiveActions.ActID, curActiveActions.PhraseID, curActiveActions.ToneID, curActiveActions.MoodID,true)
-// всегда есть образ действий оператора:	curActiveActionsID, curActiveActions
-		fixNewRules(lastCommonDiffValue,curActiveActionsID)
+//		stimul, _ := CreateNewlastActionsImageID(0, curActiveActions.ActID, curActiveActions.PhraseID, curActiveActions.ToneID, curActiveActions.MoodID,true)
+// образ действий оператора Стимул:	curStimulImageID и есть Ответ: curActiveActions
+		fixNewRules(lastCommonDiffValue,curStimulImageID)
 	}
 
 return
@@ -284,23 +284,24 @@ var currentRulesID=0
 
 ////////////////////////////////////////////////////////////////////////
 /* на стадии >3 при каждом ответе на действия оператора - прописывать текущее правило rules.
-   А так же просматривать эпизод память взад макчимум на 6 шагов или до паузы в общении > EpisodeMemoryPause шагов,
+   А так же просматривать эпизод память взад макcимум на 6 шагов или до паузы в общении > EpisodeMemoryPause шагов,
 		фиксируя цепочку правил.
+Stimul - действие оператора до Ответа Beast
 */
-func fixNewRules(lastCommonDiffValue int,ai1 int) int {
-	currentTriggerID=ai1
+func fixNewRules(lastCommonDiffValue int,stimul int) int {
+	currentTriggerID=stimul
 	if LastAutomatizmWeiting == nil{
 		return 0
 	}
 
 	// образ действий оператора
-	if ai1 == 0  || LastAutomatizmWeiting == nil {
+	if stimul == 0  || LastAutomatizmWeiting == nil {
 		return 0
 	}
 	// ответный образ действий Beast
-	ai2:=LastAutomatizmWeiting.ActionsImageID
-	if ai2 == 0{return 0}
-	TriggerAndAction,_:=createNewlastTriggerAndActionID(0,ai1,ai2,lastCommonDiffValue,true)
+	answer:=LastAutomatizmWeiting.ActionsImageID
+	if answer == 0{return 0}
+	TriggerAndAction,_:=createNewlastTriggerAndActionID(0,stimul,answer,lastCommonDiffValue,true)
 	if TriggerAndAction == 0{return 0}
 	currentRulesID, _ = createNewlastrulesID(0, detectedActiveLastNodID,detectedActiveLastUnderstandingNodID,[]int{TriggerAndAction},true)
 	if currentRulesID == 0{return 0}
@@ -318,15 +319,15 @@ func fixNewRules(lastCommonDiffValue int,ai1 int) int {
 }
 ///////////////////////////////////////////////////////////////////////
 
-
-// обработать изменение состояния - записать Правило типа BaseStateImage
+/* Не записывать Правила по изменению состояния, а только - по стимулу от Оператора!
+// записать Правило типа BaseStateImage Стимул - не от оператора, а при активации изменением состояния
 func fixRulesBaseStateImage(lastCommonDiffValue int){
 	//корректируется успешность автоматизма - как в calcAutomatizmResult
 	automatizmCorrection(lastCommonDiffValue,nil)
 	/////////////////////// ПРАВИЛО:
-	ai1, _ := СreateNewlastBaseStateImageID(0, curBaseStateImage.Mood, curBaseStateImage.EmotionID, curBaseStateImage.SituationID,true)
-	ai1*=-1 // отрицательное значение идентифицирует образ - как текущего сосотояния!!!
-	currentTriggerID=ai1
-	fixNewRules(lastCommonDiffValue,ai1)
-}
+	stimul, _ := CreateNewStatImageID(0, curStimulImage.Mood, curStimulImage.EmotionID, curBaseStateImage.SituationID,true)
+	stimul*=-1 // отрицательное значение идентифицирует образ - как текущего сосотояния!!!
+	currentTriggerID=stimul
+	fixNewRules(lastCommonDiffValue,stimul)
+}*/
 /////////////////////////////////////////////////////////////////////

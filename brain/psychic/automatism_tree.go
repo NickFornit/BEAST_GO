@@ -121,11 +121,16 @@ var curActions ActionsImage//
 // структура действий оператора при активации дерева автоматизмов
 var curActiveActions *ActionsImage // зеркалит текущий ActionsImage
 var curActiveActionsID=0
+// образ предыдущего сосотояния ПОСЛЕ стимула Оператора (не меняется при активации изменением состояния)
+var curStimulImage *ActionsImage
+var curStimulImageID=0
 
 ////////////////////////////////////////
 var curActiveVerbalID=0
 // структура образа текущего сосотояния
 var curBaseStateImage BaseStateImage
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /* попытка активации дерева автоматизмов, если неудачно - начать искать вариант действий
@@ -211,10 +216,15 @@ func automatizmTreeActivation()(int) {
 	curActions.ToneID = ToneID
 	curActions.MoodID = MoodID
 }
-// всегда делать образ действий оператора
-//if ActivationTypeSensor!=1 { пусть делает образ нулевой акции
+// образ действий оператора
+	if ActivationTypeSensor >1 {
+		// сохраняем предыдущий Стимул
+		curStimulImage=curActiveActions
+		curStimulImageID=curActiveActionsID
 	curActiveActionsID, curActiveActions = CreateNewlastActionsImageID(0, curActions.ActID, curActions.PhraseID, curActions.ToneID, curActions.MoodID, true)
-//}
+
+
+	}
 
 	condArr:=getActiveConditionsArr(lev1, lev2, lev3, lev4, lev5, lev6)
 	notAllowScanInTreeThisTime=true // защелка от повтора во время обработки
@@ -324,6 +334,8 @@ func afterTreeActivation()(bool){
 
 /*ПЕРИОД ОЖИДАНИЯ ОТВЕТА ОПЕРАТОРА, реагировать только на действия Оператора ActivationTypeSensor >1
 	Был запущен моторный автоматизм (в том числе и ментальным автоматизмом)
+Срабатывает при типе активации (ActivationTypeSensor>1) т.к. Правила записываются только
+	со стимулом от Оператора и НЕ бывает со стимулом - по изменению состояния.
  */
 if LastRunAutomatizmPulsCount >0 && ActivationTypeSensor >1{//Обработка нового ответа оператора
 	effect:=0
@@ -334,27 +346,28 @@ if LastRunAutomatizmPulsCount >0 && ActivationTypeSensor >1{//Обработка
 		if WasOperatorActiveted { // оператор отреагировал
 			lastCommonDiffValue,lastBetterOrWorse,gomeoParIdSuccesArr := wasChangingMoodCondition(2)
 			effect=lastCommonDiffValue
-			// обработать изменение состояния
+			// обработать изменение состояния фиксация ПРАВИЛА, Стимул - ОТ ОПЕРАТОРА
 			calcAutomatizmResult(lastCommonDiffValue,lastBetterOrWorse, gomeoParIdSuccesArr)
 
 // по результатам обработки, но до очистки 	LastRunAutomatizmPulsCount и LastAutomatizmWeiting
 			if EvolushnStage > 3 {
 // Активировать Дерево Понимания: или запустить ментальный автоматизм или - ориентировочная реакция для осмысления
 				understandingSituation(1) // нельзя здесь делать прерывание! после обработки ожидаемой реакции Оператора - следует реакция Beast
-				// return true
+				// !!!return true
 			}
 // закончить период ожидания после реакции оператора
 			clinerAutomatizmRunning()
 			WasConditionsActiveted = false // иначе сразу сработает fixRulesBaseStateImage после изменения состояния при действияъ
 		}
 
+		/* Не записывать Правила по изменению состояния, а только - по стимулу от Оператора!
 	if !onliOnceWasConditionsActiveted {// только один раз во время периода ожидания
 		onliOnceWasConditionsActiveted = true
 		if WasConditionsActiveted { // изменились условия (не действия оператора)
 			WasConditionsActiveted = false
 			if EvolushnStage > 3 {
 				lastCommonDiffValue, _, _ := wasChangingMoodCondition(2)
-				// обработать изменение состояния - записать Правило типа BaseStateImage
+// записать ПРАВИЛО типа BaseStateImage Стимул - НЕ ОТ ОПЕРАТОРА, а при активации изменением состояния
 				fixRulesBaseStateImage(lastCommonDiffValue)// здесь корректируется успешность автоматизма - как в calcAutomatizmResult
 				// Активировать Дерево Понимания: или запустить ментальный автоматизм или - ориентировочная реакция для осмысления
 				understandingSituation(1)
@@ -363,20 +376,23 @@ if LastRunAutomatizmPulsCount >0 && ActivationTypeSensor >1{//Обработка
 				return true
 			}
 		}
-	}
-	// после периода ожидания
+	}*/
+
+
+
+	// после обработки периода ожидания
 	setImportance(effect)//установить значимость - величина от 0 до 10, приобретаемая объектов внимания в данной ситуации
 	afterWaitingPeriod(effect)//Учесть последствия ментального запуска мот.автоматизма
 //и если нужно обдумать это в новом ментальном consciousness(2,currrentFromNextID)
 
 //  после обработки ожидаемой реакции Оператора - следует реакция Beast
 //		return true  поэтому нельзя здесь делать прерывание!
-}// конец обработки ожидания ответа оператора
+}
+////////////////////////////// конец обработки ожидания ответа оператора
 
 	// ЕСТЬ ЛИ АВТОМАТИЗМ В ВЕТКЕ и болеее ранних? выбрать лучший автоматизм для сформированной ветки nodeID
 	currentAutomatizmAfterTreeActivatedID = getAutomatizmFromNodeID(detectedActiveLastNodID)
 
-// ОБРАБОТКА ВНЕ ПЕРИОДА ОЖИДАНИЯ ОТВЕТА
 	// всегда сначала активировать дерево понимания, результаты которого могут заблокировать все внизу
 	if EvolushnStage > 3 {
 // Активировать Дерево Понимания: или запустить ментальный автоматизм или - ориентировочная реакция для осмысления

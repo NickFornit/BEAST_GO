@@ -153,7 +153,17 @@ func getCerebellumReflexAddEnergy(kind int, automatizmID int) int {
 }
 
 // выполнить дополнительные мозжечковые автоматизмы сразу после выполняющегося автоматизма
+var wasRunAutmzmID=0// защелка от бесконечного цикла RumAutomatizm() - runCerebellumAdditionalAutomatizm() - RumAutomatizmID() - RumAutomatizm()
+var wasRunMentalAutmzmID=0
 func runCerebellumAdditionalAutomatizm(kind int, automatizmID int) {
+	if wasRunAutmzmID>0{// только один вызов runCerebellumAdditionalAutomatizm для данного автоматизма
+		wasRunAutmzmID=0
+		return
+	}
+	if wasRunMentalAutmzmID>0{// только один вызов runCerebellumAdditionalAutomatizm для данного автоматизма
+		wasRunMentalAutmzmID=0
+		return
+	}
 	var cr *cerebellumReflex
 
 	if kind == 0 {
@@ -165,11 +175,13 @@ func runCerebellumAdditionalAutomatizm(kind int, automatizmID int) {
 	if kind == 0 {
 		aArr := cr.additionalAutomatizmID
 		for i := 0; i < len(aArr); i++ {
+			wasRunAutmzmID=aArr[i]
 			RumAutomatizmID(aArr[i])
 		}
 	} else {
 		aArr := cr.additionalMentalAutID
 		for i := 0; i < len(aArr); i++ {
+			wasRunMentalAutmzmID=aArr[i]
 			RunMentalAutomatizmsID(aArr[i])
 		}
 	}
