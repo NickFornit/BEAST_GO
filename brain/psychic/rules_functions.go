@@ -86,7 +86,6 @@ func getSuitableRules()(int){
 			return rID
 		}
 
-
 		/*
 		maxSteps:=1000
 		for limit:=5; limit > 1; limit-- {

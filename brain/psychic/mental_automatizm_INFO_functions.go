@@ -15,6 +15,7 @@
 package psychic
 
 import (
+	wordSensor "BOT/brain/words_sensor"
 	"BOT/lib"
 	"strconv"
 )
@@ -85,6 +86,7 @@ func runMentalFunctionID(id int){
 	case 9: infoFunc9()//найти способ улучшения значимости объекта внимания extremImportanceObject
 	case 10: infoFunc10()//найти способ улучшения значимости субъекта внимания extremImportanceMentalObject
 	case 11: infoFunc11()//Ментальное отзеркаливание
+	case 12: infoFunc12()//Cинтез новой фразц из компонентов, имеющих плюсы в Правилах
 	}
 }
 
@@ -101,6 +103,7 @@ func getMentalFunctionString(id int)string{
 	case 9: return "Найти способ улучшения значимости объекта внимания extremImportanceObject"
 	case 10: return "Найти способ улучшения значимости субъекта внимания extremImportanceMentalObject"
 	case 11: return "Ментальное отзеркаливание"
+	case 12: return "Cинтез новой фразц из компонентов, имеющих плюсы в Правилах"
 	}
 	return "Нет функции с ID = "+strconv.Itoa(id)
 }
@@ -469,27 +472,138 @@ func infoFunc11() {
 	infoMentalMirriring()
 	currentInfoStructId=11 // определение актуального поля mentalInfo
 }
-// улучшение объекта внимания
 func infoMentalMirriring()bool {
-	// определить зеркальный mentalInfoStruct.motorAtmzmID МЕНТАЛЬНЫЙ УСЛОВНЫЙ РЕФЛЕКС ?
-
-	// найти в Правилах ответное действие с объектом extremImportanceMentalObject, приводящее к успеху
-
-
-	// создание мент.авто-ма запуска действия, улучшающего значимость субъекта внимания - return true
-	/*
-	if ...{
-		actID:=TriggerAndActionArr[rules.TAid[0]].Action
-		// создание мент.авто-ма запуска действия, улучшающего значимость объекта внимания - return true
-		infoCreateAndRunMentMotorAtmzmFromAction(actID)//-тут определяется mentalInfoStruct.mentalAtmzmID
-	return true
+	//есть ли фраза в действиях оператора
+	if curActiveActions.PhraseID==nil{
+		return false
 	}
-	*/
+	/* алгоритм:
+	1. Найти такую фразу в Ответах Beast, в Правилах: rulesID
+	2. Посмотреть какое последовало действие оператора на это - в эпиз.памяти после rulesID: answer
+	3. Создать автоматизм на такое действие и выдать на Пульт.
+	 */
+
+	// Пункт 1: ищем в одиночных Правилах
+	for _, v := range rulesArr {
+		if len(v.TAid)==1{
+			ta:=TriggerAndActionArr[v.TAid[0]]
+			if ta==nil{
+				lib.WritePultConsol("Нет карты TriggerAndActionArr для iD="+strconv.Itoa(v.TAid[0]))
+				return false
+			}
+			// условия должны совпадать, чтобы фраза не была сказана невпопад
+			if v.NodeAID!=detectedActiveLastNodID { // пока v.NodePID не учитываем, иначе фиг найдет...
+				continue
+			}
+			act:=ActionsImageArr[ta.Action]
+			if act==nil{
+				lib.WritePultConsol("Нет карты ActionsImageArr для iD="+strconv.Itoa(ta.Action))
+				return false
+			}
+			if lib.EqualArrs(act.PhraseID, curActiveActions.PhraseID){// нашли
+				//rulesID=k // правило, где в Ответе применена такая же фраза
+				// Пункт 2: ищем в эпизод памяти такое Правило, начиная с конца
+				end:=10000 // не смотрим далее, чем на end кадров
+				for i := len(EpisodeMemoryObjects)-1; i >= 0 || end==0; i -- {
+					em:=EpisodeMemoryObjects[i]
+					if em.TriggerAndActionID == ta.ID{//нашли кадр
+						// вынуть действие из следующего кадра
+						nextEM:=EpisodeMemoryObjects[i+1]
+						nextTa:=TriggerAndActionArr[nextEM.TriggerAndActionID]
+						if nextTa==nil{
+							lib.WritePultConsol("Нет карты TriggerAndActionArr для iD="+strconv.Itoa(nextEM.TriggerAndActionID))
+							return false
+						}
+						acting:=ActionsImageArr[nextTa.Trigger]
+						if acting==nil{
+							lib.WritePultConsol("Нет карты ActionsImageArr для iD="+strconv.Itoa(nextTa.Trigger))
+							return false
+						}
+						// Пункт 3: здесь определяется mentalInfoStruct.motorAtmzmID
+						infoCreateAndRunMentMotorAtmzmFromAction(acting.ID)
+return true
+					}
+					end--
+				}
+			}
+		}
+	}
+
 	mentalInfoStruct.motorAtmzmID=0
 	return false
 }
 ////////////////////////////////////////////////////////////////////////
 
+
+
+
+/*Cинтез новой фразц из компонентов, имеющих плюсы в Правилах
+Возможен при хорошем словарном запасе и хорошем опыте значимости (importance) фраз.
+
+Пока что выдается первая подходящая фраза, имеющая +значимость в данных услових
+ */
+func infoFunc12() {
+	lib.WritePultConsol("Запущена функция:<br> "+getPurposeDetaileString(11))
+	clinerMentalInfo()
+	infoSynthesisOenPrase()
+	currentInfoStructId=12 // определение актуального поля mentalInfo
+}
+func infoSynthesisOenPrase()bool {
+
+/*TODO сделать фразу, состояющую из 2-3-х известных фраз, найденных в Правилах при данных условиях и выдать ее на Пульт
+Чтобы фраза не была бессмысленным попугайством, нужно проверять ее смысл по importanceFromID
+	importance.Type=5//фраза
+  importance.ObjectID=praseID
+  importance.Value>0
+	для текущих условий
+  importance.NodeAID
+  importance.NodePID
+ */
+	var phraseArr []int // здесь собираем плюсовые фразы
+	for _, v := range rulesArr {
+		if len(v.TAid) == 1 {
+			ta := TriggerAndActionArr[v.TAid[0]]
+			if ta == nil {
+				lib.WritePultConsol("Нет карты TriggerAndActionArr для iD=" + strconv.Itoa(v.TAid[0]))
+				return false
+			}
+			if ta.Effect<=0{
+				continue
+			}
+			// условия должны совпадать, чтобы фраза не была сказана невпопад
+			if v.NodeAID != detectedActiveLastNodID { // пока v.NodePID не учитываем, иначе фиг найдет...
+				continue
+			}
+			act := ActionsImageArr[ta.Action]// берем именно Ответ Beast
+			if act == nil {
+				lib.WritePultConsol("Нет карты ActionsImageArr для iD=" + strconv.Itoa(ta.Action))
+				return false
+			}
+			if act.PhraseID!=nil{
+				// посмотртеь значимость фразы, только для act.PhraseID[0]
+				imp:=getObjectImportance(5,act.PhraseID[0], detectedActiveLastNodID,detectedActiveLastUnderstandingNodID)
+				if imp!=nil && imp.Value>0{
+					phraseArr=append(phraseArr,act.PhraseID[0])
+// TODO более крутой способ подбора фраз
+					if len(phraseArr)>1{// пока не смотреть больше. т.к. будет выбрано просто 2 первые.
+break
+					}
+				}
+			}
+		}
+	}
+
+	if len(phraseArr)>0{// выдать нормальным тоном с настроением wordSensor.CurPultMood
+		actID,_:=CreateNewlastActionsImageID(0,nil,phraseArr,90,wordSensor.CurPultMood,true)
+if actID>0{
+	// здесь определяется mentalInfoStruct.motorAtmzmID
+	infoCreateAndRunMentMotorAtmzmFromAction(actID)
+	return true
+}
+	}
+	return false
+}
+/////////////////////////////////////////////////////////////////////////
 
 
 
