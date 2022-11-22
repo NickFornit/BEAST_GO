@@ -100,6 +100,7 @@ func RumAutomatizm(am *Automatizm)(bool){
 
 // блокировка выполнения плохого автоматизма, если только не применена "СИЛА ВОЛИ"
 if am.Usefulness<0{
+	lib.WritePultConsol("Блокировка выполнения плохого (Usefulness="+strconv.Itoa(am.Usefulness)+") автоматизма iD="+strconv.Itoa(am.ID))
 	return false
 }
 	notAllowReflexRuning=true // блокировка рефлексов

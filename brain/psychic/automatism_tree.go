@@ -185,8 +185,9 @@ func automatizmTreeActivation()(int) {
 	curBaseStateImage.SituationID = 0 // будет определн при активации дерева понимания, может и не быть выбранной ситуации
 
 	ActID := action_sensor.CheckCurActionsContext(); //CheckCurActions()
-
 	lev3, _ := createNewlastActivityID(0, ActID, true) // текущий образ сочетания действий с Пульта Activity
+	// дезактивировать все контексты!!!! чтобы не влияли на следующую активность
+	action_sensor.DeactivationTriggersContext()
 	//!!!!curActiveActionsID = 0
 	//!!!!curActiveActions = nil
 
@@ -209,6 +210,8 @@ func automatizmTreeActivation()(int) {
 		или из памяти о воспринятых фразах (Vernike_detector.go): var MemoryDetectedArr []MemoryDetected
 		*/
 		lev6 = verb.PhraseID[0]
+		// очистить фразу после использования, чтобы не влияла на следующую активность
+		wordSensor.CurrentPhrasesIDarr=nil
 
 	// сохраняем для отзеркаливания действий оператора
 	curActiveVerbalID = verbID

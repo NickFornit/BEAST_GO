@@ -29,7 +29,7 @@ var WasOperatorActiveted=false
 var WasConditionsActiveted=false
 
 // период ожидания реакции оператора на действие автоматизма
-const WaitingPeriodForActionsVal=20
+const WaitingPeriodForActionsVal=25
 
 
 var savePsyBaseMood=0 // -1 Плохое настроение, 0 Нормальное, 1 - хорошее настроение
@@ -236,11 +236,13 @@ func automatizmCorrection(lastCommonDiffValue int,wellIDarr []int){
 
 
 //////////////////////////////////////////////////////////////////
-// для индикации период ожидания реакции оператора на действие автоматизма
+/* для индикации период ожидания реакции оператора на действие автоматизма
 //   psychicWaitingPeriodForActions()
+Индикация включается после появления диалога ответа на Пульте (pult_gomeo.php: var allowShowWaightStr=0;).
+ */
 func WaitingPeriodForActions()(bool,int){
 
-	if LastRunAutomatizmPulsCount>0{
+	if LastRunAutomatizmPulsCount>0 && ActivationTypeSensor >1{
 		time:=WaitingPeriodForActionsVal - (PulsCount-LastRunAutomatizmPulsCount)
 		return true,time
 	}
