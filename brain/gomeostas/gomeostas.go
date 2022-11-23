@@ -153,7 +153,7 @@ func GomeostazPuls(evolushnStage int, lifeTime int, puls int, isSlipping bool) {
 		IsLevelBeginParam3 = true // уровень развития для Гона достигнут
 	}
 	gomeostazUpdate()
-	baseContextUpdate()
+	//baseContextUpdate() вызов уже есть в gomeostazUpdate()
 	badDetecting()
 	// детектор изменения базового состояния и контекстов - проветка по каждому пульсу
 	changingConditionsDetector()

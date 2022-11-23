@@ -20,7 +20,7 @@ import (
 limit 5 ограничивает выборку из эпиз.памяти, но она может получться и меньше.
 */
 func GetMentalRulesFromEpisodeMemory(){
-	rImg:=getLastRulesSequenceFromEpisodeMemory(5)
+	rImg:=getLastMentalRulesSequenceFromEpisodeMemory(5)
 	if rImg!=nil {
 		createNewlastrulesMentalID(0, detectedActiveLastNodID,detectedActiveLastUnderstandingNodID,rImg,true)//записать (если еще нет такого) групповое правило
 	}
