@@ -179,7 +179,13 @@ func commonBadDetecting() {
 	CommonBadValue=0
 	commonPerception=0
 
+	/* Из суммы CommonBadValue исключать параметры, не влияющие на жизненные показатели:
+	гон, потребность в общении, в обучении, любопытство
+	 */
 	for id, v := range GomeostazParams {
+		if id==3 || id==4 || id==5 || id==6{
+			continue
+		}
 		// насколько плохо умножаем на вес значимости параметра
 		CommonBadValue += BadValue[id] * GomeostazParamsWeight[id]
 		if id == 1{ // у энергии - чем больше значение параметра - тем лучше

@@ -115,7 +115,7 @@ if am.Usefulness<0{
 	}else{
 		out="3|"
 	}
-	out+=GetAutomotizmActionsString(am,true)
+	out+=GetAutomotizmActionsString(am,true)// здесь пишется "Энергичность"
 
 	lib.SentActionsForPult(out)
 
@@ -150,7 +150,7 @@ func GetAutomotizmActionsString(am *Automatizm,writeLog bool)(string){
 			sumEnergy = 1
 		}
 		am.Count++
-		out += TerminateMotorAutomatizmActions(ai.ActID, sumEnergy)
+		out += TerminateMotorAutomatizmActions(am.ID,ai.ActID, sumEnergy)
 	}
 
 	if ai.PhraseID != nil {
@@ -194,7 +194,7 @@ func GetAutomotizmIDString(id int)(string){
 			sumEnergy=1
 		}
 		am.Count++
-		out+=TerminateMotorAutomatizmActions(ai.ActID,sumEnergy)
+		out+=TerminateMotorAutomatizmActions(am.ID,ai.ActID,sumEnergy)
 	}
 
 if ai.PhraseID != nil {
@@ -221,13 +221,10 @@ return out
 cила действия сначала задается =5, а потот корректируется мозжечковыми рефлексами
 Использование: 	TerminateMotorAutomatizmActions(actIDarr,energy)
  */
-func TerminateMotorAutomatizmActions(actIDarr []int,energy int)string{
+var rumAutomatizmOldID=0 //
+var rumAutomatizmOldEnergi=0
+func TerminateMotorAutomatizmActions(amID int,actIDarr []int,energy int)string{
 	// energy=1
-	// название силы:
-	var enegrName=""
-	if energy < len(termineteAction.EnergyDescrib) {
-		enegrName = termineteAction.EnergyDescrib[energy]
-	}
 	var out=""
 	var isAct=false
 	for i := 0; i < len(actIDarr); i++ {
@@ -264,11 +261,54 @@ func TerminateMotorAutomatizmActions(actIDarr []int,energy int)string{
 		isAct=true
 	}
 	if isAct {
-		out = "Действие: <b>"+out+"</b><br><span style=\"font-size:14px;\">Энергичность: <b>" + enegrName+"</b></span><br>"
+
+
+		/*Если втоматизм повторяется при одном и том же стимуле,
+		то чисто "рефлекторно" повышать его силу действия с каждым разом, без мозжечкового механизма
+		чтобы потом в одиночном вызове он не срабатывал.
+		*/
+		if rumAutomatizmOldID == amID{// повторился автоматизм
+			if energy+rumAutomatizmOldEnergi < len(termineteAction.EnergyDescrib) { // не превышать максимум
+				rumAutomatizmOldEnergi++
+			}
+			energy += rumAutomatizmOldEnergi
+		}else{
+			rumAutomatizmOldEnergi=0
+		}
+		rumAutomatizmOldID=amID
+
+		// название силы:
+		var enegrName=""
+		if energy < len(termineteAction.EnergyDescrib) {// не превышать максимум
+			enegrName = termineteAction.EnergyDescrib[energy]
+		}
+		font:=getFontFromEnergy(energy)
+		out = "Действие: <b>"+out+"</b><br><span style=\""+font+"\">Энергичность: <b>" + enegrName+"</b></span><br>"
+
 		return out
 	}
 	return ""
 }
+////////////////////////
+func getFontFromEnergy(energy int)string{
+switch energy{
+case 0: return "font-size:10px;color:#888888"
+case 1: return "font-size:11px;color:#666666"
+case 2: return "font-size:12px;color:#6699FF"
+case 3: return "font-size:13px;color:#0033FF"
+case 4: return "font-size:14px;color:#660099"
+case 5: return "font-size:15px;color:#000000"
+case 6: return "font-size:17px;color:#663300"
+case 7: return "font-size:19px;color:#CC6633;text-shadow: 0 0 1px #F74447,0 0 2px #F7B4C2,0 0 3px #F7DAE1;"
+case 8: return "font-size:22px;color:#FF3300;letter-spacing: 1px;text-shadow: 0 0 2px #F74447,0 0 4px #F7B4C2,0 0 8px #F7DAE1;"
+case 9: return "font-size:22px;color:#FF0066;letter-spacing: 2px;font-weight:bold;text-shadow: 0 0 2px #F74447,0 0 4px #F7B4C2,0 0 8px #F7DAE1;"
+case 10: return "font-size:22px;color:#000000"
+}
+return ""
+}
+////////////////////////////////////////////////////
+
+
 
 /* совершить МОТОРНОЕ (ВЫДАТЬ ФРАЗУ) действие - Snn-часть автоматизма
 cила действия сначала задается = 5, а потот корректируется мозжечковыми рефлексами
