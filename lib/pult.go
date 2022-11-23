@@ -27,7 +27,9 @@ func TodoPanic(panicWarning string){
 }
 //////////////////////////////////////////////////
 
-var ActionsForPultStr = ""
+var ActionsForPultStr = "" // Строка действий для Пульта
+var ActionsForPultOldStr = ""// предыдущая строка действий для Пульта - чтобы ускорить вывод акции на Пульт - сразу после полки Стимула.
+
 /* вывести на Пульт действия Бота строкой lib.SentActionsForPult("xcvxvxcv")
 Каждая акция - в формате: вид действия (1 - действие рефлекса, 2 - фраза) затем строка акции,
 например: "1|Предлогает поиграть" или "2|Привет!"
@@ -36,10 +38,12 @@ var ActionsForPultStr = ""
 */
 func SentActionsForPult(print string) {
 	if len(ActionsForPultStr) > 0 { // еще не прочитана предыдущая инфа т.к. читается раз в пульс, а после действия может измениться услове и будет новое действие
-		ActionsForPultStr += "||" + print
+		ActionsForPultStr += "||" + print // добавить новую к предыдущему
+		ActionsForPultOldStr = ActionsForPultStr
 		return
 	}
 	ActionsForPultStr =	print
+	ActionsForPultOldStr = ActionsForPultStr
 }
 //////////////////////////////////////////////////
 

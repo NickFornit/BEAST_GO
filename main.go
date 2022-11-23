@@ -85,7 +85,13 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 
 				reflexes.ActiveFromPhrase() // активировать дерево рефлексов фразой - только для условных рефлексов
 				brain.IsPultActivnost = false
-				_, _ = fmt.Fprint(resp, res)
+
+				var answerStr=""
+				if len(lib.ActionsForPultStr)>5{
+					answerStr=lib.ActionsForPultStr
+					lib.ActionsForPultStr = "" // очистка для новой порции
+				}
+				_, _ = fmt.Fprint(resp, res+"|&|"+answerStr)
 				return
 			}
 
@@ -340,13 +346,19 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 			if len(set_action) > 0 && xxxxxxx==0 {
 				xxxxxxx=1
 				brain.IsPultActivnost = true
+				//ActionsForPultOldStr = lib.ActionsForPultOldStr
 				enegry, _ := strconv.Atoi(r.FormValue("food_portion"))
 				action_sensor.SetActionFromPult(set_action, enegry)
 
 				// активировать дерево действием
 				reflexes.ActiveFromAction()
 				brain.IsPultActivnost = false
-				_, _ = fmt.Fprint(resp, "!")
+				var answerStr=""
+				if len(lib.ActionsForPultStr)>5{
+					answerStr=lib.ActionsForPultStr
+					lib.ActionsForPultStr = "" // очистка для новой порции
+				}
+				_, _ = fmt.Fprint(resp, answerStr)
 				xxxxxxx=0
 				return
 			}
