@@ -84,6 +84,9 @@ func GetAutomatizmInfo(limitBasicID int)(string){
 		if limitBasicID==5 && v.Usefulness>=0{
 			continue
 		}
+		if limitBasicID<4 && v.BranchID>=1000000 {
+			continue
+		}
 
 id := strconv.Itoa(k)
 nodeID:=""
