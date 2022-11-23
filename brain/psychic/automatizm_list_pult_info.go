@@ -45,6 +45,11 @@ func GetAutomatizmInfo(limitBasicID int)(string){
 		out+="<span style='cursor:pointer;"
 		if limitBasicID==4{out+="background-color:#FFFF9D;font-weight:bold;"}
 		out+="' onClick='show_level(4)' title='Автоматизмы, не привязанные к определнным условиям состояния Beast.'>Свободные</span> "
+
+		out+="<span style='cursor:pointer;"
+		if limitBasicID==5{out+="background-color:#FFFF9D;font-weight:bold;"}
+		out+="' onClick='show_level(5)' title='Автоматизмы с плохой Полезностью, которые блокируются при запуске.'>Заблокированные</span> "
+
 	}
 
 	header:="<tr><th width=70 class='table_header'>ID ав-ма</th>" +
@@ -76,6 +81,10 @@ func GetAutomatizmInfo(limitBasicID int)(string){
 	for _, k := range keys {
 		v:=AutomatizmFromIdArr[k]
 
+		if limitBasicID==5 && v.Usefulness>=0{
+			continue
+		}
+
 id := strconv.Itoa(k)
 nodeID:=""
 baseID:=""
@@ -93,7 +102,7 @@ if v.BranchID<1000000{
 nodeA:=AutomatizmTreeFromID[v.BranchID]
 if nodeA!=nil {
 	nodeID = strconv.Itoa(nodeA.ID)
-	if limitBasicID > 0 {
+	if limitBasicID > 0 && limitBasicID<5 {
 		if nodeA.BaseID != limitBasicID{
 			continue
 		}
@@ -151,7 +160,11 @@ out += "<td class='table_cell' title='Информация по клику' "+ac
 out += "<td class='table_cell' title='Информация по клику'  onClick='show_actions("+id+")' style='cursor:pointer;color:blue'><nobr>"+strconv.Itoa(v.ActionsImageID)+"</nobr></td>";
 out += "<td class='table_cell' >"+strconv.Itoa(v.NextID)+"</td>";
 out += "<td class='table_cell' >"+strconv.Itoa(v.Energy)+"</td>";
-out += "<td class='table_cell' >"+strconv.Itoa(v.Usefulness)+"</td>";
+var usefulness=strconv.Itoa(v.Usefulness)
+if limitBasicID==5{
+	usefulness="<span style='cursor:pointer' onClick='cliner_block("+strconv.Itoa(v.ID)+")' title='разблокировать (установить Полезность в 1)'><b>"+usefulness+"</b></span>"
+}
+out += "<td class='table_cell' >"+usefulness+"</td>";
 out += "<td class='table_cell' >"+strconv.Itoa(v.Belief)+"</td>";
 out += "</tr>"
 	}

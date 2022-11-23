@@ -203,4 +203,13 @@ func createNodeUnattachedAutomatizm(nodeID int,aID int){
 
 
 
-
+// разблоикровака автоматизма для http://go/pages/automatizm_table.php
+func UnblockAutomatizmID(atmtzmID int)string{
+	atmtzm:=AutomatizmFromIdArr[atmtzmID]
+	if atmtzm==nil{
+		return "0"
+	}
+	atmtzm.Usefulness=1
+	return "1"
+}
+/////////////////////////////////////////////////////////////////////

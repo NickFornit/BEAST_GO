@@ -383,7 +383,7 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 
 			get_automatizm_list_info := r.FormValue("get_automatizm_list_info")
 			if len(get_automatizm_list_info) > 0 {
-				lpage := r.FormValue("limitPage")
+				lpage := r.FormValue("limitBasicID")
 				limitPage,_:=strconv.Atoi(lpage)
 				ref := psychic.GetAutomatizmInfo(limitPage)
 				_, _ = fmt.Fprint(resp, ref)
@@ -435,6 +435,14 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 			if len(get_object_info) > 0 {
 				objectID,_:=strconv.Atoi(r.FormValue("objectID"))
 				ref := psychic.GetStrnameFromobjectID(objectID)
+				_, _ = fmt.Fprint(resp, ref)
+				return
+			}
+
+			cliner_atmtzm_block := r.FormValue("cliner_atmtzm_block")
+			if len(cliner_atmtzm_block) > 0 {
+				atmtzmID,_:=strconv.Atoi(r.FormValue("atmtzmID"))
+				ref := psychic.UnblockAutomatizmID(atmtzmID)
 				_, _ = fmt.Fprint(resp, ref)
 				return
 			}
