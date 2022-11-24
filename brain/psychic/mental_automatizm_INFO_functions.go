@@ -33,6 +33,7 @@ type mentalInfo struct {
 	mentalAtmzmID int // ID моторного автоматизма
 	mentalPurposeID int // ID ментальной цели, альтернативной текущей  PurposeImage
 	notOldAutomatizm bool// true - НЕ позволить запустить рвущийся на выполнение старый автоматизм
+	runInfoFuncID int // запуск инфо-функции
 }
 var mentalInfoStruct mentalInfo
 
@@ -77,7 +78,7 @@ func runMentalFunctionID(id int){
 	switch id {
 	case 1: infoFunc1()//Подобрать MentalActionsImages для начального звена цепочки
 	case 2: infoFunc2()//Подобрать MentalActionsImages для последующего звена цепочки
-	case 3: infoFunc3()//айти подходящий мент.автоматизм по опыту ментальных Правил
+	case 3: infoFunc3()//найти подходящий мент.автоматизм по опыту ментальных Правил
 	case 4: infoFunc4()//нализ инфо стркутуры и др. информации по currentInfoStructId и выдача решения
 	case 5: infoFunc5()//создать и запустить ментальный автоматизм по акции
 	case 6: infoFunc6()//ПОДВЕРГНУТЬ СОМНЕНИЮ автоматизм, если нет опасности (не нужно реагировать аффектно) и ситуация важна
@@ -87,6 +88,7 @@ func runMentalFunctionID(id int){
 	case 10: infoFunc10()//найти способ улучшения значимости субъекта внимания extremImportanceMentalObject
 	case 11: infoFunc11()//Ментальное отзеркаливание
 	case 12: infoFunc12()//Cинтез новой фразц из компонентов, имеющих плюсы в Правилах
+	case 13: infoFunc13()//Отзеркалить Стимул от оператора
 	}
 }
 
@@ -104,6 +106,7 @@ func getMentalFunctionString(id int)string{
 	case 10: return "Найти способ улучшения значимости субъекта внимания extremImportanceMentalObject"
 	case 11: return "Ментальное отзеркаливание"
 	case 12: return "Cинтез новой фразц из компонентов, имеющих плюсы в Правилах"
+	case 13: return "Отзеркалить Стимул от оператора"
 	}
 	return "Нет функции с ID = "+strconv.Itoa(id)
 }
@@ -140,7 +143,7 @@ func infoFunc1(){
 	3. Если нет дргих веток, выбрать какой-то провоцирующий.
 	 */
 	// поиск в Правилах
-	//action:=infoFindRightMentalRukes()
+	//action:=infoFindRightMentalRules()
 
 	// создать
 	iID,_=CreateNewlastMentalActionsImagesID(0,typeID,valID,true)
@@ -156,67 +159,97 @@ func infoFunc1(){
  c вызовом activateMotorID моторнорнного автоматизма (а значит, с запуском моторного с периодом ожидания),
 т.е. раз нет решения, пробовать подобрать моторные действия, просмотрев цеаочку с начала.
 Если в базовом звене есть другие MotorBranchID то - подсмотреть как они продолжаются с насовпажающего звена цепи!
+
+Здесь выбор той или иной функции делается в контексте имеющейся инфо-среды,
+а если этого не удается, то выбирается случайно одна из инфо-функций.
 */
 func infoFunc2(){
+	currentInfoStructId=2 // определение актуального поля mentalInfo
 	lib.WritePultConsol("Запущена функция:<br> "+getPurposeDetaileString(2))
 	clinerMentalInfo()
 	iID:=0// ID MentalActionsImages
-	typeID:=0
-	valID:=0
 
 	// infoFunc2() -> getMentalPurpose() уже запускалось
 
-	// TODO подобрать
-	/*
-		1. Поиск MentalActionsImages для следующего .NextID начинается по ментальным Правилам.
-		2. Если нет правил, посмотреть, есть ли дургие ветки у данного узла и использовать их начальную инфу.
-		3. Если нет дргих веток, выбрать какой-то провоцирующий.
+// СНАЧАЛА поиск в ментальных Правилах готового решения
+	actionID:= infoFindRightMentalRules()
+	mAtmzmID,_:=createMentalAutomatizmID(0,actionID, 1)
+if mAtmzmID>0 {
+	//id, newID := createNewlastgoNextID(0, detectedActiveLastUnderstandingNodID,detectedActiveLastNodID, 0, mAtmzmID)
+	// создать новое звено типа 5(запуск моторного действия)
+	iID, _ = CreateNewlastMentalActionsImagesID(0, 5, mAtmzmID, true)
+	mentalInfoStruct.mImgID = iID // передача инфы в структуру
+	return
+}
+	///////////////////////////////////////////////////
 
-	Если оператор нажал кнопку Учитель, это - стимул привлечения внимания для наблюдения за ним, з
-	а достигаемой им целью и как он ее достигает. Это - начиная с 4-й стадии развития.
-	Для понимания отзеркаленных действий оператора цель, которую ставил тварь перед своими действиями PurposeGenetic
-	- фксируется в узлах дерева понимания PurposeImage -> SituationImage .
-	Кнопки действий теперь активируют смысл (контекст) ситуации SituationImage
+	// если нет готового правила, ТО ИДЕМ ДАЛЬШЕ
 
-	Информационная функция "Понимание объекта восприятия" - выборка данного образа восприятия в дереве с прослеживанием,
-	что оно означало в разных условиях. т.к. образ включает в себя все составляющие объекта восприятия, то он - обобщение,
-	а его понимание - Вид всех последствий в разных условиях.
-	Для образа фразы type Verbal struct - составляющие отдельные слова, которые могут быть в разных образах фраз,
-	так что можно сделать функцию Вида - выборки данного слова в разных условиях с последствиями.
-	*/
-	// поиск в Правилах
-	//action:=infoFindRightMentalRukes()
-
-	if extremImportanceObject!=nil{// есть актуальный объект внимания с отрицательной значимостью
+	/////////////// ПРИВЛЕЧЕНИЕ ОСОЗНАННОГО ВНИМАНИЯ к наиболее значимому
+	// есть ли актуальный объект внимания с отрицательной значимостью -
+	if extremImportanceObject!=nil{
 		// найти способ улучшения значимости объекта extremImportanceObject
 		if infoFindAttentionObjImprovement(){
 			return // больше не искать, уже создан мент.автоматизм объективного действия
 		}
 	}
 
-	/* TODO другие способы улучшеие (пока не реализовано) -
-	// текущий субъект внимания
+	/*  текущий субъект внимания
 	var extremImportanceMentalObject extremImportance
 	 */
 	if infoFindAttentionObjMentalImprovement(){
 		return // больше не искать, уже создан мент.автоматизм объективного действия
 	}
+	///////////////////////////////////////
 
-	// Ментальное отзеркаливание
-	infoFunc11()
-	if mentalInfoStruct.motorAtmzmID>0{
+	/*Посмотреть, есть ли другие ветки у данного узла и использовать их начальную инфу.
+	В ходе цикла осмысления могут быть переключения на другие условия goNext.MotorBranchID деревьев (перезапуск осмысления)
+	при том же контексте Цели (сначала PurposeImage -> SituationImage). Попробовать решения других веток.
+	М.б. применить goNextFromUnderstandingNodeIDArr
+	В общем - анализ состояния веток циклов осмысления для данной Цели, т.к. кнопки действий активируют смысл (контекст) ситуации SituationImage.
+	В том числе, в контексте, если оператор нажал кнопку Учитель, это - стимул привлечения внимания для наблюдения за ним, з
+	а достигаемой им целью и как он ее достигает.
 
-		return // больше не искать, уже создан мент.автоматизм объективного действия
+	Информационная функция "Понимание объекта восприятия" - выборка данного образа восприятия в дереве с прослеживанием,
+	что оно означало в разных условиях. т.к. образ включает в себя все составляющие объекта восприятия, то он - обобщение,
+	а его понимание - Вид всех последствий в разных условиях.
+	Для образа фразы type Verbal struct - составляющие отдельные слова, которые могут быть в разных образах фраз,
+	так что можно сделать функцию Вида - выборки данного слова в разных условиях с последствиями.
+	 */
+	// TODO
+
+
+
+// тупо Ментальное отзеркаливание - в случае, если не известна еще фраза (нет еще ее значимости )
+	// сначала смотрим точно значимость фразы с учетом условий
+	praseI:=getObjectImportance(5,curActiveActions.PhraseID[0], detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
+	if praseI == nil{// попробовать передразнить чтобы отзеркалить
+		if infoMirroringStimul(){
+			return // больше не искать, уже создан мент.автоматизм объективного действия
+		}
+	}//	если не найдено, то не смотрим значимость фразы без учета условий, т.к. нужен адекватный ответ
+
+	//TODO другие способы нахождения нового звена (пока не реализовано)
+
+	// случайный выбор инфо-функции
+	funcID:= infoFindRundomMentalFunction()
+	if funcID>0 {// есть всегда
+		// создать новое звено типа 4(запуск инфо-функции runMentalFunctionID(funcID))
+		iID,_=CreateNewlastMentalActionsImagesID(0,4,funcID,true)
+		mentalInfoStruct.mImgID = iID // передача инфы в структуру
+		mentalInfoStruct.runInfoFuncID=funcID // запуск инфо-функции
+		return
 	}
 
-
-	// создать
-	iID,_=CreateNewlastMentalActionsImagesID(0,typeID,valID,true)
-
-	mentalInfoStruct.mImgID = iID // передача инфы в структуру
-	currentInfoStructId=2 // определение актуального поля mentalInfo
 }
 //////////////////////////////////////////////////////////
+
+// случайный выбор ментальной функции
+func infoFindRundomMentalFunction()int{
+	var infoArr=[]int{3,4,8,9,10,12,13}
+	return lib.RandChooseIntArr(infoArr)
+}
+////////////////////////////////////////////////
 
 
 
@@ -227,14 +260,14 @@ func infoFunc2(){
 func infoFunc3() {
 	lib.WritePultConsol("Запущена функция:<br> "+getPurposeDetaileString(3))
 	clinerMentalInfo()
-	infoFindRightMentalRukes()
+	infoFindRightMentalRules()
 	// получили mentalInfoStruct.mImgID
 	currentInfoStructId=3 // определение актуального поля mentalInfo
 }
-func infoFindRightMentalRukes()(int){
-	mrules:=getSuitableMentalRules()
-	if mrules > 0 { // по правилу найти автоматизм и запустить его
-		mta := MentalTriggerAndActionArr[mrules]
+func infoFindRightMentalRules()(int){
+	mrulesID:=getSuitableMentalRules()
+	if mrulesID > 0 { // по правилу найти автоматизм и запустить его
+		mta := MentalTriggerAndActionArr[mrulesID]
 		// выбираем Ответное действие из Правила
 		if mta != nil {
 			mentalInfoStruct.mImgID=mta.Action
@@ -276,7 +309,7 @@ func analisAndSintez(fromNextID int)(int){
 		3. Если нет дргих веток, выбрать какой-то провоцирующий.
 	*/
 	// поиск в Правилах
-	//action:=infoFindRightMentalRukes()
+	//action:=infoFindRightMentalRules()
 
 	// сложные типы данных, полученные в инфо-функциях
 	switch currentInfoStructId{
@@ -379,6 +412,9 @@ func infoFunc7() {
 	if mentalInfoStruct.ActionsImageID >0 {
 		lib.WritePultConsol("Запущена функция:<br> "+getPurposeDetaileString(7))
 		infoCreateAndRunMentMotorAtmzmFromAction(mentalInfoStruct.ActionsImageID)
+	}else{
+		lib.WritePultConsol("Для функции infoFunc7() НЕ ОПРЕДЕЛНО mentalInfoStruct.ActionsImageID!")
+		return
 	}
 	// получили mentalInfoStruct.mImgID
 	currentInfoStructId=7 // определение актуального поля mentalInfo
@@ -387,7 +423,7 @@ func infoCreateAndRunMentMotorAtmzmFromAction(ActionsImageID int){
 	if ActionsImageID ==0 {
 		return
 	}
-	motorID,motorAtmzm:=createNewAutomatizmID(0,detectedActiveLastNodID,mentalInfoStruct.ActionsImageID,true)
+	motorID,motorAtmzm:=createNewAutomatizmID(0,detectedActiveLastNodID,ActionsImageID,true)
 	if motorID==0{
 		return
 	}
@@ -604,6 +640,29 @@ if actID>0{
 	return false
 }
 /////////////////////////////////////////////////////////////////////////
+
+
+
+
+/*Отзеркалить последний Стимул от оператора и совершить такое же действие.
+Нужно учесть, что отзеркаливание происходит и в orientation_reflexes.go func orientation_1()!!! м.б. стоит оттуда это убрать?
+*/
+func infoFunc13() {
+	lib.WritePultConsol("Запущена функция:<br> "+getPurposeDetaileString(11))
+	clinerMentalInfo()
+	infoMirroringStimul()
+	currentInfoStructId=13 // определение актуального поля mentalInfo
+}
+func infoMirroringStimul()bool {
+	// свежесть ответа оператора - не позже, чем 5 пульсов назад
+	if curActiveActionsID>0 && (curActiveActionsPulsCount > PulsCount-5){
+		// здесь определяется mentalInfoStruct.motorAtmzmID
+		infoCreateAndRunMentMotorAtmzmFromAction(curActiveActionsID)
+		return true
+	}
+	return false
+}
+/////////////////////////////////////////////////////////////////////
 
 
 

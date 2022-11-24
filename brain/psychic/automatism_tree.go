@@ -121,6 +121,7 @@ var curActions ActionsImage//
 // структура действий оператора при активации дерева автоматизмов
 var curActiveActions *ActionsImage // зеркалит текущий ActionsImage
 var curActiveActionsID=0
+var curActiveActionsPulsCount=0
 // образ предыдущего сосотояния ПОСЛЕ стимула Оператора (не меняется при активации изменением состояния)
 var curStimulImage *ActionsImage
 var curStimulImageID=0
@@ -225,7 +226,7 @@ func automatizmTreeActivation()(int) {
 		curStimulImage=curActiveActions
 		curStimulImageID=curActiveActionsID
 	curActiveActionsID, curActiveActions = CreateNewlastActionsImageID(0, curActions.ActID, curActions.PhraseID, curActions.ToneID, curActions.MoodID, true)
-
+	curActiveActionsPulsCount=PulsCount
 
 	}
 

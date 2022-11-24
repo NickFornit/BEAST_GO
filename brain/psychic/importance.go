@@ -195,7 +195,7 @@ func loadImportance(){
 
 
 ///////////////////////////////////////////////////////
-/* объект значимости (kind int,ObjectID int)
+/* объект значимости (kind int,ObjectID int) - точно по условиям
 Возвращает:
 ссылку на объект значимости
 */
@@ -208,6 +208,20 @@ func getObjectImportance(kind int,ObjectID int, NodeAID int,NodePID int)(*import
 	}
 
 	return nil
+}
+///////////////////////////////////////////////////////////
+/* объект значимости (kind int,ObjectID int) - игнорируя условия detectedActiveLastNodID detectedActiveLastUnderstandingNodID
+Возвращает массив найденных объектов
+*/
+func getObjectImportanceЦithoutСonditions(kind int,ObjectID int)([]*importance){
+	var outArr []*importance
+	for _, v := range importanceFromID {
+		if v.Type==kind && v.ObjectID ==ObjectID{
+			outArr=append(outArr,v)
+		}
+	}
+
+	return outArr
 }
 ///////////////////////////////////////////////////////////
 

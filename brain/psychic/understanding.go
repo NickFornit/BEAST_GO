@@ -84,6 +84,7 @@ activationType == 2 - активация "внутренним" (произво�
 fromNextID - ID MentalNext на котором была запущена переактивация consciousness при обдумывании
 */
 func consciousness(activationType int,fromNextID int)(bool) {   //  return false
+
 	if !AllowConsciousnessProcess {// при включении и просыпании - 1 раз AllowConsciousnessProcess=true
 		isFirstConsciousnessActivation=false
 		return false
@@ -96,6 +97,10 @@ func consciousness(activationType int,fromNextID int)(bool) {   //  return false
 	}
 
 	if activationType == 1 {
+// ТЕСТИРОВАНИЕ РАЗНЫХ ФУНКЦИЙ
+//		if infoMirroringStimul() {	return true	}
+
+
 		isActivationType2 = false
 		//
 		if !existAnswer{//не было моторного ответа на прошлый стимул, а уже последовавл новый
@@ -205,7 +210,7 @@ if EvolushnStage == 4 || !CurrentInformationEnvironment.veryActualSituation || C
 						if !mentalInfoStruct.notOldAutomatizm {
 							//можно без опаски выполнять штатный автоматизм
 							return false //Эпиз.память не пишется. При опасности - состояние аффекта.
-						}
+						}// если нет - далее искать альтернативу
 					}
 					mentalInfoStruct.motorAtmzmID=nArr[i].ID // для последующего использования с инфо-фукнциях
 					// нужно ПОДВЕРГНУТЬ СОМНЕНИЮ автоматизм
