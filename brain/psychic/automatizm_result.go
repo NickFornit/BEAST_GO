@@ -308,15 +308,14 @@ func fixNewRules(lastCommonDiffValue int,stimul int) int {
 	if answer == 0{return 0}
 	TriggerAndAction,_:=createNewlastTriggerAndActionID(0,stimul,answer,lastCommonDiffValue,true)
 	if TriggerAndAction == 0{return 0}
-	currentRulesID, _ = createNewlastrulesID(0, detectedActiveLastNodID,detectedActiveLastUnderstandingNodID,[]int{TriggerAndAction},true)
+	currentRulesID, _ = createNewRules(0, detectedActiveLastNodID,detectedActiveLastUnderstandingNodID,[]int{TriggerAndAction},true)
 	if currentRulesID == 0{return 0}
 
-	//lib.WritePultConsol("<span style='color:green'>Записано <b>ПРАВИЛО № "+strconv.Itoa(currentRulesID)+"</b></span>") // уже есть сообщение в createNewlastrulesID()
-/* В эпиз.память пишется только если не вызвало автоматических (неосознанных) действий,
-а было привлечено осознанное внимание consciousness(2
-	// новый кадр эпизодической памяти, сохраняющий
+//lib.WritePultConsol("<span style='color:green'>Записано <b>ПРАВИЛО № "+strconv.Itoa(currentRulesID)+"</b></span>") // уже есть сообщение в createNewRules()
+
+	// новый кадр эпизодической памяти, сохраняющий Правил
 	newEpisodeMemory(currentRulesID,0) // запись эпизодической памяти saveEpisodicMenory()
-*/
+
 	// теперь обрабатываем прошлую эпизодическую память (необязательно, т.к. при каждом поиске в эп.памяти это происходит)
 	GetRulesFromEpisodeMemory()
 

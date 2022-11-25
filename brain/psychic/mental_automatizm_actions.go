@@ -69,7 +69,9 @@ if am.Usefulness<0{
 		mentalPurposeImagePulsCount=PulsCount
 			understandingSituation(2)
 	case 4: runMentalFunctionID(ai.valID) //запуск инфо-функции
-	case 5: RumAutomatizmID(ai.valID) //запуск моторного автоматизма
+	case 5: 
+	saveFromNextIDAnswerCicle=nil // обнуление памяти между циклами
+	RumAutomatizmID(ai.valID) //запуск моторного автоматизма
 	//case 6: //запуск Доминанты
 	//case 7: // создание новой Доминанты
 

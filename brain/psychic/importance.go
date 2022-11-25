@@ -58,6 +58,23 @@ var importanceTypeName=[]string{
 	8:"Настроение",
 }
 
+/* Для определения текущих объектов восприятия и выделения одного из них - самого важного НЕГАТИВНОГО
+		по всем категориям importanceType
+При каждом ОБъективном вызове consciousness определяется текущий объект наибольшой значимости в воспринимаемом -
+в функции определения текущей Цели getMentalPurpose()
+*/
+// текущий объект внимания
+var extremImportanceObject *extremImportance
+// текущий субъект внимания (объект внимания к собственным мыслям)    ЕЩЕ НЕТ ТАКОГО по аналогии с importance.go
+var extremImportanceMentalObject *extremImportance
+
+type extremImportance struct {
+	objID int//  объект значимости
+	kind int // тип объекта
+	extremVal int// экстремальная значимость
+}
+var curImportanceObjectArr []extremImportance //- здесь сохраняются текущие цели внимания к наиболее важному
+
 
 // Тот объект, применение которого привело к данной значимости  ID|NodeAID|NodePID|Type|ObjectID|Value
 type importance struct {

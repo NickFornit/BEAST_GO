@@ -184,8 +184,8 @@ func understandingSituation(activationType int)(bool){
 	// 3 уровня условий в виде ID их образов
 
 	var lev1=newMoodID // PsyBaseMood: -1 Плохое настроение, 0 Нормальное, 1 - хорошее настроение
-	if mentalPurposeImageID >0 {
-		lev1=mentalPurposeImageID
+	if mentalMoodVolitionID >0 {
+		lev1=mentalMoodVolitionID
 	}
 
 	var lev2=newEmotionID

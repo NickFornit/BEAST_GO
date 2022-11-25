@@ -71,17 +71,7 @@ func setImportanceMental(effect int){
 
 
 /////////////////////////////////////////////////////
-/* определить текущие объекты восприятия и выделить один из них - самые важные НЕГАТИВНЫЕ
-		по всем категориям importanceType
-При каждом ОБъективном вызове consciousness определяется текущий объект наибольшой значимости в воспринимаемом -
-в функции определения текущей Цели getMentalPurpose()
-*/
-type extremImportance struct {
-	objID int//  объект значимости
-	kind int // тип объекта
-	extremVal int// экстремальная значимость
-}
-var curImportanceObjectArr []extremImportance //- здесь сохраняются текущие цели внимания к наиболее важному
+
 
 
 func getGreatestImportance(curActions *ActionsImage)[]extremImportance{
@@ -215,7 +205,7 @@ type extremImportanceMental struct {
 var curImportanceObjectMentalArr []extremImportanceMental // сюда складываются текущие цели внимания к наиболее важному
 func getGreatestImportanceMental(){
 
-
+// TODO - объект внимания к собственным мыслям
 }
 /////////////////////////////////////////////////
 

@@ -60,7 +60,7 @@ func rulesInit(){
 // создать новое сочетание ответных действий если такого еще нет
 var lastrulesID=0
 var isNotLoading=true
-func createNewlastrulesID(id int,NodeAID int,NodePID int,TAid []int,CheckUnicum bool)(int,*rules){
+func createNewRules(id int,NodeAID int,NodePID int,TAid []int,CheckUnicum bool)(int,*rules){
 
 	if TAid == nil{
 		return 0,nil
@@ -165,7 +165,7 @@ func loadrulesArr(){
 		}
 var saveDoWritingFile= doWritingFile; doWritingFile =false
 		isNotLoading=false
-		createNewlastrulesID(id,NodeAID,NodePID,TAid,false)
+		createNewRules(id,NodeAID,NodePID,TAid,false)
 		isNotLoading=true
 doWritingFile =saveDoWritingFile
 	}

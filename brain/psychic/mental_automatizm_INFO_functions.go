@@ -34,6 +34,9 @@ type mentalInfo struct {
 	mentalPurposeID int // ID ментальной цели, альтернативной текущей  PurposeImage
 	notOldAutomatizm bool// true - НЕ позволить запустить рвущийся на выполнение старый автоматизм
 	runInfoFuncID int // запуск инфо-функции
+	epizodFrameIndex int // индекс кадра КРАТКОВРЕМЕННОЙ памяти (shortTermMemory)
+	moodeID int
+	emotonID int
 }
 var mentalInfoStruct mentalInfo
 
@@ -89,6 +92,7 @@ func runMentalFunctionID(id int){
 	case 11: infoFunc11()//Ментальное отзеркаливание
 	case 12: infoFunc12()//Cинтез новой фразц из компонентов, имеющих плюсы в Правилах
 	case 13: infoFunc13()//Отзеркалить Стимул от оператора
+	case 14: infoFunc14()//ментально переактиваровать дерево понимания с mentalInfoStruct.moodeID и mentalInfoStruct.emotonID
 	}
 }
 
@@ -107,6 +111,7 @@ func getMentalFunctionString(id int)string{
 	case 11: return "Ментальное отзеркаливание"
 	case 12: return "Cинтез новой фразц из компонентов, имеющих плюсы в Правилах"
 	case 13: return "Отзеркалить Стимул от оператора"
+	case 14: return "Ментально переактиваровать дерево понимания с mentalInfoStruct.moodeID и mentalInfoStruct.emotonID"
 	}
 	return "Нет функции с ID = "+strconv.Itoa(id)
 }
@@ -170,11 +175,32 @@ func infoFunc2(){
 	iID:=0// ID MentalActionsImages
 
 	// infoFunc2() -> getMentalPurpose() уже запускалось
+	// curImportanceObjectArr - наиболее нзачимое в восприятии (вначале consciousness)
 
-// СНАЧАЛА поиск в ментальных Правилах готового решения
+/* СНАЧАЛА поиск в ментальных Правилах готового решения
+   Найдя нужную комбинацию Правил для другой эмоции для успешного решения цепочки
+воссоздать тот базовый контекст при той же ситуации (эмоция в найденном фрагменте эпиз.памяти)
+и отработать цепочку «правильно».
+ */
 	actionID:= infoFindRightMentalRules()
 	mAtmzmID,_:=createMentalAutomatizmID(0,actionID, 1)
 if mAtmzmID>0 {
+	/* ментально переактивировать дерево понимания с той эмоцией, что была в КРАТКОВРЕМЕННОЙ памяти из Правила
+При этом тут же будет совершено моторное действие уже в новых условиях дерева понимания.
+	 Это - непонятный пока момент...
+	 */
+	if mentalInfoStruct.epizodFrameIndex>0{
+		tm:=termMemory[mentalInfoStruct.epizodFrameIndex]
+		if tm.uTreeNodID>0 {
+			uNode:=UnderstandingNodeFromID[tm.uTreeNodID]
+			if uNode!=nil {
+				mentalInfoStruct.moodeID =uNode.Mood
+				mentalInfoStruct.emotonID=uNode.EmotionID
+				reactivateEmotionUnderstandingЕree()
+			}
+		}
+	}
+
 	//id, newID := createNewlastgoNextID(0, detectedActiveLastUnderstandingNodID,detectedActiveLastNodID, 0, mAtmzmID)
 	// создать новое звено типа 5(запуск моторного действия)
 	iID, _ = CreateNewlastMentalActionsImagesID(0, 5, mAtmzmID, true)
@@ -185,22 +211,41 @@ if mAtmzmID>0 {
 
 	// если нет готового правила, ТО ИДЕМ ДАЛЬШЕ
 
-	/////////////// ПРИВЛЕЧЕНИЕ ОСОЗНАННОГО ВНИМАНИЯ к наиболее значимому
-	// есть ли актуальный объект внимания с отрицательной значимостью -
+	/* ГЛАВНОЕ - ПРИВЛЕЧЕНИЕ ОСОЗНАННОГО ВНИМАНИЯ к наиболее значимому,
+	 есть ли актуальный объект внимания с отрицательной значимостью.
+	Информационная функция "Понимание объекта восприятия" - выборка данного образа восприятия в дереве с прослеживанием,
+	что оно означало в разных условиях. т.к. образ включает в себя все составляющие объекта восприятия, то он - обобщение,
+	а его понимание - Вид всех последствий в разных условиях.
+	Для образа фразы type Verbal struct - составляющие отдельные слова, которые могут быть в разных образах фраз,
+	так что можно сделать функцию Вида - выборки данного слова в разных условиях с последствиями.
+	 */
 	if extremImportanceObject!=nil{
 		// найти способ улучшения значимости объекта extremImportanceObject
-		if infoFindAttentionObjImprovement(){
+		if infoFindAttentionObjImprovement(){// сделано, но еще не тестировалось
 			return // больше не искать, уже создан мент.автоматизм объективного действия
 		}
 	}
 
-	/*  текущий субъект внимания
+	/*  текущий субъект внимания (наиболее нзачимое в мыслях)
+	TODO ЕЩЕ НЕТ ПОДДЕРЖКИ объектов собственных мыслей по аналогии с importance.go
 	var extremImportanceMentalObject extremImportance
+
+	Здесь должно находиться решение (выбор действия) на основе использования информации
+	о наиболее важном в мыслях, скорее всего связанное с Доминантами.
 	 */
 	if infoFindAttentionObjMentalImprovement(){
+
 		return // больше не искать, уже создан мент.автоматизм объективного действия
 	}
 	///////////////////////////////////////
+
+	/*Если оператор нажал кнопку Учитель, это - стимул привлечения внимания для наблюдения за ним,
+	за достигаемой им целью и как он ее достигает. Это - начиная с 4-й стадии развития.
+	Для понимания отзеркаленных действий оператора цель, которую ставил тварь перед своими действиями PurposeGenetic -
+	фксируется в узлах дерева понимания PurposeImage -> SituationImage .
+	Кнопки действий теперь активируют смысл (контекст) ситуации SituationImage
+	 */
+	// TODO
 
 	/*Посмотреть, есть ли другие ветки у данного узла и использовать их начальную инфу.
 	В ходе цикла осмысления могут быть переключения на другие условия goNext.MotorBranchID деревьев (перезапуск осмысления)
@@ -209,14 +254,11 @@ if mAtmzmID>0 {
 	В общем - анализ состояния веток циклов осмысления для данной Цели, т.к. кнопки действий активируют смысл (контекст) ситуации SituationImage.
 	В том числе, в контексте, если оператор нажал кнопку Учитель, это - стимул привлечения внимания для наблюдения за ним, з
 	а достигаемой им целью и как он ее достигает.
-
-	Информационная функция "Понимание объекта восприятия" - выборка данного образа восприятия в дереве с прослеживанием,
-	что оно означало в разных условиях. т.к. образ включает в себя все составляющие объекта восприятия, то он - обобщение,
-	а его понимание - Вид всех последствий в разных условиях.
-	Для образа фразы type Verbal struct - составляющие отдельные слова, которые могут быть в разных образах фраз,
-	так что можно сделать функцию Вида - выборки данного слова в разных условиях с последствиями.
-	 */
+	*/
 	// TODO
+
+
+
 
 
 
@@ -229,7 +271,13 @@ if mAtmzmID>0 {
 		}
 	}//	если не найдено, то не смотрим значимость фразы без учета условий, т.к. нужен адекватный ответ
 
+
 	//TODO другие способы нахождения нового звена (пока не реализовано)
+	if EvolushnStage > 4 {
+		// доминанты нерешенной проблемы
+
+	}
+	////////////////////////////////////////////////////////
 
 	// случайный выбор инфо-функции
 	funcID:= infoFindRundomMentalFunction()
@@ -244,9 +292,12 @@ if mAtmzmID>0 {
 }
 //////////////////////////////////////////////////////////
 
-// случайный выбор ментальной функции
+/* случайный выбор ментальной функции
+Непонятно, как отслеживать Эффект если нет памяти о том, какой именно случайный парамет был применен.
+ */
 func infoFindRundomMentalFunction()int{
-	var infoArr=[]int{3,4,8,9,10,12,13}
+	clinerMentalInfo()// чтобы было случайное clinerMentalInfo() для 14-й функции
+	var infoArr=[]int{3,4,8,9,10,12,13,14}
 	return lib.RandChooseIntArr(infoArr)
 }
 ////////////////////////////////////////////////
@@ -270,6 +321,12 @@ func infoFindRightMentalRules()(int){
 		mta := MentalTriggerAndActionArr[mrulesID]
 		// выбираем Ответное действие из Правила
 		if mta != nil {
+// последний кадр эпиз.памяти
+			epizodFrameIndex :=0
+			if len(mta.ShortTermMemoryID)>0 {
+				epizodFrameIndex = mta.ShortTermMemoryID[len(mta.ShortTermMemoryID)-1]
+			}
+			mentalInfoStruct.epizodFrameIndex=epizodFrameIndex  // индекс кадра КРАТКОВРЕМЕННОЙ памяти
 			mentalInfoStruct.mImgID=mta.Action
 			return mentalInfoStruct.mImgID
 		}
@@ -491,6 +548,7 @@ func infoFindAttentionObjMentalImprovement()bool {
 		return false
 	}
 
+	//ЕЩЕ НЕТ ПОДДЕРЖКИ объектов собственных мыслей по аналогии с importance.go
 	// TODO по аналогии rulesID:=getRulesArrFromAttentionObject( - найти в Правилах ответное действие с объектом extremImportanceMentalObject, приводящее к успеху
 
 	mentalInfoStruct.motorAtmzmID=0
@@ -579,7 +637,7 @@ return true
 Пока что выдается первая подходящая фраза, имеющая +значимость в данных услових
  */
 func infoFunc12() {
-	lib.WritePultConsol("Запущена функция:<br> "+getPurposeDetaileString(11))
+	lib.WritePultConsol("Запущена функция:<br> "+getPurposeDetaileString(12))
 	clinerMentalInfo()
 	infoSynthesisOenPrase()
 	currentInfoStructId=12 // определение актуального поля mentalInfo
@@ -648,7 +706,7 @@ if actID>0{
 Нужно учесть, что отзеркаливание происходит и в orientation_reflexes.go func orientation_1()!!! м.б. стоит оттуда это убрать?
 */
 func infoFunc13() {
-	lib.WritePultConsol("Запущена функция:<br> "+getPurposeDetaileString(11))
+	lib.WritePultConsol("Запущена функция:<br> "+getPurposeDetaileString(13))
 	clinerMentalInfo()
 	infoMirroringStimul()
 	currentInfoStructId=13 // определение актуального поля mentalInfo
@@ -660,6 +718,41 @@ func infoMirroringStimul()bool {
 		infoCreateAndRunMentMotorAtmzmFromAction(curActiveActionsID)
 		return true
 	}
+	return false
+}
+/////////////////////////////////////////////////////////////////////
+
+
+
+/* Ментально переактиваровать дерево понимания с mentalInfoStruct.moodeID и mentalInfoStruct.emotonID
+Хотя можно переактивировать четез действия ментального автоматизма 1 или 2 (или 3 для Цели), но только что-то одно.
+*/
+func infoFunc14() {
+	lib.WritePultConsol("Запущена функция:<br> "+getPurposeDetaileString(14))
+	// clinerMentalInfo() чтобы можно было задавать mentalInfoStruct.moodeID и mentalInfoStruct.emotonID
+	reactivateEmotionUnderstandingЕree()
+	currentInfoStructId=14 // определение актуального поля mentalInfo
+}
+func reactivateEmotionUnderstandingЕree()bool {
+if mentalInfoStruct.moodeID==0{// выбрать случайно - для infoFindRundomMentalFunction()
+	var infoArr=[]int{1,2,3}
+	mentalMoodVolitionID=lib.RandChooseIntArr(infoArr)
+}else{
+	mentalMoodVolitionID=mentalInfoStruct.moodeID
+}
+if mentalInfoStruct.emotonID==0{// выбрать случайно - для infoFindRundomMentalFunction()
+	var infoArr []int
+	for k,_ := range EmotionFromIdArr {
+		infoArr=append(infoArr,k)
+	}
+	mentalEmotionVolitionID=lib.RandChooseIntArr(infoArr)
+}else{
+	mentalEmotionVolitionID=mentalInfoStruct.emotonID
+}
+	mentalMoodVolitionPulsCount=PulsCount
+	mentalEmotionVolitionPulsCount=PulsCount
+	understandingSituation(2)
+	clinerMentalInfo()
 	return false
 }
 /////////////////////////////////////////////////////////////////////

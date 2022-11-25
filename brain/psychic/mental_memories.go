@@ -20,6 +20,8 @@ import (
 если только Стимул не возникнет, не дожидаясь ответа на предыдущий.
 В таком случае ментальное Правило не формируется.
 
+Обнуление saveFromNextIDAnswerCicle=nil - в mental_automatizm_actions.go func RunMentalAutomatizm(
+
 Может быть с разными базовыми звеньями из-за произвольной переактивации.
 */
 var saveFromNextIDAnswerCicle []int // последовательность fromNextID
