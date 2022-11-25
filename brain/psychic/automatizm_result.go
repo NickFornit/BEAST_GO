@@ -97,7 +97,7 @@ func automatizmActionsPuls(){
 		return
 	}
 // вышло время ожидания реакции
-		if (LastRunAutomatizmPulsCount+WaitingPeriodForActionsVal) > PulsCount {
+		if (LastRunAutomatizmPulsCount+WaitingPeriodForActionsVal) < PulsCount {  
 			// отреагировать на отсуствие реакции - повторить автоматизм с большей силой Energy
 			// Из МОЗЖУЧКА как-то отреагировать на отсуствие реакции - повторить автоматизм с большей силой Energy
 			if noAutovatizmResult(){// была попытка отреагировать сильнее - в cerebellum.go
