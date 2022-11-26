@@ -183,7 +183,7 @@ lib.WritePultConsol("<span style='color:blue;background-color:#FFD0FF;'>Был �
 		*/
 //		stimul, _ := CreateNewlastActionsImageID(0, curActiveActions.ActID, curActiveActions.PhraseID, curActiveActions.ToneID, curActiveActions.MoodID,true)
 // образ действий оператора Стимул:	curStimulImageID и есть Ответ: curActiveActions
-		fixNewRules(lastCommonDiffValue,curStimulImageID)
+		fixNewRules(lastCommonDiffValue)
 	}
 
 return
@@ -280,24 +280,22 @@ func wasChangingMoodCondition(kind int)(int,int,[]int){
 /* // текущий ID пускового стимула типов curActiveActions или curBaseStateImage
 при активации дерева автоматизмов. Если тип curBaseStateImage, то ID отрицательное (ID<0)!
  */
-var currentTriggerID=0
+//var currentTriggerID=0 не нужен
 var currentRulesID=0
 
 
 ////////////////////////////////////////////////////////////////////////
-/* на стадии >3 при каждом ответе на действия оператора - прописывать текущее правило rules.
+/* на стадии >3 при каждом ответе на действия оператора - прописывать текущее ПРАВИЛО rules.
    А так же просматривать эпизод память взад макcимум на 6 шагов или до паузы в общении > EpisodeMemoryPause шагов,
 		фиксируя цепочку правил.
-Stimul - действие оператора до Ответа Beast
 */
-func fixNewRules(lastCommonDiffValue int,stimul int) int {
-	currentTriggerID=stimul
+func fixNewRules(lastCommonDiffValue int) int {
 	if LastAutomatizmWeiting == nil{
 		return 0
 	}
 
-	// образ действий оператора
-	if stimul == 0  || LastAutomatizmWeiting == nil {
+	// curStimulImageID - образ действий оператора перед Ответом для записи Правила
+	if curStimulImageID == 0  || LastAutomatizmWeiting == nil {
 		return 0
 	}
 	if curStimulImage.ActID == nil && curStimulImage.PhraseID ==nil{ // не писать Правила с пустым Стимулом
@@ -306,9 +304,10 @@ func fixNewRules(lastCommonDiffValue int,stimul int) int {
 	// ответный образ действий Beast
 	answer:=LastAutomatizmWeiting.ActionsImageID
 	if answer == 0{return 0}
-	TriggerAndAction,_:=createNewlastTriggerAndActionID(0,stimul,answer,lastCommonDiffValue,true)
+	TriggerAndAction,_:=createNewlastTriggerAndActionID(0,curStimulImageID,answer,lastCommonDiffValue,true)
 	if TriggerAndAction == 0{return 0}
-	currentRulesID, _ = createNewRules(0, detectedActiveLastNodID,detectedActiveLastUnderstandingNodID,[]int{TriggerAndAction},true)
+	// Запись Правила
+	currentRulesID, _ = createNewRules(0, detectedActiveLastNodPrevID,detectedActiveLastUnderstandingNodPrevID,[]int{TriggerAndAction},true)
 	if currentRulesID == 0{return 0}
 
 //lib.WritePultConsol("<span style='color:green'>Записано <b>ПРАВИЛО № "+strconv.Itoa(currentRulesID)+"</b></span>") // уже есть сообщение в createNewRules()
@@ -331,7 +330,6 @@ func fixRulesBaseStateImage(lastCommonDiffValue int){
 	/////////////////////// ПРАВИЛО:
 	stimul, _ := CreateNewStatImageID(0, curStimulImage.Mood, curStimulImage.EmotionID, curBaseStateImage.SituationID,true)
 	stimul*=-1 // отрицательное значение идентифицирует образ - как текущего сосотояния!!!
-	currentTriggerID=stimul
 	fixNewRules(lastCommonDiffValue,stimul)
 }*/
 /////////////////////////////////////////////////////////////////////

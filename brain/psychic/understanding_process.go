@@ -224,14 +224,14 @@ func afterWaitingPeriod(effect int){
 // mact.valID потому что это - точно моторный запуск, выше: if mact.typeID !=5{
 	mRules,_:=createNewlastMentalTriggerAndActionID(0,saveFromNextIDAnswerCicle,mact.valID,effectValuation,true)
 
-	rID,_:=createNewlastrulesMentalID(0,detectedActiveLastNodID,detectedActiveLastUnderstandingNodID,[]int{mRules},true)
+	rID,_:= createNewRulesMentalID(0,detectedActiveLastNodPrevID,detectedActiveLastUnderstandingNodPrevID,[]int{mRules},true)
 	if rID>0 {
 		// записать в эпизод.пямять ментальный кадр - всегда если дошло до этой строки
 		newEpisodeMemory(rID,1)
 	}
 
 // образ значимости ментального действия
-createNewlastImportanceID(0, detectedActiveLastNodID, detectedActiveLastUnderstandingNodID, 2, mentAtmzm.ActionsImageID, effectValuation, true)
+createNewlastImportanceID(0, detectedActiveLastNodPrevID, detectedActiveLastUnderstandingNodPrevID, 2, mentAtmzm.ActionsImageID, effectValuation, true)
 
 
 	// нужно ли осмыслить это?

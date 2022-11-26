@@ -18,7 +18,7 @@ limit 5 ограничивает выборку из эпиз.памяти, но
 func GetRulesFromEpisodeMemory(){
 	rImg:=getLastRulesSequenceFromEpisodeMemory(5)
 	if rImg!=nil {
-		createNewRules(0, detectedActiveLastNodID,detectedActiveLastUnderstandingNodID,rImg,true) //записать (если еще нет такого) групповое правило
+		createNewRules(0, detectedActiveLastNodPrevID,detectedActiveLastUnderstandingNodPrevID,rImg,true) //записать (если еще нет такого) групповое правило
 	}
 }
 //////////////////////////////////////////////////
@@ -64,41 +64,167 @@ func GetCur10lastRules()string{
 ///////////////////////////////////////////
 
 
+
+
+
 ///////////////////////////////////////////
-/*  выбрать наилучшее Правило rulesID по действию с Пульта или измееннию состояния
+/*  выбрать наилучшее Правило rulesID для текущего действию Оператора с Пульта (curActiveActionsID)
 Текущая ситуация - массив самых последних кадров эпизодической памяти и
-активный пусковой стимул currentTriggerID типов curActiveActions или curBaseStateImage.
+активный пусковой стимул curActiveActionsID.
 */
 func getSuitableRules()(int){
 
-	rID,doubt := getRulesArrFromTrigger(currentTriggerID)
+
 // попытка срочно найти действие, в опасной ситуации
 	if CurrentInformationEnvironment.veryActualSituation || CurrentInformationEnvironment.danger{
-// на смотрим на сомнительность doubt
-		return rID
-	}else{ //
-/* попытка более обстоятельно найти в эпиз.памяти подходящий фрагмент
-	Чем больше limit тем маловероятнее найти совпадения сочетания Правил в ранней эпизодюпамяти,
-   так что можно вызывать getRulesFromEpisodicsSlice постепенно уменьшая limit
-Чем больше 	limit тем точнее результат обобщения, но меньше вероятность нахождения данного сочетания Правил
- */
-		if doubt<3{// пойдет...
+		rID,exact := getRulesArrFromTrigger(curActiveActionsID,true)
+		if exact>0{// пойдет хоть что-то...
 			return rID
 		}
-
-		/*
-		maxSteps:=1000
-		for limit:=5; limit > 1; limit-- {
-			rID,_=getRulesFromEpisodicsSlice(limit,maxSteps)
-			if rID>0{
-				return rID
-			}
-			maxSteps = maxSteps/2
-		}*/
+	}else{ //
+		rID,exact := getRulesArrFromTrigger(curActiveActionsID,false)
+		if exact>5{// пойдет...
+			return rID
+		}
 	}
 
 	return 0
 }
+//////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
+// для выбора в func getRulesArrFromTrigger()
+type гUsefool struct {
+	rID int
+	exact int
+}
+///////////////////////////////////////////////////
+/*  быстро выбрать ранее успешное правило из rulesArr для данных условий
+и заданного Стимула trigID типа ActionsImage
+Алгоритм:
+.....................
+
+Возвращает наиболее совпадающее ПОЛЕЗНОЕ (Effect>0) Правило:
+1 - ID Правила, совпадающие по цепочке эп.памяти с уверенностью exact
+2 - точность совпадения: если 10...15 - для полны0 условий, 5-9 - только для условий дерева автоматизмов
+*/
+func getRulesArrFromTrigger(trigger int,veryActualSituation bool)(int,int){
+
+	/* В конце эпиз.памяти еще нет Правила с новым Стимулом curActiveActionsID,
+	но его последние Правила нужны чтобы по ним находить в групповых Правилах
+	предшествовашие события: при совпадении цепочки последнего куска эпиз.памяти и групп.Правила
+	велика вероятность верности такого реагирования.
+	Поэтому сначала выделяем последнюю цепочку эпиз.памяти.
+	*/
+	//Вытащить из эпизод.памяти посленюю цепочку кадров, максимум в 5 кадров.
+	rImg := getLastRulesSequenceFromEpisodeMemory(5)
+
+	// полный образ текущих условий
+	rulesID,exact:=searchingRules(trigger,rImg,0)
+	if rulesID>0 { // не найдено для точного совпадения условий
+		return rulesID,exact
+	}
+	//// не найдено для точного совпадения условий
+	// смотрим тоолько для условий дерева автоматизмов
+	rulesID,exact=searchingRules(trigger,rImg,1)
+	if rulesID>0 { // не найдено для точного совпадения условий
+		return rulesID,exact
+	}
+	if veryActualSituation {
+		// смотрим безусловно (самый неувернный вариант)
+		rulesID, exact = searchingRules(trigger, rImg, 2)
+		if rulesID > 0 { // не найдено для точного совпадения условий
+			return rulesID, exact
+		}
+	}
+
+	return 0,0
+}
+//
+func searchingRules(trigger int,rImg []int,condType int )(int,int){
+	var гUsefoolArr []гUsefool
+	// текущие значения
+	exact:=0 // точность совпадения
+	rules:=0 //
+	for _, v := range rulesArr {
+		switch condType{
+		// с учетом обоих деревьев
+		case 0: if v.NodeAID!=detectedActiveLastNodID || v.NodePID!=detectedActiveLastUnderstandingNodID{
+			continue
+		}
+		// с учетом только дерева автоматизмов
+		case 1: if v.NodeAID!=detectedActiveLastNodID {
+			continue
+		}
+		}
+		exact=0 // точность совпадения
+		rules=0 //
+		for i := 0; i < len(v.TAid); i++ {
+			rul:=TriggerAndActionArr[v.TAid[i]]
+			if rul==nil{ lib.WritePultConsol("Нет карты TriggerAndActionArr для iD="+strconv.Itoa(v.TAid[i]));return 0,0}
+			if rul.Trigger == trigger && rul.Effect>0 { // есть такое эффективное Правило
+				// уже есть Ответ
+				rules = rul.ID
+				exact = 1 // предварительное начальное значение
+				//смотрим совпадения предыдущих звеньев Правила и rImg
+				var eIndex = len(rImg) - 1 // последний кадр эпиз.памяти
+				// уходим назад, начиная с пердыдущего звена от найденного
+				for r := i - 1; r >= 0; r-- { // смотрим совпадения предыдущих звеньев rImg
+					if eIndex < 0 {
+						break
+					}
+					eR := rImg[eIndex]
+					rulR := TriggerAndActionArr[eR]
+					rulE := TriggerAndActionArr[v.TAid[r]]
+					if rulR == nil {
+						lib.WritePultConsol("Нет карты TriggerAndActionArr для iD=" + strconv.Itoa(eR));
+						return 0, 0
+					}
+					if rulE == nil {
+						lib.WritePultConsol("Нет карты TriggerAndActionArr для iD=" + strconv.Itoa(eR));
+						return 0, 0
+					}
+					if rulR.ID == rulE.ID { // совпадает
+						exact++ // более 5 не бывает
+					}else{
+						break
+					}
+					eIndex--
+				}
+			}
+			// запоминаем лучший результат текущего группового правла
+			if rules>0 {
+				гUsefoolArr = append(гUsefoolArr, гUsefool{rules, exact})
+			}
+		}
+	}
+	if гUsefoolArr!=nil {
+		maxExact:=0
+		curR:=0
+		// выбираем самое правильное Правило
+		for i := 0; i < len(гUsefoolArr); i++ {
+			if гUsefoolArr[i].exact>maxExact{
+				curR=гUsefoolArr[i].rID
+				maxExact=гUsefoolArr[i].exact
+			}
+		}
+		switch condType{
+		// с учетом обоих деревьев
+		case 0: maxExact += 10
+		// с учетом только дерева автоматизмов
+		case 1: maxExact += 5
+			//case 2:
+		}
+		return curR,maxExact
+	}
+
+	return 0,0
+}
+///////////////////////////////////////////////
+
+
+
+
+
 
 /////////////////////////////////////////////////
 /* Найти последнее известное Правило по цепочке последних limit кадров эпиз.памяти (шаблон решений)
@@ -220,94 +346,15 @@ if len(rImg)>limit{// limit последних
 }
 ///////////////////////////////////////////////////
 
-/* Вытащить из эпизод.памяти посленюю цепочку кадров
- */
-func getLastRulesSequenceFromEpisodeMemory(limit int)([]int){
-	if EpisodeMemoryLastIDFrameID==0{
-		return nil
-	}
-	var kind=0 // здесь всегда - объективнй тип эпизод.памяти
-	var beginID=0
-	var preLifeTime=0
-	for i := EpisodeMemoryLastIDFrameID; i >=0; i-- {
-		em:=EpisodeMemoryObjects[i]
-		// если самый последний эпизод уже является em.Type == kind
-		if i==EpisodeMemoryLastIDFrameID && em.Type == kind || beginID > 5{
-			continue
-		}
-		if preLifeTime==0{
-			preLifeTime=em.LifeTime
-		}
-		if em == nil || em.Type != kind ||
-			(em.LifeTime - preLifeTime) >EpisodeMemoryPause ||
-			beginID >=limit{
-			break // закончить выборку
-		}
-		beginID++
-	}
-	if beginID == 0 {
-		return nil
-	}
-	var rImg []int
-	// перебор последнего фрагмента кадров эпиз.памяти
-	//beginID+1 чтобы число проходов цикла было равно beginID и окончился на i <= EpisodeMemoryLastIDFrameID
-	for i := EpisodeMemoryLastIDFrameID - beginID+1; i <= EpisodeMemoryLastIDFrameID; i++ {
-		em := EpisodeMemoryObjects[i]
-		rImg = append(rImg, em.TriggerAndActionID)
-	}
-	if len(rImg)>1{
-		createNewRules(0, detectedActiveLastNodID,detectedActiveLastUnderstandingNodID,rImg,true) // записать (если еще нет такого) групповое правило
-
-		return rImg
-	}
-
-	return nil
-}
-/////////////////////////////////////////////////
 
 
 
-///////////////////////////////////////////////////
-/*  быстро выбрать ранее успешное правило из rulesArr для данных условий
-и заданного Стимула trigID типа ActionsImage
-используя шаблоном последнюю цепочку кадров эпизод. памяти.
 
-Возвращает:
-1 - ID Правила
-2 - неуверенность нахождения: 0 - макисмальная уваеренность, чем ниже, тем неопределеннее
- */
-func getRulesArrFromTrigger(trigID int)(int,int){
-	doubt:=0 // сомнение
-	// сначала попробовать найти Правило с учетом тематического контекста (групповые Правила)
-	for limit:=5; limit > 1; limit-- {
-		//Вытащить из эпизод.памяти посленюю цепочку кадров
-		rImg := getLastRulesSequenceFromEpisodeMemory(limit)
-		sinex:=strconv.Itoa(detectedActiveLastNodID)+"_"+strconv.Itoa(detectedActiveLastUnderstandingNodID);
-		rArr:=rulesArrConditinArr[sinex] // все правила для данного индекса
-		rules:=0
-		for _, v := range rArr {
-			if len(v.TAid)!=limit {
-				continue
-			}
-			if lib.EqualArrs(rImg, v.TAid){
-				lastTa:=v.TAid[len(v.TAid)-1:]
-				ta:=TriggerAndActionArr[lastTa[0]]
-				if ta !=nil && ta.Trigger==trigID {
-					if ta.Effect >0{// с хорошим эффектом
-						rules = lastTa[0]
-					}//else - продолжает искать хороший конец далее назад
-				}
-			}
-		}
-		if rules>0{
-			return rules,doubt
-		}
-		doubt++
-	}
 
-	return 0,10
-}
-///////////////////////////////////////////////
+
+
+
+
 /*
 func getRulesFromTemp(rImg []int,limit int)(int){
 	for _, v := range rulesArr {

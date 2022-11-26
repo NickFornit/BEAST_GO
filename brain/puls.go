@@ -84,9 +84,9 @@ func pulsActions(){
 		}
 	}
 	LifeTime++
-	if (PulsCount + 1) % 10 == 0 {
-		saveLifeTime()
-	}
+	//if (PulsCount + 1) % 10 == 0 {
+	//	saveLifeTime()
+	//}
 	//ac := time.Date(0, time.January, 1, 0, 0, 0, 0, time.UTC)
 	//lastPulsTime=curTime
 	PulsCount++

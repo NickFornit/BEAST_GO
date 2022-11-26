@@ -29,7 +29,7 @@ func SaveAll() bool {
 	}()
 	// сохранения всего
 	// pppp()
-	// !!!! saveLifeTime() записывает только в puls.go
+	saveLifeTime() 
 	word_sensor.SaveWordTree()
 	word_sensor.SavePhraseTree()
 	// сохранение всех файлов по рефлексам

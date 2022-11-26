@@ -43,7 +43,12 @@ var rulesArr=make(map[int]*rules)
 // выборка по условиям Правила: "NodeAID_NodePID"
 //sinex:=strconv.Itoa(NodeAID)+"_"+strconv.Itoa(NodePID); rulesArrConditinArr[sinex]
 var rulesArrConditinArr=make(map[string] []*rules)// Массив Правил
-
+/*
+// массив только одиночных Правил
+var rulesSinsleArr=make(map[int]*rules)
+// массив только групповых Правил
+var rulesGroupArr=make(map[int]*rules)
+*/
 //////////////////////////////////////////
 
 
@@ -91,6 +96,14 @@ func createNewRules(id int,NodeAID int,NodePID int,TAid []int,CheckUnicum bool)(
 	rulesArr[id]=&node
 	sinex:=strconv.Itoa(NodeAID)+"_"+strconv.Itoa(NodePID)
 	rulesArrConditinArr[sinex]=append(rulesArrConditinArr[sinex],&node)
+	/*
+	if len(TAid)==1{
+		rulesSinsleArr[id]=&node
+	}
+	if len(TAid)>1{
+		rulesGroupArr[id]=&node
+	}
+	 */
 
 	if doWritingFile{
 		SaveRulesArr()

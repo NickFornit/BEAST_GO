@@ -80,8 +80,8 @@ func getMentalPurpose()bool{
 	}
 // тупо - для 4-й ступени (и 5-й, если нет Доминанты), когда набирается значимость и Правила
 		indexE := 0 // индекс в массиве эпизод.памяти, чтобы по нему смотреть, что было дальне
-		rID, doubt := getRulesArrFromTrigger(currentTriggerID)
-		if doubt > 3 { // слишком сомнительно
+		rID, exact := getRulesArrFromTrigger(curActiveActionsID,true)
+		if exact > 3 { // слишком сомнительно
 
 			rulexID := 0
 			maxSteps := 1000

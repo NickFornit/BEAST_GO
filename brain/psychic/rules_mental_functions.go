@@ -19,10 +19,10 @@ import (
 из последнего участка эпизодической памяти объектиынх (EpisodeMemory.Type==0) элеметов.
 limit 5 ограничивает выборку из эпиз.памяти, но она может получться и меньше.
 */
-func GetMentalRulesFromEpisodeMemory(){
+func GetMentalRulesFromEpisodeMemory(){  // НЕ ПРИМЕНЕНО
 	rImg:=getLastMentalRulesSequenceFromEpisodeMemory(5)
 	if rImg!=nil {
-		createNewlastrulesMentalID(0, detectedActiveLastNodID,detectedActiveLastUnderstandingNodID,rImg,true)//записать (если еще нет такого) групповое правило
+		createNewRulesMentalID(0, detectedActiveLastNodPrevID,detectedActiveLastUnderstandingNodID,rImg,true) //записать (если еще нет такого) групповое правило
 	}
 }
 //////////////////////////////////////////////////
@@ -230,50 +230,7 @@ if len(rImg)>limit{// limit последних
 }
 ///////////////////////////////////////////////////
 
-/* Вытащить из эпизод.памяти посленюю цепочку кадров
- */
-func getLastMentalRulesSequenceFromEpisodeMemory(limit int)([]int){
-	if EpisodeMemoryLastIDFrameID==0{
-		return nil
-	}
-	var kind=1 // ментальный тип эпизод.памяти
 
-	var beginID=0
-	var preLifeTime=0
-	for i := EpisodeMemoryLastIDFrameID; i >=0; i-- {
-		em:=EpisodeMemoryObjects[i]
-		// если самый последний эпизод уже является em.Type == kind
-		if i==EpisodeMemoryLastIDFrameID && em.Type == kind{
-			continue
-		}
-		if preLifeTime==0{
-			preLifeTime=em.LifeTime
-		}
-		if em == nil || em.Type != kind ||
-			(em.LifeTime - preLifeTime) >EpisodeMemoryPause ||
-			beginID >=limit{
-			break // закончить выборку
-		}
-		beginID++
-	}
-	if beginID == 0 {
-		return nil
-	}
-	var rImg []int
-	// перебор последнего фрагмента кадров эпиз.памяти
-	for i := EpisodeMemoryLastIDFrameID - beginID+1; i <= EpisodeMemoryLastIDFrameID; i++ {
-		em := EpisodeMemoryObjects[i]
-		rImg = append(rImg, em.TriggerAndActionID)
-	}
-	if len(rImg)>1{
-		createNewlastrulesMentalID(0, detectedActiveLastNodID,detectedActiveLastUnderstandingNodID,rImg,true)// записать (если еще нет такого) групповое правило
-
-		return rImg
-	}
-
-	return nil
-}
-/////////////////////////////////////////////////
 
 
 

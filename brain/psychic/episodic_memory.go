@@ -73,9 +73,9 @@ var EpisodeMemoryPause=100 // в числе пульсов
 вызывается только в func calcAutomatizmResult:
  */
 func newEpisodeMemory(rulesID int,kind int)(*EpisodeMemory){
-	// новый эпизод памяти
-	em:=createEpisodeMemoryFrame(detectedActiveLastNodID,
-		detectedActiveLastUnderstandingNodID,
+	// новый эпизод памяти - для условий ПРЕДЫДУЩЕЙ активации деревьев, - как и Правила
+	em:=createEpisodeMemoryFrame(detectedActiveLastNodPrevID,
+		detectedActiveLastUnderstandingNodPrevID,
 		rulesID,
 		LifeTime,
 		kind)
@@ -168,5 +168,94 @@ func GetEpisodeMemoryChechCount(kind int)(int){
 return count
 }*/
 ////////////////////////////////////////////
+
+
+
+
+/* Вытащить из эпизод.памяти посленюю цепочку кадров типа 0 - объективная память
+ */
+func getLastRulesSequenceFromEpisodeMemory(limit int)([]int){
+	if EpisodeMemoryLastIDFrameID==0{
+		return nil
+	}
+	var kind=0 // здесь всегда - объективнй тип эпизод.памяти
+	var beginID=0
+	var preLifeTime=0
+	for i := EpisodeMemoryLastIDFrameID; i >=0; i-- {
+		em:=EpisodeMemoryObjects[i]
+		if preLifeTime==0{
+			preLifeTime=em.LifeTime
+		}
+		if em == nil ||
+			em.Type != kind || // если самый последний эпизод уже не является em.Type == kind
+			(em.LifeTime - preLifeTime) >EpisodeMemoryPause ||
+			beginID >=limit{
+			break // закончить выборку
+		}
+		beginID++
+	}
+	if beginID == 0 {
+		return nil
+	}
+	var rImg []int
+	// перебор последнего фрагмента кадров эпиз.памяти
+	//beginID+1 чтобы число проходов цикла было равно beginID и окончился на i <= EpisodeMemoryLastIDFrameID
+	for i := EpisodeMemoryLastIDFrameID - beginID+1; i <= EpisodeMemoryLastIDFrameID; i++ {
+		em := EpisodeMemoryObjects[i]
+		rImg = append(rImg, em.TriggerAndActionID)
+	}
+	if len(rImg)>1{
+		lastFrame:=EpisodeMemoryObjects[len(rImg)-1]
+		if lastFrame!=nil {
+			createNewRules(0, lastFrame.NodeAID, lastFrame.NodePID, rImg, true) // записать (если еще нет такого) групповое правило
+		}
+		return rImg
+	}
+
+	return nil
+}
+/////////////////////////////////////////////////
+/* Вытащить из эпизод.памяти посленюю цепочку кадров типа 1 - ментальная память
+ */
+func getLastMentalRulesSequenceFromEpisodeMemory(limit int)([]int){
+	if EpisodeMemoryLastIDFrameID==0{
+		return nil
+	}
+	var kind=1 // ментальный тип эпизод.памяти
+
+	var beginID=0
+	var preLifeTime=0
+	for i := EpisodeMemoryLastIDFrameID; i >=0; i-- {
+		em:=EpisodeMemoryObjects[i]
+		if preLifeTime==0{
+			preLifeTime=em.LifeTime
+		}
+		if em == nil || em.Type != kind ||
+			(em.LifeTime - preLifeTime) >EpisodeMemoryPause ||
+			beginID >=limit{
+			break // закончить выборку
+		}
+		beginID++
+	}
+	if beginID == 0 {
+		return nil
+	}
+	var rImg []int
+	// перебор последнего фрагмента кадров эпиз.памяти
+	for i := EpisodeMemoryLastIDFrameID - beginID+1; i <= EpisodeMemoryLastIDFrameID; i++ {
+		em := EpisodeMemoryObjects[i]
+		rImg = append(rImg, em.TriggerAndActionID)
+	}
+	if len(rImg)>1{
+		lastFrame:=EpisodeMemoryObjects[len(rImg)-1]
+		if lastFrame!=nil {
+			createNewRulesMentalID(0, lastFrame.NodeAID, lastFrame.NodePID, rImg, true) // записать (если еще нет такого) групповое правило
+		}
+		return rImg
+	}
+
+	return nil
+}
+/////////////////////////////////////////////////
 
 

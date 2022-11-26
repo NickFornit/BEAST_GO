@@ -107,6 +107,8 @@ if am.Usefulness<0{
 	LastAutomatizmWeiting=am
 	if ActivationTypeSensor>1 {// только при активации Оператором, а не изменением состояния
 		LastRunAutomatizmPulsCount = PulsCount // активность мот.автоматизма в чисде пульсов
+		detectedActiveLastNodPrevID=detectedActiveLastNodID
+		detectedActiveLastUnderstandingNodPrevID=detectedActiveLastUnderstandingNodID
 	}
 
 	var out=""

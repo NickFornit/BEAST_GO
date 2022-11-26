@@ -81,6 +81,7 @@ var MentalReasonBlocing=false
 
 */
 var detectedActiveLastUnderstandingNodID=0
+
 // нераспознанный остаток - НОВИЗНА
 var CurrentUnderstandingTreeEnd []int
 var currentUnderstandingStepCount=0
@@ -140,6 +141,7 @@ func understandingSituation(activationType int)(bool){
 	savePurposeGenetic=ps
 
 	detectedActiveLastUnderstandingNodID=0
+
 	ActiveBranchNodeArr=nil
 	CurrentUnderstandingTreeEnd=nil
 	currentUnderstandingStepCount=0

@@ -177,10 +177,11 @@ func consciousness(activationType int,fromNextID int)(bool) {   //  return false
 	}
 	//////////////////////////////////////
 
-
-	rules := getSuitableRules() //тестирвоание
-	if rules>0{
-		rules=0
+	if !isFirstActivation { //это - не пробуждение
+		rules := getSuitableRules() //тестирвоание
+		if rules > 0 {
+			rules = 0
+		}
 	}
 
 

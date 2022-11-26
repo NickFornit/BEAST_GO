@@ -122,7 +122,7 @@ var curActions ActionsImage//
 var curActiveActions *ActionsImage // зеркалит текущий ActionsImage
 var curActiveActionsID=0
 var curActiveActionsPulsCount=0
-// образ предыдущего сосотояния ПОСЛЕ стимула Оператора (не меняется при активации изменением состояния)
+// образ предыдущего сосотояния Стимула ПОСЛЕ стимула Оператора (не меняется при активации изменением состояния)
 var curStimulImage *ActionsImage
 var curStimulImageID=0
 
@@ -142,6 +142,10 @@ var PsyActionImg *Activity // текущий образ сочетания де�
 var PsyVerbImg *Verbal // текущий образ фразы с Пульта Verbal
 */
 var detectedActiveLastNodID=0
+// при запуске автоматизма по действию оператора, для Правил
+var detectedActiveLastNodPrevID=0
+var detectedActiveLastUnderstandingNodPrevID=0
+
 // нераспознанный остаток - НОВИЗНА
 var CurrentAutomatizTreeEnd []int
 var currentStepCount=0
@@ -169,6 +173,8 @@ func automatizmTreeActivation()(int) {
 	*/
 
 	detectedActiveLastNodID = 0
+
+
 	ActiveBranchNodeArr = nil
 	CurrentAutomatizTreeEnd = nil
 	currentStepCount = 0
@@ -186,7 +192,9 @@ func automatizmTreeActivation()(int) {
 	curBaseStateImage.SituationID = 0 // будет определн при активации дерева понимания, может и не быть выбранной ситуации
 
 	ActID := action_sensor.CheckCurActionsContext(); //CheckCurActions()
+	curActions.ActID=ActID
 	lev3, _ := createNewlastActivityID(0, ActID, true) // текущий образ сочетания действий с Пульта Activity
+
 	// дезактивировать все контексты!!!! чтобы не влияли на следующую активность
 	action_sensor.DeactivationTriggersContext()
 	//!!!!curActiveActionsID = 0
