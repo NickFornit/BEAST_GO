@@ -93,10 +93,7 @@ func getSuitableRules()(int){
 //////////////////////////////////////////////////////////
 /////////////////////////////////////////////////
 // для выбора в func getRulesArrFromTrigger()
-type гUsefool struct {
-	rID int
-	exact int
-}
+
 ///////////////////////////////////////////////////
 /*  быстро выбрать ранее успешное правило из rulesArr для данных условий
 и заданного Стимула trigID типа ActionsImage
@@ -123,24 +120,37 @@ func getRulesArrFromTrigger(trigger int,veryActualSituation bool)(int,int){
 	if rulesID>0 { // не найдено для точного совпадения условий
 		return rulesID,exact
 	}
+
 	//// не найдено для точного совпадения условий
 	// смотрим тоолько для условий дерева автоматизмов
 	rulesID,exact=searchingRules(trigger,rImg,1)
 	if rulesID>0 { // не найдено для точного совпадения условий
 		return rulesID,exact
 	}
+
 	if veryActualSituation {
 		// смотрим безусловно (самый неувернный вариант)
 		rulesID, exact = searchingRules(trigger, rImg, 2)
 		if rulesID > 0 { // не найдено для точного совпадения условий
 			return rulesID, exact
 		}
+
+		// для условия дерева автоматизмов в одиночных Правилах выбираем наилучшее
+		rulesID:=getBeastIDRulesFromCondA(detectedActiveLastNodID)
+		if rulesID>0 { // не найдено для точного совпадения условий
+			return rulesID,1
+		}
 	}
+
 
 	return 0,0
 }
 //
 func searchingRules(trigger int,rImg []int,condType int )(int,int){
+	type гUsefool struct {
+		rID int
+		exact int
+	}
 	var гUsefoolArr []гUsefool
 	// текущие значения
 	exact:=0 // точность совпадения
@@ -446,3 +456,105 @@ case 8:// ID настроение оператора  Verbal.MoodID
 	return rules
 }
 ///////////////////////////////////////////////
+
+
+/*Eсли для данного сочетания Стимул-Ответ есть только один вид эффекта,
+то это - уже Информация, и чем больше опыт (количество обобщенных правил), тем такая информация полезнее.
+Найти доминирующий эффект для сочетания Стимул-Ответ
+ */
+func getDominantEffect(triggerID int, actionID int)int{
+var effect=0
+	for _, v := range TriggerAndActionArr {
+		if v.Trigger==triggerID && v.Action==actionID{
+			effect+=v.Effect
+		}
+	}
+	if effect > 1{effect=1}
+	if effect < -1{effect=-1}
+	return effect
+}
+////////////////////////////////////////////////
+
+// для условия дерева автоматизмов (NodeAID) в одиночных Правилах выбираем наилучшее
+func getBeastIDRulesFromCondA(NodeAID int)int {
+	type res struct {
+		rulesID int
+		sumEffect int
+	}
+	var rules []res
+	var oldRes *res
+
+	for k, v := range rulesArr {
+		if len(v.TAid) > 1 || v.NodeAID != NodeAID {
+			continue
+		}
+		r:=TriggerAndActionArr[k]
+		effect:=getDominantEffect(r.Trigger, r.Action)
+		oldRes=nil
+		for i := 0; i < len(rules); i++ {
+			if rules[i].rulesID==r.ID{
+				oldRes=&rules[i]
+				rules[i].rulesID=r.ID
+				rules[i].sumEffect+=effect
+				break
+			}
+		}
+		if oldRes == nil {
+			rules = append(rules, res{r.ID,effect})
+		}
+	}
+	maxE:=0
+	rulesID:=0
+	if rules!=nil && len(rules)>0 {
+		for i := 0; i < len(rules); i++ {
+			if rules[i].sumEffect > maxE {
+				maxE = rules[i].sumEffect
+				rulesID = rules[i].rulesID
+			}
+		}
+	}
+	if rulesID>0{
+		return rulesID
+	}
+return 0
+}
+////////////////////////////////////////////////////////////////////
+
+
+
+/* есть ли положительный эффект у Правила, следующего за действием автоматизма,
+чтобы если он хороший, посчитать такое действие приемлемым и запустить автоматизм.
+Для текущего detectedActiveLastNodID.
+т.е. смотрим цепочку Правил,
+в которой есть Правило с действием==actionsImageID,
+а последующее Правило имеет эффект >0
+ */
+func isNextWellEffectFromActonRules(actionsImageID int)bool{
+	// Правила, у которых TriggerAndAction.Action == actionsImageID
+	var taIdArr []int
+	for k, v := range TriggerAndActionArr {
+		if v.Action == actionsImageID{
+			taIdArr=append(taIdArr,k)
+		}
+	}
+	if rulesArr == nil{
+		return false
+	}
+	// смотрим групповые Правила, у которых есть такой TriggerAndAction при NodeAID==detectedActiveLastNodID
+	for _, v := range rulesArr {// пропускаем одиночные правила len(v.TAid) == 1
+		if len(v.TAid) == 1 || v.NodeAID != detectedActiveLastNodID {
+			continue
+		}
+		for i := 0; i < len(v.TAid); i++ {
+			ta:=TriggerAndActionArr[v.TAid[i]]
+			if ta.Action==actionsImageID{
+				taNext:=TriggerAndActionArr[v.TAid[i]+1]
+				if taNext != nil && taNext.Action == actionsImageID && taNext.Effect>0{
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
+////////////////////////////////////////////////

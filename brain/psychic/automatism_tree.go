@@ -267,7 +267,7 @@ func automatizmTreeActivation()(int) {
 		if currentStepCount<conditionsCount {              // не пройдено до конца имеющихся условий
 			// нарастить недостающее в ветке дерева - всегда для orientation_1()
 			//oldDetectedActiveLastNodID:=detectedActiveLastNodID
-			detectedActiveLastNodID = formingBranch(detectedActiveLastNodID, currentStepCount+1, condArr)
+			detectedActiveLastNodID = formingBranch(detectedActiveLastNodID, currentStepCount, condArr)
 		}
 
 	}else{// вообще нет совпадений для данных условий
@@ -402,7 +402,9 @@ if LastRunAutomatizmPulsCount >0 && ActivationTypeSensor >1{//Обработка
 }
 ////////////////////////////// конец обработки ожидания ответа оператора
 
-	// ЕСТЬ ЛИ АВТОМАТИЗМ В ВЕТКЕ и болеее ранних? выбрать лучший автоматизм для сформированной ветки nodeID
+	/* ЕСТЬ ЛИ АВТОМАТИЗМ В ВЕТКЕ и болеее ранних? выбрать лучший автоматизм для сформированной ветки nodeID
+	а если нет, то учитывать общие автомтизмы, привязанные к действиям (виртуальная ветка ID от 1000000) и словам (>2000000)
+	 */
 	currentAutomatizmAfterTreeActivatedID = getAutomatizmFromNodeID(detectedActiveLastNodID)
 
 	// всегда сначала активировать дерево понимания, результаты которого могут заблокировать все внизу

@@ -192,6 +192,10 @@ return
 
 //корректируется успешность автоматизма - реакция на результат lastCommonDiffValue
 func automatizmCorrection(lastCommonDiffValue int,wellIDarr []int){
+	var isCommon=false
+	if LastAutomatizmWeiting.BranchID>1000000{// это общий, привязанный не к ветке, а к действиям или словам
+		isCommon=true
+	}
 	/// если числа имеют разные знаки (одно положительное, другое отрицательное)
 	if lib.IsDiffersOfSign(LastAutomatizmWeiting.Usefulness,lastCommonDiffValue){
 		LastAutomatizmWeiting.Count=0 // сбрасываем  надежность
@@ -201,10 +205,16 @@ func automatizmCorrection(lastCommonDiffValue int,wellIDarr []int){
 
 	// изменять полезность по 1 шагу!
 	if lastCommonDiffValue>0 && LastAutomatizmWeiting.Usefulness<10 {
-		LastAutomatizmWeiting.Usefulness++ // lastBetterOrWorse
+		if !isCommon { // не трогать общий автоматизм
+			LastAutomatizmWeiting.Usefulness++ // lastBetterOrWorse
+		}else{// привязать общий автоматизм к активной ветке
+			linkCoomonAtmtzmToBrench(LastAutomatizmWeiting)
+		}
 	}
 	if lastCommonDiffValue<0 && LastAutomatizmWeiting.Usefulness>-10 {
-		LastAutomatizmWeiting.Usefulness-- // lastBetterOrWorse
+		if !isCommon {// не трогать общий автоматизм
+			LastAutomatizmWeiting.Usefulness-- // lastBetterOrWorse
+		}
 	}
 
 	if LastAutomatizmWeiting.Usefulness>0 {

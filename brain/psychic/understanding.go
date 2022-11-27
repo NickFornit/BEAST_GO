@@ -193,30 +193,27 @@ if true && !isFirstActivation { //это - не пробуждение
 	////////////////////////////// 1 уровень ////////////////////
 	// ПЕРВЫЙ УРОВЕНЬ, самый примитивный уровень:
 	// есть ли штатный мот.автоматизм и нужно ли его менять или задумываться
-	if fromNextID == 0 {// только перед началом цикла
-		mentalInfoStruct.motorAtmzmID=0 // сброс прежнего значения
-		nArr := GetMotorsAutomatizmListFromTreeId(detectedActiveLastNodID)
-		/* - только привязанные к ветке, а не выбранный мягким алгоритмом
-		   Если нет привязанных - находим решение - по сдедующим уровням привлечения осознания.
-		*/
-		if nArr != nil {
-			for i := 0; i < len(nArr); i++ {
-				if nArr[i].Belief == 2 && nArr[i].Usefulness >= 0 { // есть штатный, пусть выполняется
-
-// Если Период преступной инициативы, если важная ситуация, но нет опасности, то - ПОДВЕРГНУТЬ СОМНЕНИЮ автоматизм.
-if EvolushnStage == 4 || !CurrentInformationEnvironment.veryActualSituation || CurrentInformationEnvironment.danger {
-	//ПОДВЕРГНУТЬ СОМНЕНИЮ автоматизм, если нет опасности (не нужно реагировать аффектно) и ситуация важна
-						infoFunc6()
-//mentalInfoStruct.notOldAutomatizm true - НЕ позволить запустить рвущийся на выполнение старый автоматизм
-						if !mentalInfoStruct.notOldAutomatizm {
-							//можно без опаски выполнять штатный автоматизм
-							return false //Эпиз.память не пишется. При опасности - состояние аффекта.
-						}// если нет - далее искать альтернативу
-					}
-					mentalInfoStruct.motorAtmzmID=nArr[i].ID // для последующего использования с инфо-фукнциях
-					// нужно ПОДВЕРГНУТЬ СОМНЕНИЮ автоматизм
-				}
+	if fromNextID == 0 { // только перед началом цикла
+		mentalInfoStruct.motorAtmzmID = 0 // сброс прежнего значения
+		//НЕТ!!! atmtzm := GetBelief2AutomatizmListFromTreeId(detectedActiveLastNodID)
+/* учитывается именно тот автоматизм, что рвется на выполнение при активации дерева автоматизмов,
+даже если он подобран "мягким алгоритмом" в getAutomatizmFromNodeID
+При атасе он выполняется не раздумявая, иначе подвергается сомнению в infoFunc6()
+ */
+		atmtzm := AutomatizmFromIdArr[currentAutomatizmAfterTreeActivatedID]
+		if atmtzm != nil { // есть автоматизм
+			// Если Период преступной инициативы, если важная ситуация, но нет опасности, то - ПОДВЕРГНУТЬ СОМНЕНИЮ автоматизм.
+			if EvolushnStage == 4 || !CurrentInformationEnvironment.veryActualSituation || CurrentInformationEnvironment.danger {
+				//ПОДВЕРГНУТЬ СОМНЕНИЮ автоматизм, если нет опасности (не нужно реагировать аффектно) и ситуация важна
+				infoFunc6()
+				//mentalInfoStruct.notOldAutomatizm true - НЕ позволить запустить рвущийся на выполнение старый автоматизм
+				if !mentalInfoStruct.notOldAutomatizm {
+					//можно без опаски выполнять штатный автоматизм
+					return false //Эпиз.память не пишется. При опасности - состояние аффекта.
+				} // если нет - далее искать альтернативу
 			}
+			mentalInfoStruct.motorAtmzmID = atmtzm.ID // для последующего использования с инфо-фукнциях
+			// нужно ПОДВЕРГНУТЬ СОМНЕНИЮ автоматизм
 		}
 	}
 }

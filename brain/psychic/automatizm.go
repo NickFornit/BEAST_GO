@@ -100,17 +100,10 @@ var AutomatizmIdFromPhraseId = make(map[int] []*Automatizm)
  */
 var AutomatizmSuccessFromIdArr = make(map[int]*Automatizm)
 
-// список всех автоматизмов для ID узла Дерева
-func GetMotorsAutomatizmListFromTreeId(nodeID int) []*Automatizm {
-	if nodeID == 0 { return nil	}
-	var mArr[] *Automatizm
-	for _, a := range AutomatizmFromIdArr {
-		if a.BranchID < 1000000 && a.BranchID == nodeID{
-			mArr = append(mArr, a)
-		}
-	}
-	return mArr
-}
+// GetMotorsAutomatizmListFromTreeId(nodeID int) список всех автоматизмов для ID узла Дерева
+// ExistsAutomatizmForThisNodeID(nodeID int) есть ли штатный автоматизм (с Belief==2), привязанные к узлу дерева
+// GetBelief2AutomatizmListFromTreeId(nodeID int) штатный, невредный автоматизм, привязанный к ветке
+
 
 var lastAutomatizmID = 0 // ID последнего созданного автоматизма
 var NoWarningCreateShow = false // true - не выдавать сообщение о новом автоматизме

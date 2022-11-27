@@ -93,6 +93,7 @@ func runMentalFunctionID(id int){
 	case 12: infoFunc12()//Cинтез новой фразц из компонентов, имеющих плюсы в Правилах
 	case 13: infoFunc13()//Отзеркалить Стимул от оператора
 	case 14: infoFunc14()//ментально переактиваровать дерево понимания с mentalInfoStruct.moodeID и mentalInfoStruct.emotonID
+	case 15: infoFunc15()//Для условия дерева автоматизмов (NodeAID) в одиночных Правилах выбираем наилучшее
 	}
 }
 
@@ -112,6 +113,7 @@ func getMentalFunctionString(id int)string{
 	case 12: return "Cинтез новой фразц из компонентов, имеющих плюсы в Правилах"
 	case 13: return "Отзеркалить Стимул от оператора"
 	case 14: return "Ментально переактиваровать дерево понимания с mentalInfoStruct.moodeID и mentalInfoStruct.emotonID"
+	case 15: return "Для условия дерева автоматизмов (NodeAID) в одиночных Правилах выбираем наилучшее"
 	}
 	return "Нет функции с ID = "+strconv.Itoa(id)
 }
@@ -238,6 +240,14 @@ if mAtmzmID>0 {
 		return // больше не искать, уже создан мент.автоматизм объективного действия
 	}
 	///////////////////////////////////////
+
+	/*если для данного сочетания Стимул-Ответ есть только один вид эффекта,
+	то это - уже Информация, и чем больше опыт (количество обобщенных правил), тем такая информация полезнее.
+	infoFunc15()
+	 */
+	//getDominantEffect(triggerID int, actionID int)
+
+
 
 	/*Если оператор нажал кнопку Учитель, это - стимул привлечения внимания для наблюдения за ним,
 	за достигаемой им целью и как он ее достигает. Это - начиная с 4-й стадии развития.
@@ -424,6 +434,12 @@ func infoCreateAndRunNewActionMentAtmzmFromAction(actImgID int){
 	if actImgID ==0 {// ID действия мот.автоматизма, рвущегося на выполнение
 		return
 	}
+/* учитывать ли инфу, что автоматизм - общий (не привязанный к конечному узлу ветки)?
+var isCommon=false
+if automatizm.BranchID>1000000{// это общий, привязанный не к ветке, а к действию или фразе
+	isCommon=true
+}
+ */
 
 // сопоставление, грозит ли опасностной значимостью запускаемый автоматизм
 todoComparison(actImgID)
@@ -756,6 +772,38 @@ if mentalInfoStruct.emotonID==0{// выбрать случайно - для info
 	return false
 }
 /////////////////////////////////////////////////////////////////////
+
+
+
+/* для условия дерева автоматизмов (NodeAID) в одиночных Правилах выбираем наилучшее
+Eсли для данного сочетания Стимул-Ответ есть только один вид эффекта,
+	то это - уже Информация, и чем больше опыт (количество обобщенных правил), тем такая информация полезнее.
+*/
+func infoFunc15() {
+	lib.WritePultConsol("Запущена функция:<br> "+getPurposeDetaileString(15))
+	clinerMentalInfo()
+	beastIDRulesFromCondA()
+	currentInfoStructId=15 // определение актуального поля mentalInfo
+}
+func beastIDRulesFromCondA()bool {
+	// для условия дерева автоматизмов в одиночных Правилах выбираем наилучшее
+	rulesID:=getBeastIDRulesFromCondA(detectedActiveLastNodID)
+	if rulesID>0 { // не найдено для точного совпадения условий
+		rules:=rulesArr[rulesID]
+		if rules==nil{
+			return false
+		}
+		actID:=TriggerAndActionArr[rules.TAid[0]].Action
+		if actID>0{
+			// здесь определяется mentalInfoStruct.motorAtmzmID
+			infoCreateAndRunMentMotorAtmzmFromAction(actID)
+			return true
+		}
+		return true
+	}
+return false
+}
+///////////////////////////////////////////////////
 
 
 

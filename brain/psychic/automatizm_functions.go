@@ -8,31 +8,46 @@ package psychic
 
 
 
-/* выбрать лучший автоматизм для узла nodeID то более ранних, если нет у поздних.
+/* Не раздумывая, а рефлексторно используя имеющуюся информацию,
+ВЫБРАТЬ ЛУЧШИЙ АВТОМАТИЗМ для узла nodeID то более ранних, если нет у поздних.
+а если нет, то учитывать общие автомтизмы, привязанные к действиям (виртуальная ветка ID от 1000000) и словам (>2000000)
 */
 func getAutomatizmFromNodeID(nodeID int)(int){
 	// список всех автоматизмов для ID узла Дерева
 	aArr:=GetMotorsAutomatizmListFromTreeId(nodeID)
 	var usefulness = -10 // полезность, выбрать наилучшую
-	var usefulnessID = 0
+	var autmtzm *Automatizm
 	if aArr != nil {
 		for i := 0; i < len(aArr); i++ {
-			if aArr[i].Belief == 2 { // есть единственный проверенный автоматизм
+var allowRun=false
+			if aArr[i].Usefulness < 0 {
+				/* Не блокировать сразу, а посмотреть в Правила,
+				м.б. после плохого эффекта последует следующее Правило с хорошим эффектом
+				и тогда можно допустить Usefulness<0 в расчете на последующий успех.
+				Не в качестве волевого усилия, а чисто автоматически использовать такую информацию.
+				*/
+				isWellEffect := isNextWellEffectFromActonRules(aArr[i].ActionsImageID)
+				if isWellEffect {
+					allowRun=true
+				}
+			}
+
+			if aArr[i].Belief == 2 && allowRun { // есть штатный, проверенный автоматизм
 				return aArr[i].ID
 			}
 			if aArr[i].Usefulness > usefulness {
 				usefulness = aArr[i].Usefulness
-				usefulnessID = aArr[i].ID
+				autmtzm = aArr[i]
 			}
 		}
-		if usefulnessID > 0 { // выбран самый полезный из всех
+	}
+		if autmtzm !=nil { // выбран самый полезный из всех
 			/*формирование не привязанных к узлу автоматизмов при активации дерева
 			- для всех фраз - и для всех действий на основе привязанного автоматизма,
 			чтобы другие ветки могли пользоваться при разных условиях.
 			*/
-			createNodeUnattachedAutomatizm(nodeID, usefulnessID)
-			return usefulnessID
-		}
+			createNodeUnattachedAutomatizm(nodeID, autmtzm.ID)
+			return autmtzm.ID
 	}
 	// в данном узле нет привязанного к нему автоматизма
 	// если это - узел действий или узел фразы, смотрим, если привязанные к таким объектам автоматизм
@@ -67,7 +82,7 @@ func getAutomatizmFromNodeID(nodeID int)(int){
 		}
 	}
 	*/
-	/////////// нет никаких автоматизмов хоть как-то относящийся к данному узлу
+	/////////// нет никаких автоматизмов хоть как-то относящихся к данному узлу
 	// найти у предыдущих узел действий
 	for i := len(ActiveBranchNodeArr)-1; i >2 ; i-- {
 		node=AutomatizmTreeFromID[ActiveBranchNodeArr[i]]
@@ -131,6 +146,36 @@ if belief==2{
 }
 /////////////////////////////////////////////////////
 
+
+
+
+// список всех автоматизмов для ID узла Дерева
+func GetMotorsAutomatizmListFromTreeId(nodeID int) []*Automatizm {
+	if nodeID == 0 { return nil	}
+	var mArr[] *Automatizm
+	for _, a := range AutomatizmFromIdArr {
+		if a.BranchID < 1000000 && a.BranchID == nodeID{
+			mArr = append(mArr, a)
+		}
+	}
+	return mArr
+}
+// штатный, невредный автоматизм, привязанный к ветке
+func GetBelief2AutomatizmListFromTreeId(nodeID int) *Automatizm {
+	if nodeID == 0 {
+		return nil
+	}
+	aArr:=AutomatizmBelief2FromTreeNodeId[nodeID]
+
+	if aArr == nil {
+		return nil
+	}
+	if aArr.Usefulness >= 0 { // есть штатный, невредный
+			return aArr
+	}
+	return nil
+}
+//////////////////////////////////////////////////
 
 // есть ли штатный автоматизм (с Belief==2), привязанные к узлу дерева
 func ExistsAutomatizmForThisNodeID(nodeID int)(bool){
@@ -211,5 +256,19 @@ func UnblockAutomatizmID(atmtzmID int)string{
 	}
 	atmtzm.Usefulness=1
 	return "1"
+}
+/////////////////////////////////////////////////////////////////////
+
+
+// привязать общий автоматизм к активной ветке detectedActiveLastNodID
+func linkCoomonAtmtzmToBrench(commonAutomatizm *Automatizm){
+	if LastAutomatizmWeiting.BranchID<1000000 { // это НЕ общий - не должно такого быть
+		return
+	}
+	atmtzm := GetBelief2AutomatizmListFromTreeId(detectedActiveLastNodID)
+	if atmtzm!=nil || atmtzm.ID == commonAutomatizm.ID{
+		return
+	}
+	CreateAtutomatizmNoSaveFile(detectedActiveLastNodID,commonAutomatizm.ActionsImageID)
 }
 /////////////////////////////////////////////////////////////////////
