@@ -313,7 +313,8 @@ func fixNewRules(lastCommonDiffValue int) int {
 	}
 	// ответный образ действий Beast
 	answer:=LastAutomatizmWeiting.ActionsImageID
-	if answer == 0{return 0}
+	if answer == 0  || ActionsImageArr[answer]==nil {
+		return 0}
 	TriggerAndAction,_:=createNewlastTriggerAndActionID(0,curStimulImageID,answer,lastCommonDiffValue,true)
 	if TriggerAndAction == 0{return 0}
 	// Запись Правила

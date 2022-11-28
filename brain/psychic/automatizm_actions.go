@@ -105,10 +105,20 @@ if am.Usefulness<0{
 }
 	notAllowReflexRuning=true // блокировка рефлексов
 	LastAutomatizmWeiting=am
-	if ActivationTypeSensor>1 {// только при активации Оператором, а не изменением состояния
-		LastRunAutomatizmPulsCount = PulsCount // активность мот.автоматизма в чисде пульсов
-		detectedActiveLastNodPrevID=detectedActiveLastNodID
-		detectedActiveLastUnderstandingNodPrevID=detectedActiveLastUnderstandingNodID
+
+	// начать ПЕРИОД ОЖИДАНИЯ реакции оператора - только при Стимуле Оператора, а не изменением состояния
+	if ActivationTypeSensor>1 {
+/*От Стимула до Ответа должно быть было не более 3-х пульсов (потому как бот не может думать так долго),
+		чтобы начался период ожидания,
+		иначе ответ был явно не на Стимул, а, м.б. - по инициативе Beast (по ответу без стимула Правило не пишется).
+Даже если возник в ходе решения доминанты,то он сразу не выдается на Пульт, а записывается в правило - уже более высокого порядка.
+ */
+		// свежесть Стимула оператора - не позже, чем 3 пульса до Ответа на него
+		if curActiveActionsID>0 && (curActiveActionsPulsCount > PulsCount-2) {
+			LastRunAutomatizmPulsCount = PulsCount // активность мот.автоматизма в чисде пульсов
+			detectedActiveLastNodPrevID = detectedActiveLastNodID
+			detectedActiveLastUnderstandingNodPrevID = detectedActiveLastUnderstandingNodID
+		}
 	}
 
 	var out=""

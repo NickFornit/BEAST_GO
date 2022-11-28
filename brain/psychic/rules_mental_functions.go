@@ -20,7 +20,7 @@ import (
 limit 5 ограничивает выборку из эпиз.памяти, но она может получться и меньше.
 */
 func GetMentalRulesFromEpisodeMemory(){  // НЕ ПРИМЕНЕНО
-	rImg:=getLastMentalRulesSequenceFromEpisodeMemory(5)
+	rImg:=getLastRulesSequenceFromEpisodeMemory(1,5)
 	if rImg!=nil {
 		createNewRulesMentalID(0, detectedActiveLastNodPrevID,detectedActiveLastUnderstandingNodID,rImg,true) //записать (если еще нет такого) групповое правило
 	}
@@ -167,7 +167,7 @@ func getSuitableMentalRulesСarefully()(int){
 func getMentalRulesFromEpisodicsSlice(limit int,maxSteps int)(int,int){
 
 	//Вытащить из эпизод.памяти посленюю цепочку кадров
-	rImg:=getLastMentalRulesSequenceFromEpisodeMemory(limit)
+	rImg:=getLastRulesSequenceFromEpisodeMemory(1,limit)
 
 // найти такую последовательность в предыдущей эпизод.памяти, но не далее 1000 фрагментов
 /* уже обеспечено
@@ -247,7 +247,7 @@ func getMentalRulesArrFromTrigger(mentalID []int)(int,int) {
 	// сначала попробовать найти Правило с учетом тематического контекста
 	for limit := 5; limit > 1; limit-- {
 		//Вытащить из эпизод.памяти посленюю цепочку кадров
-		rImg := getLastMentalRulesSequenceFromEpisodeMemory(limit)
+		rImg := getLastRulesSequenceFromEpisodeMemory(1,limit)
 		doubt:=0 // сомнение
 		sinex := strconv.Itoa(detectedActiveLastNodID) + "_" + strconv.Itoa(detectedActiveLastUnderstandingNodID);
 		rArr := rulesMentalArrConditinArr[sinex] // все правила для данного индекса

@@ -79,23 +79,30 @@ var currentInfoStructId=0
  */
 func runMentalFunctionID(id int){
 	switch id {
-	case 1: infoFunc1()//Подобрать MentalActionsImages для начального звена цепочки
+	// НЕ ВЫЗЫВАЕТСЯ ментально case 1: infoFunc1()//Подобрать MentalActionsImages для начального звена цепочки
 	case 2: infoFunc2()//Подобрать MentalActionsImages для последующего звена цепочки
 	case 3: infoFunc3()//найти подходящий мент.автоматизм по опыту ментальных Правил
-	case 4: infoFunc4()//нализ инфо стркутуры и др. информации по currentInfoStructId и выдача решения
-	case 5: infoFunc5()//создать и запустить ментальный автоматизм по акции
+	case 4: infoFunc4()//Анализ инфо стркутуры и др. информации по currentInfoStructId и выдача решения
+	case 5: infoFunc5()//создать и запустить ментальный автоматизм по ID акции
 	case 6: infoFunc6()//ПОДВЕРГНУТЬ СОМНЕНИЮ автоматизм, если нет опасности (не нужно реагировать аффектно) и ситуация важна
 	case 7: infoFunc7()//создать и запустить ментальный автоматизм запуска моторного автоматизма по действию ActionsImageID
 	case 8: infoFunc8()//Ментальное определение ближайшей Цели в данной ситуации
 	case 9: infoFunc9()//найти способ улучшения значимости объекта внимания extremImportanceObject
 	case 10: infoFunc10()//найти способ улучшения значимости субъекта внимания extremImportanceMentalObject
 	case 11: infoFunc11()//Ментальное отзеркаливание
-	case 12: infoFunc12()//Cинтез новой фразц из компонентов, имеющих плюсы в Правилах
+	case 12: infoFunc12()//Cинтез новой фразы из компонентов, имеющих плюсы в Правилах
+	case 122: infoFunc122()//выбрать ID действия имеющего плюсы в Правилах
 	case 13: infoFunc13()//Отзеркалить Стимул от оператора
 	case 14: infoFunc14()//ментально переактиваровать дерево понимания с mentalInfoStruct.moodeID и mentalInfoStruct.emotonID
 	case 15: infoFunc15()//Для условия дерева автоматизмов (NodeAID) в одиночных Правилах выбираем наилучшее
+	case 16: infoFunc16()//Случайно выдать любую известную фразу или действие и затем infoFunc7()
+
+	default: return
 	}
+
+//	setCurIfoFuncID(id)
 }
+//////////////////////////////////////////////////
 
 func getMentalFunctionString(id int)string{
 	switch id {
@@ -103,17 +110,19 @@ func getMentalFunctionString(id int)string{
 	case 2: return "Подобрать MentalActionsImages для последующего звена цепочки"
 	case 3: return "Найти подходящий мент.автоматизм по опыту ментальных Правил"
 	case 4: return "Анализ инфо стркутуры и др. информации по currentInfoStructId и выдача решения"
-	case 5: return "Создать и запустить ментальный автоматизм по акции"
+	case 5: return "Создать и запустить ментальный автоматизм по ID акции"
 	case 6: return "Подвергнуть сомнению автоматизм, если нет опасности (не нужно реагировать аффектно) и ситуация важна"
 	case 7: return "Создать и запустить ментальный автоматизм запуска моторного автоматизма по действию ActionsImageID"
 	case 8: return "Ментальное определение ближайшей Цели в данной ситуации"
 	case 9: return "Найти способ улучшения значимости объекта внимания extremImportanceObject"
 	case 10: return "Найти способ улучшения значимости субъекта внимания extremImportanceMentalObject"
 	case 11: return "Ментальное отзеркаливание"
-	case 12: return "Cинтез новой фразц из компонентов, имеющих плюсы в Правилах"
+	case 12: return "Cинтез новой фразы из компонентов, имеющих плюсы в Правилах"
+	case 122: return "Выбрать ID действия имеющего плюсы в Правилах"
 	case 13: return "Отзеркалить Стимул от оператора"
 	case 14: return "Ментально переактиваровать дерево понимания с mentalInfoStruct.moodeID и mentalInfoStruct.emotonID"
 	case 15: return "Для условия дерева автоматизмов (NodeAID) в одиночных Правилах выбираем наилучшее"
+	case 16: return "Случайно выдать любую известную фразу и затем infoFunc7()"
 	}
 	return "Нет функции с ID = "+strconv.Itoa(id)
 }
@@ -131,85 +140,99 @@ func getMentalFunctionString(id int)string{
 
 
 
-/* НЕ ИСПОЛЬЗУЕТСЯ т.к. базовое звено цикла теперь всегда пустое. Применяется infoFunc2()
-№0 Подобрать MentalActionsImages для базового звена цепочки
-c вызовом activateInfoFunc для начальной информированности,
-случайно или по заготовке редактора с Пульта
+/* 1. Подобрать MentalActionsImages для продолжения цикла осмысления.
+находить другое действие, вернуть новый fromNextID
+Вызывается только из consciousness
 */
-func infoFunc1(){
+func infoFunc1(fromNextID int){
 	clinerMentalInfo()
+	setCurIfoFuncID(1)
 	iID:=0// ID MentalActionsImages
 
-	typeID:=0
-	valID:=0
+	/* СНАЧАЛА поиск в ментальных Правилах готового решения
+	      Найдя нужную комбинацию Правил для другой эмоции для успешного решения цепочки
+	   воссоздать тот базовый контекст при той же ситуации (эмоция в найденном фрагменте эпиз.памяти)
+	   и отработать цепочку «правильно».
+	*/
+	actionID:= infoFindRightMentalRules()
+	if actionID>0{
+		mAtmzmID,_:=createMentalAutomatizmID(0,actionID, 1)
+		if mAtmzmID>0 {
+			/* ментально переактивировать дерево понимания с той эмоцией, что была в КРАТКОВРЕМЕННОЙ памяти из Правила
+			При этом тут же будет совершено моторное действие уже в новых условиях дерева понимания.
+				 Это - непонятный пока момент...
+			*/
+			if mentalInfoStruct.epizodFrameIndex > 0 {
+				tm := termMemory[mentalInfoStruct.epizodFrameIndex]
+				if tm.uTreeNodID > 0 {
+					uNode := UnderstandingNodeFromID[tm.uTreeNodID]
+					if uNode != nil {
+						mentalInfoStruct.moodeID = uNode.Mood
+						mentalInfoStruct.emotonID = uNode.EmotionID
+						reactivateEmotionUnderstandingЕree()// с перезапуском функции consciousness
+					}
+				}
+			}
+		}
+		//id, newID := createNewlastgoNextID(0, detectedActiveLastUnderstandingNodID,detectedActiveLastNodID, 0, mAtmzmID)
+		// создать новое звено типа 5(запуск моторного действия)
+		iID, _ = CreateNewlastMentalActionsImagesID(0, 5, mAtmzmID, true)
+		//mentalInfoStruct.mImgID = iID // передача инфы в структуру
+		infoCreateAndRunMentMotorAtmzmFromAction(iID)// запустить моторный автоматизм
+		reloadConsciousness(0)// конец цикла осмысления
+		return
+	}// конец поиска в правилах
+	///////////////////////////////////////////////////
 
-	// TODO подобрать
-	/*
-	1. Поиск MentalActionsImages для следующего .NextID начинается по ментальным Правилам.
-	2. Если нет правил, посмотреть, есть ли дургие ветки у данного узла и использовать их начальную инфу.
-	3. Если нет дргих веток, выбрать какой-то провоцирующий.
-	 */
-	// поиск в Правилах
-	//action:=infoFindRightMentalRules()
+	// найти следующую инфо-функцию для вызова
+	var nextIF=0
 
-	// создать
-	iID,_=CreateNewlastMentalActionsImagesID(0,typeID,valID,true)
+	//случайная инфо-фунция
+	if EvolushnStage == 4 {
+		// случайный выбор инфо-функции (хотел сделать Пультовй редактор последовательности выбора инфо-функции)
+		nextIF= infoFindRundomMentalFunction()
+	}
+	if EvolushnStage == 5 {
 
-	mentalInfoStruct.mImgID = iID // передача инфы в структуру
-	currentInfoStructId=1 // определение актуального поля mentalInfo
+		// TODO есть есть проблема - создать Доминанту
+
+	}
+
+
+	if nextIF>0 { // найдена инфо-функция, ну и просто запустить ее !!!!!!
+		/* создание ментального автоматизма для запуска инфо-функции
+		Можно было бы просто запускать инфо-функции, но в мент.Правилах - действие мент.автоматизма!
+		*/
+		fromNextID = createNexusFromNextID(fromNextID, nextIF) // создается мент.авт-м запуска infoFunc2()
+		if fromNextID > 0 {
+			// перезапуск осмысления с обновлением currrentFromNextID - с последующим запуском мент-го автоматизма.
+			reloadConsciousness(fromNextID)
+			return
+		}
+	}
+
+	reloadConsciousness(0)// конец цикла осмысления
 }
 /////////////////////////////////////////////////////////
 
 
-/* №2 Подобрать MentalActionsImages для последующего звена цепочки, если не найдено в опыте
-с вызовом различных activateInfoFunc или
- c вызовом activateMotorID моторнорнного автоматизма (а значит, с запуском моторного с периодом ожидания),
-т.е. раз нет решения, пробовать подобрать моторные действия, просмотрев цеаочку с начала.
-Если в базовом звене есть другие MotorBranchID то - подсмотреть как они продолжаются с насовпажающего звена цепи!
-
-Здесь выбор той или иной функции делается в контексте имеющейся инфо-среды,
+/* №2 Здесь выбор той или иной функции делается в контексте имеющейся инфо-среды,
 а если этого не удается, то выбирается случайно одна из инфо-функций.
+
+Не обязательно - ответ на Стимул, а может быть собственная ИНИЦИАТИВА (начинается со случайных действий infoFindRundomMentalFunction()).
 */
 func infoFunc2(){
 	currentInfoStructId=2 // определение актуального поля mentalInfo
 	lib.WritePultConsol("Запущена функция:<br> "+getPurposeDetaileString(2))
+	mentalSimpleRelexSolution()
+	currentInfoStructId=2 // определение актуального поля mentalInfo
+}
+func mentalSimpleRelexSolution()bool{
 	clinerMentalInfo()
+	setCurIfoFuncID(2)
 	iID:=0// ID MentalActionsImages
 
-	// infoFunc2() -> getMentalPurpose() уже запускалось
-	// curImportanceObjectArr - наиболее нзачимое в восприятии (вначале consciousness)
-
-/* СНАЧАЛА поиск в ментальных Правилах готового решения
-   Найдя нужную комбинацию Правил для другой эмоции для успешного решения цепочки
-воссоздать тот базовый контекст при той же ситуации (эмоция в найденном фрагменте эпиз.памяти)
-и отработать цепочку «правильно».
- */
-	actionID:= infoFindRightMentalRules()
-	mAtmzmID,_:=createMentalAutomatizmID(0,actionID, 1)
-if mAtmzmID>0 {
-	/* ментально переактивировать дерево понимания с той эмоцией, что была в КРАТКОВРЕМЕННОЙ памяти из Правила
-При этом тут же будет совершено моторное действие уже в новых условиях дерева понимания.
-	 Это - непонятный пока момент...
-	 */
-	if mentalInfoStruct.epizodFrameIndex>0{
-		tm:=termMemory[mentalInfoStruct.epizodFrameIndex]
-		if tm.uTreeNodID>0 {
-			uNode:=UnderstandingNodeFromID[tm.uTreeNodID]
-			if uNode!=nil {
-				mentalInfoStruct.moodeID =uNode.Mood
-				mentalInfoStruct.emotonID=uNode.EmotionID
-				reactivateEmotionUnderstandingЕree()
-			}
-		}
-	}
-
-	//id, newID := createNewlastgoNextID(0, detectedActiveLastUnderstandingNodID,detectedActiveLastNodID, 0, mAtmzmID)
-	// создать новое звено типа 5(запуск моторного действия)
-	iID, _ = CreateNewlastMentalActionsImagesID(0, 5, mAtmzmID, true)
-	mentalInfoStruct.mImgID = iID // передача инфы в структуру
-	return
-}
-	///////////////////////////////////////////////////
+	infoMirroringStimul()
 
 	// если нет готового правила, ТО ИДЕМ ДАЛЬШЕ
 
@@ -220,11 +243,11 @@ if mAtmzmID>0 {
 	а его понимание - Вид всех последствий в разных условиях.
 	Для образа фразы type Verbal struct - составляющие отдельные слова, которые могут быть в разных образах фраз,
 	так что можно сделать функцию Вида - выборки данного слова в разных условиях с последствиями.
-	 */
+	*/
 	if extremImportanceObject!=nil{
-		// найти способ улучшения значимости объекта extremImportanceObject
+		// найти способ улучшения значимости объекта extremImportanceObject - запуск моторного автоматизма
 		if infoFindAttentionObjImprovement(){// сделано, но еще не тестировалось
-			return // больше не искать, уже создан мент.автоматизм объективного действия
+			return true// больше не искать, уже создан мент.автоматизм объективного действия
 		}
 	}
 
@@ -234,17 +257,17 @@ if mAtmzmID>0 {
 
 	Здесь должно находиться решение (выбор действия) на основе использования информации
 	о наиболее важном в мыслях, скорее всего связанное с Доминантами.
-	 */
+	*/
 	if infoFindAttentionObjMentalImprovement(){
 
-		return // больше не искать, уже создан мент.автоматизм объективного действия
+		return true// больше не искать, уже создан мент.автоматизм объективного действия
 	}
 	///////////////////////////////////////
 
 	/*если для данного сочетания Стимул-Ответ есть только один вид эффекта,
 	то это - уже Информация, и чем больше опыт (количество обобщенных правил), тем такая информация полезнее.
 	infoFunc15()
-	 */
+	*/
 	//getDominantEffect(triggerID int, actionID int)
 
 
@@ -254,7 +277,7 @@ if mAtmzmID>0 {
 	Для понимания отзеркаленных действий оператора цель, которую ставил тварь перед своими действиями PurposeGenetic -
 	фксируется в узлах дерева понимания PurposeImage -> SituationImage .
 	Кнопки действий теперь активируют смысл (контекст) ситуации SituationImage
-	 */
+	*/
 	// TODO
 
 	/*Посмотреть, есть ли другие ветки у данного узла и использовать их начальную инфу.
@@ -272,46 +295,36 @@ if mAtmzmID>0 {
 
 
 
-// тупо Ментальное отзеркаливание - в случае, если не известна еще фраза (нет еще ее значимости )
-	// сначала смотрим точно значимость фразы с учетом условий
-	praseI:=getObjectImportance(5,curActiveActions.PhraseID[0], detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
-	if praseI == nil{// попробовать передразнить чтобы отзеркалить
-		if infoMirroringStimul(){
-			return // больше не искать, уже создан мент.автоматизм объективного действия
-		}
-	}//	если не найдено, то не смотрим значимость фразы без учета условий, т.к. нужен адекватный ответ
 
+//ЗНАЧИМОСТЬ фразы infoFunc16() и попугайское отзеркаливание infoFunc13() - вызывается только в состове случайных функций!!!!
 
-	//TODO другие способы нахождения нового звена (пока не реализовано)
-	if EvolushnStage > 4 {
-		// доминанты нерешенной проблемы
-
-	}
-	////////////////////////////////////////////////////////
 
 	// случайный выбор инфо-функции
 	funcID:= infoFindRundomMentalFunction()
 	if funcID>0 {// есть всегда
 		// создать новое звено типа 4(запуск инфо-функции runMentalFunctionID(funcID))
+		// мент.автоматизм нужен для Мент.Правила MentalTriggerAndAction
 		iID,_=CreateNewlastMentalActionsImagesID(0,4,funcID,true)
 		mentalInfoStruct.mImgID = iID // передача инфы в структуру
-		mentalInfoStruct.runInfoFuncID=funcID // запуск инфо-функции
-		return
+		mentalInfoStruct.runInfoFuncID=funcID
+
+		runMentalFunctionID(funcID)// запуск инфо-функции
+		return true
 	}
 
+
+	//TODO другие способы нахождения нового звена (пока не реализовано) это
+	if EvolushnStage > 4 {
+		// доминанты нерешенной проблемы НЕ ЗДЕСЬ :)
+
+	}
+	////////////////////////////////////////////////////////
+
+
+
+	return false
 }
 //////////////////////////////////////////////////////////
-
-/* случайный выбор ментальной функции
-Непонятно, как отслеживать Эффект если нет памяти о том, какой именно случайный парамет был применен.
- */
-func infoFindRundomMentalFunction()int{
-	clinerMentalInfo()// чтобы было случайное clinerMentalInfo() для 14-й функции
-	var infoArr=[]int{3,4,8,9,10,12,13,14}
-	return lib.RandChooseIntArr(infoArr)
-}
-////////////////////////////////////////////////
-
 
 
 
@@ -326,6 +339,7 @@ func infoFunc3() {
 	currentInfoStructId=3 // определение актуального поля mentalInfo
 }
 func infoFindRightMentalRules()(int){
+	setCurIfoFuncID(3)
 	mrulesID:=getSuitableMentalRules()
 	if mrulesID > 0 { // по правилу найти автоматизм и запустить его
 		mta := MentalTriggerAndActionArr[mrulesID]
@@ -355,6 +369,7 @@ func infoFindRightMentalRules()(int){
 func infoFunc4(){
 	lib.WritePultConsol("Запущена функция:<br> "+getPurposeDetaileString(4))
 	clinerMentalInfo()
+	setCurIfoFuncID(4)
 	if currrentFromNextID>0 {
 		analisAndSintez(currrentFromNextID) // возвращает mentalInfoStruct.mImgID
 	}else{
@@ -407,6 +422,7 @@ func infoCreateAndRunMentAtmzmFromAction(actImgID int){
 	if actImgID ==0 {
 		return
 	}
+	setCurIfoFuncID(5)
 	id, matmzm := createMentalAutomatizmID(0, actImgID, 1)
 	if id >0 {
 		// запустить мент.автоматизм
@@ -434,6 +450,7 @@ func infoCreateAndRunNewActionMentAtmzmFromAction(actImgID int){
 	if actImgID ==0 {// ID действия мот.автоматизма, рвущегося на выполнение
 		return
 	}
+	setCurIfoFuncID(6)
 /* учитывать ли инфу, что автоматизм - общий (не привязанный к конечному узлу ветки)?
 var isCommon=false
 if automatizm.BranchID>1000000{// это общий, привязанный не к ветке, а к действию или фразе
@@ -496,6 +513,7 @@ func infoCreateAndRunMentMotorAtmzmFromAction(ActionsImageID int){
 	if ActionsImageID ==0 {
 		return
 	}
+	setCurIfoFuncID(7)
 	motorID,motorAtmzm:=createNewAutomatizmID(0,detectedActiveLastNodID,ActionsImageID,true)
 	if motorID==0{
 		return
@@ -534,6 +552,7 @@ func infoFunc9() {
 }
 // улучшение объекта внимания
 func infoFindAttentionObjImprovement()bool {
+	setCurIfoFuncID(9)
 	if extremImportanceObject == nil {
 		return false
 	}
@@ -560,6 +579,7 @@ func infoFunc10() {
 }
 // улучшение объекта внимания
 func infoFindAttentionObjMentalImprovement()bool {
+	setCurIfoFuncID(10)
 	if extremImportanceMentalObject == nil {
 		return false
 	}
@@ -583,6 +603,7 @@ func infoFunc11() {
 	currentInfoStructId=11 // определение актуального поля mentalInfo
 }
 func infoMentalMirriring()bool {
+	setCurIfoFuncID(11)
 	//есть ли фраза в действиях оператора
 	if curActiveActions.PhraseID==nil{
 		return false
@@ -647,7 +668,7 @@ return true
 
 
 
-/*Cинтез новой фразц из компонентов, имеющих плюсы в Правилах
+/*Cинтез новой фразы из компонентов, имеющих плюсы в Правилах
 Возможен при хорошем словарном запасе и хорошем опыте значимости (importance) фраз.
 
 Пока что выдается первая подходящая фраза, имеющая +значимость в данных услових
@@ -655,11 +676,11 @@ return true
 func infoFunc12() {
 	lib.WritePultConsol("Запущена функция:<br> "+getPurposeDetaileString(12))
 	clinerMentalInfo()
-	infoSynthesisOenPrase()
+	infoSynthesisOwnPrase()
 	currentInfoStructId=12 // определение актуального поля mentalInfo
 }
-func infoSynthesisOenPrase()bool {
-
+func infoSynthesisOwnPrase()bool {
+	setCurIfoFuncID(12)
 /*TODO сделать фразу, состояющую из 2-3-х известных фраз, найденных в Правилах при данных условиях и выдать ее на Пульт
 Чтобы фраза не была бессмысленным попугайством, нужно проверять ее смысл по importanceFromID
 	importance.Type=5//фраза
@@ -702,7 +723,7 @@ break
 			}
 		}
 	}
-
+// суммарная фраза - на выход
 	if len(phraseArr)>0{// выдать нормальным тоном с настроением wordSensor.CurPultMood
 		actID,_:=CreateNewlastActionsImageID(0,nil,phraseArr,90,wordSensor.CurPultMood,true)
 if actID>0{
@@ -715,10 +736,55 @@ if actID>0{
 }
 /////////////////////////////////////////////////////////////////////////
 
+/*выбрать ID действия имеющего плюсы в Правилах
+*/
+func infoFunc122() {
+	lib.WritePultConsol("Запущена функция:<br> "+getPurposeDetaileString(122))
+	clinerMentalInfo()
+	infoSynthesisOenAction()
+	currentInfoStructId=12 // определение актуального поля mentalInfo
+}
+func infoSynthesisOenAction()bool {
+	setCurIfoFuncID(122)
+	for _, v := range rulesArr {
+		if len(v.TAid) == 1 {
+			ta := TriggerAndActionArr[v.TAid[0]]
+			if ta == nil {
+				lib.WritePultConsol("Нет карты TriggerAndActionArr для iD=" + strconv.Itoa(v.TAid[0]))
+				return false
+			}
+			if ta.Effect<=0{
+				continue
+			}
+			// условия должны совпадать, чтобы фраза не была сказана невпопад
+			if v.NodeAID != detectedActiveLastNodID { // пока v.NodePID не учитываем, иначе фиг найдет...
+				continue
+			}
+			act := ActionsImageArr[ta.Action]// берем именно Ответ Beast
+			if act == nil {
+				lib.WritePultConsol("Нет карты ActionsImageArr для iD=" + strconv.Itoa(ta.Action))
+				return false
+			}
+			if act.ActID!=nil{
+				aID,_:=CreateNewlastActionsImageID(0,act.ActID,nil,90,0,true)
+				// посмотртеь значимость действия
+				imp:=getObjectImportance(1,aID, detectedActiveLastNodID,detectedActiveLastUnderstandingNodID)
+				if imp!=nil && imp.Value>0{
+					infoCreateAndRunMentMotorAtmzmFromAction(aID)
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
+/////////////////////////////////////////////////////////////////////////
 
 
 
-/*Отзеркалить последний Стимул от оператора и совершить такое же действие.
+
+/* Тупое повторение Стимула оператора. Попугайство.
+Отзеркалить последний Стимул от оператора и совершить такое же действие.
 Нужно учесть, что отзеркаливание происходит и в orientation_reflexes.go func orientation_1()!!! м.б. стоит оттуда это убрать?
 */
 func infoFunc13() {
@@ -728,9 +794,10 @@ func infoFunc13() {
 	currentInfoStructId=13 // определение актуального поля mentalInfo
 }
 func infoMirroringStimul()bool {
+	setCurIfoFuncID(13)
 	// свежесть ответа оператора - не позже, чем 5 пульсов назад
 	if curActiveActionsID>0 && (curActiveActionsPulsCount > PulsCount-5){
-		// здесь определяется mentalInfoStruct.motorAtmzmID
+		// выполнить действие curActiveActionsID
 		infoCreateAndRunMentMotorAtmzmFromAction(curActiveActionsID)
 		return true
 	}
@@ -750,6 +817,7 @@ func infoFunc14() {
 	currentInfoStructId=14 // определение актуального поля mentalInfo
 }
 func reactivateEmotionUnderstandingЕree()bool {
+	setCurIfoFuncID(14)
 if mentalInfoStruct.moodeID==0{// выбрать случайно - для infoFindRundomMentalFunction()
 	var infoArr=[]int{1,2,3}
 	mentalMoodVolitionID=lib.RandChooseIntArr(infoArr)
@@ -786,6 +854,7 @@ func infoFunc15() {
 	currentInfoStructId=15 // определение актуального поля mentalInfo
 }
 func beastIDRulesFromCondA()bool {
+	setCurIfoFuncID(15)
 	// для условия дерева автоматизмов в одиночных Правилах выбираем наилучшее
 	rulesID:=getBeastIDRulesFromCondA(detectedActiveLastNodID)
 	if rulesID>0 { // не найдено для точного совпадения условий
@@ -806,9 +875,107 @@ return false
 ///////////////////////////////////////////////////
 
 
+/* По ЗНАЧИМОСТИ или Случайно выдать действие и затем infoFunc7()
+и сразу запустить (Писать мент.Правило на случайным действиям бесполезно)
+*/
+func infoFunc16() {
+	lib.WritePultConsol("Запущена функция:<br> "+getPurposeDetaileString(15))
+	clinerMentalInfo()
+	randomAction()
+	currentInfoStructId=16 // определение актуального поля mentalInfo
+}
+var oldRandActionsIDarr []int // выполненные действияID, чтобы не повторяться. Сбрасывается при просыпании if isFirstActivation{
+var wasRandPhrase=false // последний раз была не фраза
+func randomAction()bool {
+	setCurIfoFuncID(16)
+	var rActID=0
+
+	//значимый образ ActionsImage
+	praseI:=getObjectImportance(1,curActiveActions.PhraseID[0], detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
+	if praseI != nil{//
+		rActID=ActionsImageArr[praseI.ObjectID].ID
+	}
+	if rActID==0{// ID несловестного действия ActionsImage.ActID[n]
+		praseI:=getObjectImportance(3,curActiveActions.PhraseID[0], detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
+		if praseI != nil{//
+			rActID,_=CreateNewlastActionsImageID(0,[]int{praseI.ObjectID},nil,90,0,true)
+		}
+	}
+	if rActID==0{// ID отдельной фразы Verbal.PhraseID[n]
+		praseI:=getObjectImportance(4,curActiveActions.PhraseID[0], detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
+		if praseI != nil{//
+			rActID,_=CreateNewlastActionsImageID(0,nil,[]int{praseI.ObjectID},90,0,true)
+		}
+	}
+/*
+	// попробовать найти по значимостям - infoFunc9()
+	if infoFindAttentionObjImprovement(){
+		return true
+	}
+
+	if !wasRandPhrase { // выбрать случайную фразу
+		//infoFunc12()//Cинтез новой фразы из компонентов, имеющих плюсы в Правилах
+		if infoSynthesisOwnPrase() {// уже совершено найденное действие
+			wasRandPhrase = true
+			return true
+		}
+	}
+
+		// infoFunc122():
+if infoSynthesisOenAction() {// уже совершено найденное действие
+	wasRandPhrase = false
+	return true
+}*/
+	if rActID==0 {
+		// выдать случайное действие из уже известных ActionsImageArr
+		var actualArr []int
+		for k, _ := range ActionsImageArr {
+			actualArr = append(actualArr, k)
+		}
+		rActID = lib.RandChooseIntArr(actualArr)
+	}
+
+	if rActID>0{
+		// не повторяться
+		if !lib.ExistsValInArr(oldRandActionsIDarr, rActID){
+			return false
+		}
+
+			oldRandActionsIDarr=append(oldRandActionsIDarr,rActID)
+			// далее - infoFunc7(): создать и запустить ментальный автоматизм запуска моторного автоматизма по действию
+			infoCreateAndRunMentMotorAtmzmFromAction(rActID)
+			return true
+		}
+
+	return false
+}
+///////////////////////////////////////////////////
+
+
 
 
 //////////////////////////////////////////////////////////
+/* случайный выбор ментальной функции, из тех, что еще не использовались в данном цикле (нет в functionsInThisCickles)
+Непонятно, как отслеживать Эффект если нет памяти о том, какой именно случайный парамет был применен.
+*/
+func infoFindRundomMentalFunction()int{
+	clinerMentalInfo()// чтобы было случайное clinerMentalInfo() для 14-й функции
+	var infoArr=[]int{3,4,8,9,10,12,13,14,15,16}
+	var actualArr []int
+	for i := 0; i < len(infoArr); i++ {
+		if !lib.ExistsValInArr(functionsInThisCickles, infoArr[i]){
+			actualArr=append(actualArr,infoArr[i])
+		}
+	}
+	if len(actualArr)>0{
+		return lib.RandChooseIntArr(actualArr)
+	}
+	return 0
+}
+////////////////////////////////////////////////
+
+
+
 /*
 *************** Группировка зеркальных автоматизмов *********************
 Были зафиксированы две цепочки диалога по 2 шага каждая (1 шаг - 1 пара вопрос + ответ):

@@ -51,6 +51,13 @@ var existAnswer = false
 // не было моторного ответа на прошлый стимул, а уже последовавл новый
 var isСonfusion=false
 var timeOfLastStimul=0 //время с прошлого Стимула
+
+var newMentCickle=true // начало прохода ментального цикла, чтобы не повторять сообщения
+
+var functionsInThisCickles []int//ID запускаемых в текущем цикле инфо-функций
+func setCurIfoFuncID(infofID int){
+	functionsInThisCickles=append(functionsInThisCickles,infofID)
+}
 ///////////////////////////////////////////////////////////
 
 
@@ -137,7 +144,8 @@ func consciousness(activationType int,fromNextID int)(bool) {   //  return false
 	}
 	//////////////////////////////////////////////////////////
 
-	var limitCickleCountForEvolushnStage4 = 10 // ограничить число циклов для 4-й стадии
+	var limitCickleCountForEvolushnStage4 = 4 // ограничить число циклов для 4-й стадии
+	var limitCickleCountForEvolushnStage5 = 20 // ограничить число циклов для 5-й стадии
 
 	timeOfLastStimul=PulsCount-timeOfLastStimul //время с прошлого Стимула
 	/////////////////////////////////////////////////////////////////////////////////////////////
@@ -145,13 +153,14 @@ func consciousness(activationType int,fromNextID int)(bool) {   //  return false
 
 	/////////////////////////////////
 	if isFirstActivation{// проснулся, получил InterruptMemory, первые мысли
+		oldRandActionsIDarr =nil // выполненные случайно действияID, чтобы не повторяться
 		/* уже есть конец активной цепочки fromNextID, полученный выше при if fromNextID==0{
 		 */
 		infoFunc8() //infoFunc8() -> getMentalPurpose()
 
 		// перезапуск осмысления после просыпания, но можно и не перезапускать, а ждать Стимула
 		if EvolushnStage > 4 {// инициативность
-			return reloadConsciousness(stopMentalWork, fromNextID)
+			return reloadConsciousness(fromNextID)
 		}
 	}else{// при кажом вызове кроме первого
 		/* определить текущие объекты восприятия и выделить один из них - самые важные НЕГАТИВНЫЕ
@@ -176,13 +185,13 @@ func consciousness(activationType int,fromNextID int)(bool) {   //  return false
 		}
 	}
 	//////////////////////////////////////
-
+/* // тестирование Правил
 	if !isFirstActivation { //это - не пробуждение
 		rules := getSuitableRules() //тестирвоание
 		if rules > 0 {
 			rules = 0
 		}
-	}
+	}*/
 
 
 	//////////////////////////////  ПЕРВЫЙ УРОВЕНЬ  /////////////////////////////////////////////
@@ -269,12 +278,14 @@ if true && !isFirstActivation {//это - не пробуждение false дл
 		fromNextID = createBasicLink()
 		// перезапуск осмысления
 		// !!! не нужен перезапуск  return reloadConsciousness(stopMentalWork, fromNextID)
+		newMentCickle=true // начало прохода ментального цикла
+		functionsInThisCickles =nil//ID запускаемых в текущем цикле инфо-функций
 	}
 	/////////////////////////////////////////////////
 
 
 	//////////////////////////////  ТРЕТИЙ УРОВЕНЬ  /////////////////////////////////////////////
-	if !isFirstActivation {// это - не пробуждение
+	if !isFirstActivation { // это - не пробуждение
 
 		//////// ТРЕТИЙ УРОВЕНЬ - попытка найти решение, используя всю текущую инфрмацию с учетом срочности.
 		/* Если не было цикла осмысления, а проходилиь только уровни до 3-го,
@@ -314,14 +325,7 @@ if true && !isFirstActivation {//это - не пробуждение false дл
 		в виде глобальной структурц и задается значение глобальной переменной currentInfoStructId == ID инфо-функции),
 		которые могут использоваться при запуске consciousness().
 		*/
-		if stopMentalWork {
-			//lib.WritePultConsol("Прерывание осмысления")
-			// запомнить текущую работу в момент ее прерывания, чтобы можно было вернуться к обдумыванию
-			addInterruptMemory()
-		}
 		///////////////////////////////////////////
-
-
 
 		// детекция ленивого состояния
 		if isIdleness() { // ЛЕНЬ
@@ -337,24 +341,46 @@ if true && !isFirstActivation {//это - не пробуждение false дл
 		/////////////////////////
 		/////////////////////////  НЕТ ЛЕНИ
 
+		if stopMentalWork {// прерывание цикла
+			//lib.WritePultConsol("Прерывание осмысления")
+			// запомнить текущую работу в момент ее прерывания, чтобы можно было вернуться к обдумыванию
+			addInterruptMemory()
+			fromNextID = 0
+			return false
+		}
+		///////////////////////////////
+
 		if isСonfusion {
-			if timeOfLastStimul<1{
+			if timeOfLastStimul < 1 {
 				lib.SentСonfusion("Beast не успел обдумать прошлый ответ, а уже есть новый.")
-			}else{
+			}
+			if newMentCickle { // начался новый цикл
 				lib.SentСonfusion("Beast задумался...")
+				newMentCickle = false
+			}
+		}
+		///////////////////////////////////
+
+		// ограничить число циклов для 4-й стадии (кстати, - средство против зацикливания)
+		if EvolushnStage == 4 && len(saveFromNextIDcurretCicle) > limitCickleCountForEvolushnStage4 {
+			fromNextID = 0 // перестать думать,  не вызывать больше consciousness на 4-й ступени
+			return false
+		}
+		// ограничить число циклов для 5-й стадии (кстати, - средство против зацикливания)
+		if EvolushnStage == 5 && len(saveFromNextIDcurretCicle) > limitCickleCountForEvolushnStage5 {
+			fromNextID = 0 // перестать думать
+			return false
+		}
+
+		// запустить базовую функцию infoFunc2() поиска по имеющейся информации и прекратить цикл, т.е. нет ментальных Правил на стадии 4.
+		if !lib.ExistsValInArr(functionsInThisCickles, 2) {// еще не использовалась infoFunc2()
+			// запустить infoFunc2():
+			if mentalSimpleRelexSolution() { //есть какое-то решение при запуске infoFunc2(), запущен моторный автоматизм
+				fromNextID = 0 // раз есть моторный автоматизм, не нужно больше думать (М,Б, ТОЛЬКО ДЛЯ 4-йСТАДИИ)
+				return false
 			}
 		}
 
-
-
-
-
-
-		// ограничить число циклов для 4-й стадии
-		if EvolushnStage == 4 && len(saveFromNextIDcurretCicle) > limitCickleCountForEvolushnStage4 {
-			//Нужно или совершенствовать инфо-функции или пусть решается на 5-й ступени
-			fromNextID = 0 // перестать думать,  не вызывать больше consciousness на 4-й ступени
-		}
 		// НАЙДЕНО fromNextID
 		if fromNextID > 0 { // продолжение осмысления по цепочке goNext.ID == fromNextID
 
@@ -363,13 +389,13 @@ if true && !isFirstActivation {//это - не пробуждение false дл
 
 			// если нужно, учесть: ID последний запуск инфо-функции: switch currentInfoStructId{
 
-/*			// тестирование случая, когда создан мент.автоматизм, запускающий мот.автоматизм
-			if true && PulsCount > 6 {
-				mentalInfoStruct.ActionsImageID, _ = CreateNewlastActionsImageID(0, []int{111}, []int{124}, 4, 5,true)
-				infoFunc7()
-				goNextFromIDArr[fromNextID].AutomatizmID = mentalInfoStruct.mentalAtmzmID
-			}
- */
+			/*			// тестирование случая, когда создан мент.автоматизм, запускающий мот.автоматизм
+						if true && PulsCount > 6 {
+							mentalInfoStruct.ActionsImageID, _ = CreateNewlastActionsImageID(0, []int{111}, []int{124}, 4, 5,true)
+							infoFunc7()
+							goNextFromIDArr[fromNextID].AutomatizmID = mentalInfoStruct.mentalAtmzmID
+						}
+			*/
 
 			// fromNextID определяет звено цепи (другого не может быть после перезапуска с fromNextID)
 			mImgID := goNextFromIDArr[fromNextID].AutomatizmID // id ментального автоматизма
@@ -403,7 +429,7 @@ if true && !isFirstActivation {//это - не пробуждение false дл
 					fromNextID = calcNexusFromNextID(fromNextID)
 					if fromNextID > 0 {
 						// перезапуск осмысления
-						return reloadConsciousness(stopMentalWork, fromNextID)
+						return reloadConsciousness(fromNextID)
 					}
 				}
 			}
@@ -415,26 +441,24 @@ if true && !isFirstActivation {//это - не пробуждение false дл
 				Или же, если действия actImgID в данных условиях прогнозируют плохой эффект, то
 				попытаться сгенерировать новое действие по имеющейся информации.
 				*/
-				fromNextID = createNexusFromNextID(fromNextID, 6)// создается мент.авт-м запуска infoFunc6()
+				fromNextID = createNexusFromNextID(fromNextID, 6) // создается мент.авт-м запуска infoFunc6()
 				if fromNextID > 0 {
 					// перезапуск осмысления с обновлением currrentFromNextID
-					return reloadConsciousness(stopMentalWork, fromNextID)
+					return reloadConsciousness(fromNextID)
 				}
 			}
+			/////////////////////////////////
 
-			/* создание ментального автоматизма для запуска инфо-функции №2 infoFunc2():
-					Подобрать MentalActionsImages для последующего звена цепочки
-			 */
-			fromNextID = createNexusFromNextID(fromNextID, 2)// создается мент.авт-м запуска infoFunc2()
-			if fromNextID > 0 {
-				// перезапуск осмысления с обновлением currrentFromNextID
-				return reloadConsciousness(stopMentalWork, fromNextID)
-			}
+			// еще нет решения
+			infoFunc1(fromNextID)// - находить другое действие, вернуть новый fromNextID
+
 			///////////////////
 
 		} // конец фазы осмысления по цепоске goNext.ID == fromNextID
-
-	}//if !isFirstActivation{
+		//if !isFirstActivation{
+	}else{// начать думать при пробуждении
+		// TODO
+	}
 //////////////////////////////////////
 
 

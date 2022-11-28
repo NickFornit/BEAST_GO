@@ -121,7 +121,7 @@ var curActions ActionsImage//
 // структура действий оператора при активации дерева автоматизмов
 var curActiveActions *ActionsImage // зеркалит текущий ActionsImage
 var curActiveActionsID=0
-var curActiveActionsPulsCount=0
+var curActiveActionsPulsCount=0// время действия оператора
 // образ предыдущего сосотояния Стимула ПОСЛЕ стимула Оператора (не меняется при активации изменением состояния)
 var curStimulImage *ActionsImage
 var curStimulImageID=0
@@ -394,6 +394,8 @@ if LastRunAutomatizmPulsCount >0 && ActivationTypeSensor >1{//Обработка
 
 	// после обработки периода ожидания
 	setImportance(effect)//установить значимость - величина от 0 до 10, приобретаемая объектов внимания в данной ситуации
+
+// МЕНТАЛЬНЫЕ ПРАВИЛА после периода ожидания
 	afterWaitingPeriod(effect)//Учесть последствия ментального запуска мот.автоматизма
 //и если нужно обдумать это в новом ментальном consciousness(2,currrentFromNextID)
 

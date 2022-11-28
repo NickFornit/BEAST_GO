@@ -16,7 +16,7 @@ import (
 limit 5 ограничивает выборку из эпиз.памяти, но она может получться и меньше.
 */
 func GetRulesFromEpisodeMemory(){
-	rImg:=getLastRulesSequenceFromEpisodeMemory(5)
+	rImg:=getLastRulesSequenceFromEpisodeMemory(0,5)
 	if rImg!=nil {
 		createNewRules(0, detectedActiveLastNodPrevID,detectedActiveLastUnderstandingNodPrevID,rImg,true) //записать (если еще нет такого) групповое правило
 	}
@@ -113,7 +113,7 @@ func getRulesArrFromTrigger(trigger int,veryActualSituation bool)(int,int){
 	Поэтому сначала выделяем последнюю цепочку эпиз.памяти.
 	*/
 	//Вытащить из эпизод.памяти посленюю цепочку кадров, максимум в 5 кадров.
-	rImg := getLastRulesSequenceFromEpisodeMemory(5)
+	rImg := getLastRulesSequenceFromEpisodeMemory(0,5)
 
 	// полный образ текущих условий
 	rulesID,exact:=searchingRules(trigger,rImg,0)
@@ -281,7 +281,7 @@ func searchingRules(trigger int,rImg []int,condType int )(int,int){
 
 func getRulesFromEpisodicsSlice(limit int,maxSteps int)(int,int){
 
-	rImg:=getLastRulesSequenceFromEpisodeMemory(limit)
+	rImg:=getLastRulesSequenceFromEpisodeMemory(0,limit)
 
 // найти такую последовательность в предыдущей эпизод.памяти, но не далее 1000 фрагментов
 /* уже обеспечено
@@ -486,6 +486,9 @@ func getBeastIDRulesFromCondA(NodeAID int)int {
 
 	for k, v := range rulesArr {
 		if len(v.TAid) > 1 || v.NodeAID != NodeAID {
+			continue
+		}
+		if TriggerAndActionArr[k] == nil{
 			continue
 		}
 		r:=TriggerAndActionArr[k]

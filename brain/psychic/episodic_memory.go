@@ -172,13 +172,12 @@ return count
 
 
 
-/* Вытащить из эпизод.памяти посленюю цепочку кадров типа 0 - объективная память
+/* Вытащить из эпизод.памяти посленюю цепочку кадров типа (kind=) 0 - объективная память
  */
-func getLastRulesSequenceFromEpisodeMemory(limit int)([]int){
+func getLastRulesSequenceFromEpisodeMemory(kind int, limit int)([]int){
 	if EpisodeMemoryLastIDFrameID==0{
 		return nil
 	}
-	var kind=0 // здесь всегда - объективнй тип эпизод.памяти
 	var beginID=0
 	var preLifeTime=0
 	for i := EpisodeMemoryLastIDFrameID; i >=0; i-- {
@@ -187,12 +186,14 @@ func getLastRulesSequenceFromEpisodeMemory(limit int)([]int){
 			preLifeTime=em.LifeTime
 		}
 		if em == nil ||
-			em.Type != kind || // если самый последний эпизод уже не является em.Type == kind
-			(em.LifeTime - preLifeTime) >EpisodeMemoryPause ||
+// объективные чредуются с ментальными во время диалога!!!!  em.Type != kind || // если самый последний эпизод уже не является em.Type == kind
+(em.LifeTime - preLifeTime) >EpisodeMemoryPause ||// - главный критерий границы контекста цепочки э.памчти
 			beginID >=limit{
 			break // закончить выборку
 		}
-		beginID++
+		if em.Type == kind {// игнорировать другой вид памяти
+			beginID++
+		}
 	}
 	if beginID == 0 {
 		return nil
@@ -202,8 +203,11 @@ func getLastRulesSequenceFromEpisodeMemory(limit int)([]int){
 	//beginID+1 чтобы число проходов цикла было равно beginID и окончился на i <= EpisodeMemoryLastIDFrameID
 	for i := EpisodeMemoryLastIDFrameID - beginID+1; i <= EpisodeMemoryLastIDFrameID; i++ {
 		em := EpisodeMemoryObjects[i]
-		rImg = append(rImg, em.TriggerAndActionID)
+		if em.Type == kind {
+			rImg = append(rImg, em.TriggerAndActionID)
+		}
 	}
+	// групповое Правило
 	if len(rImg)>1{
 		lastFrame:=EpisodeMemoryObjects[len(rImg)-1]
 		if lastFrame!=nil {
@@ -215,47 +219,10 @@ func getLastRulesSequenceFromEpisodeMemory(limit int)([]int){
 	return nil
 }
 /////////////////////////////////////////////////
-/* Вытащить из эпизод.памяти посленюю цепочку кадров типа 1 - ментальная память
- */
-func getLastMentalRulesSequenceFromEpisodeMemory(limit int)([]int){
-	if EpisodeMemoryLastIDFrameID==0{
-		return nil
-	}
-	var kind=1 // ментальный тип эпизод.памяти
 
-	var beginID=0
-	var preLifeTime=0
-	for i := EpisodeMemoryLastIDFrameID; i >=0; i-- {
-		em:=EpisodeMemoryObjects[i]
-		if preLifeTime==0{
-			preLifeTime=em.LifeTime
-		}
-		if em == nil || em.Type != kind ||
-			(em.LifeTime - preLifeTime) >EpisodeMemoryPause ||
-			beginID >=limit{
-			break // закончить выборку
-		}
-		beginID++
-	}
-	if beginID == 0 {
-		return nil
-	}
-	var rImg []int
-	// перебор последнего фрагмента кадров эпиз.памяти
-	for i := EpisodeMemoryLastIDFrameID - beginID+1; i <= EpisodeMemoryLastIDFrameID; i++ {
-		em := EpisodeMemoryObjects[i]
-		rImg = append(rImg, em.TriggerAndActionID)
-	}
-	if len(rImg)>1{
-		lastFrame:=EpisodeMemoryObjects[len(rImg)-1]
-		if lastFrame!=nil {
-			createNewRulesMentalID(0, lastFrame.NodeAID, lastFrame.NodePID, rImg, true) // записать (если еще нет такого) групповое правило
-		}
-		return rImg
-	}
 
-	return nil
-}
-/////////////////////////////////////////////////
+
+
+
 
 

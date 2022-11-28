@@ -81,7 +81,8 @@ func createNewNextFromUnderstandingNodeID(UnderstandingNodeID int,
 	FromID int, // записывается текущее currrentFromNextID
 	AutomatizmID int)(int,*goNext){
 
-	// если ли уже такое начало цепочки?
+	// если ли уже есть такое начало цепочки?
+	/*  всегда определяет что есть и зацикливает...
 	firstArr:=goNextFromUnderstandingNodeIDArr[UnderstandingNodeID]
 	if firstArr != nil {
 		for i := 0; i < len(firstArr); i++ {
@@ -89,7 +90,7 @@ func createNewNextFromUnderstandingNodeID(UnderstandingNodeID int,
 				return firstArr[i].ID, goNextFromIDArr[firstArr[i].ID]
 			}
 		}
-	}
+	}*/
 	id,newID:=createNewlastgoNextID(0,MotorBranchID,FromID,0,AutomatizmID)
 	goNextFromUnderstandingNodeIDArr[UnderstandingNodeID]=append(goNextFromUnderstandingNodeIDArr[UnderstandingNodeID],newID)
 // прицепить мент.автоматизм

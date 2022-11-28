@@ -18,19 +18,14 @@ import (
 
 //////////////////////////////////////////////////////////////////
 // перезапустить осмысление или остановить цикл
-func reloadConsciousness(stop bool,fromNextID int)(bool){
+func reloadConsciousness(fromNextID int)(bool){
 	if fromNextID == currrentFromNextID{//тихо (без стека прерываний) предотвратить зацикливание
 		return false
 	}
-	if stop{// было прервано объективной активацией, запомнить остановленное и прекратить ментальный цикл
-		// не запускать consciousness(2,fromNextID)
-		addInterruptMemory()
 
-		return false
-	}else {
 		// перезапуск осмысления
 		consciousness(2, fromNextID)
-	}
+
 	return true
 }
 ///////////////////////////////////////////////////
@@ -76,7 +71,9 @@ func isIdleness()(bool){
 // обработка структур в свободном состоянии, в первую очередь - эпизодической памяти
 func processingFreeState(stopMentalWork bool){
 
-	// if stopMentalWork{ - прекратить обработку
+	 if stopMentalWork { //- прекратить обработку
+return
+	 }
 
 	// TODO переработка происходившего, в первую очередь - эпизодической памяти
 	//EpisodeMemoryLastCalcID - последний эпизод, который был осмыслен в лени или во сне
@@ -129,18 +126,21 @@ func createBasicLink()(int){
 
 
 ///////////////////////////////////////////////////////
-/* Продолжить цепочку осмысления: найти мотивированное продолжение:
-- создается мент.авт-м запуска infoFuncNNN() - infoID
+/*  Создается мент.авт-м запуска infoFuncNNN() - infoID
  т.е. - создание ментального автоматизма инфо-функции c ID= infoID
 Это не ментальная функция! а наследственная структура для мотивации действий и направления мышления.
+
+Можно было бы просто запускать инфо-функции, но в мент.Правилах - действие мент.автоматизма!
  */
 
 func createNexusFromNextID(fromNextID int,infoID int)(int){
-// typeD==4 - запуск инфо-функции
+// typeD==4 - тип ментального автоматизма: "запуск инфо-функции"
 	imgID,_:=CreateNewlastMentalActionsImagesID(0,4,infoID,true)
 	if imgID>0 {
 		aID, _ := createMentalAutomatizmID(0, imgID, 1)
 		if aID > 0 {
+			// запуск ментального автоматизма - после вызова createNexusFromNextID
+
 			// создание звена цепочки (всегда уникальное звено)
 			fromNextID0 := fromNextID
 			// создание нового элемента цепочки
@@ -202,8 +202,7 @@ func afterWaitingPeriod(effect int){
 		return
 	}
 	mentAtmzm:=MentalAutomatizmsFromID[lastNextFrom.AutomatizmID]
-	if mentAtmzm==nil{// не должно быть такого, поэтому выдадим панику
-// ???		lib.TodoPanic("Нет автоматизма для func afterWaitingPeriod()")
+	if mentAtmzm==nil{// быает, если в цикле есть только 1 базовое звено, где нет ментального автоматизма
 		return
 	}
 	mact:= MentalActionsImagesArr[mentAtmzm.ActionsImageID]
