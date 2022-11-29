@@ -45,9 +45,10 @@ func fixNewRules(lastCommonDiffValue int) int {
 	// не записывать Правило с curActiveActionsID==answer
 	if answer == 0  || ActionsImageArr[answer]==nil  || curStimulImageID==answer{
 		return 0}
+
 	TriggerAndAction,_:=createNewlastTriggerAndActionID(0,curStimulImageID,answer,lastCommonDiffValue,true)
 	if TriggerAndAction == 0{return 0}
-	// Запись Правила
+	// Запись Правила (именно detectedActiveLastNodPrevID а не detectedActiveLastNodID)
 	currentRulesID, _ = createNewRules(0, detectedActiveLastNodPrevID,detectedActiveLastUnderstandingNodPrevID,[]int{TriggerAndAction},true)
 	if currentRulesID == 0{return 0}
 
@@ -96,6 +97,11 @@ func fixNewTeachRules()int{
 		return 0
 	}
 
+	/* Если есть ли автоматизм с действием оператора curActiveActionsID, и если у него atmtzm.Usefulness<0 - снять блокировку
+	потому как это - новое авторитарное подтвержение полезности.
+	*/
+	checkForUnbolokingAutomatizm(curActiveActionsID)
+
 	answer:=LastAutomatizmWeiting.ActionsImageID// образ действий Beast перел ответом Оператора
 	// не записывать Правило с curActiveActionsID==answer
 	if answer == 0  || ActionsImageArr[answer]==nil || curActiveActionsID==answer{
@@ -109,6 +115,28 @@ func fixNewTeachRules()int{
 	return currentRulesID
 }
 /////////////////////////////////////////////////////////////////////
+
+
+// удалить авторитарное Правило
+func tryRemoveRules(atmtzm *Automatizm){
+	if atmtzm==nil{
+		return
+	}
+	treeNodeID:=atmtzm.BranchID
+	actID:=atmtzm.ActionsImageID
+	for k, v := range rulesArr { // пропускаем одиночные правила len(v.TAid) == 1
+		if len(v.TAid) == 1 && v.NodeAID != treeNodeID {
+			ta:=TriggerAndActionArr[v.TAid[0]]
+			if ta.Trigger==actID && ta.Effect==1{
+				//Обобщенное Правило пусть остается
+				//delete(TriggerAndActionArr, v.TAid[0])
+				delete(rulesArr, k)
+				return
+			}
+		}
+	}
+}
+///////////////////////////////////////////////////////////////////
 
 
 

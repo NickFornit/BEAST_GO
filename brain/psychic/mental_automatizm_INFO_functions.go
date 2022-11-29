@@ -297,11 +297,14 @@ func mentalSimpleRelexSolution()bool{
 
 
 
-//ЗНАЧИМОСТЬ фразы infoFunc16() и попугайское отзеркаливание infoFunc13() - вызывается только в состове случайных функций!!!!
+	funcID:=0
+	if isIdleness() && EvolushnStage == 4 { // ЛЕНЬ в четвертой стадии
+		funcID = 13 // спросить, как правильно ответить
+	}else{
+		// случайный выбор инфо-функции
+		funcID= infoFindRundomMentalFunction()
+	}
 
-
-	// случайный выбор инфо-функции
-	funcID:= infoFindRundomMentalFunction()
 	if funcID>0 {// есть всегда
 		// создать новое звено типа 4(запуск инфо-функции runMentalFunctionID(funcID))
 		// мент.автоматизм нужен для Мент.Правила MentalTriggerAndAction

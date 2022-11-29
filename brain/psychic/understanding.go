@@ -58,6 +58,7 @@ var functionsInThisCickles []int//ID запускаемых в текущем ц
 func setCurIfoFuncID(infofID int){
 	functionsInThisCickles=append(functionsInThisCickles,infofID)
 }
+
 ///////////////////////////////////////////////////////////
 
 
@@ -194,95 +195,103 @@ func consciousness(activationType int,fromNextID int)(bool) {   //  return false
 	}*/
 
 
-	//////////////////////////////  ПЕРВЫЙ УРОВЕНЬ  /////////////////////////////////////////////
-	/* Период ожидания ответа LastRunAutomatizmPulsCount при поочередном Стимуле-Ответе есть всегда.
-	   А здсь - поиск Ответа именно после каждого Стимула. Так что LastRunAutomatizmPulsCount в функции не учитываем.
-	*/
-if true && !isFirstActivation { //это - не пробуждение
-	////////////////////////////// 1 уровень ////////////////////
-	// ПЕРВЫЙ УРОВЕНЬ, самый примитивный уровень:
-	// есть ли штатный мот.автоматизм и нужно ли его менять или задумываться
-	if fromNextID == 0 { // только перед началом цикла
-		mentalInfoStruct.motorAtmzmID = 0 // сброс прежнего значения
-		//НЕТ!!! atmtzm := GetBelief2AutomatizmListFromTreeId(detectedActiveLastNodID)
-/* учитывается именно тот автоматизм, что рвется на выполнение при активации дерева автоматизмов,
-даже если он подобран "мягким алгоритмом" в getAutomatizmFromNodeID
-При атасе он выполняется не раздумявая, иначе подвергается сомнению в infoFunc6()
- */
-		//atmtzm := AutomatizmFromIdArr[currentAutomatizmAfterTreeActivatedID] НЕ ВСЕГДА  ВЫЗЫВАЕТСЯ КОГДА ЕСТЬ currentAutomatizmAfterTreeActivatedID
-		atmtzmID := getAutomatizmFromNodeID(detectedActiveLastNodID)
-		atmtzm := AutomatizmFromIdArr[atmtzmID]
-		if atmtzm != nil { // есть автоматизм
-			// Если Период преступной инициативы, если важная ситуация, но нет опасности, то - ПОДВЕРГНУТЬ СОМНЕНИЮ автоматизм.
-			if EvolushnStage == 4 || !CurrentInformationEnvironment.veryActualSituation || CurrentInformationEnvironment.danger {
-				//ПОДВЕРГНУТЬ СОМНЕНИЮ автоматизм, если нет опасности (не нужно реагировать аффектно) и ситуация важна
-				infoFunc6()
-				//mentalInfoStruct.notOldAutomatizm true - НЕ позволить запустить рвущийся на выполнение старый автоматизм
-				if !mentalInfoStruct.notOldAutomatizm {
-					//можно без опаски выполнять штатный автоматизм
-					return false //Эпиз.память не пишется. При опасности - состояние аффекта.
-				} // если нет - далее искать альтернативу
-			}
-			mentalInfoStruct.motorAtmzmID = atmtzm.ID // для последующего использования с инфо-фукнциях
-			// нужно ПОДВЕРГНУТЬ СОМНЕНИЮ автоматизм
-		}
-	}
-}
-	
+	if fromNextID == 0 { // еще нет цикла осмысления, 1 и 2 уровни - не требуют осмысления
 
-
-/*  так нельзя, пусть пишется в automatizm_result.go там где сформировалось Правило!
-	// нет штатного автоматизма, ситуация осмысливается, эпиз.память пишется в момент объективного вызова:
-	if activationType==1 {
-		// новый кадр эпизодической памяти, тип - ОБЪЕКТИВНЫЙ
-		// В эпиз.память пишется только если не вызвало автоматических (неосознанных) действий,
-		//   а было привлечено осознанное внимание consciousness(2
-		newEpisodeMemory(currentRulesID, 0) // запись ОБЪЕКТИВНОЙ эпизодической памяти saveEpisodicMenory()
-// МЕНТАЛЬНЫЙ кадр newEpisodeMemory(currentRulesID, 1) пишется в func afterWaitingPeriod(
-	}
-	*/
-	/////////////////////////////////////////////////////////
-
-
-//return false //для тестирования
-
-
-	//////////////////////////////// 2 уровень ////////////////////////////
-if true && !isFirstActivation {//это - не пробуждение false для тестирования
-	// ВТОРОЙ УРОВЕНЬ - попытка использования примитивных Правил
-	if fromNextID == 0 {
-		rules := getSuitableRules()
-		if rules > 0 { // по правилу найти автоматизм и запустить его
-			ta := TriggerAndActionArr[rules]
-			purpose := getPurposeGenetic()
-			// выбираем Ответное действие из Правила чтобы повторить его
-			ai := ActionsImageArr[ta.Action]
-			if ai != nil {
-				purpose.actionID = ai
-				atmzm := createAndRunAutomatizmFromPurpose(purpose)
-				if atmzm != nil {
-					return true // заблокирвать более низкоуровневое
+		//////////////////////////////  ПЕРВЫЙ УРОВЕНЬ  /////////////////////////////////////////////
+		/* Период ожидания ответа LastRunAutomatizmPulsCount при поочередном Стимуле-Ответе есть всегда.
+		   А здсь - поиск Ответа именно после каждого Стимула. Так что LastRunAutomatizmPulsCount в функции не учитываем.
+		*/
+		if true && !isFirstActivation { //это - не пробуждение
+			////////////////////////////// 1 уровень ////////////////////
+			// ПЕРВЫЙ УРОВЕНЬ, самый примитивный уровень:
+			// есть ли штатный мот.автоматизм и нужно ли его менять или задумываться
+			if fromNextID == 0 { // только перед началом цикла
+				mentalInfoStruct.motorAtmzmID = 0 // сброс прежнего значения
+				//НЕТ!!! atmtzm := GetBelief2AutomatizmListFromTreeId(detectedActiveLastNodID)
+				/* учитывается именно тот автоматизм, что рвется на выполнение при активации дерева автоматизмов,
+				   даже если он подобран "мягким алгоритмом" в getAutomatizmFromNodeID
+				   При атасе он выполняется не раздумявая, иначе подвергается сомнению в infoFunc6()
+				*/
+				//atmtzm := AutomatizmFromIdArr[currentAutomatizmAfterTreeActivatedID] НЕ ВСЕГДА  ВЫЗЫВАЕТСЯ КОГДА ЕСТЬ currentAutomatizmAfterTreeActivatedID
+				atmtzmID := getAutomatizmFromNodeID(detectedActiveLastNodID)
+				atmtzm := AutomatizmFromIdArr[atmtzmID]
+				if atmtzm != nil { // есть незаблокированный автоматизм
+					if atmtzm.Usefulness >= 0{//незаблокированный
+						// Если Период преступной инициативы, если важная ситуация, но нет опасности, то - ПОДВЕРГНУТЬ СОМНЕНИЮ автоматизм.
+						if EvolushnStage == 4 || !CurrentInformationEnvironment.veryActualSituation || CurrentInformationEnvironment.danger {
+							//ПОДВЕРГНУТЬ СОМНЕНИЮ автоматизм, если нет опасности (не нужно реагировать аффектно) и ситуация важна
+							infoFunc6()
+							//mentalInfoStruct.notOldAutomatizm true - НЕ позволить запустить рвущийся на выполнение старый автоматизм
+							if !mentalInfoStruct.notOldAutomatizm {
+								//можно без опаски выполнять штатный автоматизм
+								return false //Эпиз.память не пишется. При опасности - состояние аффекта.
+							} // если нет - далее искать альтернативу
+						}
+						mentalInfoStruct.motorAtmzmID = atmtzm.ID // для последующего использования с инфо-фукнциях
+						// нужно ПОДВЕРГНУТЬ СОМНЕНИЮ автоматизм
+					}else{// если автоматизмв заблокирован
+						/*удалить авторитарное Правило с таким действием.
+						Иначе никогда не сраотает checkForUnbolokingAutomatizm, см. ниже об этом
+						 */
+						tryRemoveRules(atmtzm)
+						/* НО при создании авторитарного правила (func fixNewRules(lastCommonDiffValue int)) определяется,
+						есть ли автоматизм с действием оператора curActiveActionsID, и если у него atmtzm.Usefulness<0 -
+						снять блокировку и сделать штатным (checkForUnbolokingAutomatizm(curActiveActionsID))
+						*/
+					}
 				}
 			}
 		}
-	}
-	/////////////////////////////////////////////////////////
-}// конец блокирования для тестирования
 
-//	return false //для тестирования
+		/*  так нельзя, пусть пишется в automatizm_result.go там где сформировалось Правило!
+			// нет штатного автоматизма, ситуация осмысливается, эпиз.память пишется в момент объективного вызова:
+			if activationType==1 {
+				// новый кадр эпизодической памяти, тип - ОБЪЕКТИВНЫЙ
+				// В эпиз.память пишется только если не вызвало автоматических (неосознанных) действий,
+				//   а было привлечено осознанное внимание consciousness(2
+				newEpisodeMemory(currentRulesID, 0) // запись ОБЪЕКТИВНОЙ эпизодической памяти saveEpisodicMenory()
+		// МЕНТАЛЬНЫЙ кадр newEpisodeMemory(currentRulesID, 1) пишется в func afterWaitingPeriod(
+			}
+		*/
+		/////////////////////////////////////////////////////////
 
+		//return false //для тестирования
 
-// НАЧАТЬ ЦИКЛ ОСМЫСЛЕНИЯ
-	if fromNextID == 0 {
+		//////////////////////////////// 2 уровень ////////////////////////////
+		if true && !isFirstActivation { //это - не пробуждение false для тестирования
+			// ВТОРОЙ УРОВЕНЬ - попытка использования примитивных Правил
+			if fromNextID == 0 {
+				rules := getSuitableRules()
+				if rules > 0 { // по правилу найти автоматизм и запустить его
+					ta := TriggerAndActionArr[rules]
+					purpose := getPurposeGenetic()
+					// выбираем Ответное действие из Правила чтобы повторить его
+					ai := ActionsImageArr[ta.Action]
+					if ai != nil {
+						purpose.actionID = ai
+						atmzm := createAndRunAutomatizmFromPurpose(purpose)
+						if atmzm != nil {
+							return true // заблокирвать более низкоуровневое
+						}
+					}
+				}
+			}
+			/////////////////////////////////////////////////////////
+		} // конец блокирования для тестирования
+
+		//	return false //для тестирования
+
+		// НАЧАТЬ ЦИКЛ ОСМЫСЛЕНИЯ
 		/* НАЙТИ или создать Базовое звено цепи fromNextID для данной активности деревьев
 		и пройти цепочку до конца, чтобы продолжить цикл от него.
-		 */
+		*/
 		fromNextID = createBasicLink()
 		// перезапуск осмысления
 		// !!! не нужен перезапуск  return reloadConsciousness(stopMentalWork, fromNextID)
-		newMentCickle=true // начало прохода ментального цикла
-		functionsInThisCickles =nil//ID запускаемых в текущем цикле инфо-функций
-	}
+		newMentCickle = true         // начало прохода ментального цикла
+		functionsInThisCickles = nil //ID запускаемых в текущем цикле инфо-функций
+
+	}//if fromNextID == 0 { // еще нет цикла осмысления, 1 и 2 уровни - не требуют осмысления
 	/////////////////////////////////////////////////
 
 
@@ -338,6 +347,7 @@ if true && !isFirstActivation {//это - не пробуждение false дл
 			processingFreeState(stopMentalWork) // обработка структур в свободном состоянии может быть долгой -
 
 			EvolushnStage = saveEvolushnStage // возвращаем уровень осмысления, иначе зависнет на этой стадии
+
 			return false                      // пусть выполняется все менее высокоуровневое
 		} //if isIdleness()
 		/////////////////////////

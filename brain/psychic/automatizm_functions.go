@@ -272,3 +272,18 @@ func linkCoomonAtmtzmToBrench(commonAutomatizm *Automatizm){
 	CreateAtutomatizmNoSaveFile(detectedActiveLastNodID,commonAutomatizm.ActionsImageID)
 }
 /////////////////////////////////////////////////////////////////////
+
+
+/*Если есть ли автоматизм с действием curStimulImageID, и если у него atmtzm.Usefulness<0 - снять блокировку
+потому как это - новое авторитарное подтвержение полезности.
+Для текущей ветки дерева автоматизмов.
+ */
+func checkForUnbolokingAutomatizm(actID int){
+	for _, v := range AutomatizmFromIdArr {
+		if v.BranchID==detectedActiveLastNodID && v.ActionsImageID==actID{
+			v.Usefulness=1 //авторитарно
+			SetAutomatizmBelief(v, 2)// сделать штатным
+		}
+	}
+}
+///////////////////////////////////////////////////////
