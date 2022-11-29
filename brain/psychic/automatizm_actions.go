@@ -131,10 +131,14 @@ if am.Usefulness<0{
 	if LastRunMentalAutomatizmPulsCount ==PulsCount { // активность мот.автоматизма в чисде пульсов
 		out="4|" // ментальный запуск моторного автоматизма
 	}else{
-		out="3|"
+		out="3|" // Бессознательный Автоматизм
 	}
 
+// описание автоматизма
 res:=GetAutomotizmActionsString(am,true)// здесь пишется "Энергичность"
+if len(res)<2{// пустой не пускать
+	return false
+}
 
 	if isTeachQuestion{
 		out="10|Ответь сам на &quot;<b>"+res+"</b>&quot; чтобы показать, как лучше ответить."
