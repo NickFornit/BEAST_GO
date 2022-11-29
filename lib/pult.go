@@ -48,10 +48,11 @@ func SentActionsForPult(print string) {
 //////////////////////////////////////////////////
 
 /* Показать непонимания, растерянность -
-в случае отсуствия пси-реакций но Лени.
+в случае отсуствия пси-реакций но не Лени.
 lib.SentСonfusion()
  */
 func SentСonfusion(detaile string){
 	ActionsForPultStr ="10|"+detaile
 }
 //////////////////////////////////
+

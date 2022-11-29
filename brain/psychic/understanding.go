@@ -209,7 +209,9 @@ if true && !isFirstActivation { //это - не пробуждение
 даже если он подобран "мягким алгоритмом" в getAutomatizmFromNodeID
 При атасе он выполняется не раздумявая, иначе подвергается сомнению в infoFunc6()
  */
-		atmtzm := AutomatizmFromIdArr[currentAutomatizmAfterTreeActivatedID]
+		//atmtzm := AutomatizmFromIdArr[currentAutomatizmAfterTreeActivatedID] НЕ ВСЕГДА  ВЫЗЫВАЕТСЯ КОГДА ЕСТЬ currentAutomatizmAfterTreeActivatedID
+		atmtzmID := getAutomatizmFromNodeID(detectedActiveLastNodID)
+		atmtzm := AutomatizmFromIdArr[atmtzmID]
 		if atmtzm != nil { // есть автоматизм
 			// Если Период преступной инициативы, если важная ситуация, но нет опасности, то - ПОДВЕРГНУТЬ СОМНЕНИЮ автоматизм.
 			if EvolushnStage == 4 || !CurrentInformationEnvironment.veryActualSituation || CurrentInformationEnvironment.danger {

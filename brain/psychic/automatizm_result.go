@@ -184,6 +184,8 @@ lib.WritePultConsol("<span style='color:blue;background-color:#FFD0FF;'>Был �
 //		stimul, _ := CreateNewlastActionsImageID(0, curActiveActions.ActID, curActiveActions.PhraseID, curActiveActions.ToneID, curActiveActions.MoodID,true)
 // образ действий оператора Стимул:	curStimulImageID и есть Ответ: curActiveActions
 		fixNewRules(lastCommonDiffValue)
+//записать Правило как Оператор отвечает на действиЯ Beast - авторитетное Правило всегда имеет +эффект
+		fixNewTeachRules()
 	}
 
 return
@@ -294,53 +296,3 @@ func wasChangingMoodCondition(kind int)(int,int,[]int){
 var currentRulesID=0
 
 
-////////////////////////////////////////////////////////////////////////
-/* на стадии >3 при каждом ответе на действия оператора - прописывать текущее ПРАВИЛО rules.
-   А так же просматривать эпизод память взад макcимум на 6 шагов или до паузы в общении > EpisodeMemoryPause шагов,
-		фиксируя цепочку правил.
-*/
-func fixNewRules(lastCommonDiffValue int) int {
-	if LastAutomatizmWeiting == nil{
-		return 0
-	}
-
-	// curStimulImageID - образ действий оператора перед Ответом для записи Правила
-	if curStimulImageID == 0  || LastAutomatizmWeiting == nil {
-		return 0
-	}
-	if curStimulImage.ActID == nil && curStimulImage.PhraseID ==nil{ // не писать Правила с пустым Стимулом
-		return 0
-	}
-	// ответный образ действий Beast
-	answer:=LastAutomatizmWeiting.ActionsImageID
-	if answer == 0  || ActionsImageArr[answer]==nil {
-		return 0}
-	TriggerAndAction,_:=createNewlastTriggerAndActionID(0,curStimulImageID,answer,lastCommonDiffValue,true)
-	if TriggerAndAction == 0{return 0}
-	// Запись Правила
-	currentRulesID, _ = createNewRules(0, detectedActiveLastNodPrevID,detectedActiveLastUnderstandingNodPrevID,[]int{TriggerAndAction},true)
-	if currentRulesID == 0{return 0}
-
-//lib.WritePultConsol("<span style='color:green'>Записано <b>ПРАВИЛО № "+strconv.Itoa(currentRulesID)+"</b></span>") // уже есть сообщение в createNewRules()
-
-	// новый кадр эпизодической памяти, сохраняющий Правил
-	newEpisodeMemory(currentRulesID,0) // запись эпизодической памяти saveEpisodicMenory()
-
-	// теперь обрабатываем прошлую эпизодическую память (необязательно, т.к. при каждом поиске в эп.памяти это происходит)
-	GetRulesFromEpisodeMemory()
-
-	return currentRulesID
-}
-///////////////////////////////////////////////////////////////////////
-
-/* Не записывать Правила по изменению состояния, а только - по стимулу от Оператора!
-// записать Правило типа BaseStateImage Стимул - не от оператора, а при активации изменением состояния
-func fixRulesBaseStateImage(lastCommonDiffValue int){
-	//корректируется успешность автоматизма - как в calcAutomatizmResult
-	automatizmCorrection(lastCommonDiffValue,nil)
-	/////////////////////// ПРАВИЛО:
-	stimul, _ := CreateNewStatImageID(0, curStimulImage.Mood, curStimulImage.EmotionID, curBaseStateImage.SituationID,true)
-	stimul*=-1 // отрицательное значение идентифицирует образ - как текущего сосотояния!!!
-	fixNewRules(lastCommonDiffValue,stimul)
-}*/
-/////////////////////////////////////////////////////////////////////

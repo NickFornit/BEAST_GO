@@ -77,7 +77,13 @@ func GetAllowReflexRuning()(bool){
 
 
 
-// todo = true - выполнить полюбому,
+/* Запуск автоматизма с передачей строки на Пульт c
+"10|"+message
+
+ isTeachQuestion=true - Показать непонимание, растерянность с предложение научить
+в случае отсуствия пси-реакций с вопросом о том, как нужно реагировать.
+*/
+var isTeachQuestion=false
 func RumAutomatizm(am *Automatizm)(bool){
 	if am==nil{
 		return false
@@ -127,9 +133,18 @@ if am.Usefulness<0{
 	}else{
 		out="3|"
 	}
-	out+=GetAutomotizmActionsString(am,true)// здесь пишется "Энергичность"
+
+res:=GetAutomotizmActionsString(am,true)// здесь пишется "Энергичность"
+
+	if isTeachQuestion{
+		out="10|Ответь сам на &quot;<b>"+res+"</b>&quot; чтобы показать, как лучше ответить."
+	}else{
+		out+=res
+	}
 
 	lib.SentActionsForPult(out)
+
+	isTeachQuestion=false
 
 	//выполнить мозжечковый рефлекс сразу после выполняющегося автоматизма
 	runCerebellumAdditionalAutomatizm(0,am.ID)
@@ -330,14 +345,20 @@ func TerminatePraseAutomatizmActions(IDarr []int, energy int)string{
 	// expensesGomeostatParametersAfterAction(aI) болтать можно без устали?
 
 	// выдать на ПУльт
-	var out = "Фраза Beast: "
+	var out = ""
+	if !isTeachQuestion{
+		out += "Фраза Beast: "
+	}
+
 	for i := 0; i < len(IDarr); i++ {
 		prase := word_sensor.GetPhraseStringsFromPhraseID(IDarr[i])
 		out += "<b>"+prase+"</b>"
 	}
 	// название силы:
-	if energy < len(termineteAction.EnergyDescrib) {
-		out += " " + termineteAction.EnergyDescrib[energy] + "</b>"
+	if !isTeachQuestion {
+		if energy < len(termineteAction.EnergyDescrib) {
+			out += " " + termineteAction.EnergyDescrib[energy] + "</b>"
+		}
 	}
 	return out
 }
