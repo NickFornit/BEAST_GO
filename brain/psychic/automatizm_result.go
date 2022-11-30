@@ -266,7 +266,8 @@ func WaitingPeriodForActions()(bool,int){
 
 
 /////////////////////////////////////////////////////////////////////////
-/* сканируется с каждым пульсом в func automatizmActionsPuls() во время ожидания
+/* Определения эффект реакции, негативный или позитивный: возвращает значение res0.
+сканируется с каждым пульсом в func automatizmActionsPuls() во время ожидания
 В  gomeostas.BetterOrWorseNow() учитывается CommonMoodAfterAction - Общее (де)мотивирующее действие с Пульта
 
 res - стали лучше или хуже: величина измнения от -10 через 0 до 10
@@ -285,10 +286,41 @@ func wasChangingMoodCondition(kind int)(int,int,[]int){
 	if lib.ExistsValInArr(aArr, 4){// Поощрить
 		res0=5
 	}
+	// влияние тона и настроения при отправке фразы
+	if curActiveActions !=nil {
+		tone := curActiveActions.ToneID
+		k := 1
+		if tone == 4 { // повышенный
+			k = 2
+		}
+		mood := curActiveActions.MoodID
+		switch mood {
+		case 20:
+			res0 = res0 + (k) // хорошее
+		case 21:
+			res0 = res0 - (k) // плохое
+		case 22:
+			res0 = res0 + (k) // игровое
+		case 27:
+			res0 = res0 - (k) // протест
+		}
+
+		// влияние значимости только первого компонента фразы
+		id, v := getObjectsImportanceValue(5, curActiveActions.PhraseID[0], detectedActiveLastNodID, detectedActiveLastUnderstandingNodID)
+		if id > 0 {
+			if v > 0 { res0 = res0+1*k }
+			if v < 0 { res0 = res0-1*k }
+		}
+	}//	if curActiveActions !=nil {
+
+	// для Пульта
 	if res0>0{	CurrentMoodCondition=3	}//лучше
 	if res0==0{	CurrentMoodCondition=2	}// не изменилось
 	if res0<0{	CurrentMoodCondition=1	}// Хуже
 
+	/* понятно, что компоненты эффекта res0 могут суммироваться и нейтрализовываться, тут ничего не сделашь...
+
+	 */
 	return res0,res,wellIDarr
 }
 /////////////////////////////////////////////////////////////////////////

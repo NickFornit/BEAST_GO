@@ -317,7 +317,7 @@ func BetterOrWorseNow(kind int)(int, int, []int) {
 	// commonDiffValue - главный параметр для формирования Эффекта реакции (В оценке автоматизма и Правилах)
 
 	// применить "эффект" кнопок с Пульта (в таблице http://go/pages/gomeostaz.php он забивался в виде "+" "-")
-	if kind == 2 { // второй вызов при измерении эффекта реакции
+//	if kind == 2 { // второй вызов при измерении эффекта реакции
 		if commonDiffValue == 0 {
 			if CommonMoodAfterAction == "+" {
 				commonDiffValue = 1
@@ -325,8 +325,9 @@ func BetterOrWorseNow(kind int)(int, int, []int) {
 			if CommonMoodAfterAction == "-" {
 				commonDiffValue = -1
 			}
+			CommonMoodAfterAction="" // сбросить чтобы не влияло предыдущее если не нажаты кнопки
 		}
-	}
+//	}
 	/* авторитарные оценки Наказать (3) и Поощрить (4) имеют преимущество над всем остальным:
 	Это делается в психике (в func wasChangingMoodCondition), при передаче значений от BetterOrWorseNow
 	 */
