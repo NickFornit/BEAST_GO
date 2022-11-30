@@ -298,12 +298,23 @@ func mentalSimpleRelexSolution()bool{
 
 
 	funcID:=0
-	if isIdleness() && EvolushnStage == 4 { // ЛЕНЬ в четвертой стадии
-		funcID = 13 // спросить, как правильно ответить
-	}else{
-		// случайный выбор инфо-функции
-		funcID= infoFindRundomMentalFunction()
+	if EvolushnStage == 4 {
+		if CurrentInformationEnvironment.veryActualSituation || CurrentInformationEnvironment.danger {
+			funcID = 13 // спросить, как правильно ответить
+		}else{
+			// случайный выбор инфо-функции
+			funcID = infoFindRundomMentalFunction()
+		}
 	}
+	if EvolushnStage > 4 {
+		if isIdleness() { // ЛЕНЬ думать
+			funcID = 13 // спросить, как правильно ответить
+		} else {
+			// случайный выбор инфо-функции
+			funcID = infoFindRundomMentalFunction()
+		}
+	}
+
 
 	if funcID>0 {// есть всегда
 		// создать новое звено типа 4(запуск инфо-функции runMentalFunctionID(funcID))

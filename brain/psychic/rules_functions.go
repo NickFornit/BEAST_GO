@@ -150,11 +150,14 @@ func GetCur10lastRules()string{
 	var out=""
 	for i := 0; i < rCount; i++ {
 		r:=rulesArr[lastrulesID-i]
+		if r.ID == 31{
+			r.ID = 31
+		}
 		out+="ID="+strconv.Itoa(r.ID)+" для <span title='ID дерева автоматизмов'>"+strconv.Itoa(r.NodeAID)+"</span> и <span title='ID дерева понимания'>"+strconv.Itoa(r.NodePID)+"</span> :"
 		for n := 0; n < len(r.TAid); n++ {
 			taa:=TriggerAndActionArr[r.TAid[n]]
 			if taa == nil{
-				out+="<span style='padding:40px;'></span><span style='color:red;' title='Нет образа TriggerAndActionArr "+strconv.Itoa(r.TAid[n])+"'>нет "+strconv.Itoa(r.TAid[n])+"&nbsp;&nbsp;&nbsp;&nbsp;</span>"
+				out+="<span style='padding:40px;'></span><span style='color:red;cursor:pointer' title='Нет образа TriggerAndActionArr (из trigger_and_actions.txt) "+strconv.Itoa(r.TAid[n])+"'>нет Правила с ID="+strconv.Itoa(r.TAid[n])+"&nbsp;&nbsp;&nbsp;&nbsp;</span>"
 				continue
 			}
 			if n>0{

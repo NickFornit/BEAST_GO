@@ -148,7 +148,14 @@ if len(res)<2{// пустой не пускать
 
 	lib.SentActionsForPult(out)
 
-	isTeachQuestion=false
+	if isTeachQuestion {
+		isTeachQuestion = false
+		/* нужно погасить попугайский автоматизм, созданный для вопроса, чтобы он не возникал при активации дерева
+		а создавался по Правилу в understanding.go на втором уровне осознания.
+		 */
+		am.Usefulness=-1
+		SetAutomatizmBelief(am,0)
+	}
 
 	//выполнить мозжечковый рефлекс сразу после выполняющегося автоматизма
 	runCerebellumAdditionalAutomatizm(0,am.ID)

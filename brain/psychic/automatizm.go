@@ -8,7 +8,7 @@
 сохраняются в карте AutomatizmIdFromPhraseId
 
 Если задается Belief=2, остальные Belief=2 становится Belief=0.
-!!! ПОЭТОМУ ВСЕГДА нужно задавать с помощью setAutomatizmBelief(atmzm *Automatizm,belief int))
+!!! ПОЭТОМУ ВСЕГДА нужно задавать с помощью SetAutomatizmBelief(atmzm *Automatizm,belief int))
 
 Если для прикрепленных к узлу дерева есть карта штатных AutomatizmBelief2FromTreeNodeId,
 то для прикрепленных к образам нужны ФУНКЦИИ ПОЛУЧЕНИЯ ШТАТНОГО ДЛЯ ДАННОГО ОБРАЗА:
@@ -69,7 +69,7 @@ type Automatizm struct {
 	а даст ли такой автоматизм в самом деле обещанное улучшение.
 	Только один из автоматизмов, прикрепленных к ветке, может иметь Belief=2 - проверенное собственное знание
 	Если задается Belief=2, остальные Belief=2 становится Belief=0.
-	!!! ПОЭТОМУ ВСЕГДА нужно задавать с помощью setAutomatizmBelief(atmzm *Automatizm,belief int)
+!!! ПОЭТОМУ ВСЕГДА нужно задавать с помощью SetAutomatizmBelief(atmzm *Automatizm,belief int)
 	*/
 	Belief int // 0 - предположение, 1 - чужие сведения, 2 - проверенное собственное знание
 	/* В случае, если в результате автоматизма его Usefulness изменит знак, то
