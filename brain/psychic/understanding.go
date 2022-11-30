@@ -261,7 +261,7 @@ func consciousness(activationType int,fromNextID int)(bool) {   //  return false
 		if true && !isFirstActivation { //это - не пробуждение false для тестирования
 			// ВТОРОЙ УРОВЕНЬ - попытка использования примитивных Правил
 			if fromNextID == 0 {
-				rules := getSuitableRules()
+				rules := getSuitableRules()// выбрать подходящее Правило
 				if rules > 0 { // по правилу найти автоматизм и запустить его
 					ta := TriggerAndActionArr[rules]
 					purpose := getPurposeGenetic()

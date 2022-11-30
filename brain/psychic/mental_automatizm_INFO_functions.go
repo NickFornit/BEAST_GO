@@ -300,17 +300,17 @@ func mentalSimpleRelexSolution()bool{
 	funcID:=0
 	if EvolushnStage == 4 {
 		if CurrentInformationEnvironment.veryActualSituation || CurrentInformationEnvironment.danger {
-			funcID = 13 // спросить, как правильно ответить
+			funcID = 13 // спросить, как правильно ответить, цикл осмысления прекращается
 		}else{
-			// случайный выбор инфо-функции
+			// случайный выбор инфо-функции - поддержка продолжения цикла осмысления
 			funcID = infoFindRundomMentalFunction()
 		}
 	}
 	if EvolushnStage > 4 {
 		if isIdleness() { // ЛЕНЬ думать
-			funcID = 13 // спросить, как правильно ответить
+			funcID = 13 // спросить, как правильно ответить, цикл осмысления прекращается
 		} else {
-			// случайный выбор инфо-функции
+			// случайный выбор инфо-функции - поддержка продолжения цикла осмысления
 			funcID = infoFindRundomMentalFunction()
 		}
 	}

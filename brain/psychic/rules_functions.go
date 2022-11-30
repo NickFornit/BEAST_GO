@@ -192,7 +192,6 @@ func GetCur10lastRules()string{
 */
 func getSuitableRules()(int){
 
-
 // попытка срочно найти действие, в опасной ситуации
 	if CurrentInformationEnvironment.veryActualSituation || CurrentInformationEnvironment.danger{
 		rID,exact := getRulesArrFromTrigger(curActiveActionsID,true)
@@ -240,7 +239,7 @@ func getRulesArrFromTrigger(trigger int,veryActualSituation bool)(int,int){
 	}
 
 	//// не найдено для точного совпадения условий
-	// смотрим тоолько для условий дерева автоматизмов
+	// смотрим только для условий дерева автоматизмов
 	rulesID,exact=searchingRules(trigger,rImg,1)
 	if rulesID>0 { // не найдено для точного совпадения условий
 		return rulesID,exact
@@ -613,7 +612,7 @@ func getBeastIDRulesFromCondA(NodeAID int)int {
 		effect:=getDominantEffect(r.Trigger, r.Action)
 		oldRes=nil
 		for i := 0; i < len(rules); i++ {
-			if rules[i].rulesID==r.ID{
+			if rules[i].rulesID==r.ID{// для одинаковых Правил суммируем эффекты
 				oldRes=&rules[i]
 				rules[i].rulesID=r.ID
 				rules[i].sumEffect+=effect

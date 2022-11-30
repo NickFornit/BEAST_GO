@@ -272,6 +272,7 @@ func WaitingPeriodForActions()(bool,int){
 res - стали лучше или хуже: величина измнения от -10 через 0 до 10
 wellIDarr - стали лучше следующие г.параметры []int гоменостаза
 */
+var CurrentMoodCondition=0 // индикация на Пульте
 func wasChangingMoodCondition(kind int)(int,int,[]int){
 	//стало хуже или лучше теперь, возвращает величину измнения от -10 через 9 до 10
 	res0,res,wellIDarr:=gomeostas.BetterOrWorseNow(kind)
@@ -284,6 +285,10 @@ func wasChangingMoodCondition(kind int)(int,int,[]int){
 	if lib.ExistsValInArr(aArr, 4){// Поощрить
 		res0=5
 	}
+	if res0>0{	CurrentMoodCondition=3	}//лучше
+	if res0==0{	CurrentMoodCondition=2	}// не изменилось
+	if res0<0{	CurrentMoodCondition=1	}// Хуже
+
 	return res0,res,wellIDarr
 }
 /////////////////////////////////////////////////////////////////////////

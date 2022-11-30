@@ -129,7 +129,8 @@ func receiveSend(resp http.ResponseWriter, r *http.Request) {
 					"#|#" + strconv.Itoa(brain.LifeTime) +
 					"#|#" + reflexes.NoUnconditionRefles +
 					"#|#" + waitingPeriod +
-					"#|#" + psichicReady
+					"#|#" + psichicReady +
+					"#|#" + strconv.Itoa(psychic.CurrentMoodCondition)
 				brain.IsPultActivnost = false
 
 				_, _ = fmt.Fprint(resp, outStr)
