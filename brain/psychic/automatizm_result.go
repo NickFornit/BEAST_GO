@@ -313,10 +313,13 @@ func wasChangingMoodCondition(kind int)(int,int,[]int){
 		}
 	}//	if curActiveActions !=nil {
 
-	// для Пульта
+	// для страницы Пульта
 	if res0>0{	CurrentMoodCondition=3	}//лучше
 	if res0==0{	CurrentMoodCondition=2	}// не изменилось
 	if res0<0{	CurrentMoodCondition=1	}// Хуже
+
+	// для лога
+	lib.WritePultConsol("Изменение состояния: "+strconv.Itoa(res0))
 
 	/* понятно, что компоненты эффекта res0 могут суммироваться и нейтрализовываться, тут ничего не сделашь...
 

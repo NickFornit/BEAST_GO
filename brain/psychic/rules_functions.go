@@ -42,7 +42,7 @@ func fixNewRules(lastCommonDiffValue int) int {
 	}
 
 	answer:=LastAutomatizmWeiting.ActionsImageID// ответный образ действий Beast
-	// не записывать Правило с curActiveActionsID==answer
+	// не записывать Правило с curActiveActionsID==answer, например, попугайство просьбы показать как нужно
 	if answer == 0  || ActionsImageArr[answer]==nil  || curStimulImageID==answer{
 		return 0}
 

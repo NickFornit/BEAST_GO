@@ -292,7 +292,7 @@ func formingUnderstandingBranch(fromID int,lastLevel int,condArr []int)(int){
 
 	lastNodeID:=addNewUnderstandingBranchFromNodes(lastLevel,condArr,lastNode)
 	if lastNodeID>0{
-		SaveUnderstandingTree()
+		// SaveUnderstandingTree() // сохранять в общем порядке, при закрытии и по времени сохранения
 	}
 	return lastNodeID
 }
