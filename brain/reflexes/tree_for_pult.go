@@ -11,7 +11,7 @@ import (
 	"strconv"
 )
 
-// образ дерева рефлексов для вывода
+// образ дерева рефлексов для вывода  на Пульт
 var reflesTreeModel = ""
 
 func GetReflexesTreeForPult() string {

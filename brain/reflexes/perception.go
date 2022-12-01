@@ -162,7 +162,7 @@ func ActiveFromConditionChange() {
 	psychic.WasConditionsActiveted =false
 }
 
-// активировать дерево действием reflexes.ActiveFromAction()
+// активировать дерево атовматизмов действием reflexes.ActiveFromAction()
 func ActiveFromAction() {
 	if activetedPulsCount == ReflexPulsCount { // ждет следующего пульса
 		return

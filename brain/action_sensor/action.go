@@ -82,7 +82,7 @@ func GetActionNameFromID(id int)string{
 	return out
 }
 
-/* акция с пульта
+/* акция с кнопок пульта
 сопровождается гомеостатическими эффектами GomeostazActionEffectArr =make(map[int]string)
  */
 var FoodPortionForEnergi = 0
@@ -154,7 +154,7 @@ func DeactivationTriggersContext(){
 	}
 }
 
-// какие акции действуют в данный момент действий с пульта - активные контексты действий с Пульта
+// какие акции действуют в данный момент действий с пульта - активные контексты действий с Пульта Очищаются
 func CheckCurActions()[]int{
 	var aArr[]int
 	for i := 1; i < 18; i++ {
@@ -168,7 +168,7 @@ func CheckCurActions()[]int{
 	return aArr
 }
 
-// какие сохраненные акции действуют в данный момент пульса - активные контексты действий с Пульта
+// какие сохраненные акции действуют в данный момент пульса - активные контексты действий с Пульта НЕ очищаются, сохраняя контекст
 func CheckCurActionsContext()[]int{
 	var aArr[]int
 	for i := 1; i < 18; i++ {
