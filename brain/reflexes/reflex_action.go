@@ -202,7 +202,7 @@ func todoAction(out string) {
 	lib.SentActionsForPult(out)
 }
 
-/* Блокировка рефлексотрных действий из Психики или во сне */
+/* Блокировка рефлексорных действий из Психики или во сне */
 func IsBlockingMotorsAction() bool {
 	notAllow1 := psychic.NotAllowReflexesAction()
 	notAllow2 := sleep.NotAllowReflexesAction()

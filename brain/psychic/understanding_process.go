@@ -238,6 +238,7 @@ createNewlastImportanceID(0, detectedActiveLastNodPrevID, detectedActiveLastUnde
 }
 ///////////////////////////////////////////////////////
 
+// учесть эффект достижения ментальной цели TODO ИМЕННО ПО ЦЕЛИ, А НЕ ПО ГОМЕО_ЭФФЕКТУ!!!!
 func getMentalEffect(effect0 int)int{
 	/* улучшилось ли положение с учетом текущего PurposeImage 4-го узла ветки понимания?
 	currentUnderstandingActivedNodes[]*UnderstandingNode // начиная с конечного к первому

@@ -14,7 +14,7 @@ import (
 /////////////////////////////////////////////////////////////
 
 
-/* Создать новый узел дерева автоматизма.
+/* Создать новый узел дерева автоматизма, если такого еще нет.
 Формат записи:
 ID|ParentNode|BaseID|EmotionID|ActivityID|ToneMoodID|SimbolID|VerbalID
 
@@ -149,7 +149,7 @@ func createNulLevelAutomatizmTree(rt *AutomatizmNode){
 	return
 }
  */
-/////////////////////////////////////
+//сохранить в файле дерево автоматизмов
 func SaveAutomatizmTree(){
 	notAllowScanInTreeThisTime = true
 	var out=""

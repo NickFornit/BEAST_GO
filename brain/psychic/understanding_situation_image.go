@@ -40,6 +40,7 @@ var SituationImageFromIdArr=make(map[int]*SituationImage)
 /////////////////////////////////
 
 
+//создать образ ситуации, если такого еще нет
 var lastSituationImageID=0
 func createSituationImage(id int,autmzmTreeNodeID int,SituationType int,CheckUnicum bool)(int,*SituationImage){
 	if EvolushnStage < 4 { // только со стадии развития 4

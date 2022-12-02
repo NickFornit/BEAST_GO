@@ -24,6 +24,10 @@ func prepareWordArr(){
 if EvolushnStage>3 {
 	// обработка эпизодической памяти
 
+	//бъекты PurposeGeneticObject накапливаются в оперативке и удаляются во сне
+
+	// объекты внимания, имеющую высокую значимость importanceObjectID
+
 
 	// обработка кратковременной памяти во сне или бездействии
 	psychic.ShortTermMemoryProcessing()

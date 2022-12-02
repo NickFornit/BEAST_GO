@@ -175,6 +175,7 @@ func consciousness(activationType int,fromNextID int)(bool) {   //  return false
 			indexA:=getTopAttentionObject(curImportanceObjectArr)// - индекс объекта внимания
 			if indexA>0{//выбран curImportanceObjectArr[indexA]
 				extremImportanceObject = &curImportanceObjectArr[indexA]
+				importanceObjectID=append(importanceObjectID,extremImportanceObject)
 			}
 		}
 		if activationType==2 {// субъективный цикл

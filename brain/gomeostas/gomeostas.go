@@ -213,7 +213,7 @@ var IsLevelBeginParam5 = false  // true - уровень развития для
 // сколько Beast уже съел и нужно превратить в энергию (сразу писать нельзя из-за паники: "concurrent map read and map write")
 var FoodPortionEaten=0
 
-// состояние гомеостаза
+// скорректировать текущее состояние гомеостаза
 func gomeostazUpdate() {
 	if NotAllowSetGomeostazParams { return }
 	if FoodPortionEaten > 0 { // Beast съел порцию, нужно переварить в энергию
@@ -329,7 +329,7 @@ func gomeostazUpdate() {
 	} else { parMaxPulsCount[3] = 0 }
 }
 
-// Сохрнаить значения параметров гомеостаза в файл
+// Сохрнаить значения параметров гомеостаза в файле
 func SaveCurrentGomeoParams() {
 	if len(GomeostazParams) < 7 { return }
 	var fStr =

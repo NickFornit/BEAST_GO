@@ -43,6 +43,7 @@ actions string
 var geneticReflexesStr = make(map[int]*geneticReflexStr)
 var lastGeneticReflexID = 0
 
+//создание нового безусловного рефлекса, если такого еще нет.
 func CreateNewGeneticReflex(id int, lev1 int, lev2 []int, lev3 []int, ActionIDarr []int,CheckUnicum bool) (int, *GeneticReflex) {
 	// посмотреть, если рефлекс с такими же условиями уже есть
 	if CheckUnicum {
@@ -85,6 +86,7 @@ func compareUnicum(lev1 int, lev2 []int, lev3 []int) (int, *GeneticReflex) {
 // P.S. безусловные рефлексы создаются в редакторе и поэтому здесь нет функции их сохранения.
 // а только загрузка имеющихся в формате ID|lev1|lev2_1,lev2_2,...|lev3_1,lev3_2,...|actin_1,actin_2,...:
 
+//загрузка безусловных рефлексов из файла хранения
 func loadGeneticReflexes() {
 	path := lib.GetMainPathExeFile()
 	lines, _ := lib.ReadLines(path + "/memory_reflex/dnk_reflexes.txt")

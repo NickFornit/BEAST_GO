@@ -97,7 +97,7 @@ func checkUnicumMentalActionsImages(typeID int,valID int)(int,*MentalActionsImag
 
 
 
-//////////////////// сохранить образы сочетаний ответных действий
+//////////////////// сохранить образы сочетаний ментальных действий
 // ID|activateBaseID|activateEmotion|activatePurpose|activateInfoFunc|activateMotorID|
 func SaveMentalActionsImagesArr(){
 	var out=""
@@ -110,7 +110,7 @@ func SaveMentalActionsImagesArr(){
 	lib.WriteFileContent(lib.GetMainPathExeFile()+"/memory_psy/action_images_mental.txt",out)
 
 }
-////////////////////  загрузить образы сочетаний ответных действий
+////////////////////  загрузить образы сочетаний ментальных действий
 func loadMentalActionsImagesArr(){
 	MentalActionsImagesArr=make(map[int]*MentalActionsImages)
 	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_psy/action_images_mental.txt")

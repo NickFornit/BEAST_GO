@@ -296,7 +296,8 @@ func commonPerceptionNow() {
 	return
 }
 
-/* вызывается из психики res:=gomeostas.BetterOrWorseNow()
+/* Стало лучше или хуже теперь - эффект результата действия.
+Вызывается из психики res:=gomeostas.BetterOrWorseNow()
 Сканируется с каждым пульсом в func automatizmActionsPuls() во время ожидания
 CommonMoodAfterAction - "+" действия оператора привели к позитиву, "-" к негативу
 ВОЗВРАЩАЕТ:

@@ -41,7 +41,7 @@ func SincroTic(){
 ////////////////////////////////
 
 
-
+//водитель ритма пульса
 var IsPultActivnost = false	// начало активности с Пульта  brain.IsPultActivnost=true brain.IsPultActivnost=false
 func Puls() {
 	if blockinfP>0{// не запускать генеретор пульса в этот раз - синхронизация из Пульта
@@ -57,7 +57,7 @@ func Puls() {
 		Puls()
 	})
 }
-////////////////////////////////////////////////
+// действия, совершаемые по каждому пульсу
 func pulsActions(){
 	// сканирование состояния (пульс):
 	//now := time.Now()

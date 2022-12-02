@@ -56,7 +56,7 @@ var VerbalFromIdArr=make(map[int]*Verbal)
 //var VerbalFromPhraseIdArr=make(map[int]*Verbal)
 ///////////////////////////////////////////
 
-// создать образ сочетаний пусковых стимулов
+// создать новый вербальный образ, если такого еще нет
 //В случае отсуствия пусковых стимулов создается ID такого отсутсвия, пример такой записи: 2|||0|0| - ID=2
 var lastVerbalID=0
 func createNewlastVerbalID(id int,SimbolID int,PhraseID []int,ToneID int,MoodID int,CheckUnicum bool)(int,*Verbal){
@@ -134,7 +134,7 @@ func CreateVerbalImage(FirstSimbolID int,PhraseID []int,ToneID int,MoodID int)(i
 
 /////////////////////////////////////////
 
-//////////////////// сохранить образы сочетаний пусковых стимулов
+//////////////////// сохранить вербальные образы
 //В случае отсуствия пусковых стимулов создается ID такого отсутсвия, пример такой записи: 2|||0|0|
 func SaveVerbalFromIdArr(){
 	var out=""
@@ -152,7 +152,7 @@ func SaveVerbalFromIdArr(){
 	lib.WriteFileContent(lib.GetMainPathExeFile()+"/memory_psy/verbal_images.txt",out)
 
 }
-////////////////////  загрузить образы сочетаний пусковых стимулов
+////////////////////  загрузить вербальные образы
 func loadVerbalFromIdArr(){
 	VerbalFromIdArr=make(map[int]*Verbal)
 	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_psy/verbal_images.txt")
@@ -286,8 +286,6 @@ return out
 /////////////////////////////////////////////////////
 
 
-
-// ПРОИЗВОЛЬНОЕ ТВОРЕНИЕ ФРАЗ
 
 
 /* сделать фразу PhraseID из wordID []

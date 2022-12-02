@@ -73,7 +73,7 @@ var goNextFromUnderstandingNodeIDArr=make(map[int][]*goNext)
 
 
 ////////////////////////////////////////////////
-/* начать новую цепочку
+/* начать новое звено цепочки размышления
 Возвращает новый *goNext
  */
 func createNewNextFromUnderstandingNodeID(UnderstandingNodeID int,

@@ -41,7 +41,7 @@ func TriggerAndActionInit(){
 
 
 ////////////////////////////////////////////////
-// создать новое сочетание ответных действий если такого еще нет
+// создать новый образ правила если такого еще нет
 var lastTriggerAndActionID=0
 func createNewlastTriggerAndActionID(id int,Trigger int,Action int,Effect int,CheckUnicum bool)(int,*TriggerAndAction){
 	if Effect<0{Effect=-1}
@@ -99,8 +99,7 @@ func checkUnicumTriggerAndAction(Trigger int,Action int,Effect int)(int,*Trigger
 
 
 
-//////////////////// сохранить Образы стимула (действий оператора) - ответа Beast
-//В случае отсуствия ответных действий создается ID такого отсутсвия, пример такой записи: 2|||0|0|
+//////////////////// сохранить Образы правил
 // ID|ActID через ,|PhraseID через ,|ToneID|MoodID|
 func SaveTriggerAndActionArr(){
 	var out=""
@@ -114,7 +113,7 @@ func SaveTriggerAndActionArr(){
 	lib.WriteFileContent(lib.GetMainPathExeFile()+"/memory_psy/trigger_and_actions.txt",out)
 
 }
-////////////////////  загрузить образы стимула (действий оператора) - ответа Beast
+////////////////////  загрузить образы правил
 // ID|ActID через ,|PhraseID через ,|ToneID|MoodID|
 func loadTriggerAndActionArr(){
 	TriggerAndActionArr=make(map[int]*TriggerAndAction)
