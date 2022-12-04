@@ -41,7 +41,7 @@ func TriggerAndActionInit(){
 
 
 ////////////////////////////////////////////////
-// создать новое сочетание ответных действий если такого еще нет
+// создать новое правило если такого еще нет
 var lastTriggerAndActionID=0
 func createNewlastTriggerAndActionID(id int,Trigger int,Action int,Effect int,CheckUnicum bool)(int,*TriggerAndAction){
 	if Effect<0{Effect=-1}

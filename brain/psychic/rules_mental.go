@@ -45,7 +45,7 @@ func rulesMentalInit(){
 
 
 ////////////////////////////////////////////////
-// создать новое сочетание ответных действий если такого еще нет
+// создать новое ментальное правило если такого еще нет
 var lastrulesMentalID=0
 var isNotMentLoading=true
 func createNewRulesMentalID(id int,NodeAID int,NodePID int,TAid []int,CheckUnicum bool)(int,*rulesMental){

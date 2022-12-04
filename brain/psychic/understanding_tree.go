@@ -103,7 +103,7 @@ var preEmotionID=0
 var prePurposeID=0
 
 
-/* Активация дерева ментальных автоматизмов происходит из:
+/* Активация дерева понимания ситуации происходит из:
 func afterTreeActivation() - при каждой активации automatism_tree.go
 и если было действия без ответа в течении 20 пульсов, то understandingSituation вызывается из
 func noAutovatizmResult()

@@ -69,8 +69,8 @@ func PsychicInit(){
 	ImportanceInit()
 	loadSituationImage()
 	goNextInit()
-	loadMentalActionsImagesArr()
 	rulesMentalInit()
+	MentalActionsImagesInit()// -> loadMentalActionsImagesArr()
 	mentalAutomatizmInit()
 	UnderstandingTreeInit()
 
@@ -241,6 +241,7 @@ func SaveAllPsihicMemory(){
 	SaveMentalTriggerAndActionArr()
 	SavePurposeImageFromIdArr()
 	SaveRulesArr()
+	SaverulesMentalArr()
 	Saveimportance()
 	SavegoNext()
 	saveInterruptMemory()

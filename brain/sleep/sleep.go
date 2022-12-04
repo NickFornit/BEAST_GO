@@ -19,7 +19,7 @@ import (
 var SlipPulsCount=0 // передача тика Пульса из brine.go
 var LifeTime=0
 var EvolushnStage=0  // стадия развития
-// коррекция текущего состояния гомеостаза и базового контекста с каждым пульсом
+// коррекция текущего состояния с каждым пульсом
 func SleepPuls(evolushnStage int,lifeTime int,puls int){
 	LifeTime=lifeTime
 	EvolushnStage=evolushnStage

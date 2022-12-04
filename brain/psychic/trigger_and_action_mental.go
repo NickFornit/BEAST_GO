@@ -48,14 +48,11 @@ var MentalTriggerAndActionArr=make(map[int]*MentalTriggerAndAction)
 
 //////////////////////////////////////////
 
-// вызывается из psychic.go
-func MentalTriggerAndActionInit(){
-	loadMentalTriggerAndActionArr()
-}
+
 
 
 ////////////////////////////////////////////////
-// создать новое сочетание ответных действий если такого еще нет
+// создать новое ментальное правило если такого еще нет
 var lastMentalTriggerAndActionID=0
 func createNewlastMentalTriggerAndActionID(id int,ShortTermMemoryID []int,Action int,Effect int,CheckUnicum bool)(int,*MentalTriggerAndAction){
 	if Effect<0{Effect=-1}

@@ -565,7 +565,7 @@ func infoFunc9() {
 	infoFindAttentionObjImprovement()
 	currentInfoStructId=9 // определение актуального поля mentalInfo
 }
-// улучшение объекта внимания
+// улучшение значимости объекта внимания
 func infoFindAttentionObjImprovement()bool {
 	setCurIfoFuncID(9)
 	if extremImportanceObject == nil {

@@ -73,7 +73,7 @@ func setImportanceMental(effect int){
 /////////////////////////////////////////////////////
 
 
-
+//Найти наиболее значащие обхекты в данных условиях
 func getGreatestImportance(curActions *ActionsImage)[]extremImportance{
 	var importanceObjectArr []extremImportance
 	if curActions == nil{

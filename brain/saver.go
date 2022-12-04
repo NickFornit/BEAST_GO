@@ -6,6 +6,7 @@ package brain
 import (
 	"BOT/brain/psychic"
 	"BOT/brain/reflexes"
+	termineteAction "BOT/brain/terminete_action"
 	"BOT/brain/words_sensor"
 )
 
@@ -32,6 +33,7 @@ func SaveAll() bool {
 	saveLifeTime() 
 	word_sensor.SaveWordTree()
 	word_sensor.SavePhraseTree()
+	termineteAction.SaveTerminalActons()
 	// сохранение всех файлов по рефлексам
 	reflexes.SaveReflexesAttributes()
 	psychic.SaveAllPsihicMemory()

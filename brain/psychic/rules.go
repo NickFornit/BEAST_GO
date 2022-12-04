@@ -62,7 +62,7 @@ func rulesInit(){
 
 
 ////////////////////////////////////////////////
-// создать новое сочетание ответных действий если такого еще нет
+// создать новое правило если такого еще нет
 var lastrulesID=0
 var isNotLoading=true
 func createNewRules(id int,NodeAID int,NodePID int,TAid []int,CheckUnicum bool)(int,*rules){

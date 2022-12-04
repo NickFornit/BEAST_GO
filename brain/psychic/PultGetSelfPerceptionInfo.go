@@ -12,7 +12,7 @@ import (
 )
 ///////////////////////////////////////
 
-
+// информация самоощущения для Пульта
 func GetSelfPerceptionInfo()(string){
 
 	refreshCurrentInformationEnvironment()

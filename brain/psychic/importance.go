@@ -102,7 +102,7 @@ func ImportanceInit(){
 
 
 ////////////////////////////////////////////////
-// создать новый образ значимости объекта восприятия если такого еще нет
+// создать новый образ значимости Importance если такого еще нет
 var lastImportanceID=0
 var isNotImpLoading=true
 func createNewlastImportanceID(id int,NodeAID int,NodePID int,Type int,ObjectID int,Value int,CheckUnicum bool)(int,*importance){

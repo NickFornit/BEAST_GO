@@ -18,6 +18,8 @@ import (
 /* Создать групповое правило (более одного в цепочке EpisodeMemory.TAid)
 из последнего участка эпизодической памяти объектиынх (EpisodeMemory.Type==0) элеметов.
 limit 5 ограничивает выборку из эпиз.памяти, но она может получться и меньше.
+
+!!! ТУТ вызов ОБЪЕКТИВНЫХ ПРАВИЛ getLastRulesSequenceFromEpisodeMemory !!!???
 */
 func GetMentalRulesFromEpisodeMemory(){  // НЕ ПРИМЕНЕНО
 	rImg:=getLastRulesSequenceFromEpisodeMemory(1,5)
@@ -163,6 +165,8 @@ func getSuitableMentalRulesСarefully()(int){
 Возвращает:
 1 - ID Правила
 2 - index эпиз.памяти с таким Правилом
+
+!!?? тут вызов getLastRulesSequenceFromEpisodeMemory ДЛЯ ОБЪЕКТИВНЫХ ПРАВИЛ
  */
 func getMentalRulesFromEpisodicsSlice(limit int,maxSteps int)(int,int){
 
@@ -242,6 +246,7 @@ mentalID - saveFromNextIDAnswerCicle []int
 Возвращает:
 1 - ID Правила
 2 - неуверенность нахождения: 0 - макисмальная уваеренность, чем ниже, тем неопределеннее
+!!! ТУТ вызов ОБЪЕКТИВНЫХ ПРАВИЛ getLastRulesSequenceFromEpisodeMemory !!!???
 */
 func getMentalRulesArrFromTrigger(mentalID []int)(int,int) {
 	// сначала попробовать найти Правило с учетом тематического контекста

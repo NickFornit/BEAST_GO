@@ -84,7 +84,7 @@ func createAndRunAutomatizmFromPurpose(purpose *PurposeGenetic)(*Automatizm){
 	return runAutomatizmFromPurpose(atmzm, purpose)
 }
 //////////////////////////////////////////////////////////
-
+//запуск автоматизма на выполнение с сохранением текущего состоняия гомеостатической цели в savePurposeGenetic
 func runAutomatizmFromPurpose(atmzm *Automatizm, purpose *PurposeGenetic)(*Automatizm){
 	// запустить автоматизм
 	if RumAutomatizm(atmzm) {

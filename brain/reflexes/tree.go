@@ -360,4 +360,5 @@ func SaveReflexesAttributes() {
 	SaveTriggerStimulsArr()
 	saveReflexTree()
 	SaveConditionReflex()
+	SaveGeneticReflexes()
 }
