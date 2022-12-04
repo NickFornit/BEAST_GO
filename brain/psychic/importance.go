@@ -93,8 +93,7 @@ var importanceFromID=make(map[int]*importance)
 var importanceConditinArr=make(map[string] []*importance)// Массив значимостей при данном условии
 
 
-//объекты внимания, имеющую высокую значимость, не сохраняются в памяти и гасятки во сне
-var importanceObjectID []*extremImportance
+/////////////////////////////////////////////////
 ///////////////////////////////////////////
 // вызывается из psychic.go
 func ImportanceInit(){

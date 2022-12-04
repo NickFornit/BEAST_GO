@@ -41,7 +41,7 @@ func cerebellumReflexInit() {
 // последний ID рефлексов мохжечка
 var lastCRid = 0
 
-// создать новый автоматизм  для мозжечкового рефлекса
+// создать новый автоматизм
 // В случае отсуствия автоматизма создается ID такого отсутсвия, пример такой записи: 2|||0|0| - ID=2
 func createNewCerebellumReflex(id int, typeAut int, sourceAutomatizmID int,CheckUnicum bool)(int, *cerebellumReflex){
 	if CheckUnicum {

@@ -83,7 +83,7 @@ func newEpisodeMemory(rulesID int,kind int)(*EpisodeMemory){
 }
 
 
-// создать новый кадр памяти
+// создать новый образ сочетаний действий, если такого еще нет
 func createEpisodeMemoryFrame(NodeAID int,NodePID int,rulesID int,lifeTime int,Type int)(*EpisodeMemory){
 
 	var node EpisodeMemory
@@ -120,7 +120,7 @@ func saveEpisodicMenory(){
 }
 ///////////////////////////////////////////
 
-// загрузка эпизодической памяти
+// запись эпизодической памяти
 func loadEpisodicMenory(){
 	EpisodeMemoryObjects=nil
 	strArr,_:=lib.ReadLines(lib.GetMainPathExeFile()+"/memory_psy/episod_memory.txt")

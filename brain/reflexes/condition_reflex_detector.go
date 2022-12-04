@@ -21,7 +21,7 @@ import (
 	"strings"
 )
 
-/* есть ли условный рефлекс при активации дерева в tree_activation.go */
+/* есть ли условный рефлекс для активного узла дерева рефлексов */
 func conditionRexlexFound(cond []int) bool {
 	if cond == nil || len(cond) == 0 { return false	}
 	reflex := getRightConditionReflexesFrom3(cond[0])

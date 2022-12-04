@@ -38,7 +38,7 @@ func ActionsImageInit(){
 
 
 ////////////////////////////////////////////////
-// создать новое сочетание совокупного образа действий (оператора или Beast) если такого еще нет
+// создать новое сочетание ответных действий если такого еще нет
 var lastActionsImageID=0
 func CreateNewlastActionsImageID(id int,ActID []int,PhraseID []int,ToneID int,MoodID int,CheckUnicum bool)(int,*ActionsImage){
 	if CheckUnicum {

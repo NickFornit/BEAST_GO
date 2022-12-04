@@ -55,7 +55,7 @@ func MentalTriggerAndActionInit(){
 
 
 ////////////////////////////////////////////////
-// создать новый образы ментального правила, если такого еще нет
+// создать новое сочетание ответных действий если такого еще нет
 var lastMentalTriggerAndActionID=0
 func createNewlastMentalTriggerAndActionID(id int,ShortTermMemoryID []int,Action int,Effect int,CheckUnicum bool)(int,*MentalTriggerAndAction){
 	if Effect<0{Effect=-1}
@@ -113,7 +113,8 @@ func checkUnicumMentalTriggerAndAction(ShortTermMemoryID []int,Action int,Effect
 
 
 
-//////////////////// сохранить образы ментального правила
+//////////////////// сохранить Образы стимула (действий оператора) - ответа Beast
+//В случае отсуствия ответных действий создается ID такого отсутсвия, пример такой записи: 2|||0|0|
 // ID|ActID через ,|PhraseID через ,|ToneID|MoodID|
 func SaveMentalTriggerAndActionArr(){
 	var out=""
@@ -131,7 +132,7 @@ func SaveMentalTriggerAndActionArr(){
 	lib.WriteFileContent(lib.GetMainPathExeFile()+"/memory_psy/trigger_and_actions_mental.txt",out)
 
 }
-////////////////////  загрузить образы ментального правила
+////////////////////  загрузить образы стимула (действий оператора) - ответа Beast
 // ID|ActID через ,|PhraseID через ,|ToneID|MoodID|
 func loadMentalTriggerAndActionArr(){
 	MentalTriggerAndActionArr=make(map[int]*MentalTriggerAndAction)

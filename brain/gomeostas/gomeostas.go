@@ -213,7 +213,7 @@ var IsLevelBeginParam5 = false  // true - уровень развития для
 // сколько Beast уже съел и нужно превратить в энергию (сразу писать нельзя из-за паники: "concurrent map read and map write")
 var FoodPortionEaten=0
 
-// скорректировать текущее состояние гомеостаза
+// корректировка жизненных параметров по каждому пульсу
 func gomeostazUpdate() {
 	if NotAllowSetGomeostazParams { return }
 	if FoodPortionEaten > 0 { // Beast съел порцию, нужно переварить в энергию

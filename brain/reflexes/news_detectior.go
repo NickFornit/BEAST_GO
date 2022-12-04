@@ -82,11 +82,7 @@ func updateNewsConditions(rank int) {
 	if TriggImage == nil { // почему-то нет такого образа пусковых стимулов? а должен быть т.к. при любых событиях с Пульта они записываются
 		return
 	}
-	// есть ли такой TriggerStimulsTemp?
-	_, tempImg := checkUnicumTriggerStimulsTemp(TriggImage.RSarr, TriggImage.PhraseID, TriggImage.ToneID, TriggImage.MoodID)
-	if tempImg == nil {
-		_, tempImg = createNewlastTriggerStimulsTempID(0, TriggImage)
-	}
+		_, tempImg := createNewlastTriggerStimulsTempID(0, TriggImage)
 
 	// должно уже быть не менее 2 событий образования рефлекса
 	// или включен режим IsUnlimitedMode "набивка рабочих фраз без отсеивания мусорных слов"
