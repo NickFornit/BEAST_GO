@@ -59,6 +59,9 @@ func setCurIfoFuncID(infofID int){
 	functionsInThisCickles=append(functionsInThisCickles,infofID)
 }
 
+// в прошлом объективной активации был запущен автоматизм, так что не нужно прерывать размышление
+var isNormalRunAutomatimsInPreActive=false
+
 ///////////////////////////////////////////////////////////
 
 
@@ -102,6 +105,8 @@ func consciousness(activationType int,fromNextID int)(bool) {   //  return false
 // ТЕСТИРОВАНИЕ РАЗНЫХ ФУНКЦИЙ
 //		if infoMirroringStimul() {	return true	}
 
+		isNormalRunAutomatimsInPreActive=false
+
 
 		isActivationType2 = false
 		//
@@ -128,8 +133,10 @@ func consciousness(activationType int,fromNextID int)(bool) {   //  return false
 
 	var stopMentalWork=false
 	if activationType == 1 && isActivationType2{// объективная активация
-		// нужно прервать выполнение циклов субъективныъ активаций
-		stopMentalWork=true
+		if !isNormalRunAutomatimsInPreActive {
+			// нужно прервать выполнение циклов субъективныъ активаций
+			stopMentalWork = true
+		}
 	}
 
 
@@ -223,6 +230,10 @@ func consciousness(activationType int,fromNextID int)(bool) {   //  return false
 							infoFunc6()
 							//mentalInfoStruct.notOldAutomatizm true - НЕ позволить запустить рвущийся на выполнение старый автоматизм
 							if !mentalInfoStruct.notOldAutomatizm {
+								isNormalRunAutomatimsInPreActive=true
+								//Мышление не прерывается если нормально выполняются штатные автоматизмы
+								reloadConsciousness(fromNextID)// перезапуск осмысления
+
 								//можно без опаски выполнять штатный автоматизм
 								return false //Эпиз.память не пишется. При опасности - состояние аффекта.
 							} // если нет - далее искать альтернативу
@@ -271,6 +282,9 @@ func consciousness(activationType int,fromNextID int)(bool) {   //  return false
 						purpose.actionID = ai
 						atmzm := createAndRunAutomatizmFromPurpose(purpose)
 						if atmzm != nil {
+							isNormalRunAutomatimsInPreActive=true
+							//Мышление не прерывается если нормально выполняются штатные автоматизмы
+							reloadConsciousness(fromNextID)// перезапуск осмысления
 							return true // заблокирвать более низкоуровневое
 						}
 					}
