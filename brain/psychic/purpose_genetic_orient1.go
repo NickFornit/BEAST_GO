@@ -10,7 +10,7 @@ package psychic
 import "BOT/brain/gomeostas"
 
 /* Определение Цели в данной ситуации - на уровне наследственных функций
-Здесь выбирается действие пробного автоматизма из выполнившегося рефлекса actualRelextActon.
+Здесь getPurposeGenetic2AndRunAutomatizm.
 */
 func getPurposeGeneticAndRunAutomatizm()*Automatizm {
 	purpose:=getPurposeGenetic()// выбираются наиболее подходящие действия для автоматизмаы

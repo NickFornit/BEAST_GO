@@ -34,29 +34,9 @@ func getPurposeGenetic2AndRunAutomatizm(atmtzmID int)(*Automatizm){
 	if purpose.veryActual{// нужно ли вообще шевелиться?
 
 if newsRes{// повышенная опасность от оператора
-	if purpose.veryActual{
 		// срочность и важность ситуации: если очень срочно и важно - просто оставить имеющийся автоматизм
 		runAutomatizmFromPurpose(atmzm, purpose)
 		return atmzm
-	}else{//....................................... не очень актуально
-		// проверенный и хороший автоматизм не трогать
-		if  atmzm.Belief == 2 && atmzm.Usefulness>0{
-			//просто выполнить автоматизм и отслеживать последствия
-			runAutomatizmFromPurpose(atmzm, purpose)
-			return atmzm
-		}
-	}
-		// плохой автоматизм, попробовать оптимизировать с помощью рефлексов МОЗЖЕЧКА
-		if atmzm.Usefulness < 0{
-			// была ли уже оптимизация?
-			if cerebellumCoordination(atmzm,0){
-				runAutomatizmFromPurpose(atmzm, purpose)
-				return atmzm
-			}else{
-	// просто не выполнять плохой автоматизм, раз что-то не так с рефлексами мозжечка
-	return nil
-}
-		}
 
 //if newsRes{// повышенная опасность от оператора
 }else {
@@ -82,18 +62,30 @@ if oldNodeAutomatizm != atmzm.ID{
 }
 //if purpose.veryActual
 }else{// нет опасности и нет опасной новизны
+		if newsRes { // повышенная опасность от оператора
+			// срочность и важность ситуации: если очень срочно и важно - просто оставить имеющийся автоматизм
+			runAutomatizmFromPurpose(atmzm, purpose)
+			return atmzm
+		}
+
 		// плохой автоматизм,
 		if atmzm.Usefulness < 0 {
-			if gomeostas.BaseContextActive[2] || gomeostas.BaseContextActive[3] { // активен Поиск или Игра
-				// тупо метод тыка
-				// Тупо поэкспериментировать для пополнения опыта (не)удачных автоматизмов
-				// TODO !не проверено!
-				// в отличии от createAndRunAutomatizmFromPurpose(purpose) не использовать текущие рефлексы, а пробовать всякое
-				// Выдавая это на стадии 3, тварь получает реакцию оператора, которую отзеркаливает
-				atmzm := findAnySympleRandActions()
+			// была ли уже оптимизация?
+			if cerebellumCoordination(atmzm,0){
+				runAutomatizmFromPurpose(atmzm, purpose)
 				return atmzm
-			} else { // НЕ ИГРА  И НЕ ПОИСК, плохой автоматизм просто не выполнять
-				return nil
+			}else {
+				if gomeostas.BaseContextActive[2] || gomeostas.BaseContextActive[3] { // активен Поиск или Игра
+					// тупо метод тыка
+					// Тупо поэкспериментировать для пополнения опыта (не)удачных автоматизмов
+					// TODO !не проверено!
+					// в отличии от createAndRunAutomatizmFromPurpose(purpose) не использовать текущие рефлексы, а пробовать всякое
+					// Выдавая это на стадии 3, тварь получает реакцию оператора, которую отзеркаливает
+					atmzm := findAnySympleRandActions()
+					return atmzm
+				} else { // НЕ ИГРА  И НЕ ПОИСК, плохой автоматизм просто не выполнять
+					return nil
+				}
 			}
 		}
 

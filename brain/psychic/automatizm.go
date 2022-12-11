@@ -194,7 +194,6 @@ func CreateAtutomatizmNoSaveFile(BranchID int, ActionsImageID int)(int, *Automat
 // В случае отсуствия пусковых стимулов создается ID такого отсутсвия, пример такой записи: 2|||0|0|
 func SaveAutomatizm() {
 	var out = ""
-
 	for k, v := range AutomatizmFromIdArr {
 		out += strconv.Itoa(k) + "|"
 		out += strconv.Itoa(v.BranchID) + "|"
