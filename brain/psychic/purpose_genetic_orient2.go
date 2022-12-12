@@ -30,22 +30,17 @@ func getPurposeGenetic2AndRunAutomatizm(atmtzmID int)(*Automatizm){
 
 	// есть ли очень значимые новые признаки?
 	newsRes:=getImportantSigns()
-
-	if purpose.veryActual{// нужно ли вообще шевелиться?
-
-if newsRes{// повышенная опасность от оператора
+	if newsRes { // повышенная опасность от оператора
 		// срочность и важность ситуации: если очень срочно и важно - просто оставить имеющийся автоматизм
 		runAutomatizmFromPurpose(atmzm, purpose)
 		return atmzm
+	}
 
-//if newsRes{// повышенная опасность от оператора
-}else {
-	/* от оператора нет опасности, но высокий purpose.veryActual,
-	нужно выполнить штатный автоматизм, а не придуманный
-	*/
+	if purpose.veryActual{// нужно ли вообще шевелиться?
+	// высокий purpose.veryActual, 	нужно выполнить штатный автоматизм, а не придуманный
 
 	// если в прошлый раз уже был такой автоматизм, то ничего не делать, иначе начинает повторять одно и то же
-if oldNodeAutomatizm != atmzm.ID{
+if oldNodeAutomatizm != atmzm.ID {
 	runAutomatizmFromPurpose(atmzm, purpose)
 	oldNodeAutomatizm = atmzm.ID
 	return atmzm
@@ -59,22 +54,17 @@ if oldNodeAutomatizm != atmzm.ID{
 	purpose.actionID=ActionsImageArr[atmzm.ActionsImageID]
 	runAutomatizmFromPurpose(atmzm, purpose)*/
 	return nil
-}
+
 //if purpose.veryActual
-}else{// нет опасности и нет опасной новизны
-		if newsRes { // повышенная опасность от оператора
-			// срочность и важность ситуации: если очень срочно и важно - просто оставить имеющийся автоматизм
-			runAutomatizmFromPurpose(atmzm, purpose)
-			return atmzm
-		}
+}else {              // нет опасности и нет опасной новизны
 
 		// плохой автоматизм,
 		if atmzm.Usefulness < 0 {
 			// была ли уже оптимизация?
-			if cerebellumCoordination(atmzm,0){
+			if cerebellumCoordination(atmzm, 0) {
 				runAutomatizmFromPurpose(atmzm, purpose)
 				return atmzm
-			}else {
+			} else {
 				if gomeostas.BaseContextActive[2] || gomeostas.BaseContextActive[3] { // активен Поиск или Игра
 					// тупо метод тыка
 					// Тупо поэкспериментировать для пополнения опыта (не)удачных автоматизмов
@@ -89,10 +79,10 @@ if oldNodeAutomatizm != atmzm.ID{
 			}
 		}
 
-//просто выполнить автоматизм и отслеживать последствия
-	runAutomatizmFromPurpose(atmzm, purpose)
-	return atmzm
-}
+		//все нормально, просто выполнить автоматизм и отслеживать последствия
+		runAutomatizmFromPurpose(atmzm, purpose)
+		return atmzm
+	}
 
 	return nil
 }
