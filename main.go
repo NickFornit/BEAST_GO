@@ -622,9 +622,8 @@ func init() {
 	// 	tools.MakeContextCombinations()
 }
 
-// старт
 func main() {
-	defer closer.Close()
+		defer closer.Close()
 	// для перехвата при завершении программы (использует пакет "BOT/closer" https://github.com/xlab/closer):
 	closer.Bind(cleanupFunc)
 

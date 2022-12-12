@@ -212,7 +212,6 @@ func consciousness(activationType int,fromNextID int)(bool) {   //  return false
 			////////////////////////////// 1 уровень ////////////////////
 			// ПЕРВЫЙ УРОВЕНЬ, самый примитивный уровень:
 			// есть ли штатный мот.автоматизм и нужно ли его менять или задумываться
-			if fromNextID == 0 { // только перед началом цикла
 				mentalInfoStruct.motorAtmzmID = 0 // сброс прежнего значения
 				//НЕТ!!! atmtzm := GetBelief2AutomatizmListFromTreeId(detectedActiveLastNodID)
 				/* учитывается именно тот автоматизм, что рвется на выполнение при активации дерева автоматизмов,
@@ -251,7 +250,6 @@ func consciousness(activationType int,fromNextID int)(bool) {   //  return false
 						*/
 					}
 				}
-			}
 		}
 
 		/*  так нельзя, пусть пишется в automatizm_result.go там где сформировалось Правило!
@@ -271,7 +269,6 @@ func consciousness(activationType int,fromNextID int)(bool) {   //  return false
 		//////////////////////////////// 2 уровень ////////////////////////////
 		if true && !isFirstActivation { //это - не пробуждение false для тестирования
 			// ВТОРОЙ УРОВЕНЬ - попытка использования примитивных Правил
-			if fromNextID == 0 {
 				rules := getSuitableRules()// выбрать подходящее Правило
 				if rules > 0 { // по правилу найти автоматизм и запустить его
 					ta := TriggerAndActionArr[rules]
@@ -288,7 +285,6 @@ func consciousness(activationType int,fromNextID int)(bool) {   //  return false
 							return true // заблокирвать более низкоуровневое
 						}
 					}
-				}
 			}
 			/////////////////////////////////////////////////////////
 		} // конец блокирования для тестирования
