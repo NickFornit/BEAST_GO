@@ -126,6 +126,7 @@ if am.Usefulness<0{
 			detectedActiveLastUnderstandingNodPrevID = detectedActiveLastUnderstandingNodID
 		}
 	}
+	stimulCount=0 //сколько раз был стимул от оператора после последнего запуска Ответа
 
 	var out=""
 	if LastRunMentalAutomatizmPulsCount ==PulsCount { // активность мот.автоматизма в чисде пульсов

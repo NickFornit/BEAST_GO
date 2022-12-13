@@ -46,11 +46,11 @@ var isActivationType2=false
 var currrentFromNextID=0 // текущий fromNextID в текущем запуске consciousness
 
 
-// true - после объективной активации (стимул) был запущен моторный автоматизм и ожидается новый Стимул от оператора.
-var existAnswer = false
+// сколько раз был стимул от оператора после последнего запуска Ответа
+var stimulCount = 0
 // не было моторного ответа на прошлый стимул, а уже последовавл новый
 var isСonfusion=false
-var timeOfLastStimul=0 //время с прошлого Стимула
+var timeOfLastStimul=0 //время с прошлого Стимула от Оператора timeOfLastStimul=PulsCount - curActiveActionsPulsCount
 
 var newMentCickle=true // начало прохода ментального цикла, чтобы не повторять сообщения
 
@@ -110,10 +110,9 @@ func consciousness(activationType int,fromNextID int)(bool) {   //  return false
 
 		isActivationType2 = false
 		//
-		if !existAnswer{//не было моторного ответа на прошлый стимул, а уже последовавл новый
+		if stimulCount > 1{//не было моторного ответа на прошлый стимул, а уже последовавл новый
 			isСonfusion=true
 		}
-		existAnswer = false
 		extremImportanceObject=nil
 		extremImportanceMentalObject=nil
 
@@ -155,7 +154,6 @@ func consciousness(activationType int,fromNextID int)(bool) {   //  return false
 	var limitCickleCountForEvolushnStage4 = 4 // ограничить число циклов для 4-й стадии
 	var limitCickleCountForEvolushnStage5 = 20 // ограничить число циклов для 5-й стадии
 
-	timeOfLastStimul=PulsCount-timeOfLastStimul //время с прошлого Стимула
 	/////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -373,11 +371,12 @@ func consciousness(activationType int,fromNextID int)(bool) {   //  return false
 		///////////////////////////////
 
 		if isСonfusion {
-			if timeOfLastStimul < 1 {
+			/*
+			if timeOfLastStimul < 3 { // 3 пульса установлено для запуска периода ожидания
 				lib.SentСonfusion("Beast не успел обдумать прошлый ответ, а уже есть новый.")
-			}
+			}*/
 			if newMentCickle { // начался новый цикл
-				lib.SentСonfusion("Beast задумался...")
+				lib.SentСonfusion("Beast задумался... Beast не успел обдумать прошлый ответ, а уже есть новый.")
 				newMentCickle = false
 			}
 		}
@@ -431,7 +430,7 @@ func consciousness(activationType int,fromNextID int)(bool) {   //  return false
 						// запуск моторного автоматизма  или объектиный перезапуск (через переактивированные деревья)
 						RunMentalAutomatizm(matmzm)
 						//ментально запущен мот.автоматизм, но можно продолжать размышления
-						existAnswer = true
+
 						/* НЕ ТРЕБУЕТСЯ выход из рекурсивного цикла в understanding_tree.go в блок if detectedActiveLastUnderstandingNodID>0{
 						   Если моторный окажется успешным, то он будет записан штатным для ветки detectedActiveLastUnderstandingNodID.
 						   В func afterWaitingPeriod( будут записаны ментальные Правила.

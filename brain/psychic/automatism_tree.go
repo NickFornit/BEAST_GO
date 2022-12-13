@@ -231,11 +231,12 @@ func automatizmTreeActivation()(int) {
 // образ действий оператора
 	if ActivationTypeSensor >1 {
 		// сохраняем предыдущий Стимул
-		curStimulImage=curActiveActions
-		curStimulImageID=curActiveActionsID
+	curStimulImage=curActiveActions
+	curStimulImageID=curActiveActionsID
 	curActiveActionsID, curActiveActions = CreateNewlastActionsImageID(0, curActions.ActID, curActions.PhraseID, curActions.ToneID, curActions.MoodID, true)
 	curActiveActionsPulsCount=PulsCount
-
+	stimulCount++// сколько раз был стимул от оператора после последнего запуска Ответа
+	timeOfLastStimul=PulsCount - curActiveActionsPulsCount
 	}
 
 	condArr:=getActiveConditionsArr(lev1, lev2, lev3, lev4, lev5, lev6)
