@@ -55,6 +55,7 @@ import (
 Работает в news_detectior.go: if tempImg.Count > 2 - в func updateNewsConditions(rank int)
  */
 var IsUnlimitedMode=0
+var NoWarningCreateCondRef = false // true - не выдавать сообщение о новом условном рефлексе
 
 func initConditionReflex() {
 	loadConditionReflexes()
@@ -131,6 +132,9 @@ func CreateNewConditionReflex(id int, lev1 int, lev2 []int, lev3 int, ActionIDar
 
 	ConditionReflexes[id] = &newW
 	ConditionReflexesFrom3[lev3] = append(ConditionReflexesFrom3[lev3],&newW)
+	if !NoWarningCreateCondRef {
+		lib.WritePultConsol("Создан новый условный рефлекс.")
+	}
 	return id, &newW
 }
 
@@ -185,6 +189,7 @@ ID|lev1|lev2 через ,|lev3 типа TriggerStimulsID|ActionIDarr через 
  в отличие от безусловного рефлекссв, а только один ID образа пускового стимула типа TriggerStimulsID
 */
 func loadConditionReflexes() {
+	NoWarningCreateCondRef = true
 	path := lib.GetMainPathExeFile()
 	lines, _ := lib.ReadLines(path + "/memory_reflex/condition_reflexes.txt")
 	for i := 0; i < len(lines); i++ {
@@ -220,6 +225,7 @@ func loadConditionReflexes() {
 		r.lastActivation = lastActivation
 		r.birthTime = birthTime
 	}
+	NoWarningCreateCondRef=false
 	return
 }
 
