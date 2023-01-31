@@ -148,9 +148,10 @@ func baseContextUpdate() {
 	// Определяем текущее сочетания активных базовых контекстов:
 	for i := 1; i < 9; i++ {
 		if BadNormalWell[i] == 2 { // НОРМА
-			diapazoN := getNormaDiapason(i)
+			//diapazoN := getBadDiapazon(i)
 			// правило для данного диапазона
-			rule := GomeostazActivnostArr[i][diapazoN + 1] // +2 из-за 1 и 2 заняты под Хор. и Пл.
+			rule := GomeostazActivnostArr[i][0]
+			//rule := GomeostazActivnostArr[i][diapazoN + 1] // +2 из-за 1 и 2 заняты под Хор. и Пл.
 			// активируем или пассивируем контексты по заданному правилу в http://go/pages/gomeostaz.php
 			activeOrPassiveContext(rule)
 		}
@@ -162,7 +163,9 @@ func baseContextUpdate() {
 		}
 		// перекрывает предыдущее
 		if BadNormalWell[i] == 1 { // ПЛОХО
-			rule := GomeostazActivnostArr[i][0]
+			diapazoN := getBadDiapazon(i)
+			//rule := GomeostazActivnostArr[i][0]
+			rule := GomeostazActivnostArr[i][diapazoN + 1] // +2 из-за 1 и 2 заняты под Хор. и Пл.
 			// активируем или пассивируем контексты по заданному правилу в http://go/pages/gomeostaz.php
 			activeOrPassiveContext(rule)
 		}

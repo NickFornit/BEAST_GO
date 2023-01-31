@@ -51,29 +51,28 @@ func sortingForImpotents() map[int]int {
 	return arr
 }
 
-/* в каком из 5 диапазоне нормы находится Базовый параметр
-0 - это не норма
-1 Норма 0-19%
-2 Норма 20-39%
-3 Норма 40-59%
-4 Норма 60-79%
-5 Норма 80-100%
+/* в каком из 5 диапазоне Плохо находится Жизненный параметр
+1 Плохо 0-19%
+2 Плохо 20-39%
+3 Плохо 40-59%
+4 Плохо 60-79%
+5 Плохо 80-100%
  */
-func getNormaDiapason(pID int) int {
+func getBadDiapazon(pID int) int {
 	gp := int(GomeostazParams[pID])
 	limit := compareLimites[pID] // порог начала критического выхода параметров из нормы
-	if pID == 1 && gp <= limit { return 0 } // для энергии - наоборот
-	if pID > 1 && gp >= limit { return 0 }
-	// для нормы
-	var norm = 0
+	if pID == 1 && gp >= limit { return 0 } // для энергии - наоборот
+	if pID > 1 && gp <= limit { return 0 }
+	// для Плохо
+	var bad = 0
 	if pID == 1 {
-		norm = 100 - limit // остаток параметра вне критического
-		gp = gp - limit // убираем критическую часть
+		bad = limit // остаток параметра вне Норма
 	} else {
-		norm = limit // остаток параметра вне критического
+		bad = 100 - limit // остаток параметра вне Норма
+		gp = gp - limit // убираем Норма
 	}
-	// какой процент составляет gp от norm
-	proc := int((gp * 100) / norm)
+	// какой процент составляет gp от Плохо
+	proc := int((gp * 100) / bad)
 	if proc < 20 { return 1 }
 	if proc < 40 { return 2 }
 	if proc < 60 { return 3 }
